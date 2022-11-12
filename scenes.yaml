@@ -1,0 +1,486 @@
+- id: Z_Estudio Work Sunrise
+  name: Estudio Work Sunrise (Z)
+  entities:
+    light.esphome_bas_sw3_led:
+      supported_color_modes:
+      - brightness
+      friendly_name: esphome bas sw3 led
+      supported_features: 40
+      state: 'off'
+    switch.esphome_bas_sw3:
+      icon: mdi:desk
+      friendly_name: BAS.SW3 Regleta Desk Setup
+      state: 'on'
+    media_player.echo_alexa_estudio:
+      source_list:
+      - Local Speaker
+      - iPhone-AAC
+      is_volume_muted: false
+      media_content_type: standby
+      media_position_updated_at: '2022-09-16T20:15:35.788893+00:00'
+      source: Local Speaker
+      available: true
+      last_called:
+      last_called_timestamp:
+      last_called_summary:
+      connected_bluetooth:
+      bluetooth_list:
+      - iPhone-AAC
+      friendly_name: Echo Alexa Estudio
+      supported_features: 56253
+      volume_level: 0.2
+      state: standby
+    cover.estudio_persiana:
+      device_class: shutter
+      friendly_name: Persiana Estudio
+      supported_features: 15
+      state: open
+    scene.estudio_desk_high:
+      friendly_name: Estudio Desk_High
+      group_name: Estudio
+      group_type: room
+      name: Desk_High
+      speed: 0.6031746031746031
+      brightness: 42.91
+      is_dynamic: false
+      state: '2022-09-16T19:43:22.537745+00:00'
+    media_player.firetv_estudio:
+      friendly_name: FireTV Estudio
+      supported_features: 22961
+      source: YouTube (FireTV)
+      entity_picture: /api/media_player_proxy/media_player.firetv_estudio?token=bbfaf66a2c48f352adbac3377dd2bb37bff0a87986a14bda826971cf836add99&cache=1663359573.333498
+      state: standby
+  icon: mdi:weather-sunset-up
+  metadata:
+    scene.estudio_desk_high:
+      entity_only: true
+- id: '1662220604194'
+  name: Estudio Home Cinema (Z)
+  entities:
+    light.wled_estudio_tv:
+      effect_list:
+      - Android
+      - Aurora
+      - Blends
+      - Blink
+      - Blink Rainbow
+      - Bouncing Balls
+      - Bpm
+      - Breathe
+      - Candle
+      - Candle Multi
+      - Candy Cane
+      - Chase
+      - Chase 2
+      - Chase 3
+      - Chase Flash
+      - Chase Flash Rnd
+      - Chase Rainbow
+      - Chase Random
+      - Chunchun
+      - Colorful
+      - Colorloop
+      - Colortwinkles
+      - Colorwaves
+      - Dancing Shadows
+      - Dissolve
+      - Dissolve Rnd
+      - Drip
+      - Dynamic
+      - Dynamic Smooth
+      - Fade
+      - Fairy
+      - Fairytwinkle
+      - Fill Noise
+      - Fire 2012
+      - Fire Flicker
+      - Fireworks
+      - Fireworks 1D
+      - Fireworks Starburst
+      - Flow
+      - Glitter
+      - Gradient
+      - Halloween
+      - Halloween Eyes
+      - Heartbeat
+      - ICU
+      - Juggle
+      - Lake
+      - Lighthouse
+      - Lightning
+      - Loading
+      - Meteor
+      - Meteor Smooth
+      - Multi Comet
+      - Noise 1
+      - Noise 2
+      - Noise 3
+      - Noise 4
+      - Noise Pal
+      - Oscillate
+      - Pacifica
+      - Palette
+      - Percent
+      - Phased
+      - Phased Noise
+      - Plasma
+      - Police
+      - Popcorn
+      - Pride 2015
+      - Railway
+      - Rain
+      - Rainbow
+      - Rainbow Runner
+      - Random Colors
+      - Ripple
+      - Ripple Rainbow
+      - Running
+      - Running Dual
+      - Saw
+      - Scan
+      - Scan Dual
+      - Scanner
+      - Scanner Dual
+      - Sine
+      - Sinelon
+      - Sinelon Dual
+      - Sinelon Rainbow
+      - Solid
+      - Solid Glitter
+      - Solid Pattern
+      - Solid Pattern Tri
+      - Sparkle
+      - Sparkle Dark
+      - Sparkle+
+      - Spots
+      - Spots Fade
+      - Stream
+      - Stream 2
+      - Strobe
+      - Strobe Mega
+      - Strobe Rainbow
+      - Sunrise
+      - Sweep
+      - Sweep Random
+      - TV Simulator
+      - Tetrix
+      - Theater
+      - Theater Rainbow
+      - Traffic Light
+      - Tri Fade
+      - Tri Wipe
+      - Twinkle
+      - Twinklecat
+      - Twinklefox
+      - Twinkleup
+      - Two Dots
+      - Washing Machine
+      - Wipe
+      - Wipe Random
+      supported_color_modes:
+      - rgb
+      color_mode: rgb
+      brightness: 153
+      hs_color:
+      - 300
+      - 100
+      rgb_color:
+      - 255
+      - 0
+      - 255
+      xy_color:
+      - 0.385
+      - 0.155
+      effect: Gradient
+      icon: mdi:led-strip-variant
+      friendly_name: Led TV Estudio
+      supported_features: 36
+      state: 'on'
+    light.luz_estudio_led_mesa:
+      min_mireds: 153
+      max_mireds: 500
+      supported_color_modes:
+      - color_temp
+      - xy
+      icon: mdi:led-strip-variant
+      friendly_name: Luz Estudio LED Mesa
+      supported_features: 40
+      color_mode: xy
+      brightness: 191
+      hs_color:
+      - 303.962
+      - 83.137
+      rgb_color:
+      - 255
+      - 43
+      - 241
+      xy_color:
+      - 0.4006
+      - 0.1678
+      mode: normal
+      dynamics: none
+      state: 'on'
+    light.luz_estudio_alta:
+      min_mireds: 153
+      max_mireds: 500
+      supported_color_modes:
+      - color_temp
+      - xy
+      icon: mdi:floor-lamp-dual
+      friendly_name: Luz Estudio Alta
+      supported_features: 40
+      color_mode: xy
+      brightness: 255
+      hs_color:
+      - 247.671
+      - 85.882
+      rgb_color:
+      - 64
+      - 36
+      - 255
+      xy_color:
+      - 0.1534
+      - 0.0541
+      mode: normal
+      dynamics: none
+      state: 'on'
+    light.luz_estudio_media:
+      min_mireds: 153
+      max_mireds: 500
+      supported_color_modes:
+      - color_temp
+      - xy
+      icon: mdi:floor-lamp-dual
+      friendly_name: Luz Estudio Media
+      supported_features: 40
+      color_mode: xy
+      brightness: 253
+      hs_color:
+      - 260.941
+      - 100
+      rgb_color:
+      - 89
+      - 0
+      - 255
+      xy_color:
+      - 0.1723
+      - 0.0506
+      mode: normal
+      dynamics: none
+      state: 'on'
+    light.luz_estudio_play_i:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - None
+      - candle
+      - fire
+      supported_color_modes:
+      - color_temp
+      - xy
+      icon: mdi:floor-lamp-torchiere-variant
+      friendly_name: Luz Play Izquierda
+      supported_features: 44
+      color_mode: xy
+      brightness: 191
+      hs_color:
+      - 303.962
+      - 83.137
+      rgb_color:
+      - 255
+      - 43
+      - 241
+      xy_color:
+      - 0.4006
+      - 0.1678
+      effect: None
+      mode: normal
+      dynamics: none
+      state: 'on'
+    light.luz_estudio_play_c:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - None
+      - candle
+      - fire
+      supported_color_modes:
+      - color_temp
+      - xy
+      icon: mdi:floor-lamp-torchiere-variant-outline
+      friendly_name: Luz Play Centro
+      supported_features: 44
+      color_mode: xy
+      brightness: 191
+      hs_color:
+      - 303.962
+      - 83.137
+      rgb_color:
+      - 255
+      - 43
+      - 241
+      xy_color:
+      - 0.4006
+      - 0.1678
+      effect: None
+      mode: normal
+      dynamics: none
+      state: 'on'
+    light.luz_estudio_play_d:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - None
+      - candle
+      - fire
+      supported_color_modes:
+      - color_temp
+      - xy
+      icon: mdi:floor-lamp-torchiere-variant
+      friendly_name: Luz Play Derecha
+      supported_features: 44
+      color_mode: xy
+      brightness: 191
+      hs_color:
+      - 303.962
+      - 83.137
+      rgb_color:
+      - 255
+      - 43
+      - 241
+      xy_color:
+      - 0.4006
+      - 0.1678
+      effect: None
+      mode: normal
+      dynamics: none
+      state: 'on'
+    light.estudio_beer:
+      supported_color_modes:
+      - onoff
+      icon: mdi:light-flood-down
+      friendly_name: Cuadro Beer
+      supported_features: 0
+      state: 'off'
+    light.luz_estudio_nate:
+      effect_list:
+      - None
+      - candle
+      supported_color_modes:
+      - brightness
+      icon: mdi:lightbulb-variant
+      friendly_name: Hue Nate
+      supported_features: 44
+      mode: normal
+      dynamics: none
+      state: 'off'
+    light.luz_estudio_baja:
+      effect_list:
+      - None
+      - candle
+      supported_color_modes:
+      - brightness
+      icon: mdi:floor-lamp-dual
+      friendly_name: Luz Estudio Baja
+      supported_features: 44
+      mode: normal
+      dynamics: none
+      state: 'off'
+    light.luz_estudio_techo:
+      effect_list:
+      - None
+      - candle
+      supported_color_modes:
+      - brightness
+      icon: mdi:ceiling-light
+      friendly_name: Hue Estudio Techo
+      supported_features: 44
+      mode: normal
+      dynamics: none
+      state: 'off'
+    light.luz_estudio_escalera:
+      effect_list:
+      - None
+      - candle
+      supported_color_modes:
+      - brightness
+      icon: mdi:floor-lamp
+      friendly_name: Luz Estudio Escalera
+      supported_features: 44
+      mode: normal
+      dynamics: none
+      state: 'off'
+    light.estudio_lamparita:
+      supported_color_modes:
+      - onoff
+      icon: mdi:lamp-outline
+      friendly_name: Lamparita Estudio
+      supported_features: 0
+      state: 'off'
+    light.luz_estudio_izquierda:
+      effect_list:
+      - None
+      - candle
+      supported_color_modes:
+      - brightness
+      icon: mdi:light-flood-down
+      friendly_name: Luz Estudio Izquierda
+      supported_features: 44
+      mode: normal
+      dynamics: none
+      state: 'off'
+    light.esphome_s26_sw1_led:
+      supported_color_modes:
+      - brightness
+      friendly_name: esphome s26 sw1 led
+      supported_features: 40
+      state: 'off'
+    switch.esphome_s26_sw1:
+      friendly_name: esphome s26 sw1
+      state: 'off'
+    fan.esphome_s26_sw1:
+      friendly_name: esphome s26 sw1
+      supported_features: 0
+      state: 'off'
+    media_player.firetv_estudio:
+      friendly_name: FireTV Estudio
+      supported_features: 22961
+      source: YouTube (FireTV)
+      entity_picture: /api/media_player_proxy/media_player.firetv_estudio?token=bbfaf66a2c48f352adbac3377dd2bb37bff0a87986a14bda826971cf836add99&cache=1663359946.123165
+      source_list:
+      - YouTube (FireTV)
+      - de.cyberdream.firenotifications.amazon
+      - Twitch (FireTV)
+      - Netflix
+      app_id: com.amazon.firetv.youtube
+      state: playing
+  icon: mdi:dolby
+  metadata:
+    light.wled_estudio_tv:
+      entity_only: true
+    light.luz_estudio_led_mesa:
+      entity_only: true
+    light.luz_estudio_alta:
+      entity_only: true
+    light.luz_estudio_media:
+      entity_only: true
+    light.luz_estudio_play_i:
+      entity_only: true
+    light.luz_estudio_play_c:
+      entity_only: true
+    light.luz_estudio_play_d:
+      entity_only: true
+    light.estudio_beer:
+      entity_only: true
+    light.luz_estudio_nate:
+      entity_only: true
+    light.luz_estudio_baja:
+      entity_only: true
+    light.luz_estudio_techo:
+      entity_only: true
+    light.luz_estudio_escalera:
+      entity_only: true
+    light.estudio_lamparita:
+      entity_only: true
+    light.luz_estudio_izquierda:
+      entity_only: true

@@ -1,0 +1,38 @@
+# Generic ignores
+*.log
+*.log.*
+*.db*
+*.db-shm
+*.db-wal
+*.pyc
+._*
+__pycache__
+
+# Directory (contents) ignores
+.cloud
+.storage
+android
+custom_components
+deps
+image
+tts
+www
+
+# Specific file ignores
+config.code-workspace
+core
+image
+ip_bans.yaml
+secrets.yaml
+phue.conf
+
+# Build-in blueprints ignores
+blueprints/*/homeassistant
+
+# ESPHome ignores
+esphome/.*
+esphome/.esphome*
+esphome/secrets.yaml
+
+# Ignore files created by IDE's
+.vscode

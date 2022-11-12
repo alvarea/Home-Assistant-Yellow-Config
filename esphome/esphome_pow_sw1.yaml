@@ -1,0 +1,63 @@
+#
+# ESPHOME - POW SW1 - RIEGO BONSAIS PRODUCCION
+#
+# FTDDI CABLE 1 ROJO-MARRON
+#   GND => MARRON
+#   R   => ROJO
+#   TX  => NARANJA
+#   VCC => AMARILLO - 3.3V
+#
+substitutions:
+  device_name: esphome_pow_sw1
+
+esphome:
+  name: ${device_name}
+  platform: ESP8266
+  board: esp01_1m
+  board_flash_mode: dout
+
+wifi:
+  ssid: !secret wifi_ssid_wlan
+  password: !secret wifi_pwd
+  manual_ip:
+    static_ip: 192.168.0.36
+    gateway: !secret wifi_gateway
+    subnet: 255.255.255.0
+
+api:
+
+ota:
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: True
+    name: ${device_name}_boton
+  - platform: status
+    name: ${device_name}_status
+
+switch:
+  - platform: gpio
+    name: ${device_name}
+    pin: GPIO12
+
+output:
+  # Register the green LED as a dimmable output ....
+  - platform: esp8266_pwm
+    id: ${device_name}_led
+    pin:
+      number: GPIO13
+      inverted: True
+
+light:
+  # ... and then make a light out of it.
+  - platform: monochromatic
+    name: ${device_name}_led
+    output: ${device_name}_led
+
+# Example configuration entry
+# Disable logging over USB
+logger:
+  baud_rate: 0

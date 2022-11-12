@@ -1,0 +1,60 @@
+#
+# ESPHOME SONOFF LIGHT B1 LI1 - COCINA
+#
+esphome:
+  name: esphome_lb1_l01
+  platform: ESP8266
+  board: esp01_1m
+  board_flash_mode: dout
+
+wifi:
+  ssid: !secret wifi_ssid_wlan
+  password: !secret wifi_pwd
+  manual_ip:
+    gateway: !secret wifi_gateway
+    subnet: 255.255.255.0
+    static_ip: 192.168.0.45
+
+api:
+
+# Enable logging
+#logger:
+
+ota:
+
+# Enable logging
+logger:
+
+my9231:
+ data_pin: GPIO12  # GPIO13 for AiLight
+ clock_pin: GPIO14  # GPIO15 for AiLight
+ num_channels: 6
+ num_chips: 2
+
+output:
+  - platform: my9231
+    id: output_blue
+    channel: 0
+  - platform: my9231
+    id: output_red
+    channel: 1
+  - platform: my9231
+    id: output_green
+    channel: 2
+  - platform: my9231
+    id: output_warm_white
+    channel: 4
+  - platform: my9231
+    id: output_cold_white
+    channel: 5
+
+light:
+  - platform: rgbww
+    name: esphome_lb1_l01
+    red: output_red
+    green: output_green
+    blue: output_blue
+    cold_white: output_cold_white
+    warm_white: output_warm_white
+    cold_white_color_temperature: 6500 K
+    warm_white_color_temperature: 2800 K

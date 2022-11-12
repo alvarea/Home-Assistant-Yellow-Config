@@ -1,0 +1,55 @@
+#
+# ESPHOME SONOFF BASIC V.1.1 - SW0 - SIRENA ALARMA.-
+
+substitutions:
+  device_name: esphome_bas_sw0
+
+esphome:
+  name: ${device_name}
+  platform: ESP8266
+  board: esp01_1m
+  board_flash_mode: dout
+
+wifi:
+  ssid: !secret wifi_ssid_tc
+  password: !secret wifi_pwd
+  manual_ip:
+    gateway: !secret wifi_gateway
+    subnet: 255.255.255.0
+    static_ip: 192.168.0.30
+
+api:
+
+# Enable logging
+logger:
+  level: VERY_VERBOSE
+
+ota:
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: True
+    name: ${device_name}_boton
+
+  - platform: status
+    name: ${device_name}_status
+
+switch:
+  - platform: gpio
+    name: ${device_name}
+    pin: GPIO12
+
+output:
+  - platform: esp8266_pwm
+    id: ${device_name}_green_led
+    pin:
+      number: GPIO13
+      inverted: True
+
+light:
+  - platform: monochromatic
+    name: ${device_name}_led
+    output: ${device_name}_green_led

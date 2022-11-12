@@ -1,0 +1,50 @@
+#
+# ESPHOME SONOFF BASIC R3 - SW3 - REGLETA ENCHUFES DESK SETUP.-
+#
+esphome:
+  name: esphome_bas_sw3
+  platform: ESP8266
+  board: esp01_1m
+  board_flash_mode: dout
+
+wifi:
+  ssid: !secret wifi_ssid_tc
+  password: !secret wifi_pwd
+  manual_ip:
+    gateway: !secret wifi_gateway
+    subnet: 255.255.255.0
+    static_ip: 192.168.0.33
+
+api:
+
+# Enable logging
+logger:
+
+ota:
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "esphome bas sw3 boton"
+  - platform: status
+    name: "esphome bas sw3 status"
+
+switch:
+  - platform: gpio
+    name: "esphome bas sw3"
+    pin: GPIO12
+
+output:
+  - platform: esp8266_pwm
+    id: bas_sw3_green_led
+    pin:
+      number: GPIO13
+      inverted: True
+
+light:
+  - platform: monochromatic
+    name: "esphome bas sw3 led"
+    output: bas_sw3_green_led

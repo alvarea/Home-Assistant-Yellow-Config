@@ -1,0 +1,53 @@
+#
+# ESPHOME SONOFF S20 SWITCH-1
+#
+esphome:
+  name: esphome_s20_sw1
+  platform: ESP8266
+  board: esp01_1m
+  board_flash_mode: dout
+
+wifi:
+  ssid: !secret wifi_ssid_wlan
+  password: !secret wifi_pwd
+  manual_ip:
+    gateway: !secret wifi_gateway
+    subnet: 255.255.255.0
+    static_ip: 192.168.0.38
+
+api:
+
+# Enable logging
+logger:
+
+ota:
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "esphome s20 sw1 boton"
+  - platform: status
+    name: "esphome s20 sw1 status"
+
+
+switch:
+  - platform: gpio
+    name: "esphome s20 sw1"
+    pin: GPIO12
+
+output:
+  # Register the green LED as a dimmable output ....
+  - platform: esp8266_pwm
+    id: s20_sw1_green_led
+    pin:
+      number: GPIO13
+      inverted: True
+
+light:
+  # ... and then make a light out of it.
+  - platform: monochromatic
+    name: "esphome s20 sw1 led"
+    output: s20_sw1_green_led

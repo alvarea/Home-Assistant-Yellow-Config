@@ -1,0 +1,311 @@
+alarma_status_grp:
+  name: Estado Alarma
+  entities:
+    - alarm_control_panel.ha
+    - sensor.alarm_zone
+    - script.homy_armado_parcial
+    - script.homy_armado_total
+
+alarma_sirena_grp:
+  name: Botón Pánico / Sirena
+  entities:
+    - binary_sensor.esphome_bas_sw0_status
+    - binary_sensor.esphome_bas_sw0
+    - input_boolean.panic_button
+    - script.alarma_boton_panico
+    - script.alarma_sirenas_off
+
+# Como obtener el sensor del grupo
+# https://community.home-assistant.io/t/how-to-display-the-sensor-that-triggers-the-alarm/3385513
+#
+
+alarma_sensores_perimetro_grp:
+  name: Grupo Sensores Perímetro
+  entities:
+    - binary_sensor.aqara_puerta_entrada_principal          # Puerta Entrada
+    - binary_sensor.door_window_sensor_158d000201e2e7       # Puerta Salón
+    - binary_sensor.aqara_ventana_estudio_izquierda         # Ventana Estudio Izquierda
+    - binary_sensor.aqara_ventana_estudio_derecha           # Ventana Estudio Derecha
+    - binary_sensor.door_window_sensor_158d000847effe       # Ventana M&D
+    - binary_sensor.door_window_sensor_158d00020457e0       # Ventana Plancha
+    - binary_sensor.door_window_sensor_158d00020910b1       # Ventana AAF
+    - binary_sensor.door_window_sensor_158d00045d69a6       # Ventana PAF
+
+alarma_sensores_interior_grp:
+  name: Grupo Sensores Interior  # Sensores puertas interior, no activos en el armado home, solo armado away.
+  entities:
+    - binary_sensor.aqara_puerta_estudio_armario            # Estudio Puerta Armario
+    - binary_sensor.aqara_puerta_estudio_desvan             # Estudio Puerta Desván
+
+alarma_sensores_presencia_interior_grp:
+  name: Grupo Sensores Presencia Interior
+  # Binary sensors Z calculados como sensor_movimiento_X = on AND input_boleean_X = on
+  # Permite desactivar sensores de movimiento.
+  entities:
+    - binary_sensor.blink_hall_motion_detected
+    - binary_sensor.alarma_sensor_movimiento_salon
+    - binary_sensor.alarma_sensor_movimiento_estudio
+    - binary_sensor.alarma_sensor_movimiento_entrada_hall
+    - binary_sensor.alarma_sensor_movimiento_dormitorio_principal
+    - binary_sensor.alarma_sensor_movimiento_pasillo
+
+alarma_sensores_presencia_exterior_grp:
+  name: Grupo Sensores Presencia Exterior
+  entities:
+    - binary_sensor.alarma_sensor_presencia_entrada_exterior    # Presencia Entrada Exterior
+    - binary_sensor.blink_puerta_garaje_motion_detected         # Blink Puerta Garaje
+    - binary_sensor.blink_puerta_principal_motion_detected      # Blink Puerta Principal
+    - binary_sensor.blink_piscina_motion_detected               # Blink Piscina
+    - binary_sensor.blink_porche_motion_detected                # Blink Porche
+
+alarma_sensores_luz_grp:
+  name: Grupo Sensores Luz
+  entities:
+    - sensor.illumination_158d0001e464a6
+    - sensor.illumination_158d0001e637f6
+    - sensor.illumination_158d0001e05661
+    - sensor.aqara_movimiento_estudio_luminosidad               
+    - sensor.hue_movimiento_pasillo_luminosidad
+    - sensor.aqara_movimiento_entrada_luminosidad
+
+luces_salon_grp:
+  name: Luces Salon
+  entities:
+    - light.luz_cilindro
+    - light.luz_vitrina
+    - light.luz_lectura
+    - light.wled_salon_tv
+
+luces_estudio_grp:
+  name: Luces Estudio 
+  entities:
+    - light.luz_estudio_alta
+    - light.luz_estudio_media
+    - light.luz_estudio_baja
+    - light.luz_estudio_izquierda
+    - light.luz_estudio_led_mesa
+    - light.luz_estudio_nate
+    - light.luz_estudio_play_i
+    - light.luz_estudio_play_c
+    - light.luz_estudio_play_d
+    - light.luz_estudio_techo
+    - light.luz_estudio_escalera
+    - light.luz_estudio_lamparita
+    - light.luz_estudio_beer        
+    - light.luz_estudio_tv
+    - light.wled_estudio_tv
+
+luces_entrada_grp:
+  name: Entrada/Pasillo
+  entities:
+    - light.luz_entrada
+    - light.luz_pasillo
+    - light.luz_cocina
+
+luces_dormitorios_grp:
+  name: Dormitorios
+  entities:
+    - light.luz_dormitorio_aac
+    - light.luz_dormitorio_mfc
+    - light.luz_cueva_agu
+    - light.wled_mesa_agu
+
+luces_planta_baja_grp:
+  name: Luces Planta Baja
+  entities:
+    - group.luces_entrada_grp
+    - group.luces_salon_grp
+    - group.luces_dormitorios_grp
+
+luces_planta_alta_grp:
+  name: Luces Planta Alta
+  entities:
+    - group.luces_estudio_grp
+
+luces_interior_grp:
+  name: Luces Interior
+  entities:
+    - group.luces_planta_baja_grp
+    - group.luces_planta_alta_grp
+
+luces_jardin_grp:
+  name: Luces Jardín
+  entities:
+    - light.faroles_exterior            # Luces Exterior (MINI_SW1)
+    - light.luz_balizas_cesped          # Balizas Cesped  (switch.esphome_4ch_relay_1)
+    - light.luz_olivo_piscina           # Foco Olivo Piscina (switch.esphome_4ch_relay_2)
+    - light.luz_olivo_nubes             # Foco Olivo Nubes (switch.esphome_4ch_relay_3)
+    - light.luz_entrada_bonsai          # Foco Entrada Bonsai (switch.esphome_4ch_relay_4)
+    - light.porche_jardin               # Porche Salón (MINI_SW2)
+
+luces_casa_grp:
+  name: Luces De Toda La Casa
+  entities:
+    - group.luces_interior_grp
+    - group.luces_jardin_grp
+
+luces_device_sun_light_trigger_grp:
+  name: Luces Device Sun Trigger
+  entities:
+    - light.luz_vitrina
+    - light.luz_entrada
+
+person_device_sun_light_trigger_grp:
+  name: Personas Device Sun Trigger
+  entities:
+    - person.agustin
+    - person.malen
+    - person.agu
+    - person.paloma
+    
+switch_calefaccion_grp:
+  name: Grupo Calefacción de Toda La Casa
+  entities:
+    - switch.esphome_s20_sw1                      # Dormitorio M&D
+    - switch.esphome_s20_sw3                      # Dormitorio PAF
+
+setup_telegram_grp:
+  name: Notificaciones Telegram
+  entities:
+    - input_select.home_notify
+
+setup_luces_jardin_grp:
+  name: Luces Jardín Setup
+  entities:
+    - binary_sensor.esphome_4ch_status
+    - input_boolean.jardin_programador_xia_ext
+    - input_boolean.jardin_programador_bas_sw2
+    - input_boolean.jardin_programador_bas_sw4
+    - input_boolean.jardin_programador_4ch_ch1
+    - input_boolean.jardin_programador_4ch_ch2
+    - input_boolean.jardin_programador_4ch_ch3
+    - input_boolean.jardin_programador_4ch_ch4
+
+setup_reglas_luces_grp:
+  name: Reglas Luces
+  entities:
+    - automation.l01_luces_on_exterior_sunset
+    - automation.l02_luces_off_exterior_sunset_4h
+    - automation.l03_luces_off_exterior_all_family_home
+    - automation.l04_luces_on_salon_puesta_sol_30m
+    - automation.l05_luces_on_exterior_segun_sensor
+    - automation.l06_luces_off_before_sunrise
+    - automation.l07_luces_on_entrada_segun_sensor
+
+setup_sirenas_grp:
+  name: Sirenas
+  entities:
+    - input_boolean.mute_sonido_sirenas
+    - input_select.xiaomi_sound_alarm_armed
+    - input_number.xiaomi_volume_alarm_armed
+    - input_select.xiaomi_sound_alarm_disarmed
+    - input_number.xiaomi_volume_alarm_disarmed
+    - input_select.xiaomi_sound_alarm
+    - input_number.xiaomi_volume_alarm
+    - input_boolean.alarm_test_sirenas
+    #- switch.esphome_bas_sw0
+
+all_automations_grp:
+  name: Grupo automatizaciones
+  entities:
+    - automation.a0_alarma_disarmed_to_pending
+    - automation.a10_alarm_boton_panico_off
+    - automation.a12_alarm_sirena_interior_off
+    - automation.a1_alarma_armed_to_pending
+    - automation.a2_alarma_armado_away_ok
+    - automation.a3_alarma_armado_home_ok
+    - automation.a4_alarma_disarmed
+    - automation.a5_alarm_trigger_armed_away
+    - automation.a6_alarm_trigger_armed_home
+    - automation.a7_alarm_triggered
+    - automation.a8_alarm_triggered
+    - automation.a9_alarm_home_auto_disarm
+    - automation.blink_camera_update
+    - automation.f01_family_away_armado_total
+    - automation.f02_armado_parcial_midnight
+    - automation.f03_family_home_armado_home
+    - automation.f04_family_home_telegram
+    - automation.f05_family_home_how_many_sleep
+    - automation.f06_family_mfc_check_sleep
+    - automation.f07_family_aaf_check_sleep
+    - automation.f08_family_paf_check_sleep
+    - automation.f09_family_aac_check_sleep
+    - automation.f09_family_any_change_actualiza_contador
+    - automation.ha_daily_automations
+    - automation.hass_clock_notify
+    - automation.hass_daily_full_backup
+    - automation.hass_notify_snapshot_failure
+    - automation.hass_startup_scripts
+    - automation.ios_action_alarma_away
+    - automation.ios_action_alarma_off
+    - automation.ios_action_luces_salon
+    - automation.ios_action_luz_estudio
+    - automation.l01_luces_on_exterior_sunset
+    - automation.l02_luces_off_exterior_sunset
+    - automation.l04_luces_on_salon_sunset
+    - automation.l05_luces_on_exterior_segun_sensor
+    - automation.l06_luces_off_before_sunrise
+    - automation.l07_luces_on_entrada_segun_sensor
+    - automation.l08_luces_on_dormitorio_segun_sensor
+    - automation.l09_luces_on_dormitorio_warning
+    - automation.l10_luces_on_estudio_segun_sensor
+    - automation.l11_luces_estudio_off
+    - automation.l12_cube_tap_twice_light_toggle
+    - automation.l13_cube_flip90_light_estudio_on
+    - automation.l13_cube_flip90_light_on
+    - automation.l14_cube_rotate_light_desk_toggle
+    - automation.l14_cube_shake_light_off
+    - automation.l14_cube_shake_light_off_2
+    - automation.l15_cube_move_light_desk_toggle
+    - automation.m1_toogle_luz_rack_macbook_webcam
+    - automation.nfc_home_blue_tag_alarma_away
+    - automation.p01_ping_router_fibra
+    - automation.p02_ping_ap_wifi_tplink
+    - automation.p03_sony_ps4_on
+    - automation.p04_sony_ps4_off
+    - automation.s01_sonoff_4ch_boton1_on
+    - automation.s02_sonoff_4ch_boton2_on
+    - automation.s03_sonoff_4ch_boton3_on
+    - automation.s04_sonoff_4ch_status
+    - automation.s05_sonoff_pow_status
+    - automation.s06_timer_piscina_start
+    - automation.s07_timer_piscina_end
+    - automation.s08_set_hora_final_planificado
+    - automation.s09_sonoff_s20_sw1_toggle
+    - automation.s09b_sonoff_s20_sw3_toggle
+    - automation.s10_switch_dormitorio_mfc_on
+    - automation.s10b_switch_dormitorio_paf_on
+    - automation.s10c_switch_dormitorio_aaf_on
+    - automation.s11_switch_dormitorio_paf_on
+    - automation.s12_switch_dormitorios_off
+    - automation.s13_sonoff_sw2_porche_piscina
+    - automation.s14_sonoff_sw4_porche_piscina
+    - automation.s15_ups_apc700_status
+    - automation.s16_sonoff_pow_lavadora_boton_switch_on
+    - automation.s17_sonoff_pow_lavadora_led
+    - automation.s17c_sonoff_pow_lavadora_warning_off
+    - automation.s19_timer_riego_bonsais_ch1_start
+    - automation.s19_timer_riego_bonsais_ch1_timer2_start
+    - automation.s20_timer_riego_bonsais_ch1_end
+    - automation.s21_timer_riego_bonsais_ch2_start
+    - automation.s22_timer_riego_bonsais_ch2_end
+    - automation.s23_timer_fuente_ch3_start
+    - automation.s24_timer_fuente_ch3_end
+    - automation.s25_timer_fuente_frog_sw2_start
+    - automation.s26_timer_fuente_frog_sw2_start
+    - automation.s27_timer_fuente_frog_sw2_end
+    - automation.s28_control_jardin_before_sunrise
+    - automation.t01_family_away_armado_total
+    - automation.t02_armado_parcial_midnight
+    - automation.t03_family_home_armado_home
+    - automation.t04_family_home_telegram
+    - automation.t05_family_home_how_many_sleep
+    - automation.t06_family_mfc_check_sleep
+    - automation.t07_family_aaf_check_sleep
+    - automation.t08_family_paf_check_sleep
+    - automation.t09_family_aac_check_sleep
+    - automation.tag_nfc_blue_house_tag_is_scanned
+    - automation.update_device_meta_tracker
+    - automation.x0_test_on
+    - automation.x1_alarma_agua_arqueta
+    - automation.x1_alarma_humo_cocina

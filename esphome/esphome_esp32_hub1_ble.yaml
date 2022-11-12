@@ -1,0 +1,78 @@
+#
+# ESPHOME - ESP32S HUB1 - BLUETOOTH BLE - SENSORES MIFLORA BONSAIS TOP
+#
+substitutions:
+  device_name: esphome_esp32_hub1_ble_tracker
+
+esphome:
+  name: ${device_name}
+  platform: ESP32
+  board: nodemcu-32s
+
+wifi:
+  ssid: !secret wifi_ssid_wlan
+  password: !secret wifi_pwd
+  manual_ip:
+    static_ip: 192.168.0.49
+    gateway: !secret wifi_gateway
+    subnet: 255.255.255.0
+
+api:
+
+# Enable logging
+logger:
+
+binary_sensor:
+  - platform: status
+    name: ${device_name}_status
+
+ota:
+
+# Example configuration entry
+esp32_ble_tracker:
+
+sensor:
+  - platform: xiaomi_hhccjcy01
+    mac_address: C4:7C:8D:67:C1:9E
+    temperature:
+      name: "Temperatura Plant Monitor PM01"
+    moisture:
+      name: "Humedad Plant Monitor PM01"
+    illuminance:
+      name: "Luminosidad Plant Monitor PM01"
+    conductivity:
+      name: "Fertilidad Plant Monitor PM01"
+    #battery_level:
+    #  name: "MiFlora S1 Bateria"
+
+  - platform: xiaomi_hhccjcy01
+    mac_address: 80:EA:CA:89:59:A5
+    temperature:
+      name: "Temperatura Plant Monitor PM02"
+    moisture:
+      name: "Humedad Plant Monitor PM02"
+    illuminance:
+      name: "Luminosidad Plant Monitor PM02"
+    conductivity:
+      name: "Fertilidad Plant Monitor PM02"
+
+  - platform: xiaomi_hhccjcy01
+    mac_address: 80:EA:CA:89:59:EF
+    temperature:
+      name: "Temperatura Plant Monitor PM03"
+    moisture:
+      name: "Humedad Plant Monitor PM03"
+    illuminance:
+      name: "Luminosidad Plant Monitor PM03"
+    conductivity:
+      name: "Fertilidad Plant Monitor PM03"
+
+  # LY3 Entrada Exterior
+  - platform: atc_mithermometer
+    mac_address: 'A4:C1:38:E8:02:EF'
+    temperature:
+      name: "LY3 Entrada Exterior Temperatura"
+    humidity:
+      name: "LY3 Entrada Exterior Humedad"
+    battery_level:
+      name: "LY3 Entrada Exterior Bateria"

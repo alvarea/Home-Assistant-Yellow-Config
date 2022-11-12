@@ -1,0 +1,53 @@
+#
+# ESPHOME BASIC SW2 - RIEGO JARDIN TOMATERA
+#
+substitutions:
+  device_name: esphome_bas_sw2
+
+esphome:
+  name: ${device_name}
+  platform: ESP8266
+  board: esp01_1m
+  board_flash_mode: dout
+
+wifi:
+  ssid: !secret wifi_ssid_wlan
+  password: !secret wifi_pwd
+  manual_ip:
+    gateway: !secret wifi_gateway
+    subnet: 255.255.255.0
+    static_ip: 192.168.0.32
+
+api:
+
+# Enable logging
+logger:
+
+ota:
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: True
+    name: ${device_name}_boton
+  - platform: status
+    name: ${device_name}_status
+
+switch:
+  - platform: gpio
+    name: ${device_name}
+    pin: GPIO12
+
+output:
+  - platform: esp8266_pwm
+    id: bas_sw2_green_led
+    pin:
+      number: GPIO13
+      inverted: True
+
+light:
+  - platform: monochromatic
+    name: ${device_name}_greenled
+    output: bas_sw2_green_led

@@ -1,0 +1,245 @@
+# PANEL CONTROL ALARMA
+#
+alarm_control_panel.ha:
+  friendly_name: Panel Control Alarma
+input_select.home_last_change:
+  friendly_name: Último Tracking
+input_boolean.panic_button:
+  icon: mdi:key-variant
+script.alarma_boton_panico:
+  icon: mdi:arrow-collapse-down
+script.boton_panico_off:
+  icon: mdi:volume-off
+script.sirena_stop_alarma:
+  icon: mdi:volume-off
+
+# Centro Control Homy
+sensor.version_local:
+  icon: mdi:home-assistant
+
+#CERTIFICADO SSL
+sensor.ssl_certificate_expiry:
+  friendly_name: Certificado SSL
+
+# PANEL CONTROL ALARMA
+sensor.family_sleep_home:
+  friendly_name: ¿Duermen? # en Casa?
+  icon: mdi:sleep
+
+# GRUPOS DE LUCES / INTERRUPTORES
+group.luces_estudio_grp:
+  icon: mdi:television-ambient-light
+group.luces_entrada_grp:
+  icon: mdi:lightbulb-multiple
+
+group.luces_jardin_grp:
+  icon: mdi:theme-light-dark
+group.luces_focos_arboles_grp:
+  icon: mdi:track-light
+
+group.luces_planta_baja_grp:
+  icon: mdi:lightbulb-group-outline
+group.luces_planta_alta_grp:
+  icon: mdi:lightbulb-group
+
+group.luces_interior_grp:
+  icon: mdi:home-lightbulb-outline
+group.luces_casa_grp:
+  icon: mdi:home-lightbulb
+
+# SENSORES BAYESIAN TRACKING FAMILY HOME
+#
+binary_sensor.family_home_mfc:
+  friendly_name: Malen
+binary_sensor.family_home_aac:
+  friendly_name: Agustín
+binary_sensor.family_home_paf:
+  friendly_name: Paloma
+binary_sensor.family_home_aaf:
+  friendly_name: Agu
+
+binary_sensor.baye_home_mfc:
+  friendly_name: Bayesian Malen
+binary_sensor.baye_home_aac:
+  friendly_name: Bayesian Agustín
+binary_sensor.baye_home_paf:
+  friendly_name: Bayesian Paloma
+binary_sensor.baye_home_aaf:
+  friendly_name: Bayesian Agu
+
+# SOL Y TIEMPO
+#
+sun.sun:
+  friendly_name: Sol
+sensor.moon:
+  friendly_name: Luna
+sensor.date:
+  friendly_name: Fecha
+sensor.time:
+  friendly_name: Hora Actual
+sensor.time_utc:
+  friendly_name: Hora (UTC)
+
+
+# PI3 system status
+#
+#sensor.disk_use_percent_:
+#  friendly_name: '%Disk'
+sensor.load_15m:
+  friendly_name: System Load (15')
+  icon: mdi:server
+sensor.processor_use:
+  friendly_name: '%CPU'
+sensor.memory_use_percent:
+  friendly_name: '%Memory'
+sensor.memory_free:
+  unit_of_measurement: MB
+sensor.memory_use:
+  unit_of_measurement: MB
+#sensor.disk_use_:
+#  unit_of_measurement: GB
+#  friendly_name: 'Disk used'
+#sensor.disk_free_:
+#  unit_of_measurement: GB
+#  friendly_name: 'Disk free'
+sensor.swap_use_percent:
+  friendly_name: '%Swapping'
+sensor.last_boot:
+  friendly_name: Último Reinicio del Sistema
+
+#
+# SERIE SONOFF 4CH_SW1
+#
+binary_sensor.esphome_4ch_status:
+  friendly_name: 4CH.SW1 Cuadro Jardín
+
+#
+# SERIE SONOFF POW-R2
+#
+
+# Nativo del codigo ESPHOME. Boton  pulsador del sensor esphome
+# Sensor Read-Only para mostrar en front-end
+binary_sensor.esphome_pow_sw2_boton:
+  friendly_name: Lavadora Pulsador On/off
+
+# Nativo del codigo ESPHOME. Indica solo la conectividad del sensor esphome
+# Sensor Read-Only para mostrar en front-end
+binary_sensor.esphome_pow_sw2_status:
+  friendly_name: POW.SW2 Lavadora
+
+# Nativo del codigo ESPHOME. SWITCH
+# Interruptor real (no usado en front-end)
+switch.esphome_pow_sw2:
+  friendly_name: Lavadora (Power-On)
+  icon: mdi:power-plug
+
+# Binary sensor calculado en base al anterior
+# Sensor Read-Only para mostrar en front-end
+binary_sensor.esphome_pow_sw2_switch:
+  friendly_name: Lavadora (Power-On)
+  icon: mdi:power-plug
+
+# Nativo del codigo ESPHOME. Light LED azul
+# Luz real (no usado en front-end)
+light.esphome_pow_sw2_led:
+  friendly_name: Lavado Activo (LED)
+
+# Binary sensor calculado en base al anterior
+# Sensor Read-Only para mostrar en front-end
+binary_sensor.esphome_pow_sw2_blue_led:
+  friendly_name: Lavado Activo (LED)
+  icon: mdi:washing-machine
+
+# Nativo del codigo ESPHOME. Sensor Consumo A
+# Sensor real (no usado en front-end)
+sensor.esphome_pow_sw2_current:
+  #unit_of_measurement: A
+  friendly_name: Consumo (A)
+  icon: mdi:flash
+
+# Binary sensor calculado en base al anterior
+# Sensor Read-Only para mostrar en front-end
+binary_sensor.esphome_pow_sw2_current:
+  friendly_name: Consumo Lavado (A)
+  icon: mdi:flash
+
+# Nativo del codigo ESPHOME. Sensor Consumo W
+# Sensor real (no usado en front-end)
+sensor.esphome_pow_sw2_power:
+  #	unit_of_measurement: W
+  friendly_name: Potencia (W)
+  icon: mdi:trending-up
+
+# Binary sensor calculado en base al anterior
+# Sensor Read-Only para mostrar en front-end
+binary_sensor.esphome_pow_sw2_power:
+  friendly_name: Potencia Lavado (W)
+  icon: mdi:trending-up
+
+# Nativo del codigo ESPHOME. Sensor Consumo V
+# Sensor real (no usado en front-end)
+sensor.esphome_pow_sw2_voltage:
+  #	unit_of_measurement: V
+  friendly_name: Voltage (V)
+  icon: mdi:power-plug
+
+# Binary sensor calculado en base al anterior
+# Sensor Read-Only para mostrar en front-end
+binary_sensor.esphome_pow_sw2_voltage:
+  friendly_name: 220V Corriente Lavado (V)
+  icon: mdi:power-plug
+
+# Binary sensor calculado Cuando Power > 2.5W and Voltage > 200V
+# Sensor Read-Only para mostrar en front-end
+binary_sensor.esphome_pow_sw2_lavadora_lavando:
+  friendly_name: Lavado Activo (W>2.5)
+  icon: mdi:washing-machine
+
+# Binary sensor calculado Cuando Power > 2.5W and Voltage > 200V
+# Sensor Read-Only para mostrar en front-end
+binary_sensor.esphome_pow_sw2_lavadora_warning:
+  friendly_name: Lavado Warning (W<2.5)
+  icon: mdi:washing-machine
+
+#
+# UPS APC
+sensor.ups_status:
+  icon: mdi:car-battery
+
+
+# PING BINARY SENSORS
+binary_sensor.ping_00_wan_router_fibra_movistar:
+  friendly_name: '00 WAN Router Internet Check'
+  icon: mdi:wan
+
+binary_sensor.ping_01_router_fibra_movistar:
+  icon: mdi:wan
+  friendly_name: '01 Router Fibra Movistar'
+
+binary_sensor.ping_02_nas_time_capsule:
+  icon: mdi:nas
+  friendly_name: '02 NAS TimeCapsule'
+
+binary_sensor.ping_04_router_wifi_zte:
+  icon: mdi:router-wireless
+  friendly_name: '04 Router WIFI ZTE'
+
+binary_sensor.ping_05_router_wifi_tplink:
+  icon: mdi:router-wireless
+  friendly_name: '05 Router Wifi TPlink'
+
+binary_sensor.ping_06_router_wifi_linksys:
+  icon: mdi:router-wireless
+  friendly_name: ' 06 Router WIFI Linksys'
+
+binary_sensor.ping_07_switch_salon:
+  icon: mdi:server-network
+  friendly_name: '07 Switch Salon'
+
+binary_sensor.ping_08_switch_pasillo:
+  icon: mdi:server-network
+  friendly_name: '08 Switch Pasillo'
+
+binary_sensor.ping_09_switch_estudio:
+  icon: mdi:server-network
+  friendly_name: '09 Switch Estudio'

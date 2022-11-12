@@ -1,0 +1,313 @@
+# Modo Notificaciones
+#
+  home_notify:
+    name: Notificaciones
+    options:
+     - 'Off'
+     - 'Telegram'
+     - 'IOS'
+    initial: Telegram
+    icon: mdi:bell-ring
+
+  alarma_media_player:
+    name: "Alarma Destino Media Player"
+    options:
+      - "media_player.en_todas_partes"
+      - "media_player.echo_alexa_entrada"
+      - "media_player.echo_alexa_estudio"
+      - "media_player.echo_alexa_dormitorio"
+      - "media_player.fire_tv_cocina"
+      - "media_player.fire_tv_salon"
+      - "media_player.apple_tv"
+    icon: mdi:speaker-wireless
+    initial: 'media_player.echo_alexa_entrada'
+
+# ALARM WARNING BEFORE ARMED : PENDING TIME
+#
+  alarma_sonido_armado:
+    name: "Alarma Sonido Armado"
+    options:
+      - "bell_02"
+      - "buzzers_pistols_01"
+      - "amzn_sfx_church_bell_1x_02"
+      - "amzn_sfx_doorbell_01"
+      - "amzn_sfx_doorbell_chime_01"
+      - "amzn_sfx_doorbell_chime_02"
+      - "air_horn_03"
+      - "boing_01"
+      - "boing_03"
+      - "camera_01"
+      - "squeaky_12"
+      - "clock_01"
+      - "amzn_sfx_trumpet_bugle_04"
+      - "futuristic_10"
+      - "amzn_sfx_scifi_engines_on_02"
+      - "amzn_sfx_scifi_alarm_04"
+      - "amzn_sfx_scifi_sheilds_up_01"
+      - "amzn_sfx_scifi_alarm_01"
+      - "zap_01"
+    initial: 'air_horn_03'
+
+# ALARM WARNING DISARMED
+#
+  alarma_sonido_desarmado:
+    name: "Alarma Sonido Desarmado"
+    options:
+      - "bell_02"
+      - "buzzers_pistols_01"
+      - "amzn_sfx_church_bell_1x_02"
+      - "amzn_sfx_doorbell_01"
+      - "amzn_sfx_doorbell_chime_01"
+      - "amzn_sfx_doorbell_chime_02"
+      - "air_horn_03"
+      - "boing_01"
+      - "boing_03"
+      - "camera_01"
+      - "squeaky_12"
+      - "clock_01"
+      - "amzn_sfx_trumpet_bugle_04"
+      - "futuristic_10"
+      - "amzn_sfx_scifi_engines_on_02"
+      - "amzn_sfx_scifi_alarm_04"
+      - "amzn_sfx_scifi_sheilds_up_01"
+      - "amzn_sfx_scifi_alarm_01"
+      - "zap_01"
+    icon: mdi:music-note
+    initial: 'bell_02'
+
+# ALARM TRIGGERED
+#
+  alarma_sonido_disparado:
+    name: "Alarma Sonido Disparada"
+    options:
+      - "bell_02"
+      - "buzzers_pistols_01"
+      - "amzn_sfx_church_bell_1x_02"
+      - "amzn_sfx_doorbell_01"
+      - "amzn_sfx_doorbell_chime_01"
+      - "amzn_sfx_doorbell_chime_02"
+      - "air_horn_03"
+      - "boing_01"
+      - "boing_03"
+      - "camera_01"
+      - "squeaky_12"
+      - "clock_01"
+      - "amzn_sfx_trumpet_bugle_04"
+      - "futuristic_10"
+      - "amzn_sfx_scifi_engines_on_02"
+      - "amzn_sfx_scifi_alarm_04"
+      - "amzn_sfx_scifi_sheilds_up_01"
+      - "amzn_sfx_scifi_alarm_01"
+      - "zap_01"
+    icon: mdi:music-note
+    initial: 'amzn_sfx_scifi_alarm_04'
+
+  alexa_secuencia:
+    name: "Alexa Secuencia"
+    options:
+      - "Alexa.Weather.Play"
+      - "Alexa.Traffic.Play"
+      - "Alexa.FlashBriefing.Play"
+      - "Alexa.GoodMorning.Play"
+      - "Alexa.GoodNight.Play"
+      - "Alexa.SingASong.Play"
+      - "Alexa.TellStory.Play"
+      - "Alexa.FunFact.Play"
+      - "Alexa.Joke.Play"
+      - "Alexa.Music.PlaySearchPhrase"
+      - "Alexa.Calendar.PlayTomorrow"
+      - "Alexa.Calendar.PlayToday"
+      - "Alexa.Calendar.PlayNext"
+      - "Alexa.CleanUp.Play"
+      - "Alexa.ImHome.Play"
+    initial: 'Alexa.Weather.Play'
+
+# ALARM WARNING BEFORE ARMED : PENDING TIME
+#
+  xiaomi_sound_alarm_armed:
+    name: "Sonido Alarma Armado"
+    options:
+      - "0 - Police car 1"
+      - "1 - Police car 2"
+      - "2 - Accident"
+      - "3 - Countdown"
+      - "4 - Ghost"
+      - "5 - Sniper rifle"
+      - "6 - Battle"
+      - "7 - Air raid"
+      - "8 - Bark"
+      - "10 - Doorbell"
+      - "11 - Knock at a door"
+      - "12 - Amuse"
+      - "13 - Alarm clock"
+      - "10004 - ArmadoDesarme"
+      - "10005 - ArmadoSalgaAhora"
+    icon: mdi:music-note
+    initial: '11 - Knock at a door'
+
+# ALARM WARNING DISARMING
+#
+  xiaomi_sound_alarm_disarmed:
+    name: "Sonido Alarma Desarmado"
+    options:
+      - "0 - Police car 1"
+      - "1 - Police car 2"
+      - "2 - Accident"
+      - "3 - Countdown"
+      - "4 - Ghost"
+      - "5 - Sniper rifle"
+      - "6 - Battle"
+      - "7 - Air raid"
+      - "8 - Bark"
+      - "10 - Doorbell"
+      - "11 - Knock at a door"
+      - "12 - Amuse"
+      - "13 - Alarm clock"
+      - "10004 - ArmadoDesarme"
+      - "10005 - ArmadoSalgaAhora"
+    icon: mdi:music-note
+    initial: '11 - Knock at a door'
+
+# ALARM TRIGGER SOUND
+#
+  xiaomi_sound_alarm:
+    name: "Sonido Alarma"
+    options:
+      - "0 - Police car 1"
+      - "1 - Police car 2"
+      - "2 - Accident"
+      - "3 - Countdown"
+      - "4 - Ghost"
+      - "5 - Sniper rifle"
+      - "6 - Battle"
+      - "7 - Air raid"
+      - "8 - Bark"
+      - "10 - Doorbell"
+      - "11 - Knock at a door"
+      - "12 - Amuse"
+      - "13 - Alarm clock"
+    icon: mdi:music-note
+    initial: '2 - Accident'
+
+# Depuradora Piscina
+  piscina_depuradora_ch0_programador_dias:
+    name: Frecuencia Programador
+    options:
+      - 'Bloqueado'
+      - 'Diario'
+      - 'Sábado'
+      - 'Domingo'
+      - 'Weekend'
+    icon: mdi:calendar
+
+# Riego Bonsais
+  riego_bonsais_ch1_programador_dias:
+    name: Frecuencia Programador
+    options:
+      - 'Bloqueado'
+      - 'Diario'
+      - 'Sábado'
+      - 'Domingo'
+      - 'Weekend'
+    icon: mdi:calendar
+
+# Riego Plantas Aromaticas
+  riego_bonsais_ch2_programador_dias:
+    name: Frecuencia Programador
+    options:
+      - 'Bloqueado'
+      - 'Diario'
+      - 'Sábado'
+      - 'Domingo'
+      - 'Weekend'
+    #initial: Diario
+    icon: mdi:calendar
+
+# Fuente Zen
+  riego_bonsais_ch3_programador_dias:
+    name: Frecuencia Programador
+    options:
+      - 'Bloqueado'
+      - 'Diario'
+      - 'Sábado'
+      - 'Domingo'
+      - 'Weekend'
+    icon: mdi:calendar
+
+# Riego
+  riego_bonsais_ch4_programador_dias:
+    name: Frecuencia Programador
+    options:
+      - 'Bloqueado'
+      - 'Diario'
+      - 'Sábado'
+      - 'Domingo'
+      - 'Weekend'
+    icon: mdi:calendar
+
+# Riego Bonsais Producción
+  riego_bonsais_ch0_programador_dias:
+    name: Frecuencia Programador
+    options:
+      - 'Bloqueado'
+      - 'Diario'
+      - 'Sábado'
+      - 'Domingo'
+      - 'Weekend'
+    #initial: Diario
+    icon: mdi:calendar
+
+# Riego Huerto Tomates
+  riego_tomates_ch0_programador_dias:
+    name: Frecuencia Programador
+    options:
+      - 'Bloqueado'
+      - 'Diario'
+      - 'Sábado'
+      - 'Domingo'
+      - 'Weekend'
+    icon: mdi:calendar
+
+# Riego Cesped CH1
+  riego_cesped_ch1_programador_dias:
+    name: Frecuencia Programador
+    options:
+      - 'Bloqueado'
+      - 'Diario'
+      - 'Sábado'
+      - 'Domingo'
+      - 'Weekend'
+    icon: mdi:calendar
+
+# Riego Cesped CH2
+  riego_cesped_ch2_programador_dias:
+    name: Frecuencia Programador
+    options:
+      - 'Bloqueado'
+      - 'Diario'
+      - 'Sábado'
+      - 'Domingo'
+      - 'Weekend'
+    icon: mdi:calendar
+
+# Riego Cesped CH3
+  riego_cesped_ch3_programador_dias:
+    name: Frecuencia Programador
+    options:
+      - 'Bloqueado'
+      - 'Diario'
+      - 'Sábado'
+      - 'Domingo'
+      - 'Weekend'
+    icon: mdi:calendar
+
+# Riego Cesped CH4
+  riego_cesped_ch4_programador_dias:
+    name: Frecuencia Programador
+    options:
+      - 'Bloqueado'
+      - 'Diario'
+      - 'Sábado'
+      - 'Domingo'
+      - 'Weekend'
+    icon: mdi:calendar

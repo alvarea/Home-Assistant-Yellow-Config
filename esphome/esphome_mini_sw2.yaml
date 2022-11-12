@@ -1,0 +1,84 @@
+#
+# ESPHOME SONOFF MINI R2 - SW2 - LUCES PORCHE JARDIN
+#
+substitutions:
+  device_name: esphome_mini_sw2
+
+esphome:
+  name: ${device_name}
+  platform: ESP8266
+  board: esp8285
+
+wifi:
+  ssid: !secret wifi_ssid_wlan
+  password: !secret wifi_pwd
+  manual_ip:
+    gateway: !secret wifi_gateway
+    subnet: 255.255.255.0
+    static_ip: 192.168.0.52
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+#  password: "api_password"
+
+# Enable Over The Air update
+ota:
+#  password: "ota_password"
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+
+binary_sensor:
+  - platform: gpio
+    pin: GPIO00
+    id: reset
+    internal: true
+    filters:
+      - invert:
+      - delayed_off: 10ms
+    on_press:
+      - switch.toggle:
+          id: relay_1
+
+  - platform: gpio
+    name: ${device_name}_status
+    pin: GPIO04
+    id: switch_1
+    on_press:
+      then:
+        - switch.toggle:
+            id: relay_1
+    on_release:
+      then:
+        - switch.toggle:
+            id: relay_1
+
+switch:
+  - platform: gpio
+    name: ${device_name}
+    icon: mdi:lightbulb_outline
+    pin: GPIO12
+    id: relay_1
+    restore_mode: restore_default_off
+
+status_led:
+  pin:
+    number: GPIO13
+    inverted: true
+
+output:
+  - platform: esp8266_pwm
+    id: blue_led
+    pin: GPIO13
+    inverted: True
+
+light:
+  # the 4 lines below define the Blue LED light on Sonoff Mini, to expose in HomeAssistant remove line "internal: true"
+  - platform: monochromatic
+    name: ${device_name}_blueled
+    output: blue_led
+    internal: true # hides the Blue LED from HomeAssistant

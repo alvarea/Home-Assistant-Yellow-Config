@@ -1,0 +1,1641 @@
+  #
+  # BAYESIAN SENSORS
+  #
+  #
+
+  # NMAP ==> prob_given_true: 0.8 - prob_given_false: 0.2
+  #   - device_tracker.apple_94_ac_c4_iphone_aac
+  #   - device_tracker.apple_87_31_3b_iphone_mfc
+  #   - device_tracker.apple_46_ef_30_iphone_paf
+  #   - device_tracker.apple_89_98_36_iphone_aaf
+
+  # IOS APP ==> prob_given_true: 0.99 - prob_given_false: 0.10
+  #   - device_tracker.iphone_aac
+  #   - device_tracker.iphone_malen
+  #   - device_tracker.iphone_paf
+  #   - devoce_tracker.a2f
+
+  # OWNTRACK ==> prob_given_true: 0.99 - prob_given_false: 0.4
+  #   - device_tracker.aac_iphone_owntrack
+  #   - device_tracker.mfc_iphone_owntrack
+  #   - device_tracker.paf_iphone_owntrack
+
+  # GEOFENCY ==> prob_given_true: 0.99 - prob_given_false: 0.1
+  #   - device_tracker.b8b52a3b_f038_4e72_a268_705d9b06e496 #AAC
+  #   - device_tracker.b6cd9e1f_4100_4cac_88d0_f4d6c044a4e6 #MFC
+  #   - device_tracker.863b93f2_f00f_4737_a35f_1ff0cce201a8 #PAF
+  #   - device_tracker.0b495ff5_94fc_4773_9644_f71df3c328ac #AAF
+
+  - platform: 'bayesian'
+    prior: 0.60
+    name: 'baye_home_mfc'
+    probability_threshold: 0.95
+    observations:
+      - entity_id: 'device_tracker.apple_87_31_3b_iphone_mfc'
+        prob_given_true: 0.8
+        prob_given_false: 0.2
+        platform: 'state'
+        to_state: 'home'
+      - entity_id: 'device_tracker.iphone_malen'  # IOS APP
+        prob_given_true: 0.99
+        prob_given_false: 0.1
+        platform: 'state'
+        to_state: 'home'
+      - entity_id: 'device_tracker.b6cd9e1f_4100_4cac_88d0_f4d6c044a4e6' #MFC
+        prob_given_true: 0.99
+        prob_given_false: 0.1
+        platform: 'state'
+        to_state: 'home'
+      #- entity_id: 'device_tracker.mfc_iphone_owntrack_2' # OWNTRACK
+      #  prob_given_true: 0.99
+      #  prob_given_false: 0.4
+      #  platform: 'state'
+      #  to_state: 'home'
+
+  - platform: 'bayesian'
+    prior: 0.60
+    name: 'baye_home_aac'
+    probability_threshold: 0.95
+    observations:
+      - entity_id: 'device_tracker.apple_94_ac_c4_iphone_aac'
+        prob_given_true: 0.8
+        prob_given_false: 0.2
+        platform: 'state'
+        to_state: 'home'
+      - entity_id: 'device_tracker.iphone_aac'  # IOS APP
+        prob_given_true: 0.99
+        prob_given_false: 0.1
+        platform: 'state'
+        to_state: 'home'
+      - entity_id: 'device_tracker.b8b52a3b_f038_4e72_a268_705d9b06e496_2' #AAC
+        prob_given_true: 0.99
+        prob_given_false: 0.1
+        platform: 'state'
+        to_state: 'home'
+      #- entity_id: 'device_tracker.aac_iphone_owntrack_2' # OWNTRACK
+      #  prob_given_true: 0.99
+      #  prob_given_false: 0.4
+      #  platform: 'state'
+      #  to_state: 'home'
+
+  - platform: 'bayesian'
+    prior: 0.60
+    name: 'baye_home_paf'
+    probability_threshold: 0.95  # temporalmente estuvo a 0.98
+    observations:
+      - entity_id: 'device_tracker.apple_46_ef_30_iphone_paf'
+        prob_given_true: 0.8
+        prob_given_false: 0.2
+        platform: 'state'
+        to_state: 'home'
+      - entity_id: 'device_tracker.iphone_paf'  # IOS APP
+        prob_given_true: 0.99
+        prob_given_false: 0.1
+        platform: 'state'
+        to_state: 'home'
+      #- entity_id: 'device_tracker.863b93f2_f00f_4737_a35f_1ff0cce201a8' #PAF
+      #  prob_given_true: 0.99
+      #  prob_given_false: 0.1
+      #  platform: 'state'
+      #  to_state: 'home'
+      #- entity_id: 'device_tracker.paf_iphone_owntrack_2' # OWNTRACK
+      #  prob_given_true: 0.99
+      #  prob_given_false: 0.4
+      #  platform: 'state'
+      #  to_state: 'home'
+
+  - platform: 'bayesian'
+    prior: 0.66
+    name: 'baye_home_aaf'
+    probability_threshold: 0.95
+    observations:
+      - entity_id: 'device_tracker.0b495ff5_94fc_4773_9644_f71df3c328ac' #AAF
+        prob_given_true: 0.99    # original 0.99
+        prob_given_false: 0.1   # original 0.1
+        platform: 'state'
+        to_state: 'home'
+      - entity_id: 'device_tracker.a2f'  # IOS APP
+        prob_given_true: 0.8
+        prob_given_false: 0.2
+        platform: 'state'
+        to_state: 'home'
+      - entity_id: 'device_tracker.apple_89_98_36_iphone_aaf'
+        prob_given_true: 0.8
+        prob_given_false: 0.2
+        platform: 'state'
+        to_state: 'home'
+
+  #
+  # TEMPLATE SENSORS
+  #
+
+  - platform: template
+    sensors:
+      #
+      # SENSORES CONTROL PRESENCIA
+      #
+      # Sensores finales de control de presencia basados en el bayesian(on/off) AND input_boolean(on/off) de cada Uno.
+      #
+      # and is_state('binary_sensor.baye_home_aac','on') %}
+      family_home_aac:
+        value_template: >-
+          {% if is_state('input_boolean.family_home_aac','on')
+              and is_state('person.agustin','home') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      family_home_mfc:
+        value_template: >-
+          {% if is_state('input_boolean.family_home_mfc','on')
+              and is_state('person.malen','home') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      family_home_paf:
+        value_template: >-
+          {% if is_state('input_boolean.family_home_paf','on')
+              and is_state('person.paloma','home') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      family_home_aaf:
+        value_template: >-
+          {% if is_state('input_boolean.family_home_aaf','on')
+              and is_state('person.agu','home') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      # Todos en Casa:  IF sensor.family_home >= sensor.family_sleep_home THEN TRUE
+      #
+      family_all_home:
+        value_template: >-
+          {% if states('sensor.family_sleep_home')|int(0) > 0
+              and states('sensor.family_home')|int(0) >= states('sensor.family_sleep_home')|int(0) %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        friendly_name: '¿Todos?' #'Todos en Casa'
+        icon_template: mdi:home-map-marker
+        #entity_id:
+        #  - sensor.family_home
+        #  - sensor.family_sleep_home
+
+      # Alguien en Casa:  IF sensor.family_home > 0 THEN TRUE
+      #
+      family_any_home:
+        value_template: >-
+          {% if states('sensor.family_home')|int(0) > 0 %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        friendly_name: '¿Alguien?' #'Alguien en Casa'
+        icon_template: mdi:home
+        #entity_id:
+        #  - sensor.family_home
+
+      # Alarma SONOFF_SW1 SIRENA INTERIOR
+      esphome_bas_sw0:
+        value_template: >-
+          {% if is_state('switch.esphome_bas_sw0','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        friendly_name: 'Alarma Sirena Interior'
+        icon_template: mdi:alarm-light
+
+      #
+      # CONTROL SENSORES PRESENCIA ALARMA AWAY
+      #
+      # Genera un binary_sensor nuevo a partir del sensor movimiento original en ZHA y un selector input_boolean  
+      # lo que permite desactivar en la pestaña configuración el sensor que esté dando problemas.
+      #
+      # La alarma usa estos sensores en el grupo <group.alarma_sensores_presencia_interior_grp> durante el armado away.
+      #
+      #
+      # AQARA Movimiento Pasillo - ZHA PENDING
+      alarma_sensor_movimiento_salon:
+        value_template: >-
+          {%  if is_state('input_boolean.alarma_sensor_movimiento_salon','on')
+              and is_state('binary_sensor.motion_sensor_158d0001e05661','on')
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        icon_template: >-
+          {% if is_state('binary_sensor.alarma_sensor_movimiento_salon','on') %} mdi:motion-sensor
+          {% else %} mdi:motion-sensor-off
+          {% endif %}
+
+      # AQARA Movimiento Pasillo - ZHA OK
+      alarma_sensor_movimiento_estudio:
+        value_template: >-
+          {%  if is_state('input_boolean.alarma_sensor_movimiento_estudio','on')
+              and is_state('binary_sensor.aqara_movimiento_estudio','on')
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        icon_template: >-
+          {% if is_state('binary_sensor.alarma_sensor_movimiento_estudio','on') %} mdi:motion-sensor
+          {% else %} mdi:motion-sensor-off
+          {% endif %}
+
+      # AQARA Movimiento Entrada
+      alarma_sensor_movimiento_entrada_hall:
+        value_template: >-
+          {%  if is_state('input_boolean.alarma_sensor_movimiento_entrada_hall','on')
+              and is_state('binary_sensor.aqara_movimiento_entrada','on')
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        icon_template: >-
+          {% if is_state('binary_sensor.alarma_sensor_movimiento_entrada_hall','on') %} mdi:motion-sensor
+          {% else %} mdi:motion-sensor-off
+          {% endif %}
+
+      # AQARA Movimiento Entrada Exterior - ZHA PENDING
+      alarma_sensor_movimiento_entrada_exterior:
+        value_template: >-
+          {%  if is_state('input_boolean.alarma_sensor_movimiento_entrada_exterior','on')
+              and is_state('binary_sensor.motion_sensor_158d0001e637f6','on')
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        icon_template: >-
+          {% if is_state('binary_sensor.alarma_sensor_movimiento_entrada_exterior','on') %} mdi:motion-sensor
+          {% else %} mdi:motion-sensor-off
+          {% endif %}
+
+      # AQARA Movimiento Dormitorio Principal - ZHA PENDING
+      alarma_sensor_movimiento_dormitorio_principal:
+        value_template: >-
+          {%  if is_state('input_boolean.alarma_sensor_movimiento_dormitorio_principal','on')
+              and is_state('binary_sensor.motion_sensor_158d0002ea1d0f','on')
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        icon_template: >-
+          {% if is_state('binary_sensor.alarma_sensor_movimiento_dormitorio_principal','on') %} mdi:motion-sensor
+          {% else %} mdi:motion-sensor-off
+          {% endif %}
+
+      # HUE Movimiento Pasillo - ZHA OK
+      alarma_sensor_movimiento_pasillo:
+        value_template: >-
+          {%  if is_state('input_boolean.alarma_sensor_movimiento_pasillo','on')
+              and is_state('binary_sensor.binary_sensor.hue_movimiento_pasillo','on')
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        icon_template: >-
+          {% if is_state('binary_sensor.alarma_sensor_movimiento_pasillo','on') %} mdi:motion-sensor
+          {% else %} mdi:motion-sensor-off
+          {% endif %}
+
+      #
+      # CONTROL LAVADORA
+      #
+      # SONOFF POW_SW2. Sensores control consumo potencia
+      #
+      esphome_pow_sw2_switch:
+        value_template: >-
+          {% if is_state('switch.esphome_pow_sw2','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      esphome_pow_sw2_blue_led:
+        value_template: >-
+          {% if is_state('light.esphome_pow_sw2_led','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      esphome_pow_sw2_current:
+        value_template: >-
+          {% if states('sensor.esphome_pow_sw2_current')|int(0) > 0 %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      esphome_pow_sw2_power:
+        value_template: >-
+          {% if states('sensor.esphome_pow_sw2_power')|int(0) > 0 %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      esphome_pow_sw2_voltage:
+        value_template: >-
+          {% if states('sensor.esphome_pow_sw2_voltage')|int(0) > 0 %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      esphome_pow_sw2_lavadora_lavando:
+        value_template: >-
+          {%  if is_state('binary_sensor.esphome_pow_sw2_switch','on')
+              and states('sensor.esphome_pow_sw2_voltage')|int(0) > 200
+              and states('sensor.esphome_pow_sw2_power')|round(1) > 2.5
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      esphome_pow_sw2_lavadora_warning:
+        value_template: >-
+          {%  if is_state('binary_sensor.esphome_pow_sw2_switch','on')
+              and states('sensor.esphome_pow_sw2_power')|round(1) >= 0.1
+              and states('sensor.esphome_pow_sw2_power')|round(1) < 3.0
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      #
+      # SONOFF POW_SW3. PISCINA. Sensores control consumo potencia
+      #
+      piscina_interruptor_global:
+        friendly_name: 'Interruptor General Piscina'
+        icon_template: >-
+          {% if is_state('input_boolean.piscina_interruptor_global','on') %} mdi:pool
+          {% else %} mdi:swim
+          {% endif %}
+        value_template: >-
+          {% if is_state('input_boolean.piscina_interruptor_global','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      piscina_depuradora_ch0_status:
+        value_template: >-
+          {% if is_state('switch.esphome_pow_sw3','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        friendly_name: 'Control Depuradora Piscina'
+        icon_template: mdi:pool
+
+      esphome_pow_sw3_blue_led:
+        value_template: >-
+          {% if is_state('light.esphome_pow_sw3_led','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      esphome_pow_sw3_current:
+        value_template: >-
+          {% if states('sensor.esphome_pow_sw3_current')|int(0) > 1 %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      esphome_pow_sw3_power:
+        value_template: >-
+          {% if states('sensor.esphome_pow_sw3_power')|int(0) > 1 %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      esphome_pow_sw3_voltage:
+        value_template: >-
+          {% if states('sensor.esphome_pow_sw3_voltage')|int(0) > 1 %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      piscina_depuradora_ch0_motor_on:
+        value_template: >-
+          {%  if states('sensor.esphome_pow_sw3_voltage')|int(0) > 200
+              and states('sensor.esphome_pow_sw3_power')|round(1) > 1.0
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      piscina_depuradora_ch0_warning:
+        value_template: >-
+          {%  if states('sensor.esphome_pow_sw3_voltage')|int(0) > 200
+              and states('sensor.esphome_pow_sw3_power')|round(1) > 4.0
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      piscina_depuradora_ch0_on:
+        value_template: >-
+          {% if is_state('switch.esphome_pow_sw3','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        friendly_name: 'Depuradora on/off'
+        icon_template: mdi:power
+
+      piscina_depuradora_ch0_dia_ejecucion_t1:
+        friendly_name: '¿Próxima Ejecución Hoy? (CH0-T1)'
+        icon_template: mdi:calendar-check
+        value_template: >-
+          {% if is_state('input_select.piscina_depuradora_ch0_programador_dias','Diario') and is_state('input_boolean.piscina_depuradora_ch0_programador_t1','on') %}
+            true
+          {% elif is_state('input_select.piscina_depuradora_ch0_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.piscina_depuradora_ch0_programador_t1','on') %}
+            true
+          {% elif is_state('input_select.piscina_depuradora_ch0_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.piscina_depuradora_ch0_programador_t1','on') %}
+            true
+          {% elif is_state('input_select.piscina_depuradora_ch0_programador_dias','Weekend') and now().weekday() | int in (5,6) and is_state('input_boolean.piscina_depuradora_ch0_programador_t1','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      piscina_depuradora_ch0_dia_ejecucion_t2:
+        friendly_name: '¿Próxima Ejecución Hoy? (CH0-T2)'
+        icon_template: mdi:calendar-check
+        value_template: >-
+          {% if is_state('input_select.piscina_depuradora_ch0_programador_dias','Diario') and is_state('input_boolean.piscina_depuradora_ch0_programador_t2','on') %}
+            true
+          {% elif is_state('input_select.piscina_depuradora_ch0_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.piscina_depuradora_ch0_programador_t2','on') %}
+            true
+          {% elif is_state('input_select.piscina_depuradora_ch0_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.piscina_depuradora_ch0_programador_t2','on') %}
+            true
+          {% elif is_state('input_select.piscina_depuradora_ch0_programador_dias','Weekend') and now().weekday() | int in (5,6) and is_state('input_boolean.piscina_depuradora_ch0_programador_t2','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      piscina_depuradora_ch0_dia_ejecucion:
+        friendly_name: '¿Próxima Ejecución Hoy? (CH0)'
+        icon_template: mdi:pool
+        value_template: >-
+          {% if is_state('input_boolean.piscina_interruptor_global','on')
+                and (is_state('binary_sensor.piscina_depuradora_ch0_dia_ejecucion_t1','on') or is_state('binary_sensor.piscina_depuradora_ch0_dia_ejecucion_t2','on'))
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      #
+      #  CONTROL BOMBA JARDIN RIEGO - CH1 - CH4
+      #
+      esphome_pow_sw4_current:
+        value_template: >-
+          {% if states('sensor.esphome_pow_sw4_current')|int(0) > 1 %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      esphome_pow_sw4_power:
+        value_template: >-
+          {% if states('sensor.esphome_pow_sw4_power')|int(0) > 1 %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      esphome_pow_sw4_voltage:
+        value_template: >-
+          {% if states('sensor.esphome_pow_sw4_voltage')|int(0) > 1 %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      riego_bomba_pozo_status:
+        value_template: >-
+          {% if is_state('switch.esphome_pow_sw4','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        friendly_name: 'Control Bomba Riego'
+        icon_template: mdi:water-well
+
+      # Sensor binario que indica si el motor del pozo está activo, basado en
+      # voltaga = 220V y consumo wattios (power) > 100W
+      # El consumo habitual de la bomba es > 1500W
+      riego_bomba_pozo_motor_on:
+        value_template: >-
+          {%  if states('sensor.esphome_pow_sw4_voltage')|int(0) > 200
+              and states('sensor.esphome_pow_sw4_power')|round(1) > 100
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        icon_template: mdi:flash-outline
+      # AAC
+      riego_bomba_pozo_warning_motor_off:
+        value_template: >-
+          {% if (is_state('binary_sensor.riego_cesped_ch1_status','on') or
+                 is_state('binary_sensor.riego_cesped_ch2_status','on') or
+                 is_state('binary_sensor.riego_cesped_ch3_status','on')
+                ) and states('sensor.esphome_pow_sw3_power')|round(1) < 100
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        icon_template: mdi:flash-alert
+
+      riego_bomba_pozo_warning_consumo:
+        value_template: >-
+          {%  if states('sensor.esphome_pow_sw3_voltage')|int(0) > 200
+              and states('sensor.esphome_pow_sw3_power')|round(1) > 1800
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        icon_template: mdi:flash-alert
+
+      #
+      # AEMET PREVISION METEREOLOGICA
+      #
+      # aemet_prevision_tiempo_dia0:
+      #  # rain, snow, sleet
+      #  friendly_name: 'Previsión Tiempo Hoy'
+      #  icon_template: mdi:weather
+      #  value_template: states('sensor.dark_sky_icon')
+
+      # TARJETA VERTICAL PRONOSTICO
+      # - entity: sensor.aemet_condition = weather.aemet_daily
+
+      # - entity: sensor.aemet_rain
+      # - entity: sensor.aemet_rain_probability
+      # - entity: sensor.aemet_snow
+
+      # - entity: sensor.aemet_humidity
+      # - entity: sensor.aemet_storm_probability
+      # - entity: sensor.aemet_snow_probability
+
+      # OTROS SENSORES DISPONIBLEs
+      # - entity: sensor.aemet_daily_forecast_condition
+      # - entity: sensor.aemet_daily_forecast_precipitation_probability
+      # - sensor.aemet_daily_forecast_temperature_low
+      # - sensor.aemet_daily_forecast_temperature
+
+      aemet_prevision_lluvia_0d:
+        # DARKSKY : rain, snow, sleet
+        # AEMET : rainy, snow, sleet
+        # AYER : 0d
+        friendly_name: 'Pronóstico Lluvia 0d'
+        icon_template: >-
+          {% if is_state('binary_sensor.aemet_prevision_lluvia_0d','on') %} mdi:weather-rainy
+          {% else %} mdi:weather-sunny
+          {% endif %}
+        value_template: >-
+          {% if (is_state('sensor.aemet_icono_0d','rainy') or
+                 is_state('sensor.aemet_icono_0d','snow') or
+                 is_state('sensor.aemet_icono_0d','sleet')
+                ) and states('sensor.aemet_lluvia_0d')|int(0)>=80
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      aemet_prevision_lluvia_1d:
+        # AEMET : rainy, snow, sleet
+        # HOY : 1d
+        friendly_name: 'Pronóstico Lluvia +1d'
+        icon_template: >-
+          {% if is_state('binary_sensor.aemet_prevision_lluvia_1d','on') %} mdi:weather-rainy
+          {% else %} mdi:weather-sunny
+          {% endif %}
+        value_template: >-
+          {% if (is_state('sensor.aemet_icono_1d','rainy') or
+                 is_state('sensor.aemet_icono_1d','snow') or
+                 is_state('sensor.aemet_icono_1d','sleet')
+                ) and states('sensor.aemet_lluvia_1d')|int(0)>=80
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      aemet_prevision_lluvia_2d:
+        # AEMET : rainy, snow, sleet
+        # HOY : 2d
+        friendly_name: 'Pronóstico Lluvia +2d'
+        icon_template: >-
+          {% if is_state('binary_sensor.aemet_prevision_lluvia_2d','on') %} mdi:weather-rainy
+          {% else %} mdi:weather-sunny
+          {% endif %}
+        value_template: >-
+          {% if (is_state('sensor.aemet_icono_2d','rainy') or
+                 is_state('sensor.aemet_icono_2d','snow') or
+                 is_state('sensor.aemet_icono_2d','sleet')
+                ) and states('sensor.aemet_lluvia_2d')|int(0)>=80
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      aemet_prevision_lluvia_3d:
+        # AEMET : rainy, snow, sleet
+        # HOY : 2d
+        friendly_name: 'Pronóstico Lluvia +3d'
+        icon_template: >-
+          {% if is_state('binary_sensor.aemet_prevision_lluvia_0d','on') %} mdi:weather-rainy
+          {% else %} mdi:weather-sunny
+          {% endif %}
+        value_template: >-
+          {% if (is_state('sensor.aemet_icono_3d','rainy') or
+                 is_state('sensor.aemet_icono_3d','snow') or
+                 is_state('sensor.aemet_icono_3d','sleet')
+                ) and states('sensor.aemet_lluvia_3d')|int(0)>=80
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      riego_automatico_hoy:
+        #
+        # IA : ¿ACTIVAR RIEGO HOY?
+        #
+        # SEASON: 'autumn','winter','spring','summer'
+        # states('sensor.humedad_entrada_ly03')|int >= 50
+        # states('sensor.temperatura_entrada_ly03')|int >= 35
+        #
+        # PREVISION DE LLUVIA EN LA ZONA
+        #
+        #           AYER    HOY     MAÑANA
+        #           DIA-1   DIA+0   DIA+1     RIEGO
+        #  LLUEVE   0       0       0         1
+        #  LLUEVE   0       0       1         0
+        #  LLUEVE   0       1       1         0
+        #  LLUEVE   1       0       0         1
+        #  LLUEVE   1       0       1         0
+        #  LLUEVE   1       1       1         0
+        #
+        #
+        # select * from states
+        # where domain = 'binary_sensor'
+        # and entity_id = 'binary_sensor.aemet_prevision_lluvia_0d'
+        # and date_format(created,'%yy-%m-%d') >= date_format(now(),'%yy-%m-%d')
+
+        friendly_name: '¿IA Riego Hoy?'
+        #icon_template: mdi:head-snowflake-outline
+        icon_template: >-
+          {% if is_state('binary_sensor.riego_automatico_hoy','on') %} mdi:head-cog-outline
+          {% else %} mdi:head-remove-outline
+          {% endif %}
+        # states('sensor.season') in ('autumn','winter','spring')
+        # FORMULA IA ACTUAL SIMPLE
+        #   Si la previsión de lluvia para hoy o mañana es verdadero => SENSOR IA RIEGO HOY => FALSE
+        value_template: >-
+          {% if (is_state('binary_sensor.aemet_prevision_lluvia_0d','on')
+                      or  is_state('binary_sensor.aemet_prevision_lluvia_1d','on')
+                )
+          %}
+            false
+          {% else %}
+            true
+          {% endif %}
+
+      riego_interruptor_global:
+        friendly_name: 'Interruptor General Riego'
+        icon_template: >-
+          {% if is_state('binary_sensor.riego_interruptor_global','on') %} mdi:sprinkler-var
+          {% else %} mdi:sprinkler
+          {% endif %}
+        value_template: >-
+          {% if is_state('input_boolean.riego_interruptor_global','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      riego_algun_sector_activo:
+        friendly_name: 'Riego Algun Sector Activo?'
+        icon_template: >-
+          {% if is_state('binary_sensor.riego_algun_sector_activo','on') %} mdi:watering-can
+          {% else %} mdi:watering-can-outline
+          {% endif %}
+        value_template: >-
+          {% if is_state('binary_sensor.riego_bonsais_ch1_status','on') or
+                is_state('binary_sensor.riego_bonsais_ch2_status','on') or
+                is_state('binary_sensor.riego_cesped_ch1_status','on') or
+                is_state('binary_sensor.riego_cesped_ch2_status','on') or
+                is_state('binary_sensor.riego_cesped_ch3_status','on') or
+                is_state('binary_sensor.riego_cesped_ch4_status','on') or
+                is_state('binary_sensor.riego_bonsais_ch0_status','on') or
+                is_state('binary_sensor.riego_tomates_ch0_status','on')
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      # RIEGO BONSAIS TOP
+      #
+      riego_bonsais_ch1_status:
+        value_template: >-
+          {% if is_state('switch.esphome_4ch_sw2_relay_1','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        friendly_name: 'Riego CH1 on/off'
+        icon_template: mdi:leaf
+
+      riego_bonsais_ch1_dia_ejecucion_t1:
+        friendly_name: '¿Próxima Ejecución Hoy? (CH1-T1)'
+        icon_template: mdi:calendar-check
+        value_template: >-
+          {% if is_state('input_select.riego_bonsais_ch1_programador_dias','Diario') and is_state('input_boolean.riego_bonsais_ch1_programador_t1','on') %}
+            true
+          {% elif is_state('input_select.riego_bonsais_ch1_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_bonsais_ch1_programador_t1','on') %}
+            true
+          {% elif is_state('input_select.riego_bonsais_ch1_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.riego_bonsais_ch1_programador_t1','on') %}
+            true
+          {% elif is_state('input_select.riego_bonsais_ch1_programador_dias','Weekend') and now().weekday() | int in (5,6) and is_state('input_boolean.riego_bonsais_ch1_programador_t1','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      riego_bonsais_ch1_dia_ejecucion_t2:
+        friendly_name: '¿Próxima Ejecución Hoy? (CH1-T2)'
+        icon_template: mdi:calendar-check
+        value_template: >-
+          {% if is_state('input_select.riego_bonsais_ch1_programador_dias','Diario') and is_state('input_boolean.riego_bonsais_ch1_programador_t2','on') %}
+            true
+          {% elif is_state('input_select.riego_bonsais_ch1_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_bonsais_ch1_programador_t2','on') %}
+            true
+          {% elif is_state('input_select.riego_bonsais_ch1_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.riego_bonsais_ch1_programador_t2','on') %}
+            true
+          {% elif is_state('input_select.riego_bonsais_ch1_programador_dias','Weekend') and now().weekday() | int in (5,6) and is_state('input_boolean.riego_bonsais_ch1_programador_t2','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      riego_bonsais_ch1_dia_ejecucion:
+        friendly_name: '¿Próxima Ejecución Hoy? (CH1)'
+        icon_template: mdi:tree
+        value_template: >-
+          {% if is_state('input_boolean.riego_interruptor_global','on')
+                and (is_state('binary_sensor.riego_bonsais_ch1_dia_ejecucion_t1','on') or is_state('binary_sensor.riego_bonsais_ch1_dia_ejecucion_t2','on'))
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      # RIEGO PLANTAS ENTRADA
+      #
+      riego_bonsais_ch2_status:
+        value_template: >-
+          {% if is_state('switch.esphome_4ch_sw2_relay_2','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        friendly_name: 'Riego CH2 on/off'
+        icon_template: mdi:flower
+
+      riego_bonsais_ch2_dia_ejecucion_t1:
+        friendly_name: '¿Próxima Ejecución Hoy? (CH2-T1)'
+        icon_template: mdi:calendar-check
+        value_template: >-
+          {% if is_state('input_select.riego_bonsais_ch2_programador_dias','Diario') and is_state('input_boolean.riego_bonsais_ch2_programador_t1','on') %}
+            true
+          {% elif is_state('input_select.riego_bonsais_ch2_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_bonsais_ch2_programador_t1','on') %}
+            true
+          {% elif is_state('input_select.riego_bonsais_ch2_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.riego_bonsais_ch2_programador_t1','on') %}
+            true
+          {% elif is_state('input_select.riego_bonsais_ch2_programador_dias','Weekend') and now().weekday() | int in (5,6) and is_state('input_boolean.riego_bonsais_ch2_programador_t1','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      riego_bonsais_ch2_dia_ejecucion_t2:
+        friendly_name: '¿Próxima Ejecución Hoy? (CH2-T2)'
+        icon_template: mdi:calendar-check
+        value_template: >-
+          {% if is_state('input_select.riego_bonsais_ch2_programador_dias','Diario') and is_state('input_boolean.riego_bonsais_ch2_programador_t2','on') %}
+            true
+          {% elif is_state('input_select.riego_bonsais_ch2_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_bonsais_ch2_programador_t2','on') %}
+            true
+          {% elif is_state('input_select.riego_bonsais_ch2_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.riego_bonsais_ch2_programador_t2','on') %}
+            true
+          {% elif is_state('input_select.riego_bonsais_ch2_programador_dias','Weekend') and now().weekday() | int in (5,6) and is_state('input_boolean.riego_bonsais_ch2_programador_t2','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      riego_bonsais_ch2_dia_ejecucion:
+        friendly_name: '¿Próxima Ejecución Hoy? (CH2)'
+        icon_template: mdi:tree
+        value_template: >-
+          {% if is_state('input_boolean.riego_interruptor_global','on')
+                and (is_state('binary_sensor.riego_bonsais_ch2_dia_ejecucion_t1','on') or is_state('binary_sensor.riego_bonsais_ch2_dia_ejecucion_t2','on'))
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      # RIEGO FUENTE ZEN
+      #
+      riego_bonsais_ch3_status:
+        value_template: >-
+          {% if is_state('switch.esphome_4ch_sw2_relay_3','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        friendly_name: 'Riego CH3 on/off'
+        icon_template: mdi:power
+
+      riego_bonsais_ch3_dia_ejecucion_t0:
+        friendly_name: '¿Próxima Ejecución Hoy? (CH3) Precheck'
+        icon_template: mdi:calendar-check
+        value_template: >-
+          {% if is_state('input_select.riego_bonsais_ch3_programador_dias','Diario') and is_state('input_boolean.riego_bonsais_ch3_programador','on') %}
+            true
+          {% elif is_state('input_select.riego_bonsais_ch3_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_bonsais_ch3_programador','on') %}
+            true
+          {% elif is_state('input_select.riego_bonsais_ch3_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.riego_bonsais_ch3_programador','on') %}
+            true
+          {% elif is_state('input_select.riego_bonsais_ch3_programador_dias','Weekend') and now().weekday() | int in (5,6) and is_state('input_boolean.riego_bonsais_ch3_programador','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      riego_bonsais_ch3_dia_ejecucion:
+        friendly_name: '¿Próxima Ejecución Hoy? (CH3)'
+        icon_template: mdi:calendar-check
+        value_template: >-
+          {% if is_state('input_boolean.riego_interruptor_global','on')
+                and is_state('binary_sensor.riego_bonsais_ch3_dia_ejecucion_t0','on')
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      # RIEGO LIBRE
+      #
+      riego_bonsais_ch4_status:
+        value_template: >-
+          {% if is_state('switch.esphome_4ch_sw2_relay_4','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        friendly_name: 'Riego CH4 on/off'
+        icon_template: mdi:power
+
+      riego_bonsais_ch4_dia_ejecucion:
+        friendly_name: '¿Próxima Ejecución Hoy? (CH4)'
+        icon_template: mdi:calendar-check
+        value_template: >-
+          {% if is_state('input_select.riego_bonsais_ch4_programador_dias','Diario') and is_state('input_boolean.riego_bonsais_ch4_programador','on') %}
+            true
+          {% elif is_state('input_select.riego_bonsais_ch4_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_bonsais_ch4_programador','on') %}
+            true
+          {% elif is_state('input_select.riego_bonsais_ch4_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.riego_bonsais_ch4_programador','on') %}
+            true
+          {% elif is_state('input_select.riego_bonsais_ch4_programador_dias','Weekend') and now().weekday() | int in (5,6) and is_state('input_boolean.riego_bonsais_ch4_programador','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      # RIEGO BONSAIS PRODUCCION
+      #
+      riego_bonsais_ch0_status:
+        value_template: >-
+          {% if is_state('switch.esphome_pow_sw1','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        friendly_name: 'Riego Bonsais Produccion on/off'
+        icon_template: mdi:tree
+
+      riego_bonsais_ch0_dia_ejecucion_t1:
+        friendly_name: '¿Próxima Ejecución Hoy? (SW2-T1)'
+        icon_template: mdi:calendar-check
+        value_template: >-
+          {% if is_state('input_select.riego_bonsais_ch0_programador_dias','Diario') and is_state('input_boolean.riego_bonsais_ch0_programador_t1','on') %}
+            true
+          {% elif is_state('input_select.riego_bonsais_ch0_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_bonsais_ch0_programador_t1','on') %}
+            true
+          {% elif is_state('input_select.riego_bonsais_ch0_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.riego_bonsais_ch0_programador_t1','on') %}
+            true
+          {% elif is_state('input_select.riego_bonsais_ch0_programador_dias','Weekend') and now().weekday() | int in (5,6) and is_state('input_boolean.riego_bonsais_ch0_programador_t1','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      riego_bonsais_ch0_dia_ejecucion_t2:
+        friendly_name: '¿Próxima Ejecución Hoy? (SW2-T2)'
+        icon_template: mdi:calendar-check
+        value_template: >-
+          {% if is_state('input_select.riego_bonsais_ch0_programador_dias','Diario') and is_state('input_boolean.riego_bonsais_ch0_programador_t2','on') %}
+            true
+          {% elif is_state('input_select.riego_bonsais_ch0_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_bonsais_ch0_programador_t2','on') %}
+            true
+          {% elif is_state('input_select.riego_bonsais_ch0_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.riego_bonsais_ch0_programador_t2','on') %}
+            true
+          {% elif is_state('input_select.riego_bonsais_ch0_programador_dias','Weekend') and now().weekday() | int in (5,6) and is_state('input_boolean.riego_bonsais_ch0_programador_t2','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      riego_bonsais_ch0_dia_ejecucion:
+        friendly_name: '¿Próxima Ejecución Hoy?'
+        icon_template: mdi:pine-tree
+        value_template: >-
+          {% if is_state('input_boolean.riego_interruptor_global','on')
+                and (is_state('binary_sensor.riego_bonsais_ch0_dia_ejecucion_t1','on') or is_state('binary_sensor.riego_bonsais_ch0_dia_ejecucion_t2','on'))
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      # RIEGO HUERTO TOMATERA
+      #
+      riego_tomates_ch0_status:
+        value_template: >-
+          {% if is_state('switch.esphome_bas_sw2','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        friendly_name: 'Riego Huerto Tomates  on/off'
+        icon_template: mdi:sprout
+
+      riego_tomates_ch0_dia_ejecucion_t1:
+        friendly_name: '¿Próxima Ejecución Hoy? (POW1-T1)'
+        icon_template: mdi:calendar-check
+        value_template: >-
+          {% if is_state('input_select.riego_tomates_ch0_programador_dias','Diario') and is_state('input_boolean.riego_tomates_ch0_programador_t1','on') %}
+            true
+          {% elif is_state('input_select.riego_tomates_ch0_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_tomates_ch0_programador_t1','on') %}
+            true
+          {% elif is_state('input_select.riego_tomates_ch0_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.riego_tomates_ch0_programador_t1','on') %}
+            true
+          {% elif is_state('input_select.riego_tomates_ch0_programador_dias','Weekend') and now().weekday() | int in (5,6) and is_state('input_boolean.riego_tomates_ch0_programador_t1','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      riego_tomates_ch0_dia_ejecucion_t2:
+        friendly_name: '¿Próxima Ejecución Hoy? (POW1-T2)'
+        icon_template: mdi:calendar-check
+        value_template: >-
+          {% if is_state('input_select.riego_tomates_ch0_programador_dias','Diario') and is_state('input_boolean.riego_tomates_ch0_programador_t2','on') %}
+            true
+          {% elif is_state('input_select.riego_tomates_ch0_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_tomates_ch0_programador_t2','on') %}
+            true
+          {% elif is_state('input_select.riego_tomates_ch0_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.riego_tomates_ch0_programador_t2','on') %}
+            true
+          {% elif is_state('input_select.riego_tomates_ch0_programador_dias','Weekend') and now().weekday() | int in (5,6) and is_state('input_boolean.riego_tomates_ch0_programador_t2','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      riego_tomates_ch0_dia_ejecucion:
+        friendly_name: '¿Próxima Ejecución Hoy?'
+        icon_template: mdi:sprout
+        value_template: >-
+          {% if is_state('input_boolean.riego_interruptor_global','on')
+                and (is_state('binary_sensor.riego_tomates_ch0_dia_ejecucion_t1','on') or is_state('binary_sensor.riego_tomates_ch0_dia_ejecucion_t2','on'))
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      #
+      # RIEGO CESPED CH1
+      #
+      riego_cesped_ch1_status:
+        value_template: >-
+          {% if is_state('switch.esphome_4ch_sw3_relay_1','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        friendly_name: 'Riego Cesped CH1 on/off'
+        icon_template: mdi:sprinkler
+
+      riego_cesped_ch1_dia_ejecucion_t1:
+        friendly_name: '¿Próxima Ejecución Hoy? (CH1-T1)'
+        icon_template: mdi:calendar-check
+        value_template: >-
+          {% if is_state('input_select.riego_cesped_ch1_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch1_programador_t1','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch1_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_cesped_ch1_programador_t1','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch1_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.riego_cesped_ch1_programador_t1','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch1_programador_dias','Weekend') and now().weekday() | int in (5,6) and is_state('input_boolean.riego_cesped_ch1_programador_t1','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      riego_cesped_ch1_dia_ejecucion_t2:
+        friendly_name: '¿Próxima Ejecución Hoy? (CH1-T2)'
+        icon_template: mdi:calendar-check
+        value_template: >-
+          {% if is_state('input_select.riego_cesped_ch1_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch1_programador_t2','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch1_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_cesped_ch1_programador_t2','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch1_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.riego_cesped_ch1_programador_t2','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch1_programador_dias','Weekend') and now().weekday() | int in (5,6) and is_state('input_boolean.riego_cesped_ch1_programador_t2','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      riego_cesped_ch1_dia_ejecucion_t3:
+        friendly_name: '¿Próxima Ejecución Hoy? (CH1-T3)'
+        icon_template: mdi:calendar-check
+        value_template: >-
+          {% if is_state('input_select.riego_cesped_ch1_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch1_programador_t3','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch1_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_cesped_ch1_programador_t3','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch1_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.riego_cesped_ch1_programador_t3','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch1_programador_dias','Weekend') and now().weekday() | int in (5,6) and is_state('input_boolean.riego_cesped_ch1_programador_t3','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      riego_cesped_ch1_dia_ejecucion:
+        friendly_name: '¿Próxima Ejecución Hoy? (CH1)'
+        icon_template: mdi:tree
+        value_template: >-
+          {% if is_state('input_boolean.riego_interruptor_global','on')
+                and (is_state('binary_sensor.riego_cesped_ch1_dia_ejecucion_t1','on') 
+                     or is_state('binary_sensor.riego_cesped_ch1_dia_ejecucion_t2','on')
+                     or is_state('binary_sensor.riego_cesped_ch1_dia_ejecucion_t3','on')
+                )
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      #
+      # RIEGO CESPED CH2
+      #
+      riego_cesped_ch2_status:
+        value_template: >-
+          {% if is_state('switch.esphome_4ch_sw3_relay_2','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        friendly_name: 'Riego Cesped CH2 on/off'
+        icon_template: mdi:sprinkler-variant
+
+      riego_cesped_ch2_dia_ejecucion_t1:
+        friendly_name: '¿Próxima Ejecución Hoy? (CH2-T1)'
+        icon_template: mdi:calendar-check
+        value_template: >-
+          {% if is_state('input_select.riego_cesped_ch2_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch2_programador_t1','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch2_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_cesped_ch2_programador_t1','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch2_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.riego_cesped_ch2_programador_t1','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch2_programador_dias','Weekend') and now().weekday() | int in (5,6) and is_state('input_boolean.riego_cesped_ch2_programador_t1','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      riego_cesped_ch2_dia_ejecucion_t2:
+        friendly_name: '¿Próxima Ejecución Hoy? (CH2-T2)'
+        icon_template: mdi:calendar-check
+        value_template: >-
+          {% if is_state('input_select.riego_cesped_ch2_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch2_programador_t2','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch2_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_cesped_ch2_programador_t2','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch2_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.riego_cesped_ch2_programador_t2','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch2_programador_dias','Weekend') and now().weekday() | int in (5,6) and is_state('input_boolean.riego_cesped_ch2_programador_t2','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      riego_cesped_ch2_dia_ejecucion_t3:
+        friendly_name: '¿Próxima Ejecución Hoy? (CH2-T3)'
+        icon_template: mdi:calendar-check
+        value_template: >-
+          {% if is_state('input_select.riego_cesped_ch2_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch2_programador_t3','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch2_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_cesped_ch2_programador_t3','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch2_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.riego_cesped_ch2_programador_t3','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch2_programador_dias','Weekend') and now().weekday() | int in (5,6) and is_state('input_boolean.riego_cesped_ch2_programador_t3','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      riego_cesped_ch2_dia_ejecucion:
+        friendly_name: '¿Próxima Ejecución Hoy? (CH2)'
+        icon_template: mdi:tree
+        value_template: >-
+          {% if is_state('input_boolean.riego_interruptor_global','on')
+                and (is_state('binary_sensor.riego_cesped_ch2_dia_ejecucion_t1','on') 
+                    or is_state('binary_sensor.riego_cesped_ch2_dia_ejecucion_t2','on')
+                    or is_state('binary_sensor.riego_cesped_ch2_dia_ejecucion_t3','on')
+                )
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      #
+      # RIEGO CESPED CH3
+      #
+      riego_cesped_ch3_status:
+        value_template: >-
+          {% if is_state('switch.esphome_4ch_sw3_relay_3','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        friendly_name: 'Riego Cesped CH3 on/off'
+        icon_template: mdi:sprinkler-fire
+
+      riego_cesped_ch3_dia_ejecucion_t1:
+        friendly_name: '¿Próxima Ejecución Hoy? (CH3-T1)'
+        icon_template: mdi:calendar-check
+        value_template: >-
+          {% if is_state('input_select.riego_cesped_ch3_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch3_programador_t1','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch3_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_cesped_ch3_programador_t1','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch3_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.riego_cesped_ch3_programador_t1','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch3_programador_dias','Weekend') and now().weekday() | int in (5,6) and is_state('input_boolean.riego_cesped_ch3_programador_t1','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      riego_cesped_ch3_dia_ejecucion_t2:
+        friendly_name: '¿Próxima Ejecución Hoy? (CH3-T2)'
+        icon_template: mdi:calendar-check
+        value_template: >-
+          {% if is_state('input_select.riego_cesped_ch3_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch3_programador_t2','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch3_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_cesped_ch3_programador_t2','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch3_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.riego_cesped_ch3_programador_t2','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch3_programador_dias','Weekend') and now().weekday() | int in (5,6) and is_state('input_boolean.riego_cesped_ch3_programador_t2','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      riego_cesped_ch3_dia_ejecucion:
+        friendly_name: '¿Próxima Ejecución Hoy? (CH3)'
+        icon_template: mdi:tree
+        value_template: >-
+          {% if is_state('input_boolean.riego_interruptor_global','on')
+                and (is_state('binary_sensor.riego_cesped_ch3_dia_ejecucion_t1','on') or is_state('binary_sensor.riego_cesped_ch3_dia_ejecucion_t2','on'))
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      #
+      # RIEGO CESPED CH4
+      #
+      riego_cesped_ch4_status:
+        value_template: >-
+          {% if is_state('switch.esphome_4ch_sw3_relay_4','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        friendly_name: 'Riego Cesped CH4 on/off'
+        icon_template: mdi:power
+
+      riego_cesped_ch4_dia_ejecucion_t1:
+        friendly_name: '¿Próxima Ejecución Hoy? (CH4-T1)'
+        icon_template: mdi:calendar-check
+        value_template: >-
+          {% if is_state('input_select.riego_cesped_ch4_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch4_programador_t1','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch4_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_cesped_ch4_programador_t1','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch4_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.riego_cesped_ch4_programador_t1','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch4_programador_dias','Weekend') and now().weekday() | int in (5,6) and is_state('input_boolean.riego_cesped_ch4_programador_t1','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      riego_cesped_ch4_dia_ejecucion_t2:
+        friendly_name: '¿Próxima Ejecución Hoy? (CH4-T2)'
+        icon_template: mdi:calendar-check
+        value_template: >-
+          {% if is_state('input_select.riego_cesped_ch4_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch4_programador_t2','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch4_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_cesped_ch4_programador_t2','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch4_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.riego_cesped_ch4_programador_t2','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch4_programador_dias','Weekend') and now().weekday() | int in (5,6) and is_state('input_boolean.riego_cesped_ch4_programador_t2','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      riego_cesped_ch4_dia_ejecucion:
+        friendly_name: '¿Próxima Ejecución Hoy? (CH4)'
+        icon_template: mdi:tree
+        value_template: >-
+          {% if is_state('input_boolean.riego_interruptor_global','on')
+                and (is_state('binary_sensor.riego_cesped_ch4_dia_ejecucion_t1','on') or is_state('binary_sensor.riego_cesped_ch4_dia_ejecucion_t2','on'))
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
+      #
+      # SENSORES XIAOMI PLANT
+      #
+      plant_mp_01_problem:
+        value_template: >-
+          {% if states.plant.mp_01.attributes.problem == 'none' %}
+            false
+          {% else %}
+            true
+          {% endif %}
+        friendly_name: 'Problemas Sensor Bonsai MP1'
+        icon_template: mdi:power
+
+      plant_mp_02_problem:
+        value_template: >-
+          {% if states.plant.mp_02.attributes.problem == 'none' %}
+            false
+          {% else %}
+            true
+          {% endif %}
+        friendly_name: 'Problemas Sensor Bonsai MP2'
+        icon_template: mdi:power
+
+      plant_mp_03_problem:
+        value_template: >-
+          {% if states.plant.mp_03.attributes.problem == 'none' %}
+            false
+          {% else %}
+            true
+          {% endif %}
+        friendly_name: 'Problemas Sensor Bonsai MP3'
+        icon_template: mdi:power
+
+      plant_mp_problem:
+        value_template: >-
+          {% if states.binary_sensor.plant_mp_01_problem.state == 'on'
+             or states.binary_sensor.plant_mp_02_problem.state == 'on'
+             or states.binary_sensor.plant_mp_03_problem.state == 'on'
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        friendly_name: 'Problemas Sensor Bonsais'
+        icon_template: mdi:power
+
+      # SAI APC Rack
+      ups_status:
+        value_template: >-
+          {% if is_state('sensor.ups_status','ONLINE') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        friendly_name: 'SAI APC·700 Rack'
+        icon_template: mdi:car-battery
+
+      # MELCLOUD A/C Estudio
+      # hvac_modes: off, heat, dry, cool, fan_only, heat_cool
+      melcloud_estudio_estate:
+        value_template: >-
+          {% if is_state('climate.aa_estudio','off') %}
+            false
+          {% else %}
+            true
+          {% endif %}
+        friendly_name: 'AC/Estudio'
+        icon_template: mdi:air-conditioner
+
+      # Monitores Macbook Estudio
+      #
+      macbook_monitor_lg1:
+        value_template: >-
+          {% if is_state('binary_sensor.macbook_aac_active','on') and
+                (is_state('sensor.macbook_aac_displays','2') or is_state('sensor.macbook_aac_displays','3'))  %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        friendly_name: 'LG 4K (1)'
+        icon_template: mdi:monitor-dashboard
+
+      macbook_monitor_lg2:
+        value_template: >-
+          {% if is_state('binary_sensor.macbook_aac_active','on') and is_state('sensor.macbook_aac_displays','3') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        friendly_name: 'LG 4K (2)'
+        icon_template: mdi:monitor-shimmer
+      
+      #
+      # Control Persiana Estudio
+      #
+      estudio_persiana_motor_up:
+        friendly_name: 'Persiana Subiendo (SW2)'
+        value_template: >-
+          {% if is_state('switch.esphome_dual_sw1_relay_1','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        icon_template: >-
+          {% if is_state('switch.esphome_dual_sw1_relay_1','on') %}
+            mdi:window-shutter-settings
+          {% else %}
+            mdi:window-shutter-open
+          {% endif %}
+
+      estudio_persiana_motor_down:
+        friendly_name: 'Persiana Bajando (SW5)'
+        value_template: >-
+          {% if is_state('switch.esphome_dual_sw1_relay_2','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        icon_template: >-
+          {% if is_state('switch.esphome_dual_sw1_relay_2','on') %}
+            mdi:window-shutter-settings
+          {% else %}
+            mdi:window-shutter
+          {% endif %}
+
+      estudio_persiana_motor_en_marcha:
+        friendly_name: 'Persiana Motor en Marcha'
+        value_template: >-
+          {% if is_state('switch.esphome_dual_sw1_relay_1','on') or is_state('switch.esphome_dual_sw1_relay_2','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        icon_template: >-
+          {% if is_state('switch.esphome_dual_sw1_relay_1','on') or is_state('switch.esphome_dual_sw1_relay_2','on') %}
+            mdi:window-shutter-settings
+          {% else %}
+            mdi:window-shutter
+          {% endif %}
+
+#
+# NMAP - COMPUTER LAPTOP DEVICES
+# =====================================================================
+#
+      nmap_macbook_pro_aac_lan:
+        value_template: >-
+          {% if is_state('device_tracker.nmap_macbook_pro_aac_lan','home') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        friendly_name: 'Apple Macbook Pro AAC LAN'
+        icon_template: mdi:laptop-mac
+        #entity_id: device_tracker.nmap_macbook_pro_aac_lan
+
+      nmap_macbook_pro_aac_wifi:
+        value_template: >-
+          {% if is_state('device_tracker.nmap_macbook_pro_aac_wifi','home') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        friendly_name: 'Apple Macbook Pro AAC Wifi'
+        icon_template: mdi:laptop-mac
+        #entity_id: device_tracker.nmap_macbook_pro_aac_wifi
+
+      nmap_macbook_pro_mfc_lan:
+        value_template: >-
+          {% if is_state('device_tracker.nmap_macbook_pro_mfc_lan','home') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        friendly_name: 'Apple Macbook Pro MFC LAN'
+        icon_template: mdi:laptop-mac
+        #entity_id: device_tracker.nmap_macbook_pro_mfc_lan
+
+      nmap_macbook_pro_mfc_wifi:
+        value_template: >-
+          {% if is_state('device_tracker.nmap_macbook_pro_mfc_wifi','home') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        friendly_name: 'Apple Macbook Pro MFC Wifi'
+        icon_template: mdi:laptop-mac
+        #entity_id: device_tracker.nmap_macbook_pro_mfc_wifi
+
+      nmap_asus_zenbook_wifi:
+        value_template: >-
+          {% if is_state('device_tracker.nmap_asus_zenbook_wifi','home') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        friendly_name: 'Asus Zenbook AAF'
+        icon_template: mdi:laptop
+        #entity_id: device_tracker.nmap_asus_zenbook_wifi
+
+      nmap_macbook_air_paf:
+        value_template: >-
+          {% if is_state('device_tracker.nmap_macbook_air_paf','home') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        friendly_name: 'Macbook Air PAF'
+        icon_template: mdi:laptop-mac
+        #entity_id: device_tracker.nmap_macbook_air_paf
+
+      nmap_toshiba_satellite:
+        value_template: >-
+          {% if is_state('device_tracker.toshiba_D7_84_D0_satellite_wifi','home')
+             or is_state('device_tracker.toshiba_91_41_44_satellite_lan','home') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        friendly_name: 'Toshiba Satélite CMC'
+        icon_template: mdi:laptop
+        #entity_id: device_tracker.toshiba_91_41_44_satelite_cmc_lan
+
+      nmap_alexa_entrada:
+        value_template: >-
+          {% if is_state('device_tracker.nmap_alexa_entrada','home') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        friendly_name: 'Alexa Entrada'
+        icon_template: mdi:speaker-wireless
+        #entity_id: device_tracker.nmap_alexa_entrada
+
+      nmap_alexa_dormitorio:
+        value_template: >-
+          {% if is_state('device_tracker.nmap_alexa_dormitorio','home') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        friendly_name: 'Alexa Dormitorio'
+        icon_template: mdi:speaker-wireless
+        #entity_id: device_tracker.nmap_alexa_dormitorio
+
+  - platform: ping
+    host: 8.8.8.8
+    name: "ping 00 Internet Google"
+    count: 5
+    scan_interval: 60
+
+  - platform: ping
+    host: 192.168.0.1
+    count: 5
+    name: 'ping 01 Router Movistar'
+    scan_interval: 60
+
+    #ping_02_nas_time_capsule:
+  - platform: ping
+    host: 192.168.0.2
+    count: 2
+    name: 'ping 02 NAS Time Capsule'
+
+    #ping_04_router_wifi_zte:
+  #- platform: ping
+  #  host: 192.168.0.4
+  #  count: 2
+  #  name: 'ping 04 Router WIFI ZTE'
+
+    #ping_05_router_wifi_tplink:
+  - platform: ping
+    host: 192.168.0.5
+    count: 2
+    name: 'ping 05 Router Wifi TPlink'
+
+    #ping_06_router_wifi_linksys:
+  - platform: ping
+    host: 192.168.0.6
+    count: 2
+    name: 'ping 06 Router WIFI Linksys'
+
+    #ping_07_switch_salon:
+  - platform: ping
+    host: 192.168.0.7
+    count: 2
+    name: 'ping 07 Switch Salon'
+
+    #ping_07_switch_pasillo:
+  - platform: ping
+    host: 192.168.0.8
+    count: 2
+    name: 'ping 08 Switch Pasillo'
+
+    #ping_09_switch_estudio:
+  - platform: ping
+    host: 192.168.0.9
+    count: 2
+    name: 'ping 09 Switch Estudio'
+
+    # PING - HOME & HUB DEVICES
+    # =====================================================================
+    #
+    # ping_xiaomi_gateway
+    # ping_philips_hue
+
+  - platform: ping
+    host: 192.168.0.20
+    count: 2
+    name: 'Hub Philips Hue'
+
+  - platform: ping
+    host: 192.168.0.120
+    count: 2
+    name: 'Xiaomi Aqara Gateway'

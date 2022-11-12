@@ -1,0 +1,72 @@
+#
+# ESPHOME - ESP32S HUB2 - BLUETOOTH BLE ESTUDIO
+#
+
+substitutions:
+  device_name: esphome_esp32_hub2_ble
+
+esphome:
+  name: ${device_name}
+  platform: ESP32
+  board: nodemcu-32s
+
+wifi:
+  ssid: !secret wifi_ssid_tc
+  password: !secret wifi_pwd
+  manual_ip:
+    static_ip: 192.168.0.47
+    gateway: !secret wifi_gateway
+    subnet: 255.255.255.0
+
+api:
+
+# Enable logging
+logger:
+
+binary_sensor:
+  - platform: status
+    name: ${device_name}_status
+
+ota:
+
+# Example configuration entry
+esp32_ble_tracker:
+
+sensor:
+  # LY02 Estudio Desk-Setup
+  - platform: atc_mithermometer
+    mac_address: "A4:C1:38:4B:D6:7C"
+    temperature:
+      name: "LY1 Desk_Setup Temperatura"
+    humidity:
+      name: "LY1 Desk_Setup Humedad"
+    battery_level:
+      name: "LY1 Desk_Setup Batería Nivel"
+    #battery_voltage:
+    #  name: "LY1 Desk_Setup Batería (V)"
+    # signal_strength:
+    #  name: "LY1 Desk_Setup Señal"
+
+
+  # LY02 Entrada Interior
+  - platform: atc_mithermometer
+    mac_address: "A4:C1:38:6B:AA:C8"
+    temperature:
+      name: "LY2 Estudio Temperatura"
+    humidity:
+      name: "LY2 Estudio Humedad"
+    battery_level:
+      name: "LY2 Estudio Batería"
+
+#  Configuración Inicial con el Firmware Orignal de Xiaomi.
+#  - platform: xiaomi_lywsd03mmc
+#    mac_address: 'A4:C1:38:6B:AA:C8'
+#    bindkey: "A7EC07B7EDC9D349CC462CB9744AC756"
+#    temperature:
+#      name: "Temperatura Estudio (LY02)"
+#    humidity:
+#      name: "Humedad Estudio (LY02)"
+#    battery_level:
+#      name: "Batería Estudio (LY02)"
+
+

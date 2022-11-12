@@ -1,0 +1,30 @@
+- name: home
+  latitude: !secret latitude_home
+  longitude: !secret longitude_home
+  icon: mdi:home-assistant
+  radius: 25
+- name: Heineken
+  latitude: 37.3876837
+  longitude: -5.9645631
+  icon: mdi:beer
+  radius: 100
+- name: Faeca
+  latitude: 37.393004
+  longitude: -5.957486
+  icon: mdi:tree
+  radius: 100
+- name: Fac.Económicas
+  latitude: 37.3783
+  longitude: -5.9763
+  icon: mdi:school
+  radius: 200
+- name: Fac.ETSII
+  latitude: 37.3593
+  longitude: -5.9867
+  icon: mdi:school
+  radius: 200
+- name: Club Sato
+  latitude: 37.3585411
+  longitude: -6.0501132
+  icon: mdi:tennis
+  radius: 50

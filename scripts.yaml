@@ -1,0 +1,1688 @@
+#-----------------------------------------------------------------------------#
+#                                                                             #
+# SCRIPTS PARA APAGADO Y ENCENDIDO GENERAL DE LA CASA                         #
+#                                                                             #
+#-----------------------------------------------------------------------------#
+home_switch_off:
+  alias: 'Home Total Switch Off'
+  sequence:
+    # APAGADO LUCES LIGHT
+    - service: light.turn_off
+      entity_id: group.luces_interior_grp
+
+    # APAGADO LUCES JARDIN EXCEPTO FAROLES EXTERIOR (TODAS TIPO SWITCH)
+    - service: switch.turn_off
+      entity_id: group.luces_jardin_grp
+
+    # APAGADO LUCES JARDIN EXCEPTO FAROLES EXTERIOR (TODAS TIPO SWITCH)
+    - service: switch.turn_off
+      entity_id: group.switch_calefaccion_grp
+
+alarma_to_pending:
+  alias: "Alarma Disarmed to Pending"
+  sequence:
+    - condition: template
+      value_template: '{{fromstate != tostate}}'
+
+    # Aviso sonoro con Xiaomi GW
+    - service: xiaomi_aqara.stop_ringtone
+      data:
+        gw_mac: !secret xiaomi_mac
+    - service: xiaomi_aqara.play_ringtone
+      data_template:
+        gw_mac: !secret xiaomi_mac
+        ringtone_id: '{{ringtone_msg}}'
+        ringtone_vol: >
+          {{ states('input_number.xiaomi_volume_alarm_armed') | int }}
+
+# SCRIPT PARA NOTIFICACION MENSAJES SONORO SISTEMA ARMADO
+#
+# {{ states.input_select.xiaomi_sound_alarm_armed.state.split('-')[0] }}
+# {{ states('input_number.xiaomi_volume_alarm_armed') | int }}
+#
+sirena_xiaomi_play_alarm_armed:
+  alias: "Alarma Sonido Armado"
+  sequence:
+    # IF Mute_Xiaomi = ON => True => CANCEL SCRIPT
+    - condition: template
+      value_template: "{% if is_state('input_boolean.mute_sonido_sirenas', 'off') %}true{% endif %}"
+    # Aviso Xiaomi GW
+    - service: xiaomi_aqara.stop_ringtone
+      data:
+        gw_mac: !secret xiaomi_mac
+    - service: xiaomi_aqara.play_ringtone
+      data_template:
+        gw_mac: !secret xiaomi_mac
+        ringtone_id: >-
+            {{ states.input_select.xiaomi_sound_alarm_armed.state.split('-')[0] }}
+        ringtone_vol: >-
+            {{ states('input_number.xiaomi_volume_alarm_armed') | int }}
+
+sirena_xiaomi_play_alarm_disarmed:
+  alias: "Alarma Sonido Desarmado"
+  sequence:
+    # IF Mute_Xiaomi = ON => True => CANCEL SCRIPT
+    - condition: template
+      value_template: "{% if is_state('input_boolean.mute_sonido_sirenas', 'off') %}true{% endif %}"
+    # SONOFF_SW1_SIRENA INTERIOR ==> OFF
+    #- service: switch.turn_off
+    #  entity_id: switch.esphome_bas_sw0
+
+    # Aviso Xiaomi GW
+    - service: xiaomi_aqara.stop_ringtone
+      data:
+        gw_mac: !secret xiaomi_mac
+    - service: xiaomi_aqara.play_ringtone
+      data_template:
+        gw_mac: !secret xiaomi_mac
+        ringtone_id: >-
+            {{ states.input_select.xiaomi_sound_alarm_disarmed.state.split('-')[0] }}
+        ringtone_vol: >-
+            {{ states('input_number.xiaomi_volume_alarm_disarmed') | int }}
+
+# SCRIPT PARA ENCENDER SIRENAS INTERIOR TRAS DISPARO DE ALARMA
+#
+# {{ states.input_select.xiaomi_sound_alarm.state.split('-')[0] }}
+# {{ states('input_number.xiaomi_volume_alarm') | int }}
+#
+sirena_v0_alarma_armed_away:
+  alias: "Sirena Alarma Armed Away"
+  sequence:
+    # IF Mute_Xiaomi = ON => True => CANCEL SCRIPT
+    - condition: template
+      value_template: "{% if is_state('input_boolean.mute_sonido_sirenas', 'off') %}true{% endif %}"
+    - service: xiaomi_aqara.stop_ringtone
+      data:
+        gw_mac: !secret xiaomi_mac
+    - service: xiaomi_aqara.play_ringtone
+      data_template:
+        gw_mac: !secret xiaomi_mac
+        ringtone_id: >-
+            {{ states.input_select.xiaomi_sound_alarm.state.split('-')[0] }}
+        ringtone_vol: >-
+            {{ states('input_number.xiaomi_volume_alarm') | int}}
+    # Retraso 5"
+    - delay: '00:00:05'
+    #######################################
+    #  SONOFF_SW1_SIRENA INTERIOR ==> ON  #
+    #######################################
+    - service: switch.turn_on
+      entity_id: switch.esphome_bas_sw0
+
+# SCRIPT PARA ENCENDER SOLO SIRENA XIAOMI TRAS DISPARO
+# DE ALARMA ARMED HOME O SENSOR DE HUMO
+#
+sirena_v0_alarma_armed_home:
+  alias: "Sirena Alarma Armed Home"
+  sequence:
+    # IF Mute_Xiaomi = ON => True => CANCEL SCRIPT
+    - condition: template
+      value_template: "{% if is_state('input_boolean.mute_sonido_sirenas', 'off') %}true{% endif %}"
+    - service: xiaomi_aqara.stop_ringtone
+      data:
+        gw_mac: !secret xiaomi_mac
+    - service: xiaomi_aqara.play_ringtone
+      data_template:
+        gw_mac: !secret xiaomi_mac
+        ringtone_id: >-
+            {{ states.input_select.xiaomi_sound_alarm.state.split('-')[0] }}
+        ringtone_vol: >-
+            {{ states('input_number.xiaomi_volume_alarm') | int}}
+
+
+# SCRIPT PARA NOTIFICACION MENSAJES SONORO SISTEMA ARMADO
+#
+sirena_stop_alarma:
+  alias: "Botón Stop Sirenas"
+  sequence:
+    # SONOFF_SW1_SIRENA INTERIOR ==> OFF
+    - service: switch.turn_off
+      entity_id: switch.esphome_bas_sw0
+    # Aviso Xiaomi GW
+    - service: xiaomi_aqara.stop_ringtone
+      data:
+        gw_mac: !secret xiaomi_mac
+
+
+# SCRIPT PARA UN MICRO AVISO DE SIRENA INTERIOR
+#
+#  SONOFF_SW1_SIRENA INTERIOR ==> ON  #
+sirena_alarma_micro_aviso:
+  alias: "Sirena Alarma Warning"
+  sequence:
+    # IF Mute Sonido Sirenas = ON => True => CANCEL SCRIPT
+    - condition: template
+      value_template: "{% if is_state('input_boolean.mute_sonido_sirenas', 'off') %}true{% endif %}"
+    #
+    # CICLO 1:
+    - service: switch.turn_on
+      entity_id: switch.esphome_bas_sw0
+    - delay:
+        milliseconds: 50
+    - service: switch.turn_off
+      entity_id: switch.esphome_bas_sw0
+
+# SCRIPT PARA ENCENDER SIRENAS INTERIOR TRAS PULSAR EL DOBLE BOTON PANICO DESDE APP HOMY IOS
+#
+# La secuencia requerida es:
+# 1. Activar la "llave del botón pánico" con el interruptor: input_boolean.panic_button
+# 2. Pulsar el botón de ESTE script publicado en el frontend: script.alarma_boton_panico
+# 3. Pulsar el botón del script de apagado para cancelar sirenas: script.boton_panico
+#
+# Las sirenas se activan en este orden:
+# 1. Sirena interior Xiaomi con el tono configurado para Alarma
+# 2. Retraso de 5 segundos
+# 3. Sirena interior pasillo mediante switch.esphome_bas_sw0
+
+alarma_boton_panico:
+  alias: 'Boton Panico ON'
+  sequence:
+    # When a condition does not return true, the script will finish
+    - condition: template
+      value_template: "{% if is_state('input_boolean.panic_button', 'on') %}true{% endif %}"
+    # Llamada Scripts SIRENAS ALARMA
+    - service: script.sirena_alarma
+    # Notifica Telegram
+    - service: script.notifica_evento
+      data:
+        titulo: '*ALARMA HOMY*'
+        mensaje: >
+          >>> URGENTE: BOTON PANICO ACTIVADO
+
+alarma_boton_panico_off:
+  alias: 'Boton Panico OFF'
+  sequence:
+    # Llamada Scripts STOP SIRENAS ALARMA
+    - service: script.sirena_stop_alarma
+    # Notifica Telegram
+    - service: script.notifica_evento
+      data:
+        titulo: '*ALARMA HOMY*'
+        mensaje: >
+          >>> URGENTE: BOTON PANICO DESACTIVADO
+
+#
+# SCRIPTS PARA GESTION ALARMA DESDE ALEXA
+#
+homy_armado_parcial:
+  alias: 'Homy Armado Parcial'
+  sequence:
+    # When a condition does not return true, the script will finish
+    - condition: template
+      value_template: "{% if not is_state('alarm_control_panel.ha', 'armed_home') %}true{% endif %}"
+    - service: alarm_control_panel.alarm_arm_home
+      entity_id: alarm_control_panel.ha
+    # La notificación se hace mediente la activación de la regla:
+    # alias: 'A2 Alarm Armed Away'
+
+homy_armado_total:
+  alias: 'Homy Armado Total'
+  sequence:
+    # When a condition does not return true, the script will finish
+    - condition: template
+      value_template: "{% if not is_state('alarm_control_panel.ha', 'armed_away') %}true{% endif %}"
+    - service: alarm_control_panel.alarm_arm_away
+      entity_id: alarm_control_panel.ha
+    # La notificación se hace mediente la activación de la regla:
+    # alias: 'A2 Alarm Armed Away'
+
+homy_desarmado_code:
+  alias: 'Homy Desarmado'
+  sequence:
+    - service: alarm_control_panel.alarm_disarm
+      entity_id: alarm_control_panel.ha
+      data:
+        code: !secret alarm_control_code
+    # La notificación se hace mediente la activación de la regla:
+    # alias: 'A4_alarma_activa_desarmada'
+
+#-----------------------------------------------------------------------------#
+#                                                                             #
+# SCRIPTS PARA ENCENDER SIRENAS INTERIOR TRAS DISPARO DE ALARMA               #
+#                                                                             #
+#-----------------------------------------------------------------------------#
+
+sirena_alarma_triggered:
+  alias: "Sirena Alarma Triggered"
+  mode: restart
+  sequence:
+    # IF Mute Sirenas = ON => True => CANCEL SCRIPT
+    - condition: template
+      value_template: "{% if is_state('input_boolean.mute_sonido_sirenas', 'off') %}true{% endif %}"
+
+    #- service: xiaomi_aqara.play_ringtone
+    #  data_template:
+    #    gw_mac: !secret xiaomi_mac
+    #    ringtone_id: >-
+    #        {{ states.input_select.xiaomi_sound_alarm.state.split('-')[0] }}
+    #    ringtone_vol: >-
+    #        {{ states('input_number.xiaomi_volume_alarm') | int}}
+
+    # Retraso 5"
+    - delay: '00:00:05'
+    #######################################
+    #  SONOFF_SW1_SIRENA INTERIOR ==> ON  #
+    #######################################
+    - service: switch.turn_on
+      entity_id: switch.esphome_bas_sw0
+
+#-----------------------------------------------------------------------------#
+#                                                                             #
+# SCRIPTS GENERICOS DE MEDIA_PLAYER ALEXA Y FIRETV                            #
+#                                                                             #
+#-----------------------------------------------------------------------------#
+
+# Script  para establecer el  volumen de voz a Alexa DORMITORIO / ENTRADA / ESTUDIO segun la hora
+#
+alexa_dormitorio_set_volumen:
+  alias: 'Alexa Dormitorio Set Vol'
+  mode: restart
+  sequence:
+    # Almacena y Ajusta el Volumen Alexa Dormitorio según hora
+    - service: input_number.set_value
+      target:
+        entity_id: input_number.alexa_dormitorio_volumen_nuevo
+      data:
+        value: >
+          {% if now().hour >= 0 and now().hour <= 7 %}
+            {{ states('input_number.alexa_dormitorio_volumen_anuncio_noc')|float }}
+          {% else %}
+            {{ states('input_number.alexa_dormitorio_volumen_anuncio_dia')|float }}
+          {%endif%}
+    # Establece el volumen
+    - service: media_player.volume_set
+      data:
+        volume_level: "{{ states('input_number.alexa_dormitorio_volumen_nuevo')|float }}"
+      target:
+        entity_id:
+          - media_player.echo_alexa_dormitorio
+          - media_player.echo_alexa_dormitorio_aac
+
+alexa_entrada_set_volumen:
+  alias: 'Alexa Entrada Set Vol'
+  mode: restart
+  sequence:
+    # Almacena y Ajusta el Volumen Alexa ENTRADA según hora
+    - service: input_number.set_value
+      target:
+        entity_id: input_number.alexa_entrada_volumen_nuevo
+      data:
+        value: >
+          {% if now().hour >= 0 and now().hour <= 7 %}
+            {{ states('input_number.alexa_entrada_volumen_anuncio_noc')|float }}
+          {% else %}
+            {{ states('input_number.alexa_entrada_volumen_anuncio_dia')|float }}
+          {%endif%}
+    # Establece el volumen
+    - service: media_player.volume_set
+      data:
+        volume_level: "{{ states('input_number.alexa_entrada_volumen_nuevo')|float }}"
+      target:
+        entity_id: media_player.echo_alexa_entrada
+
+alexa_estudio_set_volumen:
+  alias: 'Alexa Estudio Set Vol'
+  mode: restart
+  sequence:
+    # Almacena y Ajusta el Volumen Alexa ESTUDIO según hora
+    - service: input_number.set_value
+      target:
+        entity_id: input_number.alexa_estudio_volumen_nuevo
+      data:
+        value: >
+          {% if now().hour >= 0 and now().hour <= 7 %}
+            {{ states('input_number.alexa_estudio_volumen_anuncio_noc')|float }}
+          {% else %}
+            {{ states('input_number.alexa_estudio_volumen_anuncio_dia')|float }}
+          {%endif%}
+    # Establece el volumen
+    - service: media_player.volume_set
+      data:
+        volume_level: "{{ states('input_number.alexa_estudio_volumen_nuevo')|float }}"
+      target:
+        entity_id: media_player.echo_alexa_estudio
+
+# Script completo para almacenar el volumen actual y establecer el volumen de voz a Alexa DORMITORIO
+#
+#
+alexa_dormitorio_set_volumen_alarma:
+  alias: 'Alexa Dormitorio Set Vol Alarma'
+  mode: restart
+  sequence:
+    # Almacena el Volumen Actual de Alexa Dormitorio
+    - service: input_number.set_value
+      data_template:
+        entity_id: input_number.alexa_dormitorio_volumen_anterior
+        value: "{{ states.media_player.echo_alexa_dormitorio.attributes.volume_level|float }}"
+    # Almacena y Ajusta el Volumen Alexa Dormitorio según tipo mensaje-hora
+    - service: input_number.set_value
+      data_template:
+        entity_id: input_number.alexa_dormitorio_volumen_nuevo
+        value: >
+          {% if states.alarm_control_panel.ha.state == 'triggered' and now().hour >= 0 and now().hour <= 9 %}
+            {{ states('input_number.alexa_dormitorio_volumen_alarma_noc')|float }}
+          {% elif states.alarm_control_panel.ha.state == 'triggered' and now().hour >= 10 and now().hour <= 23 %}
+            {{ states('input_number.alexa_dormitorio_volumen_alarma_dia')|float  }}
+          {% elif states.alarm_control_panel.ha.state != 'triggered' and now().hour >= 0 and now().hour <= 9 %}
+            {{ states('input_number.alexa_dormitorio_volumen_anuncio_noc')|float  }}
+          {% elif states.alarm_control_panel.ha.state != 'triggered' and now().hour >= 10 and now().hour <= 23 %}
+            {{ states('input_number.alexa_dormitorio_volumen_anuncio_dia')|float  }}
+          {%endif%}
+    # Establece el volumen
+    - service: media_player.volume_set
+      data:
+        volume_level: "{{ states('input_number.alexa_dormitorio_volumen_nuevo')|float }}"
+      target:
+        entity_id:
+          - media_player.echo_alexa_dormitorio
+          - media_player.echo_alexa_dormitorio_aac
+#
+# Script completo para almacenar el volumen actual y establecer el volumen de voz a Alexa ENTRADA
+#
+#
+alexa_entrada_set_volumen_alarma:
+  alias: 'Alexa Entrada Set Vol Alarma'
+  mode: restart
+  sequence:
+    # Almacena el Volumen Actual de Alexa Entrada
+    - service: input_number.set_value
+      data_template:
+        entity_id: input_number.alexa_entrada_volumen_anterior
+        value: "{{ states.media_player.echo_alexa_entrada.attributes.volume_level|float }}"
+    # Almacena y Ajusta el Volumen Alexa entrada según tipo mensaje-hora
+    - service: input_number.set_value
+      data_template:
+        entity_id: input_number.alexa_entrada_volumen_nuevo
+        value: >
+          {% if states.alarm_control_panel.ha.state == 'triggered' and now().hour >= 0 and now().hour <= 9 %}
+            {{ states('input_number.alexa_entrada_volumen_alarma_noc') }}
+          {% elif states.alarm_control_panel.ha.state == 'triggered' and now().hour >= 10 and now().hour <= 23 %}
+            {{ states('input_number.alexa_entrada_volumen_alarma_dia') }}
+          {% elif states.alarm_control_panel.ha.state != 'triggered' and now().hour >= 0 and now().hour <= 9 %}
+            {{ states('input_number.alexa_entrada_volumen_anuncio_noc') }}
+          {% elif states.alarm_control_panel.ha.state != 'triggered' and now().hour >= 10 and now().hour <= 23 %}
+            {{ states('input_number.alexa_entrada_volumen_anuncio_dia') }}
+          {%endif%}
+    # Establece el volumen
+    - service: media_player.volume_set
+      data:
+        volume_level: "{{ states('input_number.alexa_entrada_volumen_nuevo')|float }}"
+      target:
+        entity_id: media_player.echo_alexa_entrada
+
+#
+# Scripts básicos para restaurar el volumen original que tenía Alexa antes del mensaje
+#
+alexa_entrada_restaura_volumen:
+  alias: 'Alexa Entrada Restaura Vol'
+  mode: restart
+  sequence:
+    # Restablece el Volumen Anterior al mensaje
+    - service: media_player.volume_set
+      data:
+        volume_level: "{{ states('input_number.alexa_entrada_volumen_anterior')|float }}"
+      target:
+        entity_id: media_player.echo_alexa_entrada
+
+
+alexa_dormitorio_restaura_volumen:
+  alias: 'Alexa Dormitorio Restaura Vol'
+  mode: restart
+  sequence:
+    # Restablece el Volumen Anterior al mensaje
+    - service: media_player.volume_set
+      data:
+        volume_level: "{{ states('input_number.alexa_dormitorio_volumen_anterior')|float }}"
+      target:
+        entity_id:
+          - media_player.echo_alexa_dormitorio
+          - media_player.echo_alexa_dormitorio_aac
+
+#
+# Script completo para enviar un SONIDO varias repeticiones a un Alexa
+#
+# Parámetros:
+# alexa:      nombre del dispositivo de salida:  entrada/dormitorio.
+# sonido:     nombre del sonido de Amazon Alexa.
+# repeticion: numero de repeticiones
+#
+alexa_sonido_alarma:
+  alias: 'Alexa Sonido Alarma'
+  mode: restart
+  sequence:
+    - repeat:
+        count: "{{ repeticion|int }}"
+        sequence:
+          - service: media_player.play_media
+            data_template:
+              entity_id: "media_player.echo_alexa_{{ alexa }}"
+              media_content_type: sound
+              media_content_id: "{{ sonido }}"
+
+#
+# Script completo para enviar un SONIDO DE ALARMA mientras TRIGGERED a todos los Alexa
+#
+# Parámetros:
+# sonido:     nombre del sonido de Amazon Alexa.
+#
+alexa_sirena_alarma:
+  alias: 'Alex Sirena Alarma'
+  mode: restart
+  sequence:
+    - repeat:
+        while:
+          - condition: state
+            entity_id: alarm_control_panel.ha
+            state: 'triggered'
+            # value_template: "{{ states.alarm_control_panel.ha.state == 'triggered' }}"
+        sequence:
+          - service: media_player.play_media
+            data_template:
+              entity_id:
+                - media_player.echo_alexa_entrada
+                - media_player.echo_alexa_dormitorio
+              media_content_type: sound
+              media_content_id: "{{ sonido }}"
+          - delay: 00:00:03
+
+#
+# Script genérico y básico para enviar un mensaje de voz a un Alexa Echo
+#
+# Parámetros:
+# alexa:    nombre del dispositivo destino:  entrada / dormitorio
+# titulo:   titulo del mensaje (de momento solo valido para echo show)
+# voz:      mensaje de voz
+#
+alexa_anuncio:
+  alias: 'Alexa Mensaje Voz'
+  mode: restart
+  sequence:
+    # envio mensaje voz
+    - service: notify.alexa_media
+      data_template:
+        target: "media_player.echo_alexa_{{ alexa }}"
+        title: "{{ titulo }}"
+        message: "{{ voz }}"
+        data:
+          type: announce
+#
+# Script genérico y básico para enviar un mensaje de voz a un Alexa Echo
+#
+# Parámetros:
+# alexa:    nombre del dispositivo destino:  entrada / dormitorio
+# sonido:   nombre del sonido a reproducir.  Ver https://github.com/custom-components/alexa_media_player/wiki#examples
+#
+alexa_sonido:
+  alias: 'Alexa Sonido'
+  mode: restart
+  sequence:
+    # Envio Sonido
+    - service: media_player.play_media
+      data_template:
+        entity_id: "media_player.echo_alexa_{{ alexa }}"
+        media_content_type: sound
+        media_content_id: "{{ sonido }}"
+
+#
+# Script completo para enviar un mensaje de voz y sonido Alarma a ALEXA
+# En función de la entidad input_select.alarma_media_player, se enviará al media player seleccionado.
+#
+# Parámetros:
+# voz:        mensaje de voz
+# sonido:     nombre del sonido a reproducir.  Ver https://github.com/custom-components/alexa_media_player/wiki#examples
+# repeticion: numero de repeticiones
+#
+alexa_secuencia:
+  alias: 'Alexa Secuencia'
+  mode: restart
+  sequence:
+    - choose:
+        # Opciones echo_alexa_entrada, echo alexa_dormitorio
+        - conditions:
+            - condition: state
+              entity_id: input_select.alarma_media_player
+              state: 'media_player.echo_alexa_dormitorio'
+          sequence:
+            - service: script.alexa_dormitorio_set_volumen_alarma
+            - service: script.alexa_anuncio
+              data_template:
+                alexa: 'dormitorio'
+                voz: "{{ voz }}"
+            - service: script.alexa_sonido_alarma
+              data_template:
+                alexa: 'dormitorio'
+                sonido: "{{ sonido }}"
+                repeticion: "{{ repeticion }}"
+            - delay: 00:00:10
+            - service: script.alexa_dormitorio_restaura_volumen
+      default:
+        # SALIDA ALEXA ENTRADA
+        - service: script.alexa_entrada_set_volumen_alarma
+        - service: script.alexa_anuncio
+          data_template:
+            alexa: 'entrada'
+            voz: "{{ voz }}"
+        - service: script.alexa_sonido_alarma
+          data_template:
+            alexa: 'entrada'
+            sonido: "{{ sonido }}"
+            repeticion: "{{ repeticion }}"
+        - delay: 00:00:10
+        - service: script.alexa_entrada_restaura_volumen
+
+#
+# Script completo para enviar un mensaje de voz y sonido Alarma a ALEXA ENTRADA
+#
+# Parámetros:
+# voz:        mensaje de voz
+# sonido:     nombre del sonido a reproducir.  Ver https://github.com/custom-components/alexa_media_player/wiki#examples
+# repeticion: numero de repeticiones
+#
+alexa_entrada_secuencia:
+  alias: 'Alexa Entrada Secuencia'
+  mode: restart
+  sequence:
+    - service: script.alexa_entrada_set_volumen_alarma
+    - service: script.alexa_anuncio
+      data_template:
+        alexa: 'entrada'
+        voz: "{{ voz }}"
+    - service: script.alexa_sonido_alarma
+      data_template:
+        alexa: 'entrada'
+        sonido: "{{ sonido }}"
+        repeticion: "{{ repeticion }}"
+    - delay: 00:00:10
+    - service: script.alexa_entrada_restaura_volumen
+
+alexa_dormitorio_secuencia:
+  alias: 'Alexa Dormitorio Secuencia'
+  mode: restart
+  sequence:
+    - service: script.alexa_dormitorio_set_volumen_alarma
+    - service: script.alexa_anuncio
+      data_template:
+        alexa: 'dormitorio'
+        voz: "{{ voz }}"
+    - service: script.alexa_sonido_alarma
+      data_template:
+        alexa: 'dormitorio'
+        sonido: "{{ sonido }}"
+        repeticion: "{{ repeticion }}"
+    - delay: 00:00:10
+    - service: script.alexa_dormitorio_restaura_volumen
+
+#
+# Script completo para enviar un sonido de cuenta atrás durante el proceso de ARMADO
+# Alexa estará tocando el sonido desarmado mientras el estado de alarma sea ARMING
+#
+# Parámetros:
+# voz:        mensaje de voz
+# sonido:     nombre del sonido de Amazon Alexa.
+#
+alexa_secuencia_alarma_armado:
+  alias: 'Alexa Secuencia Alarma Armado'
+  mode: restart
+  sequence:
+    - choose:
+        # Opciones echo_alexa_entrada, echo alexa_dormitorio
+        - conditions:
+            - condition: state
+              entity_id: input_select.alarma_media_player
+              state: 'media_player.echo_alexa_dormitorio'
+          sequence:
+            - service: script.alexa_dormitorio_set_volumen_alarma
+            - service: script.alexa_anuncio
+              data_template:
+                alexa: 'dormitorio'
+                voz: "{{ voz }}"
+            - repeat:
+                while:
+                  - condition: state
+                    entity_id: alarm_control_panel.ha
+                    state: 'arming'
+                    #  value_template: "{{ states.alarm_control_panel.ha.state == 'arming' }}"
+                sequence:
+                  - service: media_player.play_media
+                    data_template:
+                      entity_id: '{{ states.input_select.alarma_media_player.state }}'
+                      media_content_type: sound
+                      media_content_id: "{{ sonido }}"
+                  - delay: 00:00:03
+            - delay: 00:00:10
+            - service: script.alexa_dormitorio_restaura_volumen
+      default:
+        - service: script.alexa_entrada_set_volumen_alarma
+        - service: script.alexa_anuncio
+          data_template:
+            alexa: 'entrada'
+            voz: "{{ voz }}"
+        - repeat:
+            while:
+              - condition: state
+                entity_id: alarm_control_panel.ha
+                state: 'arming'
+                #  value_template: "{{ states.alarm_control_panel.ha.state == 'arming' }}"
+            sequence:
+              - service: media_player.play_media
+                data_template:
+                  entity_id: '{{ states.input_select.alarma_media_player.state }}'
+                  media_content_type: sound
+                  media_content_id: "{{ sonido }}"
+              - delay: 00:00:03
+    - delay: 00:00:10
+    - service: script.alexa_entrada_restaura_volumen
+
+# Script completo para enviar un sonido de cuenta atrás durante el proceso de DESARMADO
+# Alexa estará tocando el sonido desarmado mientras el estado de alarma sea PENDING
+#
+# Parámetros:
+# voz:        mensaje de voz
+# sonido:     nombre del sonido de Amazon Alexa.
+#
+alexa_secuencia_alarma_desarmado:
+  alias: 'Alexa Secuencia Alarma Desrmado'
+  mode: restart
+  sequence:
+    - choose:
+        # Opciones echo_alexa_entrada, echo alexa_dormitorio
+        - conditions:
+            - condition: state
+              entity_id: input_select.alarma_media_player
+              state: 'media_player.echo_alexa_dormitorio'
+          sequence:
+            - service: script.alexa_dormitorio_set_volumen_alarma
+            - service: script.alexa_anuncio
+              data_template:
+                alexa: 'dormitorio'
+                voz: "{{ voz }}"
+            - repeat:
+                while:
+                  - condition: state
+                    entity_id: alarm_control_panel.ha
+                    state: 'pending'
+                    #value_template: "{{ states.alarm_control_panel.ha.state == 'pending' }}"
+                sequence:
+                  - service: media_player.play_media
+                    data_template:
+                      entity_id: '{{ states.input_select.alarma_media_player.state }}'
+                      media_content_type: sound
+                      media_content_id: "{{ sonido }}"
+                  - delay: 00:00:03
+            - delay: 00:00:10
+            - service: script.alexa_dormitorio_restaura_volumen
+      default:
+        - service: script.alexa_entrada_set_volumen_alarma
+        - service: script.alexa_anuncio
+          data_template:
+            alexa: 'entrada'
+            voz: "{{ voz }}"
+        - repeat:
+            while:
+              - condition: state
+                entity_id: alarm_control_panel.ha
+                state: 'pending'
+                #value_template: "{{ states.alarm_control_panel.ha.state == 'pending' }}"
+            sequence:
+              - service: media_player.play_media
+                data_template:
+                  entity_id: '{{ states.input_select.alarma_media_player.state }}'
+                  media_content_type: sound
+                  media_content_id: "{{ sonido }}"
+              - delay: 00:00:03
+        - delay: 00:00:10
+        - service: script.alexa_entrada_restaura_volumen
+#
+# Script completo para enviar un sonido de cuenta atrás durante el proceso de armado o desarmado
+# Alexa estará tocando el sonido desarmado mientras el estado de alarma sea TRIGGERED
+#
+# Parámetros:
+# voz:        mensaje de voz
+# sonido:     nombre del sonido de Amazon Alexa.
+#
+alexa_secuencia_alarma_disparada:
+  alias: 'Alexa Secuencia Alarma Disparada'
+  mode: restart
+  sequence:
+    - service: script.alexa_entrada_set_volumen_alarma
+    - service: script.alexa_dormitorio_set_volumen_alarma
+    - service: media_player.play_media
+      data_template:
+        entity_id:
+          - media_player.echo_alexa_entrada
+          - media_player.echo_alexa_dormitorio
+        media_content_type: sound
+        media_content_id: "{{ states('input_select.alarma_sonido_disparado') }}"
+    # RETRASO DE 3 SEGUNDOS "
+    - delay: 00:00:03
+    #######################################
+    # SONOFF_SW1_SIRENA INTERIOR ==> ON
+    #######################################
+    - service: switch.turn_on
+      entity_id: switch.esphome_bas_sw0
+    #
+    # Bucle sirena Alexa mientras la alarma esté disparada.
+    - repeat:
+        while:
+          - condition: state
+            entity_id: alarm_control_panel.ha
+            state: 'triggered'
+            #value_template: "{{ states.alarm_control_panel.ha.state == 'triggered' }}"
+        sequence:
+          - service: media_player.play_media
+            data_template:
+              entity_id:
+                - media_player.echo_alexa_entrada
+                - media_player.echo_alexa_dormitorio
+              media_content_type: sound
+              media_content_id: "{{ states('input_select.alarma_sonido_disparado') }}"
+          - delay: 00:00:03
+    #######################################
+    # SONOFF_SW1_SIRENA INTERIOR ==> OFF
+    #######################################
+    - service: switch.turn_off
+      entity_id: switch.esphome_bas_sw0
+    - delay: 00:00:10
+    - service: script.alexa_entrada_restaura_volumen
+    - service: script.alexa_dormitorio_restaura_volumen
+
+#
+#---------------------------- PRUEBAS ------------------------
+#
+test_alexa_secuencia_armado:
+  alias: 'Test Alexa Secuencia Alarma Armado'
+  mode: restart
+  sequence:
+    - service: light.turn_on
+      entity_id: light.luz_vitrina
+    - service: script.alexa_dormitorio_secuencia
+      data_template:
+        voz: 'ATENCION!. Luz Vitrina Entendida'
+        sonido: "{{ states('input_select.alarma_sonido_armado') }}"
+        repeticion: 1
+    - repeat:
+        while:
+          - condition: state
+            entity_id: light.luz_vitrina
+            state: 'on'
+        sequence:
+          - service: media_player.play_media
+            data_template:
+              entity_id: '{{ states.input_select.alarma_media_player.state }}'
+              media_content_type: sound
+              media_content_id: "{{ states('input_select.alarma_sonido_armado') }}"
+          - delay: 00:00:03
+
+test_alexa_secuencia_desarmado:
+  alias: 'Test Alexa Secuencia Alarma Desrmado'
+  mode: restart
+  sequence:
+    - service: script.alexa_entrada_secuencia
+      data_template:
+        voz: 'ATENCION!. Sistema desarmado.'
+        sonido: "{{ states('input_select.alarma_sonido_desarmado') }}"
+        repeticion: 1
+
+test_alexa_anuncio:
+  mode: restart
+  sequence:
+    - service: script.alexa_entrada_set_volumen_alarma
+    - service: script.alexa_dormitorio_set_volumen_alarma
+
+    - service: script.alexa_anuncio
+      data_template:
+        alexa: 'dormitorio'
+        voz: 'ATENCION!. Armado Total activado.'
+
+    - service: script.alexa_sonido_alarma
+      data_template:
+        alexa: 'dormitorio'
+        sonido: "{{ states('input_select.alarma_sonido_armado') }}"
+        repeticion: 2
+
+    - service: script.alexa_sirena_alarma
+      data_template:
+        sonido: "{{ states('input_select.alarma_sonido_disparado') }}"
+
+    - service: script.alexa_dormitorio_restaura_volumen
+
+test_media_player_announce:
+  alias: 'Alexa Mensaje Voz'
+  sequence:
+    # envio mensaje voz
+    - service: notify.alexa_media
+      data_template:
+        target: >
+          {{ states('input_select.alarma_media_player') }}
+        message: >
+          {{ states('input_text.mensaje_voz') }}
+        data:
+          type: announce
+
+test_media_player_secuencia:
+  alias: 'Alexa Skill'
+  sequence:
+    - service: media_player.play_media
+      data_template:
+        entity_id: >
+          {{ states('input_select.alarma_media_player') }}
+        media_content_type: sequence
+        media_content_id: >
+          {{ states('input_select.alexa_secuencia') }}
+
+test_sonido_alarma_desarmado:
+  sequence:
+    - service: media_player.play_media
+      data_template:
+        entity_id: >
+          {{ states('input_select.alarma_media_player') }}
+        media_content_type: sound
+        media_content_id: >
+          {{ states('input_select.alarma_sonido_desarmado') }}
+
+test_sonido_alarma_armado:
+  sequence:
+    - service: media_player.play_media
+      data_template:
+        entity_id: >
+          {{ states('input_select.alarma_media_player') }}
+        media_content_type: sound
+        media_content_id: >
+          {{ states('input_select.alarma_sonido_armado') }}
+
+test_sonido_alarma_disparado:
+  sequence:
+    - service: media_player.play_media
+      data_template:
+        entity_id: >
+          {{ states('input_select.alarma_media_player') }}
+        media_content_type: sound
+        media_content_id: >
+          {{ states('input_select.alarma_sonido_disparado') }}
+
+#-----------------------------------------------------------------------------#
+#                                                                             #
+# SCRIPTS GENERICOS DE NOTIFICACIONES: IOS, HOMY, TELEGRAM                    #
+#                                                                             #
+#-----------------------------------------------------------------------------#
+notifica_alarma:
+  alias: 'Mensaje Alarma'
+  sequence:
+  # Actualiza el valor de input_text.mensaje_tit con el título recibido.
+  - service: input_text.set_value
+    entity_id: input_text.mensaje_tit
+    data_template:
+      value: "{{ titulo }}"
+
+  # Actualiza el valor de input_text.mensaje_msg con el mensaje recibido.
+  - service: input_text.set_value
+    entity_id: input_text.mensaje_msg
+    data_template:
+      value: "{{ mensaje }}"
+
+  # Notificación Telegram
+  - service: notify.telegram_alarm
+    data_template:
+      title: >
+        {{ states('input_text.mensaje_tit') }}
+      message: >
+        {{ states('input_text.mensaje_msg') }}
+        {{ states('input_text.alarm_trigger') }}
+
+    # Notificación IOS
+  - service: notify.notifica_grupo_ios
+    data_template:
+      title: >
+        {{ states('input_text.mensaje_tit') }}
+      message: >
+        {{ states('input_text.mensaje_msg') }}
+
+  # Notificación Persistente App HOMY
+  - service: persistent_notification.create
+    data_template:
+      title: >
+        {{ states('input_text.mensaje_tit') }}
+      message: >
+        {{ states('input_text.mensaje_msg') }}
+
+  # Notificación Telegram
+  #- service: notify.telegram_alarm
+  #  data:
+  #    titulo: '*ALARMA*'
+  #    mensaje: Cámaras Seguridad
+  #    data:
+  #      photo:
+  #        - url: http://192.168.0.13/snapshot/image0.jpg
+  #          caption: Cámara Cocina
+  #        - url: http://192.168.0.12:8080/snapshot.cgi
+  #          caption: Cámara Estudio
+
+notifica_evento:
+  alias: 'Notifica Evento'
+  sequence:
+  # IF HOME_NOTIFY = OFF CANCEL
+  - condition: template
+    value_template: "{% if not is_state('input_select.home_notify', 'Off') %}true{% endif %}"
+
+  # Actualiza el valor de input_text.mensaje_tit con el título recibido.
+  - service: input_text.set_value
+    entity_id: input_text.mensaje_tit
+    data_template:
+      value: "{{ titulo }}"
+
+  # Actualiza el valor de input_text.mensaje_msg con el cuerpo del mensaje recibido.
+  - service: input_text.set_value
+    entity_id: input_text.mensaje_msg
+    data_template:
+      value: "{{ mensaje }}"
+
+  # Notificación Telegram
+  - service: notify.telegram_notify
+    data_template:
+      title: >
+        {{ states('input_text.mensaje_tit') }}
+      message: >
+        {{ states('input_text.mensaje_msg') }}
+
+#-----------------------------------------------------------------------------#
+#                                                                             #
+# CONTROL DE LUCES Y ALUMBRADO                                                #
+#                                                                             #
+#-----------------------------------------------------------------------------#
+
+luz_on_armed_home:
+  alias: 'Leds Alarma On si Sensor'
+  sequence:
+    # When a condition does not return true, the script will finish
+    # Check Panel Alarma <> armed_home ==> Exit
+    - condition: state
+      entity_id: alarm_control_panel.ha
+      state: 'armed_home'
+    # Enciende Piloto Azul Alarma
+    - service: light.turn_on
+      entity_id: light.luz_gateway_aqara
+      data:
+        brightness: 75
+        rgb_color: [0, 0, 254]
+
+
+luces_on_family_home:
+  alias: 'Family at Home Piloto ON'
+  sequence:
+    #- condition: template
+    #  value_template: "{% if is_state('sun.sun', 'below_horizon') %}true{% endif %}"
+    - condition: sun
+      after: sunset
+    - service: light.turn_on
+      entity_id: light.luz_entrada
+
+# Apagado Luces Toda La Casa
+luces_off:
+  alias: 'Luces Off'
+  sequence:
+    # When a condition does not return true, the script will finish
+    - condition: template
+      value_template: "{% if is_state('group.luces_casa_grp', 'on') %}true{% endif %}"
+    # Apagado Luces Interior Casa
+    - service: light.turn_off
+      entity_id: group.luces_interior_grp
+    # Apagado Luces Exterior
+    - service: script.luces_exterior_off
+
+# Apagado Luces Exterior Casa
+luces_exterior_off:
+  alias: 'Luces Exterior Off'
+  sequence:
+    # When a condition does not return true, the script will finish
+    - condition: template
+      value_template: "{% if is_state('group.luces_jardin_grp', 'on') %}true{% endif %}"
+
+    # Apagado Luces Exterior - Light
+    - service: light.turn_off
+      entity_id: group.luces_jardin_grp
+
+luces_exterior_on:
+  alias: 'Luces Exterior y Jardín On'
+  sequence:
+    # Llamada a scripts de control programador luces diario
+    - service: script.luces_jardin_check_xia_ext
+    - service: script.luces_jardin_check_bas_sw4
+    - service: script.luces_jardin_check_4ch_ch1
+    - service: script.luces_jardin_check_4ch_ch2
+    - service: script.luces_jardin_check_4ch_ch3
+    - service: script.luces_jardin_check_4ch_ch4
+
+luces_jardin_check_xia_ext:
+  alias: 'Luces On Faroles Exterior'
+  sequence:
+  - condition: state
+    entity_id: input_boolean.jardin_programador_xia_ext
+    state: 'on'
+  - service: light.turn_on
+    entity_id: light.faroles_exterior
+
+luces_jardin_check_bas_sw2:
+  alias: 'Luces On Sonoff BAS SW2'
+  sequence:
+  - condition: state
+    entity_id: input_boolean.jardin_programador_bas_sw2
+    state: 'on'
+  - service: switch.turn_on
+    entity_id: switch.jardin_programador_bas_sw2
+
+luces_jardin_check_bas_sw4:
+  alias: 'Luces On SonoffBAS SW4'
+  sequence:
+  - condition: state
+    entity_id: input_boolean.jardin_programador_bas_sw4
+    state: 'on'
+  - service: switch.turn_on
+    entity_id: switch.jardin_programador_bas_sw4
+
+luces_jardin_check_4ch_ch1:
+  alias: 'Luces On Sonoff4ch CH1'
+  sequence:
+  - condition: state
+    entity_id: input_boolean.jardin_programador_4ch_ch1
+    state: 'on'
+  - service: switch.turn_on
+    entity_id: switch.esphome_4ch_sw1_relay_1
+
+luces_jardin_check_4ch_ch2:
+  alias: 'Luces On Sonoff4ch CH2'
+  sequence:
+  - condition: state
+    entity_id: input_boolean.jardin_programador_4ch_ch2
+    state: 'on'
+  - service: switch.turn_on
+    entity_id: switch.esphome_4ch_sw1_relay_2
+
+luces_jardin_check_4ch_ch3:
+  alias: 'Luces On Sonoff4ch CH3'
+  sequence:
+  - condition: state
+    entity_id: input_boolean.jardin_programador_4ch_ch3
+    state: 'on'
+  - service: switch.turn_on
+    entity_id: switch.esphome_4ch_sw1_relay_3
+
+luces_jardin_check_4ch_ch4:
+  alias: 'Luces On Sonoff4ch CH4'
+  sequence:
+  - condition: state
+    entity_id: input_boolean.jardin_programador_4ch_ch4
+    state: 'on'
+  - service: switch.turn_on
+    entity_id: switch.esphome_4ch_sw1_relay_4
+
+
+#-----------------------------------------------------------------------------#
+#                                                                             #
+# SCRIPTS DE DEPURADORA PISCINA                                               #
+#                                                                             #
+#-----------------------------------------------------------------------------#
+
+piscina_depuradora_ch0_timer_start:
+  alias: Timer Piscina Start
+  sequence:
+    - service: timer.start
+      data_template:
+        entity_id: timer.piscina_depuradora_ch0
+        duration: '{{ states.sensor.piscina_depuradora_ch0_manual_segundos.state}}'
+    - service: switch.turn_on
+      entity_id: switch.esphome_pow_sw3
+    # Actualiza Valor Hora Arranque Real
+    #- service: input_datetime.set_datetime
+    #  entity_id: input_datetime.piscina_real_start_time
+    #  data_template:
+    #    time: '{{ (as_timestamp(now()) | timestamp_custom("%H:%M:%S")) }}'
+    # Actualiza Valor Duración Programa Activo
+    #- service: input_text.set_value
+    #  entity_id: input_text.piscina_duracion_programa
+    #  data_template:
+    #    value: '{{ states.sensor.piscina_duracion_manual.state}}'
+
+piscina_depuradora_ch0_timer_start_diario:
+  alias: Timer Piscina Start
+  sequence:
+    - service: timer.start
+      data_template:
+        entity_id: timer.piscina_depuradora_ch0
+        duration: '{{ states.sensor.piscina_duracion_planificada.state}}'
+    - service: switch.turn_on
+      entity_id: switch.esphome_pow_sw3
+    # Actualiza Valor Hora Arranque Real
+    #- service: input_datetime.set_datetime
+    #  entity_id: input_datetime.piscina_real_start_time
+    #  data_template:
+    #    time: '{{ (as_timestamp(now()) | timestamp_custom("%H:%M:%S")) }}'
+    # Actualiza Valor Duración Programa Activo
+    #- service: input_text.set_value
+    #  entity_id: input_text.piscina_duracion_programa
+    #  data_template:
+    #    value: '{{ states.sensor.piscina_duracion_planificada.state}}'
+
+piscina_depuradora_ch0_timer_cancel:
+  alias: Timer Piscina Cancel
+  sequence:
+    - service: timer.cancel
+      entity_id: timer.piscina_depuradora_ch0
+    - service: switch.turn_off
+      entity_id: switch.esphome_pow_sw3
+    # Actualiza Valor Hora Arranque Real
+    #- service: input_datetime.set_datetime
+    #  entity_id: input_datetime.piscina_real_end_time
+    #  data_template:
+    #    time: '{{ (as_timestamp(now()) | timestamp_custom("%H:%M:%S")) }}'
+    # Actualiza Valor Duración Programa Activo
+    #- service: input_text.set_value
+    #  entity_id: input_text.piscina_depuradora_ch0_duracion_programa
+    #  data_template:
+    #    value: ''
+
+piscina_depuradora_ch0_timer_pause:
+  alias: Timer Piscina Pause
+  sequence:
+    - service: timer.pause
+      entity_id: timer.piscina_depuradora_ch0
+    - service: switch.turn_off
+      entity_id: switch.esphome_pow_sw3
+
+piscina_depuradora_ch0_timer_resume:
+  alias: Timer Piscina Resume
+  sequence:
+    - service: timer.start
+      entity_id: timer.piscina_depuradora_ch0
+    - service: switch.turn_on
+      entity_id: switch.esphome_pow_sw3
+
+#-----------------------------------------------------------------------------#
+#                                                                             #
+# SCRIPTS DE RIEGO                                                            #
+#                                                                             #
+#-----------------------------------------------------------------------------#
+
+riego_bonsais_ch1_timer_cancel:
+  alias: Timer Riego Bonsais CH1 Cancel
+  sequence:
+    - service: timer.cancel
+      entity_id: timer.riego_bonsais_ch1
+    - service: switch.turn_off
+      entity_id: switch.esphome_4ch_sw2_relay_1
+
+riego_bonsais_ch2_timer_cancel:
+  alias: Timer Riego Bonsais CH2 Cancel
+  sequence:
+    - service: timer.cancel
+      entity_id: timer.riego_bonsais_ch2
+    - service: switch.turn_off
+      entity_id: switch.esphome_4ch_sw2_relay_2
+
+riego_bonsais_ch3_timer_cancel:
+  alias: Timer Riego Bonsais CH3 Cancel
+  sequence:
+    - service: timer.cancel
+      entity_id: timer.riego_bonsais_ch3
+    - service: switch.turn_off
+      entity_id: switch.esphome_4ch_sw2_relay_3
+
+riego_bonsais_ch4_timer_cancel:
+  alias: Timer Riego Bonsais CH4 Cancel
+  sequence:
+    - service: timer.cancel
+      entity_id: timer.riego_bonsais_ch4
+    - service: switch.turn_off
+      entity_id: switch.esphome_4ch_sw2_relay_4
+
+riego_bonsais_ch0_timer_cancel:
+  alias: Timer Bonsais Produccion Cancel
+  sequence:
+    - service: timer.cancel
+      entity_id: timer.riego_bonsais_ch0
+    - service: switch.turn_off
+      entity_id: switch.esphome_pow_sw1
+
+riego_tomates_ch0_timer_cancel:
+  alias: Timer Tomatera Cancel
+  sequence:
+    - service: timer.cancel
+      entity_id: timer.riego_tomates_ch0
+    - service: switch.turn_off
+      entity_id: switch.esphome_bas_sw2
+
+riego_cesped_ch1_timer_cancel:
+  alias: Timer Riego Cesped CH1 Cancel
+  sequence:
+    - service: timer.cancel
+      entity_id: timer.riego_cesped_ch1
+    - service: switch.turn_off
+      entity_id: switch.esphome_4ch_sw3_relay_1
+
+riego_cesped_ch2_timer_cancel:
+  alias: Timer Riego Cesped CH2 Cancel
+  sequence:
+    - service: timer.cancel
+      entity_id: timer.riego_cesped_ch2
+    - service: switch.turn_off
+      entity_id: switch.esphome_4ch_sw3_relay_2
+
+riego_cesped_ch3_timer_cancel:
+  alias: Timer Riego Cesped CH3 Cancel
+  sequence:
+    - service: timer.cancel
+      entity_id: timer.riego_cesped_ch3
+    - service: switch.turn_off
+      entity_id: switch.esphome_4ch_sw3_relay_3
+
+riego_cesped_ch4_timer_cancel:
+  alias: Timer Riego Cesped CH4 Cancel
+  sequence:
+    - service: timer.cancel
+      entity_id: timer.riego_cesped_ch4
+    - service: switch.turn_off
+      entity_id: switch.esphome_4ch_sw3_relay_4
+
+
+#-----------------------------------------------------------------------------#
+#                                                                             #
+# SCRIPTS DE INTERRUPTORES SONOFF                                             #
+#                                                                             #
+#-----------------------------------------------------------------------------#
+
+#Apagado SW Sonoff Jardín
+jardin_riego_off:
+  alias: 'Jardin Riego Off'
+  sequence:
+    # Apagado Riego Jardin y Fuentes
+    - service: switch.turn_off
+      entity_id:
+        - switch.esphome_4ch_sw2_relay_1
+        - switch.esphome_4ch_sw2_relay_2
+        - switch.esphome_4ch_sw2_relay_3
+        - switch.esphome_4ch_sw2_relay_3
+        - switch.esphome_4ch_sw3_relay_1
+        - switch.esphome_4ch_sw3_relay_2
+        - switch.esphome_4ch_sw3_relay_3
+        - switch.esphome_4ch_sw3_relay_4
+
+#Apagado SW Sonoff Piscina Depuradora
+piscina_depuradora_off:
+  alias: 'Jardin Riego Off'
+  sequence:
+    # Apagado POW Depuradora Piscina
+    - service: switch.turn_off
+      entity_id: switch.esphome_pow_sw3
+
+# SONOFF S20 - NESSPRESSO
+#
+#nesspreso_on_timer:
+#  alias: Nespresso On Timer
+#  sequence:
+#    - service: automation.turn_off
+#      entity_id: automation.S10_esphome_s20_Sunrise_Switch_On
+#    # Incremento del contador de autoencendido
+#    - service: counter.increment
+#      entity_id: counter.nespresso_start
+#    # Enciende la Nespresso
+#    - service: switch.turn_on
+#      entity_id: switch.esphome_s20_nespresso
+#    # Notifica Evento
+#    - service: script.turn_on
+#      entity_id: script.notifica_evento
+#      data:
+#        titulo: '*HOMY: BUENOS DIAS*'
+#        mensaje: >
+#            >>> Nespresso auto-encendida al amanecer.
+#            >>> Por favor, apáguela al terminar.
+#
+#    - delay: '00:30:00'
+#   - service: automation.turn_on
+#      entity_id: automation.S10_esphome_s20_Sunrise_Switch_On
+
+# SONOFF S20 - CALEFACCION
+#
+#calefaccion_mfc_on:
+#  alias: Calefacción On Dormitorio MFC
+#  sequence:
+    # Si el interruptor duerme en casa está On continua
+    #- condition: template
+    #  value_template: "{% if is_state('input_boolean.calefac_programador_mfc', 'on') and
+    #                         (is_state('input_boolean.family_sleep_home_mfc', 'on') or is_state('input_boolean.family_sleep_home_aac', 'on'))
+    #                          %}true{% else %}false{% endif %}"
+    #
+#    - service: switch.turn_on
+#      entity_id: switch.esphome_s20_sw1
+
+
+# SONOFF POW R2 - LAVADORA
+#
+lavadora_switch_off:
+  alias: Lavadora Switch Off
+  sequence:
+    - delay: 00:00:02
+
+    - condition: template
+      value_template: '{{ as_timestamp(states.binary_sensor.esphome_pow_sw2_lavadora_warning.last_changed) - as_timestamp(states.binary_sensor.esphome_pow_sw2_lavadora_lavando.last_changed) < 300 }}'
+
+    - service: switch.turn_off
+      entity_id: switch.esphome_pow_sw2
+    
+    - service: script.alexa_secuencia
+      data_template:
+        sonido: "{{ states('input_select.alarma_sonido_armado') }}"
+        repeticion: 1
+        voz: >
+          {% if states.sensor.aemet_condition.state | string == 'sunny' 
+            %}
+            "Hola, el lavado ha terminado, el tiempo está soleado. Se puede tender fuera sin problemas."
+          {% elif (states.sensor.aemet_condition.state | string == 'rainy' ) 
+            %}
+            "Hola, el lavado ya ha terminado, pero tiene pinta de llover y recomiendo usar la secadora."
+          {% elif (states.sensor.aemet_condition.state | string == 'partlycloudy'
+                or states.sensor.aemet_condition.state | string == 'cloudy')
+            %}
+            "Hola, el lavado ya ha terminado, pero está nublado, revisa el tiempo antes de tender fuera."
+          {% else  %}
+            "Hola, el lavado ha terminado, pero antes de tender revisa la previsión del tiempo."
+          {% endif %}
+
+
+    # Si la diferencia de hora ultimo cambio entre Warning y Lavando < 5' => TRUE => CONTINUA
+    #
+    # WARNING:
+    #  2019-05-26 10:21:08.137265+00:00
+    #  1558866068.137265
+    #
+    # LAVANDO:
+    #  2019-05-26 10:20:52.612011+00:00
+    #  1558866052.612011
+    #
+    # DIF:
+    #  15.525254011154175
+    #  TRUE
+
+    # WARNING:
+    # {{ states.binary_sensor.esphome_pow_sw2_lavadora_warning.last_changed }}
+    # {{ as_timestamp(states.binary_sensor.esphome_pow_sw2_lavadora_warning.last_changed) }}
+    #
+    # LAVANDO:
+    # {{ states.binary_sensor.esphome_pow_sw2_lavadora_lavando.last_changed }}
+    # {{ as_timestamp(states.binary_sensor.esphome_pow_sw2_lavadora_lavando.last_changed) }}
+    #
+    # DIF:
+    # {{ as_timestamp(states.binary_sensor.esphome_pow_sw2_lavadora_warning.last_changed) - as_timestamp(states.binary_sensor.esphome_pow_sw2_lavadora_lavando.last_changed) }}
+    #
+    # {{ as_timestamp(states.binary_sensor.esphome_pow_sw2_lavadora_warning.last_changed) - as_timestamp(states.binary_sensor.esphome_pow_sw2_lavadora_lavando.last_changed) < 300 }}
+
+
+#-----------------------------------------------------------------------------#
+#                                                                             #
+# SCRIPTS DE ARRANQUE DEL SISTEMA                                             #
+#                                                                             #
+#-----------------------------------------------------------------------------#
+sonoff_initialize:
+  alias: 'Parada Seguridad Interruptores SONOFF'
+  sequence:
+    - service: switch.turn_off
+      entity_id:
+        - switch.esphome_bas_sw0                  # SONOFF_BAS_SW0_SIRENA INTERIOR ==> OFF
+        - switch.esphome_4ch_sw2_relay_1          # SONOFF_4CH RIEGO BONSAIS
+        - switch.esphome_4ch_sw2_relay_2
+        - switch.esphome_4ch_sw2_relay_3
+        - switch.esphome_4ch_sw2_relay_4
+        - switch.esphome_4ch_sw3_relay_1          # SONOFF_4CH RIEGO CESPED
+        - switch.esphome_4ch_sw3_relay_2
+        - switch.esphome_4ch_sw3_relay_3
+        - switch.esphome_4ch_sw3_relay_4
+        - switch.esphome_bas_sw2                  # SONOFF_BAS_SW2 HUERTO TOMATERAS
+        - switch.esphome_pow_sw1                  # SONOFF_POW_SW1 BONSAIS PRODUCCION
+        - switch.esphome_pow_sw3                  # SONOFF_POW_SW3 DEPURADORA PISCINA
+    - service: switch.turn_on
+      entity_id:
+        - switch.tagreader_9a0be4_buzzer_enabled  # Activa el zumbido al pasar un tag
+        - switch.tagreader_9a0be4_led_enabled     # Activa un led verde al pasar el tag
+
+#-----------------------------------------------------------------------------#
+#                                                                             #
+# SISTEMA DE CAMARAS BLINK                                                    #
+#                                                                             #
+#-----------------------------------------------------------------------------#
+blink_trigger_cam_hall:
+  alias: 'Blink Trigger Camera Hall'
+  sequence:
+    - service: blink.trigger_camera
+      data:
+        entity_id: camera.blink_hall
+    - delay: 00:00:05
+    - service: blink.blink_update
+    - service: camera.snapshot
+      data:
+        entity_id: camera.blink_hall
+        filename: /share/blink_hall.jpg
+
+blink_trigger_cam_puerta_principal:
+  alias: 'Blink Trigger Camera Puerta'
+  sequence:
+    - service: blink.trigger_camera
+      data:
+        entity_id: camera.blink_puerta_principal
+    - delay: 00:00:05
+    - service: blink.blink_update
+    - service: camera.snapshot
+      data:
+        entity_id: camera.blink_puerta_principal
+        filename: /share/blink_puerta.jpg
+
+blink_trigger_cam_puerta_garaje:
+  alias: 'Blink Trigger Camera Garaje'
+  sequence:
+    - service: blink.trigger_camera
+      data:
+        entity_id: camera.blink_puerta_garaje
+    - delay: 00:00:05
+    - service: blink.blink_update
+    - service: camera.snapshot
+      data:
+        entity_id: camera.blink_puerta_garaje
+        filename: /share/blink_garaje.jpg
+
+blink_trigger_cam_piscina:
+  alias: 'Blink Trigger Camera Piscina'
+  sequence:
+    - service: blink.trigger_camera
+      data:
+        entity_id: camera.blink_piscina
+    - delay: 00:00:05
+    - service: blink.blink_update
+    - service: camera.snapshot
+      data:
+        entity_id: camera.blink_piscina
+        filename: /share/blink_piscina.jpg
+
+blink_trigger_cam_porche:
+  alias: 'Blink Trigger Camera Porche'
+  sequence:
+    - service: blink.trigger_camera
+      data:
+        entity_id: camera.blink_porche
+    - delay: 00:00:05
+    - service: blink.blink_update
+    - service: camera.snapshot
+      data:
+        entity_id: camera.blink_porche
+        filename: /share/blink_porche.jpg
+
+blink_trigger_cam_estudio:
+  alias: 'Blink Trigger Camera Estudio'
+  sequence:
+    - service: blink.trigger_camera
+      data:
+        entity_id: camera.blink_estudio
+    - delay: 00:00:05
+    - service: blink.blink_update
+    - service: camera.snapshot
+      data:
+        entity_id: camera.blink_estudio
+        filename: /share/blink_estudio.jpg
+        
+#-----------------------------------------------------------------------------#
+#                                                                             #
+# CONTROL PERSIANAS MATISMO                                                   #
+#                                                                             #
+#-----------------------------------------------------------------------------#
+
+estudio_persiana_stop:
+  alias: 'Estudio Persiana Stop'
+  sequence:
+    - service: switch.turn_off
+      entity_id: 
+        - switch.esphome_dual_sw1_relay_1
+        - switch.esphome_dual_sw1_relay_2
+
+estudio_persiana_down:
+  alias: 'Estudio Persiana Down'
+  sequence:
+    - service: switch.turn_off
+      entity_id: switch.esphome_dual_sw1_relay_1
+    - service: switch.turn_on
+      entity_id: switch.esphome_dual_sw1_relay_2
+
+estudio_persiana_up:
+  alias: 'Estudio Persiana Up'
+  sequence:
+    - service: switch.turn_off
+      entity_id: switch.esphome_dual_sw1_relay_2
+    - service: switch.turn_on
+      entity_id: switch.esphome_dual_sw1_relay_1
+
+estudio_persiana_down_full:
+  alias: 'Estudio Persiana Down 20s'
+  sequence:
+    - service: switch.turn_off
+      entity_id: switch.esphome_dual_sw1_relay_1
+    - service: switch.turn_on
+      entity_id: switch.esphome_dual_sw1_relay_2
+    - delay: 00:00:20
+    - service: switch.turn_off
+      entity_id: switch.esphome_dual_sw1_relay_2
+
+estudio_persiana_up_full:
+  alias: 'Estudio Persiana Up 20'
+  sequence:
+    - service: switch.turn_off
+      entity_id: switch.esphome_dual_sw1_relay_2
+    - service: switch.turn_on
+      entity_id: switch.esphome_dual_sw1_relay_1
+    - delay: 00:00:20
+    - service: switch.turn_off
+      entity_id: switch.esphome_dual_sw1_relay_1
+
+estudio_persiana_down_3s:
+  alias: 'Estudio Persiana Down 3s'
+  sequence:
+    - service: switch.turn_off
+      entity_id: switch.esphome_dual_sw1_relay_1
+    - service: switch.turn_on
+      entity_id: switch.esphome_dual_sw1_relay_2
+    - delay: 00:00:03
+    - service: switch.turn_off
+      entity_id: switch.esphome_dual_sw1_relay_2
+
+estudio_persiana_up_3s:
+  alias: 'Estudio Persiana Up 3s'
+  sequence:
+    - service: switch.turn_off
+      entity_id: switch.esphome_dual_sw1_relay_2
+    - service: switch.turn_on
+      entity_id: switch.esphome_dual_sw1_relay_1
+    - delay: 00:00:03
+    - service: switch.turn_off
+      entity_id: switch.esphome_dual_sw1_relay_1
+
+estudio_persiana_down_1s:
+  alias: 'Estudio Persiana Down 1s'
+  sequence:
+    - service: switch.turn_off
+      entity_id: switch.esphome_dual_sw1_relay_1
+    - service: switch.turn_on
+      entity_id: switch.esphome_dual_sw1_relay_2
+    - delay: 00:00:01
+    - service: switch.turn_off
+      entity_id: switch.esphome_dual_sw1_relay_2
+
+estudio_persiana_up_1s:
+  alias: 'Estudio Persiana Up 1s'
+  sequence:
+    - service: switch.turn_off
+      entity_id: switch.esphome_dual_sw1_relay_2
+    - service: switch.turn_on
+      entity_id: switch.esphome_dual_sw1_relay_1
+    - delay: 00:00:01
+    - service: switch.turn_off
+      entity_id: switch.esphome_dual_sw1_relay_1
+
+estudio_persiana_start_stop:
+  alias: 'Estudio Persiana Start-Stop'
+  sequence:
+    - choose:
+        # IF Persiana está parada y el modo solicitado es UP 
+        - conditions:
+            - condition: template
+              value_template: "{{ is_state('binary_sensor.estudio_persiana_motor_en_marcha','off') and is_state('input_boolean.estudio_persiana_mode_up','on') }}"
+          sequence:
+            # => arranca motor subida
+            - service: script.estudio_persiana_up
+        # IF Persiana está parada y el modo solicitado es DOWN
+        - conditions:
+            - condition: template
+              value_template: "{{ is_state('binary_sensor.estudio_persiana_motor_en_marcha','off') and is_state('input_boolean.estudio_persiana_mode_up','off') }}"
+          sequence:
+            # => arranca motor bajada
+            - service: script.estudio_persiana_down
+      # ELSE : la persiana está en marcha
+      default:
+        # => Para motor
+         - service: script.estudio_persiana_stop
+
+#-----------------------------------------------------------------------------#
+#                                                                             #
+# CONTROL SECUENCIAS ESCENAS                                                  #
+#                                                                             #
+#-----------------------------------------------------------------------------#
+
+escena_estudio_home_cinema:
+  alias: 'Estudio Escena Home Cinema'
+  sequence:
+    - service: media_player.play_media
+      target:
+        entity_id: media_player.firetv_estudio
+      data:
+        media_content_type: video/mp4
+        #media_content_id: "https://youtu.be/fLWacgcUMKw"
+        media_content_id: /local/dolby-atmos-demo.mp4
+
+
+firetv_estudio_movistar_a3:
+  alias: 'FireTV Estudio MovistarTV A3'
+  sequence:
+
+    - service: media_player.turn_on
+      target:
+        entity_id: media_player.firetv_estudio
+    - service: media_player.select_source
+      data:
+        source: com.movistarplus.androidtv
+      target:
+        entity_id: media_player.firetv_estudio
+    - delay: "00:00:05"
+    - service: androidtv.adb_command
+      target:
+        entity_id: media_player.firetv_estudio
+      data:
+        command: "DOWN"
+    - delay: "00:00:01"
+    - service: androidtv.adb_command
+      target:
+        entity_id: media_player.firetv_estudio
+      data:
+        command: "CENTER"

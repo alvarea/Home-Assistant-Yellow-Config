@@ -1,0 +1,280 @@
+#
+# ON/OFF Tracking Family
+#
+  family_home_mfc:
+    name: Tracking Malen on/off
+    icon: mdi:cellphone-iphone
+  family_home_aac:
+    name: Tracking Agustin on/off
+    icon: mdi:cellphone-iphone
+  family_home_paf:
+    name: Tracking Paloma on/off
+    icon: mdi:cellphone-iphone
+  family_home_aaf:
+    name: Tracking Agu on/off
+    icon: mdi:cellphone-iphone
+
+#
+# ON/OFF Camaras Seguridad
+#
+  camara_estudio:
+    name: Camara Estudio on/off
+    icon: mdi:webcam
+
+  camara_jardin:
+    name: Camara Jardín on/off
+    icon: mdi:webcam
+
+  camara_hall_interior:
+    name: Camara Hall on/off
+    icon: mdi:webcam
+
+  camara_puerta_exterior:
+    name: Camara Puerta on/off
+    icon: mdi:webcam
+
+  camara_cancela_exterior:
+    name: Camara Cancela on/off
+    icon: mdi:webcam
+
+#
+# ON/OFF SENSORES PRESENCIA ALARMA
+#
+  alarma_sensor_presencia_salon:
+    name: Sensor Presencia Salón
+    icon: mdi:motion-sensor
+  alarma_sensor_presencia_estudio:
+    name: Sensor Presencia Estudio
+    icon: mdi:motion-sensor
+  alarma_sensor_presencia_entrada_hall:
+    name: Sensor Presencia Entrada Hall
+    icon: mdi:motion-sensor
+  alarma_sensor_presencia_entrada_exterior:
+    name: Sensor Presencia Entrada Exterior
+    icon: mdi:motion-sensor
+  alarma_sensor_presencia_dormitorio_principal:
+    name: Sensor Presencia Dormitorio Principal
+    icon: mdi:motion-sensor
+  alarma_sensor_presencia_pasillo:
+    name: Sensor Presencia Pasillo
+    icon: mdi:motion-sensor
+
+#
+# ON/OFF DUERME EN CASA
+#
+  family_sleep_home_mfc:
+    name: Malen Duerme en Casa
+    icon: mdi:sleep
+  family_sleep_home_aac:
+    name: Agustin Duerme en Casa
+    icon: mdi:sleep
+  family_sleep_home_paf:
+    name: Paloma Duerme en Casa
+    icon: mdi:sleep
+  family_sleep_home_aaf:
+    name: Agu Duerme en Casa
+    icon: mdi:sleep
+
+# Control alarma y notificaciones
+#
+  panic_button:
+    name: Alarma Botón Pánico
+    initial: off
+    icon: mdi:security-home
+    # AAC. Interruptores control alarma y notificaciones
+  alarm_status:
+    name: Sirena Alarma
+    icon: mdi:alarm-light
+  alarm_test_sirenas:
+    name: Test Sirena Alarma
+    initial: off
+    icon: mdi:alarm-light
+  mute_sonido_sirenas:
+    name: Mute Sonidos Sirena
+    icon: mdi:volume-off
+
+# Depuradora Piscina
+#
+  piscina_interruptor_global:
+    name: Piscina Interruptor General
+    icon: mdi:swin
+
+  piscina_depuradora_ch0_programador_t1:
+    name: Programador Tramo1 On/Off
+    icon: mdi:dip-switch
+
+  piscina_depuradora_ch0_programador_t2:
+    name: Programador Tramo2 On/Off
+    icon: mdi:dip-switch
+
+# Riego Plantas + Fuentes
+#
+  # RIEGO INTERRUPTOR General conectado con Previsión del Tiempo
+  riego_interruptor_global:
+    name: Riego Interruptor General
+    icon: mdi:sprinkler-var
+
+# Riego Bonsais Top
+  riego_bonsais_ch1_programador_t1:
+    name: Programador CH1 Timer1
+    icon: mdi:dip-switch
+
+  # Riego Bonsais Top - Tramo2
+  riego_bonsais_ch1_programador_t2:
+    name: Programador CH1 Timer2
+    icon: mdi:dip-switch
+
+  # Riego Bonsais Plantas Aromáticas - Tramo1
+  riego_bonsais_ch2_programador_t1:
+    name: Programador CH2 Timer 1
+    icon: mdi:dip-switch
+
+  # Riego Bonsais Plantas Aromáticas - Tramo2
+  riego_bonsais_ch2_programador_t2:
+    name: Programador CH2 Timer 2
+    icon: mdi:dip-switch
+
+  # Fuente Bonsais Fuente Zen - Tramo 1
+  riego_bonsais_ch3_programador_t1:
+    name: Programador CH3 Timer 1
+    icon: mdi:dip-switch
+
+  # Fuente Bonsais Fuente Zen - Tramo 2
+  riego_bonsais_ch3_programador_t2:
+    name: Programador CH3 Timer 2
+    icon: mdi:dip-switch
+
+  # Pendiente sin uso
+  riego_bonsais_ch4_programador:
+    name: Programador CH4
+    icon: mdi:dip-switch
+
+  # Riego Bonsais Producción - Tramo1
+  riego_bonsais_ch0_programador_t1:
+    name: Programador Riego Zona2 - Tramo1
+    icon: mdi:dip-switch
+
+  # Riego Bonsais Producción - Tramo2
+  riego_bonsais_ch0_programador_t2:
+    name: Programador Riego Zona2 - Tramo2
+    icon: mdi:dip-switch
+
+  # Riego Tomatera - Tramo1
+  riego_tomates_ch0_programador_t1:
+    name: Programador Riego Zona2 - Tramo1
+    icon: mdi:dip-switch
+
+  # Riego Tomatera - Tramo2
+  riego_tomates_ch0_programador_t2:
+    name: Programador Riego Zona2 - Tramo2
+    icon: mdi:dip-switch
+
+  # Riego Cesped CH1
+  riego_cesped_ch1_programador_t1:
+    name: Programador CH1 Timer1
+    icon: mdi:dip-switch
+
+  # Riego Cesped CH1 - Tramo2
+  riego_cesped_ch1_programador_t2:
+    name: Programador CH1 Timer2
+    icon: mdi:dip-switch
+
+  # Riego Cesped CH1 - Tramo3
+  riego_cesped_ch1_programador_t3:
+    name: Programador CH1 Timer3
+    icon: mdi:dip-switch
+
+  # Riego Cesped CH2
+  riego_cesped_ch2_programador_t1:
+    name: Programador CH2 Timer1
+    icon: mdi:dip-switch
+
+  # Riego Cesped CH2 - Tramo2
+  riego_cesped_ch2_programador_t2:
+    name: Programador CH2 Timer2
+    icon: mdi:dip-switch
+
+  # Riego Cesped CH2 - Tramo3
+  riego_cesped_ch2_programador_t3:
+    name: Programador CH2 Timer3
+    icon: mdi:dip-switch
+
+  # Riego Cesped CH3
+  riego_cesped_ch3_programador_t1:
+    name: Programador CH3 Timer1
+    icon: mdi:dip-switch
+
+  # Riego Cesped CH3 - Tramo2
+  riego_cesped_ch3_programador_t2:
+    name: Programador CH3 Timer2
+    icon: mdi:dip-switch
+
+  # Riego Cesped CH3 - Tramo3
+  riego_cesped_ch3_programador_t3:
+    name: Programador CH3 Timer3
+    icon: mdi:dip-switch
+
+# Programador Diario Luces Jardín
+
+  jardin_programador_xia_ext:
+    name: Prog. Faroles Exterior
+    icon: mdi:power-settings
+
+  jardin_programador_bas_sw2:
+    name: Prog. Porche Piscina
+    icon: mdi:power-settings
+
+  jardin_programador_bas_sw4:
+    name: Prog. Porche Salón
+    icon: mdi:power-settings
+
+  jardin_programador_4ch_ch1:
+    name: Prog. Balizas Cesped
+    icon: mdi:power-settings
+
+  jardin_programador_4ch_ch2:
+    name: Prog. Foco Olivos
+    icon: mdi:power-settings
+
+  jardin_programador_4ch_ch3:
+    name: Prog. Foco Olivo Nubes
+    icon: mdi:power-settings
+
+  jardin_programador_4ch_ch4:
+    name: Prog. Foco Bonsai
+    icon: mdi:power-settings
+
+# Programador Calefacción / Mosquitos
+
+  calefac_programador_mfc:
+    name: Prog. Dormitorio MFC
+    icon: mdi:power-settings
+
+  calefac_programador_paf:
+    name: Prog. Dormitorio PAF
+    icon: mdi:power-settings
+
+  calefac_programador_aaf:
+    name: Prog. Dormitorio AAF
+    icon: mdi:power-settings
+
+# Dormitorio Warning Mode
+#
+  dormitorio_warning:
+    name: Dormitorio Warning Mode
+    icon: mdi:heart-multiple
+
+# Bloqueo del Sensor Vibración Rack
+#
+  rack_sensor_vibration_disable:
+    name: Bloqueo Sensor Vibración Rack
+    icon: mdi:trackpad-lock
+
+#
+# Control Persiana Estudio
+# 
+  # sensor que indica si subir o bajar persiana : UP = on,  DOWN = off
+  estudio_persiana_mode_up:
+    name: Persiana Estudio Modo Up
+    icon: mdi:window-shutter-cog
+    initial: off

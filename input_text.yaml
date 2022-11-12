@@ -1,0 +1,33 @@
+# Mensaje para Notificaciones
+#
+  mensaje_tit:
+    name: Titulo Notificaciones
+    initial: '<OK>'
+
+  mensaje_msg:
+    name: Cuerpo Notificaciones
+    initial: '<OK>'
+
+  mensaje_voz:
+    name: Mensaje de Voz
+    initial: 'Jomi'
+
+  family_last_tracking:
+    name: Input Text Último Tracking
+    initial: ''
+    icon: mdi:home-map-marker
+
+  alarm_trigger:
+    name: Input Text Alarma Trigger
+    initial: ''
+    icon: mdi:security-home
+
+  piscina_depuradora_ch0_duracion_programa:
+    name: Duración Programa Activo
+    initial: ''
+    icon: mdi:timer-sand
+
+  riego_prevision_lluvia_ayer:
+    name: Previsión Lluvia Ayer
+    initial: ''
+    icon: mdi:weather

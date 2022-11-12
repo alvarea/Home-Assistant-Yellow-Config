@@ -1,0 +1,222 @@
+#
+# ESPHOME SONOFF IFAN-04 SW1 - DORMITORIO
+#
+substitutions:
+  name:  esphome_ifan_sw1
+  device_description: Sonoff iFan04-L
+  friendly_name: Ventilador Dormitorio
+
+esphome:
+  name: ${name}
+  comment: ${device_description}
+  platform: ESP8266
+  board: esp01_1m
+  on_boot:
+    priority: 225
+    # turn off the light as early as possible
+    then:
+      - light.turn_off: fan_light
+
+wifi:
+  ssid: !secret wifi_ssid_wlan
+  password: !secret wifi_pwd
+  manual_ip:
+    gateway: !secret wifi_gateway
+    subnet: 255.255.255.0
+    static_ip: 192.168.0.31
+
+# Disable logging on serial as it is used by the remote
+logger:
+  baud_rate: 0
+
+# Enable Home Assistant API
+api:
+
+ota:
+  
+external_components:
+  - source: github://ssieb/custom_components
+    components: [ ifan04 ]
+
+time:
+  - platform: homeassistant
+    id: time_homeassistant
+    on_time_sync:
+      - component.update: sensor_uptime_timestamp
+
+uart:
+  tx_pin: GPIO01
+  rx_pin: GPIO03
+  baud_rate: 9600
+#  debug:
+#    sequence:
+#      - lambda: UARTDebug::log_hex(direction, bytes, ',');
+
+ifan04:
+  on_fan:
+    - lambda: |-
+        if (speed) {
+          auto call = id(the_fan).turn_on();
+          call.set_speed(speed);
+          call.perform();
+          if (id(buzzer_dummy).state) {
+            switch(speed) {
+              case 3:
+                id(buzzer_pin).turn_on();
+                delay(50);
+                id(buzzer_pin).turn_off();
+                delay(50);
+              case 2:
+                id(buzzer_pin).turn_on();
+                delay(50);
+                id(buzzer_pin).turn_off();
+                delay(50);
+              case 1:
+                id(buzzer_pin).turn_on();
+                delay(50);
+                id(buzzer_pin).turn_off();
+            }
+          }
+        } else {
+          auto call = id(the_fan).turn_off();
+          call.perform();
+        }
+  on_light:
+    - light.toggle: fan_light
+  on_buzzer:
+    - switch.toggle: buzzer_dummy
+
+sensor:
+  - platform: uptime
+    id: sensor_uptime
+
+  - platform: template
+    id: sensor_uptime_timestamp
+    name: "${friendly_name} Uptime"
+    device_class: "timestamp"
+    accuracy_decimals: 0
+    update_interval: never
+    lambda: |-
+      static float timestamp = (
+        id(time_homeassistant).utcnow().timestamp - id(sensor_uptime).state
+      );
+      return timestamp;
+
+  - platform: wifi_signal
+    name: ${friendly_name} Signal
+    update_interval: 60s
+
+binary_sensor:
+  - platform: gpio
+    id: button
+    pin: GPIO0
+    on_press:
+      then:
+        - light.toggle: fan_light
+
+interval:
+  - interval: 500ms
+    then:
+      - if:
+          condition:
+            not:
+              wifi.connected:
+          then:
+            - light.turn_on:
+                id: led1
+                brightness: 100%
+                transition_length: 0s
+            - delay: 250ms
+            - light.turn_off:
+                id: led1
+                transition_length: 250ms
+
+output:
+  - platform: template
+    id: fanoutput
+    type: float
+    write_action:
+      - if:
+          condition:
+            lambda: return (state < 0.3);
+          then:
+            # OFF
+            - switch.turn_off: fan_relay1
+            - switch.turn_off: fan_relay2
+            - switch.turn_off: fan_relay3
+          else:
+            if:
+              condition:
+                lambda: return (state < 0.6);
+              then:
+                # low speed
+                - switch.turn_on: fan_relay1
+                - switch.turn_off: fan_relay2
+                - switch.turn_off: fan_relay3
+              else:
+                if:
+                  condition:
+                    lambda: return (state < 0.9);
+                  then:
+                    # medium speed
+                    - switch.turn_on: fan_relay1
+                    - switch.turn_on: fan_relay2
+                    - switch.turn_off: fan_relay3
+
+                  else:
+                    # high speed
+                    - switch.turn_on: fan_relay1
+                    - switch.turn_off: fan_relay2
+                    - switch.turn_on: fan_relay3
+
+  - platform: gpio
+    id: light_relay
+    pin: GPIO9
+    inverted: true
+
+  - platform: gpio
+    id: buzzer_pin
+    pin: GPIO10
+    inverted: true
+
+  - platform: esp8266_pwm
+    id: led_pin
+    pin: GPIO13
+    inverted: true
+
+light:
+  - platform: binary
+    id: fan_light
+    name: "${friendly_name} Light"
+    output: light_relay
+
+  - platform: monochromatic
+    id: led1
+    output: led_pin
+    default_transition_length: 0s
+    restore_mode: always off
+
+switch:
+  - platform: template
+    id: buzzer_dummy
+    name: "Buzzer"
+    optimistic: True
+
+  - platform: gpio
+    id: fan_relay1
+    pin: GPIO14
+
+  - platform: gpio
+    id: fan_relay2
+    pin: GPIO12
+
+  - platform: gpio
+    id: fan_relay3
+    pin: GPIO15
+
+fan:
+  - platform: speed
+    id: the_fan
+    name: "${friendly_name} Fan"
+    output: fanoutput
+    speed_count: 3

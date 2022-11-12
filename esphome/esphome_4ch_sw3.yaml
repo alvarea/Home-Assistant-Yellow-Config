@@ -1,0 +1,83 @@
+#
+# ESPHOME SONOFF 4CH PRO R2 V.1.0 - SWITCH3 - PROGRAMADOR RIEGO CESPED.-
+# INSTALACION: 20.04.2022
+#
+substitutions:
+  device_name: esphome_4ch_sw3
+
+esphome:
+  name: ${device_name}
+  platform: ESP8266
+  board: esp01_1m
+  board_flash_mode: dout
+
+wifi:
+  ssid: !secret wifi_ssid_wgar
+  password: !secret wifi_pwd
+  manual_ip:
+    gateway: !secret wifi_gateway
+    subnet: 255.255.255.0
+    static_ip: 192.168.0.43
+
+api:
+
+# Enable logging
+logger:
+
+ota:
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: True
+    name: ${device_name}_button_1
+  - platform: gpio
+    pin:
+      number: GPIO9
+      mode: INPUT_PULLUP
+      inverted: True
+    name: ${device_name}_button_2
+  - platform: gpio
+    pin:
+      number: GPIO10
+      mode: INPUT_PULLUP
+      inverted: True
+    name: ${device_name}_button_3
+  - platform: gpio
+    pin:
+      number: GPIO14
+      mode: INPUT_PULLUP
+      inverted: True
+    name: ${device_name}_button_4
+
+  - platform: status
+    name: ${device_name}_status
+
+switch:
+  - platform: gpio
+    name: ${device_name}_relay_1
+    pin: GPIO12
+  - platform: gpio
+    name: ${device_name}_relay_2
+    pin: GPIO5
+  - platform: gpio
+    name: ${device_name}_relay_3
+    pin: GPIO4
+  - platform: gpio
+    name: ${device_name}_relay_4
+    pin: GPIO15
+
+output:
+  # Register the blue LED as a dimmable output ....
+  - platform: esp8266_pwm
+    id: blue_led
+    pin: GPIO13
+    inverted: True
+
+light:
+  # ... and then make a light out of it.
+  - platform: monochromatic
+    name: ${device_name}_blueled
+    output: blue_led

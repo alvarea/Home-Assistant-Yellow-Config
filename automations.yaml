@@ -1,0 +1,2802 @@
+#-----------------------------------------------------------------------------#
+#                                                                             #
+# HOMY - HOME ASSISTANT - ALVAREA 2020                                        #
+#                                                                             #
+#-----------------------------------------------------------------------------#
+# TEMPLATING JINJA2:  https://jinja.palletsprojects.com/en/master/templates   #
+#                                                                             #
+#-----------------------------------------------------------------------------#
+#                                                                             #
+# ARRANQUE/PARADA DEL SISTEMA                                                 #
+#                                                                             #
+#-----------------------------------------------------------------------------#
+- id: hass_startup_automation
+  alias: hass_startup_scripts
+  trigger:
+    platform: homeassistant
+    # Event can also be 'shutdown'
+    event: start
+  action:
+    # Para todas las reglas durante el arranque del sistema
+    #- service: automation.turn_off
+    #  data:
+    #    entity_id:
+    #      - group.all_automations
+
+    # Llamada al script de inicialización de interruptores Sonoff
+    - service: script.sonoff_initialize
+    #
+    # Llamada al contador de personas que actualiza sensor.family_home
+    - service: python_script.countpeople
+    #
+    # 30" espera y arranca reglas
+    #- delay: 30
+    #- service: automation.turn_on
+    #  data:
+    #    entity_id:
+    #      - group.all_automations
+
+#-----------------------------------------------------------------------------#
+#                                                                             #
+# TAREAS PERIODICAS DEL SISTEMA                                               #
+#                                                                             #
+#-----------------------------------------------------------------------------#
+- id: hass_weekly_ha_restart
+  alias: 'HA weekly restart'
+  trigger:
+    - platform: time
+      at: '06:00:00'
+  condition:
+    - condition: time
+      weekday: sat
+  action:
+    # Reinicio HA Core
+    - service: homeassistant.restart
+
+- id: hass_daily_automations
+  alias: 'HA daily automations'
+  trigger:
+    - platform: time
+      at:
+        - '08:00:00'
+        - '00:00:00'
+  action:
+    # Establece Volumnen Alexa Entrada/Estudio/Dormitorio según hora del día/noche
+    - service: script.alexa_entrada_set_volumen
+    - service: script.alexa_estudio_set_volumen
+    - service: script.alexa_dormitorio_set_volumen
+    #
+    # Establece Volumen Xiaomi Hub => DEPRECATED
+    - service: input_number.set_value
+      data_template:
+        entity_id: input_number.xiaomi_volume_alarm_armed
+        value: >-
+          {% if (now().hour == 11) %} {{ 10|float}}
+          {% elif (now().hour == 23) %} {{ 2|float}}
+          {% endif %}
+    - service: input_number.set_value
+      data_template:
+        entity_id: input_number.xiaomi_volume_alarm_disarmed
+        value: >-
+          {% if (now().hour == 11) %} {{ 10|float}}
+          {% elif (now().hour == 23) %} {{ 2|float}}
+          {% endif %}
+
+- id: hass_clock_notify
+  alias: 'HASS Clock Notify'
+  trigger:
+    - platform: time
+      at:
+        - '13:00:00'
+        - '13:45:00'
+        - '14:30:00'
+        - '21:30:00'
+  action:
+    # Script Envío Sonido Alexa Alexa
+    - service: script.alexa_secuencia
+      data_template:
+        sonido: 'clock_01'
+        repeticion: 1
+        voz: >
+          {% if now().hour == 13 and now().minute == 00 %}
+            "Buenos días. Son las {{ now().hour }}, es la hora de un aperitivo"
+          {% elif now().hour == 13 and now().minute == 45 %}
+            "Buenas tardes. Son las {{ now().hour }} y {{ now().minute }}, es la hora de preparar la comida"
+          {% elif now().hour == 14 and now().minute == 30 %}
+            "Buenas tardes. Son las {{ now().hour }} y {{ now().minute }}, es la hora del almuerzo"
+          {% elif now().hour ==21 %}
+            "Buenas noches. Son las {{ now().hour }} y {{ now().minute }}, es la hora de preparar la cena"
+          {% endif %}
+
+- id: hass_blink_update
+  alias: 'BLINK Camera Update'
+  trigger:
+    - platform: time_pattern
+      hours: "/1"
+  condition:
+    condition: and
+    conditions:
+      - condition: sun
+        after: sunrise
+        before: sunset
+        before_offset: "04:00:00"
+  action:
+    # Actualizacion imagen cámaras última hora.
+    - service: script.blink_trigger_cam_hall
+    - delay: '00:00:10'
+    - service: script.blink_trigger_cam_puerta_principal
+    - delay: '00:00:10'
+    - service: script.blink_trigger_cam_puerta_garaje
+    - delay: '00:00:10'
+    - service: script.blink_trigger_cam_piscina
+    - delay: '00:00:10'
+    - service: script.blink_trigger_cam_porche
+    - delay: '00:00:10'
+    - service: script.blink_trigger_cam_estudio
+
+#-----------------------------------------------------------------------------#
+#                                                                             #
+# ALARMA: Armado y Control de la Alarma                                       #
+#                                                                             #
+#-----------------------------------------------------------------------------#
+
+# REGLAS: TEST SONIDOS ALARMA
+#
+- id: X0_test
+  alias: 'X0 TEST ON'
+  trigger:
+    - platform: state
+      entity_id: input_boolean.alarm_test_sirenas
+      from: 'off'
+      to: 'on'
+  action:
+    # Micro Aviso Sirena Interior
+    - service: script.sirena_alarma_micro_aviso
+
+#
+# ALARMA AUTOMATICA SENSOR HUMO COCINA
+#
+- id: X1_alarma_humo_cocina
+  alias: 'X1 Alarma Humo Cocina'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.aqara_humo_cocina
+      from: 'off'
+      to: 'on'
+  action:
+    # Micro Aviso Sirena Interior
+    - service: script.sirena_alarma_micro_aviso
+
+    # Script Envío Sonido Alexa Alexa
+    - service: script.alexa_secuencia
+      data_template:
+        sonido: "{{ states('input_select.alarma_sonido_disparado') }}"
+        repeticion: 5
+        voz: 'ATENCION! ¡ALARMA HUMO COCINA!. Sensor Humo Cocina. ¡ATENCION! ¡ALARMA!'
+
+    # Script Notificaciones Alarma
+    - service: script.notifica_alarma
+      data:
+        variables:
+          titulo: '*ATENCION ALARMA HUMO*'
+          mensaje: >
+            >>> URGENTE: SENSOR HUMO COCINA
+#
+# ALARMA AUTOMATICA SENSOR SENSOR AGUA ARQUETA
+#
+- id: X2_alarma_agua_arqueta
+  alias: 'X1 Alarma Agua Arqueta'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.water_leak_sensor_158d00045a3376
+      from: 'off'
+      to: 'on'
+  action:
+    # Micro Aviso Sirena Interior
+    - service: script.sirena_alarma_micro_aviso
+
+    # Script Envío Sonido Alexa Alexa
+    - service: script.alexa_secuencia
+      data_template:
+        sonido: "{{ states('input_select.alarma_sonido_disparado') }}"
+        repeticion: 5
+        voz: 'ATENCION! ¡ALARMA AGUA ARQUETA!. Sensor Agua Arqueta. ¡ATENCION! ¡ALARMA!'
+
+    # Script Notificación Alarma
+    - service: script.notifica_alarma
+      data:
+        variables:
+          titulo: '*ATENCION ALARMA AGUA*'
+          mensaje: >
+            >>> URGENTE: SENSOR AGUA ARQUETA BAÑO
+#
+# REGLA: ALARMA DISARMED A <ARMING>
+#
+- id: A0
+  alias: 'A0 Alarma Disarmed to Pending'
+  trigger:
+    - platform: state
+      entity_id: alarm_control_panel.ha
+      from: 'disarmed'
+      to: 'arming'
+  action:   
+    # Script Envío Sonido Alexa Alexa
+    - service: script.alexa_secuencia_alarma_armado
+      data_template:
+        voz: "¡ATENCION!, alarma activada. Tiene un minuto para salir. ATENCION!, alarma activada. Salga ahora, por favor."
+        sonido: "{{ states('input_select.alarma_sonido_desarmado') }}"
+#
+# REGLA: ALARMA ARMED A <PENDING>
+#
+- id: A1
+  alias: 'A1 Alarma Armed to Pending'
+  trigger:
+    - platform: state
+      entity_id: alarm_control_panel.ha
+      from: 'armed_home'
+      to: 'pending'
+    - platform: state
+      entity_id: alarm_control_panel.ha
+      from: 'armed_away'
+      to: 'pending'
+  action:
+    #- service: script.alarma_to_pending
+    #  data_template:
+    #    fromstate: '{{trigger.from_state.state}}'
+    #    tostate: '{{trigger.to_state.state}}'
+    #    ringtone_msg: 10004
+
+    # Script Notifica Evento Alarma Disparada
+    - service: script.notifica_evento
+      data_template:
+        titulo: '*ALARMA HOMY*'
+        mensaje: >
+          >>> ESTADO: ATENCION AVISO PREVIO SALTO ALARMA
+
+    # Script Envío Sonido Alexa Alexa
+    - service: script.alexa_secuencia_alarma_desarmado
+      data_template:
+        voz: "¡ATENCION!, Alarma Disparada. Tiene un minuto para desarmar. ¡ATENCION!, Desarme ahora, por favor."
+        sonido: "{{ states('input_select.alarma_sonido_desarmado') }}"
+
+# REGLA: ARMADO AWAY COMPLETADO
+#
+- id: A2
+  alias: 'A2 Alarma Armado Away OK'
+  trigger:
+    - platform: state
+      entity_id: alarm_control_panel.ha
+      to: 'armed_away'
+  action:
+    # Encendido Led VERDE Tag Reader
+    - service: light.turn_on
+      entity_id: light.tagreader_led
+      data:
+        color_name: green
+        transition: 3
+        brightness: 128
+
+    # INICIALIZA EL SENSOR DEL TRIGGER
+    - service: input_text.set_value
+      entity_id: input_text.alarm_trigger
+      data_template:
+        value: " "
+    # Aviso sonoro con Xiaomi GW
+    #- service: script.sirena_xiaomi_play_alarm_armed
+
+    # Script Envío Sonido Alexa Alexa
+    - service: script.alexa_secuencia
+      data_template:
+        voz: "ATENCION!. Armado Total activado."
+        sonido: "{{ states('input_select.alarma_sonido_armado') }}"
+        repeticion: 2
+
+    # Notifica Evento
+    - service: script.notifica_evento
+      data:
+        titulo: '*ALARMA HOMY*'
+        mensaje: >
+          >>> ESTADO: ARMADO TOTAL (AWAY)
+          >>> ACCION: Apagado Total Casa
+
+    # Llamada a Script Apagado Casa
+    - service: script.home_switch_off
+
+    #- delay: 00:01:00
+    # ARMADO PANEL ALARMA BLINK
+    #- service: alarm_control_panel.alarm_arm_away
+    #  entity_id: alarm_control_panel.blink_casa
+
+#
+# REGLA: ARMADO HOME COMPLETADO
+#
+- id: A3
+  alias: 'A3 Alarma Armado Home OK'
+  trigger:
+    - platform: state
+      entity_id: alarm_control_panel.ha
+      to: 'armed_home'
+  action:
+    # Encendido Led Azul Tag Reader
+    - service: light.turn_on
+      entity_id: light.tagreader_led
+      data:
+        color_name: blue
+        transition: 3
+        brightness: 128
+
+    # ALMACENA EL SENSOR DEL TRIGGER
+    - service: input_text.set_value
+      entity_id: input_text.alarm_trigger
+      data_template:
+        value: " "
+    # Aviso sonoro con Xiaomi GW
+    #- service: script.sirena_xiaomi_play_alarm_armed
+
+    # Script Envío Sonido Alexa Alexa
+    - service: script.alexa_secuencia
+      data_template:
+        voz: "ATENCION!. Armado parcial activado."
+        sonido: "{{ states('input_select.alarma_sonido_armado') }}"
+        repeticion: 2
+
+    # Notifica Evento
+    - service: script.notifica_evento
+      data:
+        titulo: '*ALARMA HOMY*'
+        mensaje: >
+          >>> ESTADO: ARMADO PARCIAL (HOME)
+
+
+    # Revisar
+    # https://community.home-assistant.io/t/automation-with-is-state-trigger-to-state-on-not-working/54691/2
+    #        >>> MODO: "{{ trigger.to_state.state }}"
+
+#
+# REGLA: DESARMADO OK => SIRENA OFF, AVISO Y NOTIFICACION (DISARMED)
+#
+- id: A4
+  alias: 'A4 Alarma Disarmed'
+  trigger:
+    - platform: state
+      entity_id: alarm_control_panel.ha
+      to: 'disarmed'
+  action:
+    # SONOFF_SW1_SIRENA INTERIOR ==> OFF
+    - service: switch.turn_off
+      entity_id: switch.esphome_bas_sw0
+
+    # DESARMADO PANEL ALARMA BLINK
+    - service: alarm_control_panel.alarm_disarm
+      entity_id: alarm_control_panel.blink_casa
+
+    # Resetea el sensor del TRIGGER
+    #- service: input_text.set_value
+    #  entity_id: input_text.alarm_trigger
+    #  data_template:
+    #    value: " "
+
+    #
+    # Aviso sonoro con Xiaomi GW
+    #- service: script.sirena_xiaomi_play_alarm_disarmed
+
+    # Apaga Luz Piloto Alarma
+    - service: light.turn_off
+      entity_id: 
+        - light.luz_gateway_aqara
+        - light.tagreader_led
+      
+    # Script Envío Sonido Alexa Alexa
+    - service: script.alexa_secuencia
+      data_template:
+        voz: "ATENCION!. Alarma desactivada."
+        sonido: "{{ states('input_select.alarma_sonido_desarmado') }}"
+        repeticion: 1
+
+    # Script Notificación Evento
+    - service: script.notifica_evento
+      data:
+        titulo: '*ALARMA HOMY*'
+        mensaje: >
+          >>> ESTADO: Alarma Desactivada
+#
+# REGLA: TRIGGER SENSOR => MODO ARMADO AWAY => PENDING ==> ALARMA TRIGGERED
+#
+- id: A5
+  alias: 'A5 Alarm Trigger Armed Away'
+  trigger:
+    # MUY IMPORTANTE: EN EL ARM AWAY SE CHEQUEA GRUPO SENSORES HOME + AWAY
+    - platform: state
+      entity_id:
+        - group.alarma_sensores_perimetro_grp                   # Grupo Sensores PERIMETRO
+        - group.alarma_sensores_presencia_interior_grp          # Grupo Sensores Presencia INTERIOR
+        - group.alarma_sensores_presencia_exterior_grp          # Grupo Sensores Presencia EXTERIOR
+      to: 'on'
+    # Los sensores vibración solo saltan por trigger = event
+    - platform: event
+      event_type: xiaomi_aqara.movement
+      event_data:
+        entity_id:
+          - binary_sensor.vibration_158d0002b15e3b # Rack Comunicaciones
+          - binary_sensor.vibration_158d0002a4eacc # Puerta atras salon
+        action_type: vibrate
+    - platform: event
+      event_type: xiaomi_aqara.movement
+      event_data:
+        entity_id:
+          - binary_sensor.vibration_158d0002b15e3b # Rack Comunicaciones
+          - binary_sensor.vibration_158d0002a4eacc # Puerta atras salon
+        action_type: tilt
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: alarm_control_panel.ha
+        state: armed_away
+  action:
+    # ALMACENA EL SENSOR DEL TRIGGER
+    - service: input_text.set_value
+      entity_id: input_text.alarm_trigger
+      data_template:
+        value: "{{ trigger.to_state.attributes.friendly_name }}"
+    #
+    # DISPARA LA ALARMA, que pasa a estado PENDING durante 60'
+    # Si no se desactiva, pasa a triggered y se envían notificaciones y Sirena
+    - service: alarm_control_panel.alarm_trigger
+      entity_id: alarm_control_panel.ha
+
+#
+# REGLA: TRIGGER SENSOR => MODO ARMADO HOME => PENDING ==> ALARMA TRIGGERED
+#
+- id: A6
+  alias: 'A6 Alarm Trigger Armed Home'
+  trigger:
+    - platform: state
+      # Grupo Sensores PERIMETRO
+      entity_id: group.alarma_sensores_perimetro_grp
+      to: 'on'
+    # Los sensores vibración solo saltan por trigger = event
+    - platform: event
+      event_type: xiaomi_aqara.movement
+      event_data:
+        entity_id: binary_sensor.vibration_158d0002a4eacc # Puerta atras salon
+        action_type: vibrate
+    - platform: event
+      event_type: xiaomi_aqara.movement
+      event_data:
+        entity_id: binary_sensor.vibration_158d0002a4eacc # Puerta atras salon
+        action_type: tilt
+  condition:
+    - condition: state
+      entity_id: alarm_control_panel.ha
+      state: armed_home
+  action:
+    # ALMACENA EL SENSOR DEL TRIGGER
+    - service: input_text.set_value
+      entity_id: input_text.alarm_trigger
+      data_template:
+        value: "{{ trigger.to_state.attributes.friendly_name }}"
+
+    # DISPARA LA ALARMA, que pasa a estado PENDING durante 60'
+    # Si no se desactiva, pasa a triggered y se envían notificaciones y Sirena
+    - service: alarm_control_panel.alarm_trigger
+      entity_id: alarm_control_panel.ha
+
+
+# REGLA: ALARMA ARMED_AWAY TRIGGERED ==> SIRENA + NOTIFICACION COMPLETA
+#
+- id: A7
+  alias: 'A7 Alarm Triggered'
+  trigger:
+    - platform: state
+      entity_id: alarm_control_panel.ha
+      to: 'triggered'
+  action:
+    # Script Notificación Alarma
+    - service: script.notifica_alarma
+      data_template:
+        titulo: '*ALARMA HOMY*'
+        mensaje: >
+          >>> ESTADO: ATENCION ALARMA DISPARADA
+
+    # ALEXA SIRENAS ALARMA DISPARADA
+    - service: script.alexa_secuencia_alarma_disparada
+
+# REGLA: TRIGGER DESARMADO AUTOMATICO AL AMANECER
+#
+- id: A9
+  alias: 'A9 Alarm Home Auto Disarm'
+  trigger:
+    - platform: sun
+      event: sunrise
+      offset: "-00:30:00"
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: alarm_control_panel.ha
+        state: armed_home
+      # Hay alguien en casa
+      - condition: state
+        entity_id: binary_sensor.family_any_home
+        state: 'on'
+  action:
+    # ALMACENA EL SENSOR DEL TRIGGER
+    - service: input_text.set_value
+      entity_id: input_text.alarm_trigger
+      data_template:
+        value: " "
+    # Desarmado de Alarmas
+    - service: alarm_control_panel.alarm_disarm
+      data:
+        entity_id: alarm_control_panel.ha
+        code: !secret alarm_control_code
+    #
+    # Aviso sonoro con Xiaomi GW
+    - service: script.sirena_stop_alarma
+    # Notifica Evento
+    - service: script.notifica_evento
+      data:
+        titulo: '*ALARMA HOMY*'
+        mensaje: >
+          >>> ESTADO: Desarmado automático al amanecer.
+
+#
+# REGLA: APAGADO BOTON PANICO
+#
+- id: A10
+  alias: 'A10 Alarm Boton Panico Off'
+  trigger:
+    platform: state
+    entity_id: input_boolean.panic_button
+    from: 'on'
+    to: 'off'
+  action:
+    # Llamada a script desactivado botón pánico.
+    - service: script.alarma_boton_panico_off
+
+#
+# REGLA: BOTON APAGADO ESPHOME-SW1 ==> SIRENA OFF
+#
+- id: A11
+  alias: 'A12 Alarm Sirena Interior Off'
+  trigger:
+    platform: state
+    entity_id: binary_sensor.esphome_bas_sw0_boton
+    from: 'off'
+    to: 'on'
+  action:
+    # ESPHOME_SW1_SIRENA INTERIOR ==> OFF
+    - service: switch.turn_off
+      entity_id: switch.esphome_bas_sw0
+    - service: light.toggle
+      entity_id: light.esphome_bas_sw0_led
+
+#-----------------------------------------------------------------------------#
+#                                                                             #
+# FAMILY TRACKING AT HOME: Control Home/Away                                  #
+#                                                                             #
+#-----------------------------------------------------------------------------#
+
+- id: F01
+  alias: 'F01 Family Away Armado Total'
+  trigger:
+    # Ya no hay nadie en casa
+    platform: state
+    entity_id: binary_sensor.family_any_home
+    from: 'on'
+    to: 'off'
+  action:
+    # Script Activación Alarma ARM AWAY
+    - service: script.homy_armado_total
+    # Delay para no bloquear notificaciones
+    - delay: 0:05
+    # Script Luces Apagado Total
+    - service: script.luces_off
+
+- id: F02
+  alias: 'F02 Armado Parcial Midnight'
+  trigger:
+    - platform: time
+      at: '00:30:00'
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: binary_sensor.family_any_home
+        state: 'on'
+      - condition: state
+        entity_id: alarm_control_panel.ha
+        state: disarmed
+  action:
+    - service: alarm_control_panel.alarm_arm_home
+      entity_id: alarm_control_panel.ha
+
+- id: F03
+  alias: 'F03 Family Home Armado Home'
+  trigger:
+    # Están todos en casa
+    - platform: state
+      entity_id: binary_sensor.family_all_home
+      from: 'off'
+      to: 'on'
+    - platform: time
+      at:
+        - "02:00:00"
+        - "03:00:00"
+        - "04:00:00"
+        - "05:00:00"
+        - "06:00:00"
+        - "07:00:00"
+  condition:
+    condition: and
+    conditions:
+      # Versión original: Están todos en casa y Agu ha llegado
+      - condition: state
+        entity_id: alarm_control_panel.ha
+        state: disarmed
+      - condition: time
+        after: '00:30:00'
+      - condition: sun
+        before: sunrise
+      - condition: state
+        entity_id: binary_sensor.family_any_home
+        state: 'on'
+  action:
+    # Notifica Evento
+    - service: script.notifica_evento
+      data:
+        titulo: '*FAMILY HOME*'
+        mensaje: >
+          >>> MADRUGADA TODOS EN CASA. EN 5' AUTO ARMADO HOME
+    - delay: '00:00:05'
+    - service: alarm_control_panel.alarm_arm_home
+      entity_id: alarm_control_panel.ha
+
+- id: F04
+  alias: 'F04 Family Home'
+  trigger:
+    # Hay alguien en casa
+    - platform: state
+      entity_id: binary_sensor.family_any_home
+      from: 'off'
+      to: 'on'
+  action:
+    # Script encendido Luz piloto si es de noche
+    - service: script.notifica_evento
+      data_template:
+        titulo: '*FAMILY HOME: SI*'
+        mensaje: >
+          >>> EVENTO: Primero en Entrar {{ states('sensor.family_last_tracking') }}
+
+- id: F05
+  alias: 'F05 Family Home How Many Sleep'
+  trigger:
+    # Hay alguien en casa
+    - platform: state
+      entity_id:
+        - input_boolean.family_sleep_home_mfc
+        - input_boolean.family_sleep_home_acc
+        - input_boolean.family_sleep_home_paf
+        - input_boolean.family_sleep_home_aaf
+  action:
+    # Llamada al contador de personas que actualiza sensor.family_home
+    - service: python_script.countpeople
+
+- id: F06
+  alias: 'F06 Family MFC - Check Sleep'
+  trigger:
+    - platform: time
+      at: '23:00:00'
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: binary_sensor.family_home_mfc
+        state: 'on'
+      - condition: state
+        entity_id: input_boolean.family_sleep_home_mfc
+        state: 'off'
+  action:
+    # Llamada al contador de personas que actualiza sensor.family_home
+    - service: python_script.countpeople
+
+    - service: input_boolean.turn_on
+      entity_id: input_boolean.family_sleep_home_mfc
+    # Notifica Evento
+    - service: script.notifica_evento
+      data:
+        titulo: '*FAMILY HOME*'
+        mensaje: >
+          >>> Malen está en casa a las 23:00
+
+          >>> Activado el control de Duerme en Casa.
+
+- id: F07
+  alias: 'F07 Family AAF - Check Sleep'
+  trigger:
+    - platform: time
+      at: '23:00:00'
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: binary_sensor.family_home_aaf
+        state: 'on'
+      - condition: state
+        entity_id: input_boolean.family_sleep_home_aaf
+        state: 'off'
+  action:
+    # Llamada al contador de personas que actualiza sensor.family_home
+    - service: python_script.countpeople
+
+    - service: input_boolean.turn_on
+      entity_id: input_boolean.family_sleep_home_aaf
+    # Notifica Evento
+    - service: script.notifica_evento
+      data:
+        titulo: '*FAMILY HOME*'
+        mensaje: >
+          >>> Agu está en casa a las 23:00
+
+          >>> Activado el control de Duerme en Casa.
+
+- id: F08
+  alias: 'F08 Family PAF - Check Sleep'
+  trigger:
+    - platform: time
+      at: '23:00:00'
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: binary_sensor.family_home_paf
+        state: 'on'
+      - condition: state
+        entity_id: input_boolean.family_sleep_home_paf
+        state: 'off'
+  action:
+    # Llamada al contador de personas que actualiza sensor.family_home
+    - service: python_script.countpeople
+
+    - service: input_boolean.turn_on
+      entity_id: input_boolean.family_sleep_home_paf
+    # Notifica Evento
+    - service: script.notifica_evento
+      data:
+        titulo: '*FAMILY HOME*'
+        mensaje: >
+          >>> Paloma está en casa a las 23:00
+
+          >>> Activado el control de Duerme en Casa.
+
+- id: F09
+  alias: 'F09 Family AAC - Check Sleep'
+  trigger:
+    - platform: time
+      at: '23:00:00'
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: binary_sensor.family_home_aac
+        state: 'on'
+      - condition: state
+        entity_id: input_boolean.family_sleep_home_aac
+        state: 'off'
+  action:
+    # Llamada al contador de personas que actualiza sensor.family_home
+    - service: python_script.countpeople
+
+    - service: input_boolean.turn_on
+      entity_id: input_boolean.family_sleep_home_paf
+    # Notifica Evento
+    - service: script.notifica_evento
+      data:
+        titulo: '*FAMILY HOME*'
+        mensaje: >
+          >>> Agustín está en casa a las 23:00
+
+          >>> Activado el control de Duerme en Casa.
+
+- id: F10
+  alias: 'F10 Family Any Change - Actualiza Contador'
+  mode: restart
+  trigger:
+    - platform: state
+      entity_id:
+        - binary_sensor.family_home_aac
+        - binary_sensor.family_home_mfc
+        - binary_sensor.family_home_paf
+        - binary_sensor.family_home_aaf
+  action:
+    # Llamada al contador de personas que actualiza sensor.family_home
+    - service: python_script.countpeople
+
+- id: F11
+  alias: 'F11 Family AAF Not Home'
+  mode: restart
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.family_home_aaf
+      to: 'off'
+  action:
+    # Apara el Area Dormitorio Agu
+    - service: switch.turn_off
+      data: {}
+      target:
+        area_id: dormitorio_aaf
+    - service: light.turn_off
+      data: {}
+      target:
+        area_id: dormitorio_aaf
+
+- id: F12
+  alias: 'F11 Family PAF Not Home'
+  mode: restart
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.family_home_paf
+      to: 'off'
+  action:
+    # Apara el Area Dormitorio Paloma
+    - service: switch.turn_off
+      data: {}
+      target:
+        area_id: dormitorio_paf
+    - service: light.turn_off
+      data: {}
+      target:
+        area_id: dormitorio_paf
+
+
+
+#-----------------------------------------------------------------------------#
+#                                                                             #
+# REGLAS DE CONTROL DE LUCES Y ALUMBRADO                                      #
+#                                                                             #
+#-----------------------------------------------------------------------------#
+- id: L01
+  alias: 'L01 Luces On Exterior Sunset'
+  trigger:
+      # offset: "+01:00:00"   # Horario Invierno GMT+1 - Enero
+      # offset: "-00:00:00"   # Horario Invierno GMT+1
+      # offset: "-00:00:00"   # Horario Verano GMT+2
+    - platform: sun
+      event: sunset
+      #offset: "-00:30"
+  action:
+    # Encendido Luces Exterior y Jardín
+    - service: script.luces_exterior_on
+    # Notifica a Familia
+    - service: script.notifica_evento
+      data:
+        voz: 'Se va a poner el sol. Enciendo luces del jardín'
+        titulo: '*ALUMBRADO*'
+        mensaje: >
+          >>> EVENTO: Puesta de Sol en 10'
+
+          >>> LUCES: Alumbrado Exterior On
+
+- id: L02
+  alias: 'L02 Luces Off Exterior Medianoche'
+  trigger:
+    - platform: time
+      at: '00:05:00'
+  action:
+    # Script Luces Exterior Off
+    - service: script.luces_exterior_off
+    # Notifica a Familia
+    - service: script.notifica_evento
+      data:
+        voz: 'Es casi medianoche. Apago luces del jardín'
+        titulo: '*ALUMBRADO*'
+        mensaje: >
+          >>> EVENTO: Casi Medianoche
+
+          >>> LUCES: Alumbrado Exterior Off
+
+- id: L04
+  alias: 'L04 Luces On Salon Sunset'
+  trigger:
+    - platform: sun
+      # offset: "-00:35:00"   # Horario Invierno GMT+1
+      # offset: "-00:25:00"   # Horario Verano GMT+2
+      event: sunset
+      offset: "-00:35"
+  condition:
+    condition: and
+    conditions:
+        # Hay alguien en casa
+      - condition: state
+        entity_id: binary_sensor.family_any_home
+        state: 'on'
+      - condition: numeric_state
+        entity_id: sensor.illumination_158d0001e05661
+        below: 50
+  action:
+    - service: light.turn_on
+      entity_id: light.luz_vitrina
+    # Notifica a Familia
+    - service: script.notifica_evento
+      data:
+        titulo: '*ALUMBRADO*'
+        mensaje: >
+          >>> EVENTO: Puesta de Sol en breve
+
+          >>> LUCES: Alumbrado Luz Salón On
+
+#
+# La regla de alumbrado exterior según sensor se simplifica para que se encienda por la noche, siempre que esté oscuro.
+# La idea es que por programacion horaria y puesta de sol la regla de encendido en la puesta de sol encienda y mantenga
+# encendida las luces hasta al menos las 23.55.
+# A partir de esa hora se apagan las luces y entraria a funcionar esta regla,
+# de forma que al pasar alguien por la entrada si está oscuro, encienda los faroles exterior.
+# Se elimina la notificación Telegram.
+  #
+- id: L05
+  alias: 'L05 Luces On Exterior Segun Sensor'
+  mode: restart
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.motion_sensor_158d0001e637f6
+      to: 'on'
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: sun.sun
+        state: 'below_horizon'
+      - condition: state
+        entity_id: light.faroles_exterior
+        state: 'off'
+      - condition: numeric_state
+        entity_id: sensor.illumination_158d0001e637f6
+        below: 10
+  action:
+    - service: light.turn_on
+      entity_id: light.faroles_exterior
+    - delay: '00:05:00'
+    - service: light.turn_off
+      entity_id: light.faroles_exterior
+
+- id: L06
+  alias: 'L06 Luces Off Before Sunrise'
+  trigger:
+    - platform: time
+      at:
+        - "02:00:00"
+        - "03:30:00"
+        - "04:00:00"
+        - "05:00:00"
+        - "06:00:00"
+        - "07:00:00"
+  condition:
+    condition: or
+    conditions:
+      - condition: state
+        entity_id: group.luces_interior_grp # Luces interior
+        state: 'on'
+      - condition: state
+        entity_id: group.luces_jardin_grp # Luces exterior
+        state: 'on'
+  action:
+    # Apagado Luces Casa
+    - service: script.luces_off
+
+- id: L07
+  alias: 'L07 Luces On Entrada Según Sensor'
+  mode: restart
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.aqara_movimiento_entrada
+      to: 'on'
+    - platform: state
+      entity_id: binary_sensor.aqara_puerta_entrada_principal
+      to: 'on'
+  condition:
+    condition: or  # 'when dark' condition: either after sunset or before sunrise
+    conditions:
+      - condition: sun
+        # after_offset: "-01:00:00"  ==> HORARIO INVIERNO GMT+1
+        # after_offset: "-00:30:00"  ==> HORARIO VERANO GMT+2
+        after: sunset
+        after_offset: "-01:00:00"
+      - condition: sun
+        before: sunrise
+        # en el amanecer +3h'
+        before_offset: "+06:00:00"
+      - condition: numeric_state
+        entity_id: sensor.aqara_movimiento_entrada_luminosidad
+        below: 4
+  action:
+    # Luces Entrada ON
+    - service: light.turn_on
+      entity_id: light.luz_entrada
+    # Si Alarm.Armed_Home => Piloto ON
+    - service: script.luz_on_armed_home
+    # Espera de x minutos en función de la hora
+    - delay:
+        minutes: >
+          {% if now().hour >= 1 and now().hour <= 7 %} 1
+          {% else %} 3
+          {% endif %}
+    # Luces Entrada OFF
+    - service: light.turn_off
+      entity_id:
+        - light.luz_entrada
+        - light.luz_gateway_aqara
+
+- id: L08
+  alias: 'L08 Luces On Dormitorio Según Sensor'
+  mode: restart
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.motion_sensor_158d0002ea1d0f
+      to: 'on'
+  condition:
+    condition: and
+    conditions:
+      - condition: sun
+        after: sunset
+        after_offset: "+00:30:00"
+      - condition: state
+        entity_id: light.dormitorio
+        state: 'off'
+      #- condition: sun
+      #  # before_offset: "+02:00:00"  ==> Horario Invierno GMT+1, en el amanecer -2h
+      #  # before_offset: "+00:30:00" ==> Horario Verano GMT+2, el amanecer -30m
+      #  before: sunrise
+      #  before_offset: "+02:00:00" # Horario Invierno GMT+1, en el amanecer +60m
+  action:
+    - service: scene.turn_on
+      target:
+        entity_id: scene.dormitorio_relax
+    - service: light.turn_on
+      entity_id: light.esphome_s20_sw1_led
+    # Espera de 5'
+    - delay: '00:10:00'
+    # Luces Off + Led
+    - service: light.turn_off
+      entity_id: 
+        - light.dormitorio
+        - light.esphome_s20_sw1_led
+
+- id: L09
+  alias: 'L09 Luces On Pasillo Según Sensor'
+  mode: restart
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.hue_movimiento_pasillo_presencia
+      to: 'on'
+  condition:
+    condition: and
+    conditions:
+      #- condition: sun
+      #  # after_offset: "-02:00:00"  ==> Horario Invierno GMT+1, en el amanecer -2h
+      #  # after_offset: "-00:30:00" ==> Horario Verano GMT+2, el amanecer -30m
+      #- condition: sun
+      #  after: sunset
+      #  after_offset: "-02:00:00"
+      - condition: numeric_state
+        entity_id: sensor.hue_movimiento_pasillo_luminosidad
+        below: 4
+      - condition: state
+        entity_id: light.luz_pasillo
+        state: 'off'
+  action:
+    - service: light.turn_on
+      entity_id: light.luz_pasillo
+    # Espera de 5'
+    - delay:
+        minutes: >
+          {% if now().hour >= 1 and now().hour <= 7 %} 1
+          {% else %} 3
+          {% endif %}
+    # Luces Off + Led
+    - service: light.turn_off
+      entity_id: 
+        - light.luz_pasillo
+
+- id: L10
+  alias: 'L10 Luces On Estudio Según Sensor'
+  mode: restart
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.aqara_movimiento_estudio
+      to: 'on'
+  condition:
+    - condition: state
+      entity_id: group.luces_estudio_grp
+      state: 'off'
+    - condition: or
+      conditions:
+        - condition: sun
+          after: sunset
+          after_offset: "+01:00:00"
+        - condition: sun
+          # before_offset: "+00:30:00"  ==> Horario Invierno GMT+1, en el amanecer -30m
+          # before_offset: "+01:30:00" ==> Horario Verano GMT+2, el amanecer 1h-30m
+          before: sunrise
+          before_offset: "+00:30:00"
+        # https://www.home-assistant.io/docs/scripts/conditions/
+        #
+        # si el sensor de luz está es < 3 lumx
+        #- condition: numeric_state
+        #  entity_id: sensor.illumination_158d0001e464a6
+        #  below: 2
+        # 'when dark' condition: either after sunset or before sunrise
+  action:
+    # Luces On
+    #- service: light.turn_on
+    #  entity_id:
+    #    - light.luz_estudio_techo
+    #    - light.luz_estudio_escalera
+    - service: scene.turn_on
+      target:
+        entity_id: scene.estudio_hall
+      data:
+        transition: 3
+
+- id: L11
+  alias: 'L11 Luces On Armario Estudio Sensor'
+  mode: restart
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.aqara_puerta_estudio_armario
+  action:
+    - choose:
+      # IF puerta cerrada => apaga Luz siempre
+      - conditions:
+        - condition: state
+          entity_id: binary_sensor.aqara_puerta_estudio_armario
+          state: 'off' # CERRADO
+        sequence:
+          - service: light.turn_off
+            entity_id: 
+              - light.luz_estudio_armario
+              - light.esphome_s26_sw1_led
+      #ELSE puerta abierta
+      default:
+        - service: light.turn_on
+          entity_id: 
+            - light.luz_estudio_armario
+            - light.esphome_s26_sw1_led
+
+- id: L12
+  alias: 'L12 Luces On Dormitorio Warning'
+  mode: restart
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.motion_sensor_158d0002ea1d0f       # Sensor Dormitorio
+      to: 'on'
+    - platform: state
+      entity_id: binary_sensor.door_window_sensor_158d00022b393c  # Puerta Entrada
+      to: 'on'
+    - platform: state
+      entity_id: binary_sensor.motion_sensor_158d0001e637f6       # Sensor Exterior
+      to: 'on'
+    - platform: state
+      entity_id: binary_sensor.motion_sensor_158d0001e55903       # Sensor Entrada
+      to: 'on'
+  condition:
+    condition: and
+    conditions:
+      # Dormitorio Warning F-Mode = on
+      - condition: state
+        entity_id: input_boolean.dormitorio_warning
+        state: 'on'
+      - condition: sun
+        after: sunset
+  action:
+    # Luces On
+    - service: script.luces_dormitorio_relax
+    - delay: '00:00:10'
+    - service: light.turn_off
+      entity_id: light.dormitorio
+      data:
+        transition: 10
+#-----------------------------------------------------------------------------#
+#                                                                             #
+# REGLAS MAGIC CUBE                                                           #
+#                                                                             #
+#-----------------------------------------------------------------------------#
+#
+# Available events are FLIP90, FLIP180, move, TAP_TWICE, SHAKE_AIR, swing, alert, FREE_FALL, ROTATE
+# The component stores the last action as the attribute last_action.
+#
+# shake_air:    ESTUDIO LIGHT OFF
+# free_fall:    ESTUDIO LIGHT ESCENA AZUL
+# flip_90:      ESTUDIO LIGHT ESCENA DESK
+# flip_180:     ESTUDIO LIGHT ESCENA DESK HIGH
+# tap_twice:    ESTUDIO PERSIANA ON 3s => CANCELADO
+# ROTATE:       ESTUDIO PERSIANA CAMBIO MODO UP/DOWN
+#
+- id: L12
+  alias: 'L12 Cube FreeFall Light Estudio Azul'
+  mode: restart
+  trigger:
+    platform: event
+    event_type: xiaomi_aqara.cube_action
+    event_data:
+      entity_id: binary_sensor.cube_158d00024a4a62
+      action_type: free_fall
+  action:
+    #- service: script.luces_estudio_top
+    - service: scene.turn_on
+      target:
+        entity_id: scene.estudio_azul
+      data:
+        transition: 3
+
+- id: L13
+  alias: 'L13 Cube Shake Light Estudio off'
+  mode: restart
+  trigger:
+    platform: event
+    event_type: xiaomi_aqara.cube_action
+    event_data:
+      entity_id: binary_sensor.cube_158d00024a4a62
+      action_type: shake_air
+  action:
+    - service: light.turn_off
+      entity_id: group.luces_estudio_grp
+
+- id: L14
+  alias: 'L14 Cube Flip90 Light Estudio Desk Soft'
+  mode: restart
+  trigger:
+    platform: event
+    event_type: xiaomi_aqara.cube_action
+    event_data:
+      entity_id: binary_sensor.cube_158d00024a4a62
+      action_type: flip90
+  action:
+    #- service: light.toggle
+    #  entity_id: light.sonoff_mini_sw2
+    - service: scene.turn_on
+      target:
+        entity_id: scene.estudio_desk_soft
+      data:
+        transition: 3
+
+- id: L15
+  alias: 'L15 Cube Flip180 Light Estudio Desk High'
+  mode: restart
+  trigger:
+    platform: event
+    event_type: xiaomi_aqara.cube_action
+    event_data:
+      entity_id: binary_sensor.cube_158d00024a4a62
+      action_type: flip180
+  action:
+    - service: scene.turn_on
+      target:
+        entity_id: scene.estudio_desk_high
+      data:
+        transition: 3
+
+
+- id: L16
+  alias: 'L16 Cube TapTwice'
+  mode: restart
+  trigger:
+    platform: event
+    event_type: xiaomi_aqara.cube_action
+    event_data:
+      entity_id: binary_sensor.cube_158d00024a4a62
+      action_type: tap_twice
+  action:
+    # Encendido Led Azul Tag Reader
+    - service: switch.turn_on
+      entity_id: switch.esphome_bas_sw3
+
+- id: L17
+  alias: 'L17 Cube TapTwice Estudio Persiana Mode'
+  mode: restart
+  trigger:
+    platform: event
+    event_type: xiaomi_aqara.cube_action
+    event_data:
+      entity_id: binary_sensor.cube_158d00024a4a62
+      action_type: rotate
+  action:
+    - service: input_boolean.toggle
+      data: {}
+      target:
+        entity_id: input_boolean.estudio_persiana_mode_up
+
+#-----------------------------------------------------------------------------#
+#                                                                             #
+# REGLAS DE CONTROL DE SMART SWITCH ESPHOME                                   #
+#                                                                             #
+#-----------------------------------------------------------------------------#
+
+#
+# ESPHOME 4CH SW1 - LUCES JARDIN
+#
+- id: S01_4CH_SW1
+  alias: 'S01 Sonoff 4CH SW1 Boton1 On'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.esphome_4ch_sw1_button_1
+      from: 'off'
+      to: 'on'
+  action:
+    - service: switch.toggle
+      entity_id: switch.esphome_4ch_sw1_relay_1
+
+- id: S02_4CH_SW1
+  alias: 'S02 Sonoff 4CH SW1 Boton2 On'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.esphome_4ch_sw1_button_2
+      from: 'off'
+      to: 'on'
+  action:
+    - service: switch.toggle
+      entity_id: switch.esphome_4ch_sw1_relay_2
+
+- id: S03_4CH_SW1
+  alias: 'S03 Sonoff 4CH SW1 Boton3 On'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.esphome_4ch_sw1_button_3
+      from: 'off'
+      to: 'on'
+  action:
+    - service: switch.toggle
+      entity_id: switch.esphome_4ch_sw1_relay_3
+
+- id: S04_4CH_SW1
+  alias: 'S04 Sonoff 4CH SW1 Boton4 On'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.esphome_4ch_sw1_button_4
+      from: 'off'
+      to: 'on'
+  action:
+    - service: switch.toggle
+      entity_id: switch.esphome_4ch_sw1_relay_4
+
+#
+# ESPHOME 4CH SW2 -  RIEGO PLANTAS y BONSAIS
+#
+- id: S01_4CH_SW2
+  alias: 'S01 Sonoff 4CH SW2 Boton1 On'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.esphome_4ch_sw2_button_1
+      from: 'off'
+      to: 'on'
+  action:
+    - service: switch.toggle
+      entity_id: switch.esphome_4ch_sw2_relay_1
+
+- id: S02_4CH_SW2
+  alias: 'S02 Sonoff 4CH SW2 Boton2 On'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.esphome_4ch_sw2_button_2
+      from: 'off'
+      to: 'on'
+  action:
+    - service: switch.toggle
+      entity_id: switch.esphome_4ch_sw2_relay_2
+
+- id: S03_4CH_SW2
+  alias: 'S03 Sonoff 4CH SW2 Boton3 On'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.esphome_4ch_sw2_button_3
+      from: 'off'
+      to: 'on'
+  action:
+    - service: switch.toggle
+      entity_id: switch.esphome_4ch_sw2_relay_3
+
+- id: S04_4CH_SW2
+  alias: 'S03 Sonoff 4CH SW2 Boton4 On'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.esphome_4ch_sw2_button_4
+      from: 'off'
+      to: 'on'
+  action:
+    - service: switch.toggle
+      entity_id: switch.esphome_4ch_sw2_relay_4
+
+#
+# ESPHOME 4CH SW3 -  RIEGO CESPED
+#
+- id: S01_4CH_SW3
+  alias: 'S01 Sonoff 4CH SW3 Boton1 On'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.esphome_4ch_sw3_button_1
+      from: 'off'
+      to: 'on'
+  action:
+    - service: switch.toggle
+      entity_id: switch.esphome_4ch_sw3_relay_1
+
+- id: S02_4CH_SW3
+  alias: 'S02 Sonoff 4CH SW3 Boton2 On'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.esphome_4ch_sw3_button_2
+      from: 'off'
+      to: 'on'
+  action:
+    - service: switch.toggle
+      entity_id: switch.esphome_4ch_sw3_relay_2
+
+- id: S03_4CH_SW3
+  alias: 'S01 Sonoff 4CH SW3 Boton3 On'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.esphome_4ch_sw3_button_3
+      from: 'off'
+      to: 'on'
+  action:
+    - service: switch.toggle
+      entity_id: switch.esphome_4ch_sw3_relay_3
+
+- id: S04_4CH_SW3
+  alias: 'S03 Sonoff 4CH SW3 Boton4 On'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.esphome_4ch_sw3_button_4
+      from: 'off'
+      to: 'on'
+  action:
+    - service: switch.toggle
+      entity_id: switch.esphome_4ch_sw3_relay_4
+
+- id: S04
+  alias: 'S04 Sonoff 4CH Status'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.esphome_4ch_sw1_status
+      from: 'on'
+      to: 'off'
+      for: '00:05:00'
+    - platform: state
+      entity_id: binary_sensor.esphome_4ch_sw2_status
+      from: 'on'
+      to: 'off'
+      for: '00:05:00'
+    - platform: state
+      entity_id: binary_sensor.esphome_4ch_sw3_status
+      from: 'on'
+      to: 'off'
+      for: '00:05:00'
+  action:
+    # Script Notificación Alarma
+    - service: script.notifica_alarma
+      data:
+        voz: 'Fallo Eléctrico. Cuadro del Jardín sin corriente eléctrica'
+        titulo: '*AVISO FALLO ELECTRICO*'
+        mensaje: >
+          >>> URGENTE: CUADRO ELECTRICO JARDIN SIN CORRIENTE
+
+          >>> DISPOSITIVO: ESPHOME SONOFF 4CH SW1
+
+- id: S05
+  alias: 'S05 Sonoff POW Status'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.esphome_pow_sw3_status
+      from: 'on'
+      to: 'off'
+      for: '00:05:00'
+  action:
+    # Script Notificación Alarma
+    - service: script.notifica_alarma
+      data:
+        #voz: 'Fallo Eléctrico. Cuadro depuradora piscina sin corriente eléctrica'
+        titulo: '*AVISO FALLO ELECTRICO*'
+        mensaje: >
+          >>> URGENTE: CUADRO ELECTRICO DEPURADORA PISCINA SIN CORRIENTE
+
+          >>> DISPOSITIVO: ESPHOME SONOFF POW_SW3
+
+#
+# ESPHOME POW - DEPURADORA PISCINA
+#
+- id: S06
+  alias: 'S06 Timer Piscina Depuradora Tramo1'
+  trigger:
+    - platform: template
+      value_template: "{{ states('sensor.time') == (states.input_datetime.piscina_depuradora_ch0_start_time_t1.attributes.timestamp | int | timestamp_custom('%H:%M', False)) }}"
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: input_boolean.piscina_interruptor_global
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.piscina_depuradora_ch0_dia_ejecucion_t1  # Sensor del programador on/off
+        state: 'on'
+  action:
+    # Timer Programador Diario
+    - service: timer.start
+      data_template:
+        entity_id: timer.piscina_depuradora_ch0
+        duration: '{{ states.sensor.piscina_depuradora_ch0_duracion_planificada_t1.state|int * 60}}'
+    - service: switch.turn_on
+      entity_id: switch.esphome_pow_sw3
+
+- id: S06b
+  alias: 'S06b Timer Piscinda Depuradora Tramo2'
+  trigger:
+    - platform: template
+      value_template: "{{ states('sensor.time') == (states.input_datetime.piscina_depuradora_ch0_start_time_t2.attributes.timestamp | int | timestamp_custom('%H:%M', False)) }}"
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: input_boolean.piscina_interruptor_global  # Interruptor General Piscina
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.piscina_depuradora_ch0_dia_ejecucion_t2  # Sensor del programador on/off
+        state: 'on'
+  action:
+    # Timer Programador Diario
+    - service: timer.start
+      data_template:
+        entity_id: timer.piscina_depuradora_ch0
+        duration: '{{ states.sensor.piscina_depuradora_ch0_duracion_planificada_t2.state|int * 60}}'
+    - service: switch.turn_on
+      entity_id: switch.esphome_pow_sw3
+
+- id: S06c
+  alias: 'S06c Timer Piscina Depuradora CH0 End'
+  trigger:
+    - platform: event
+      event_type: timer.finished
+      event_data:
+        entity_id: timer.piscina_depuradora_ch0
+  action:
+    - service: script.piscina_depuradora_ch0_timer_cancel
+
+
+# ESPHOME S20 - SW1 Smart Pluh Dormitorio Principal
+#
+
+- id: S09
+  alias: 'S09 Sonoff S20 SW1 Toggle'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.esphome_s20_sw1_boton
+      from: 'off'
+      to: 'on'
+  action:
+    - service: switch.toggle
+      entity_id: switch.esphome_s20_sw1
+
+- id: S09b
+  alias: 'S09b Sonoff S20 SW3 Toggle'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.esphome_s20_sw3_boton
+      from: 'off'
+      to: 'on'
+  action:
+    - service: switch.toggle
+      entity_id: switch.esphome_s20_sw3
+
+- id: S10
+  alias: 'S10 Switch Dormitorio MFC On'
+  trigger:
+    - platform: sun
+      # offset: "+03:30:00"   # Horario Invierno GMT+2  => 18:30 + 3:30 = 22:00
+      # offset: "+00:30:00"   # Horario Verano GMT+1  => 21:30 + 0:30 = 22:00
+      event: sunset
+      offset: "+00:30:00"
+    #- platform: time # Solo Invierno Calefacción
+    #  at: '06:45:00'
+    #- platform: sun  # solo para calefacción
+    #  event: sunrise
+    #  offset: "-02:00:00"
+  condition:
+    condition: and
+    conditions:
+      # Hay alguien en casa
+      - condition: state
+        entity_id: input_boolean.calefac_programador_mfc
+        state: 'on'
+      - condition: state
+        entity_id: input_boolean.family_sleep_home_mfc
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.family_any_home
+        state: 'on'
+  action:
+    - service: switch.turn_on
+      entity_id: switch.esphome_s20_sw1
+
+- id: S10b
+  alias: 'S10b Switch Dormitorio PAF On'
+  trigger:
+    - platform: sun
+      # offset: "+03:30:00"   # Horario Invierno GMT+1  => 18:30 + 3:30 = 22:00
+      # offset: "+00:30:00"   # Horario Verano GMT+2  => 21:30 + 0:30 = 22:00
+      event: sunset
+      offset: "+00:30:00"
+  condition:
+    condition: and
+    conditions:
+      # Hay alguien en casa
+      - condition: state
+        entity_id: input_boolean.calefac_programador_paf
+        state: 'on'
+      - condition: state
+        entity_id: input_boolean.family_sleep_home_paf
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.family_any_home
+        state: 'on'
+  action:
+    - service: switch.turn_on
+      entity_id: switch.esphome_s20_sw3
+
+#- id: S10c
+#  alias: 'S10c Switch Dormitorio AAF On'
+#  trigger:
+#    - platform: sun
+#      # offset: "+03:30:00"   # Horario Invierno GMT+1  => 18:30 + 3:30 = 22:00
+#      # offset: "+00:30:00"   # Horario Verano GMT+2  => 21:30 + 0:30 = 22:00
+#      event: sunset
+#      offset: "+00:30:00"
+#  condition:
+#    condition: and
+#    conditions:
+#      # Hay alguien en casa
+#      - condition: state
+#        entity_id: input_boolean.calefac_programador_aaf
+#        state: 'on'
+#      - condition: state
+#        entity_id: input_boolean.family_sleep_home_aaf
+#        state: 'on'
+#      - condition: state
+#        entity_id: binary_sensor.family_any_home
+#        state: 'on'
+#  action:
+#    - service: switch.turn_on
+#      entity_id: switch.sonoff_S26_sw1
+
+- id: S12
+  alias: 'S12 Switch Dormitorios Off'
+  trigger:
+    # - platform: time # Solo Invierno Calefacción
+    # at: '00:05:00'
+    - platform: sun
+      event: sunrise
+  condition:
+    condition: or
+    conditions:
+      - condition: state
+        entity_id: switch.esphome_s20_sw1
+        state: 'on'
+      - condition: state
+        entity_id: switch.esphome_s20_sw3
+        state: 'on'
+      #- condition: state
+      #  entity_id: switch.sonoff_S26_sw1
+      #  state: 'on'
+  action:
+    - service: switch.turn_off
+      entity_id: switch.esphome_s20_sw1
+    - service: switch.turn_off
+      entity_id: switch.esphome_s20_sw3
+    #- service: switch.turn_off
+    #  entity_id: switch.sonoff_S26_sw1
+
+#
+# SAI RACK COMUNICACIONES
+#
+#- id: S15
+#  alias: 'S15 ups apc700 status'
+#  trigger:
+#    - platform: state
+#      entity_id: binary_sensor.ups_status
+#      from: 'on'
+#      to: 'off'
+#      for: '00:00:10'
+#  action:
+#    # Script Notificación Alarma
+#    - service: script.notifica_alarma
+#      data:
+#        voz: 'Fallo Eléctrico. Cuadro rack estudio sin corriente eléctrica'
+#        titulo: '*AVISO FALLO ELECTRICO*'
+#        mensaje: >
+#          >>> URGENTE: SAI RACK COMUNICACIONES SIN CORRIENTE
+
+#
+# ESPHOME POW R2 SW2 - LAVADORA
+#
+- id: S16
+  alias: 'S16 Sonoff POW Lavadora Boton Switch on'
+  trigger:
+    platform: state
+    entity_id: binary_sensor.esphome_pow_sw2_boton
+    from: 'off'
+    to: 'on'
+    for: '00:00:02'
+  action:
+    - service: switch.toggle
+      entity_id: switch.esphome_pow_sw2
+
+- id: S16b
+  alias: 'S16b Sonoff POW Lavadora Led'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.esphome_pow_sw2_lavadora_lavando
+  action:
+    - service: light.toggle
+      entity_id: light.esphome_pow_sw2_led
+
+- id: S16c
+  alias: 'Auto-Apagado Warning Lavadora (S16c)'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.esphome_pow_sw2_lavadora_warning
+      from: 'off'
+      to: 'on'
+  action:
+    - service: input_datetime.set_datetime
+      entity_id: input_datetime.lavadora_fin_lavado
+      data:
+        time: '{{ now().strftime("%H:%M") }}'
+    # Llama al script de apagado de Sonoof POW si viene de un lavado
+    - service: script.lavadora_switch_off
+
+- id: S16d
+  alias: 'S16d Lavadora Hora Inicio'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.esphome_pow_sw2_lavadora_lavando
+      from: 'off'
+      to: 'on'
+  action:
+    - service: input_datetime.set_datetime
+      entity_id: input_datetime.lavadora_inicio_lavado
+      data:
+        time: '{{ now().strftime("%H:%M") }}'
+
+#
+# ESPHOME 4CH-R2 SW2 RIEGO BONSAIS
+#
+# https://community.home-assistant.io/t/timer-execute-and-action-from-lovelace-ui/123512
+# https://community.home-assistant.io/t/lovelace-irrigation-card-help-needed/67667/2
+#
+# Sensores para Status Programador Activo on/off
+  # - binary_sensor.riego_control_bomba_status
+  # - binary_sensor.riego_bonsais_ch1_dia_ejecucion
+  # - binary_sensor.riego_bonsais_ch2_dia_ejecucion
+  # - binary_sensor.riego_tomates_ch0_dia_ejecucion
+  # - binary_sensor.riego_bonsais_dia_ejecucion
+
+# Sensores para Status Control Riego Activo on/off  (regando ahora?)
+  # - binary_sensor.riego_bonsais_ch1_status
+  # - binary_sensor.riego_bonsais_ch2_status
+  # - binary_sensor.riego_tomates_ch0_status
+  # - binary_sensor.riego_bonsais_status
+#
+# Regla Diaria cada 8 horas
+# Control del Interruptor General de Riego en base a Previsión Tiempo
+# SENSOR:  input_boolean.riego_interruptor_global
+#
+- id: S18
+  alias: 'S18 Control Interruptor General Riego'
+  mode: restart
+  trigger:
+    - platform: time
+      at:
+        - '07:00:00'
+        - '21:00:00'
+  action:
+    - choose:
+        # IF Riego On AND HOY No Se Riega (Llueve) => Apaga Riego
+        - conditions:
+          - condition: template
+            value_template: "{{ is_state('input_boolean.riego_interruptor_global','on') and is_state('binary_sensor.riego_automatico_hoy','off') }}"
+          sequence:
+            - service: input_boolean.turn_off
+              target:
+                entity_id: input_boolean.riego_interruptor_global
+        # ELIF Riego Off AND HOY  Se Riega (No Llueve) => Enciende Riego
+        - conditions:
+          - condition: template
+            value_template: "{{ is_state('input_boolean.riego_interruptor_global','off') and is_state('binary_sensor.riego_automatico_hoy','on') }}"
+          sequence:
+            - service: input_boolean.turn_on
+              target:
+                entity_id: input_boolean.riego_interruptor_global
+
+#
+# ESPHOME POW R2 SW4 - BOMBA POZO
+#
+
+#
+# Regla para encender/apagar el controlador de la bomba de riego del cesped en función del interruptor general de riego
+#
+# SENSOR:  input_boolean.riego_interruptor_global
+#
+# PLAN DE RIEGOS ESTACION OTOÑO /VERANO
+#
+#     CANAL   SECTOR    HORA    TRAMO1    HORA2     TRAMO2
+#     A       1         8:00    5         22:00     5
+#     B       2         8:50    4         22:50     4
+#     C       3         10:00   4         23:30     4
+#
+- id: S18b
+  alias: 'S18b Control Bomba Riego'
+  mode: restart
+  trigger:
+    - platform: homeassistant
+      event: start
+    - platform: time
+      at:
+        - '07:45:00'
+        - '21:45:00'
+        - '12:30:00'
+  action:
+    # Apaga la bomba de riego por las noches y la enciende a primera hora en función del estado del interruptor global
+    - choose:
+        # IF el interruptor general riego está encendido => a las 00:00 apaga la bomba de riego
+        - conditions:
+          - condition: template
+            value_template: "{{ now().hour == 12 }}"
+          sequence:
+            - service: switch.turn_off
+              target:
+                entity_id: switch.esphome_pow_sw4
+        # ELIF
+        - conditions:
+          - condition: template
+            value_template: "{{ (now().hour == 7 or now().hour == 21) and is_state('input_boolean.riego_interruptor_global','on')}}"
+          sequence:
+            - service: switch.turn_on
+              target:
+                entity_id: switch.esphome_pow_sw4
+
+# Regla Original Control Bomba Riego basado en el interruptor global
+#
+#- id: S18b
+#  alias: 'S18b Control Bomba Riego'
+#  mode: restart
+#  trigger:
+#    - platform: state
+#      entity_id: input_boolean.riego_interruptor_global
+#  action:
+#    # Apaga/Enciende el controlador de la bomba de riego en función del interruptor
+#    - choose:
+#        # IF el interruptor general riego se enciende => enciende controlador bomba
+#        - conditions:
+#          - condition: template
+#            value_template: "{{ is_state('input_boolean.riego_interruptor_global','on') and is_state('binary_sensor.riego_control_bomba_status','off') }}"
+#          sequence:
+#            - service: switch.turn_on
+#             target:
+#                entity_id: switch.esphome_pow_sw4
+#        # ELIF el interruptor general riego se apaga y el controlador bomba riego encendido => Apaga controlador bomba
+#        - conditions:
+#          - condition: template
+#            value_template: "{{ is_state('input_boolean.riego_interruptor_global','off') and is_state('binary_sensor.riego_control_bomba_status','on') }}"
+#          sequence:
+#            - service: switch.turn_off
+#              target:
+#                entity_id: switch.esphome_pow_sw4
+#
+#
+- id: S19
+  alias: 'S19 Set Luvia Ayer'
+  mode: restart
+  trigger:
+    - platform: time
+      at:
+        - '23:59:00'
+  action:
+    - service: input_text.set_value
+      data_template:
+        entity_id: input_text.riego_prevision_lluvia_ayer
+        value: "{{ states('sensor.dark_sky_icon') }}"
+
+- id: S19b
+  alias: 'S19b Sonoff POW SW4 Boton'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.esphome_pow_sw4_boton
+      from: 'off'
+      to: 'on'
+  action:
+    - service: switch.toggle
+      entity_id: switch.esphome_pow_sw4
+#
+# ESPHOME 4CH-R2 SW2 RIEGO : Relay1 BONSAIS TOP
+#
+- id: S19c
+  alias: 'S19c Timer Riego CH1 Bonsais Top Tramo1'
+  trigger:
+    - platform: template
+      value_template: "{{ states('sensor.time') == (states.input_datetime.riego_bonsais_ch1_start_time_t1.attributes.timestamp | int | timestamp_custom('%H:%M', False)) }}"
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: input_boolean.riego_interruptor_global  # Interruptor General Riego segun Forecast Tiempo
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.riego_bonsais_ch1_dia_ejecucion_t1  # Sensor del programador on/off
+        state: 'on'
+  action:
+    # Timer Programador Diario
+    - service: timer.start
+      data_template:
+        entity_id: timer.riego_bonsais_ch1
+        duration: '{{ states.sensor.riego_bonsais_ch1_duracion_planificada_t1.state|int * 60}}'
+    - service: switch.turn_on
+      entity_id: switch.esphome_4ch_sw2_relay_1
+
+- id: S19d
+  alias: 'S19d Timer Riego CH1 Bonsais Top Tramo2'
+  trigger:
+    - platform: template
+      value_template: "{{ states('sensor.time') == (states.input_datetime.riego_bonsais_ch1_start_time_t2.attributes.timestamp | int | timestamp_custom('%H:%M', False)) }}"
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: input_boolean.riego_interruptor_global  # Interruptor General Riego segun Forecast Tiempo
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.riego_bonsais_ch1_dia_ejecucion_t2  # Sensor del programador on/off
+        state: 'on'
+  action:
+    # Timer Programador Diario
+    - service: timer.start
+      data_template:
+        entity_id: timer.riego_bonsais_ch1
+        duration: '{{ states.sensor.riego_bonsais_ch1_duracion_planificada_t2.state|int * 60}}'
+    - service: switch.turn_on
+      entity_id: switch.esphome_4ch_sw2_relay_1
+
+- id: S19e
+  alias: 'S19e Timer Riego CH1 End'
+  trigger:
+    - platform: event
+      event_type: timer.finished
+      event_data:
+        entity_id: timer.riego_bonsais_ch1
+  action:
+    - service: script.riego_bonsais_ch1_timer_cancel
+
+#
+# ESPHOME 4CH-R2 SW2 RIEGO : Relay2 PLANTAS ENTRADA
+#
+- id: S20
+  alias: 'S20 Timer Riego CH2 Plantas Aromaticas Tramo1'
+  trigger:
+    - platform: template
+      value_template: "{{ states('sensor.time') == (states.input_datetime.riego_bonsais_ch2_start_time_t1.attributes.timestamp | int | timestamp_custom('%H:%M', False)) }}"
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: input_boolean.riego_interruptor_global  # Interruptor General Riego segun Forecast Tiempo
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.riego_bonsais_ch2_dia_ejecucion_t1  # Sensor que indica si es día de ejecución en función de la lista input_select.riego_bonsais_ch1_programador_dias
+        state: 'on'
+  action:
+    # Timer Programador Diario
+    - service: timer.start
+      data_template:
+        entity_id: timer.riego_bonsais_ch2
+        duration: '{{ states.sensor.riego_bonsais_ch2_duracion_planificada_t1.state|int * 60}}'
+    - service: switch.turn_on
+      entity_id: switch.esphome_4ch_sw2_relay_2
+
+- id: S20b
+  alias: 'S20b Timer Riego CH2 Plantas Aromaticas Tramo2'
+  trigger:
+    - platform: template
+      value_template: "{{ states('sensor.time') == (states.input_datetime.riego_bonsais_ch2_start_time_t2.attributes.timestamp | int | timestamp_custom('%H:%M', False)) }}"
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: input_boolean.riego_interruptor_global  # Interruptor General Riego segun Forecast Tiempo
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.riego_bonsais_ch2_dia_ejecucion_t2  # Sensor que indica si es día de ejecución en función de la lista input_select.riego_bonsais_ch1_programador_dias
+        state: 'on'
+  action:
+    # Timer Programador Diario
+    - service: timer.start
+      data_template:
+        entity_id: timer.riego_bonsais_ch2
+        duration: '{{ states.sensor.riego_bonsais_ch2_duracion_planificada_t2.state|int * 60}}'
+    - service: switch.turn_on
+      entity_id: switch.esphome_4ch_sw2_relay_2
+
+- id: S20c
+  alias: 'S20c Timer Riego CH2 Plantas Aromaticas Tramo1'
+  trigger:
+    - platform: event
+      event_type: timer.finished
+      event_data:
+        entity_id: timer.riego_bonsais_ch2
+  action:
+    - service: script.riego_bonsais_ch2_timer_cancel
+
+#
+# ESPHOME 4CH-R2 SW2 RIEGO : Relay3 FUENTE ZEN
+#
+- id: S23
+  alias: 'S23 Timer Fuente CH3 Fuente Zen Tramo1'
+  trigger:
+    - platform: template
+      value_template: "{{ states('sensor.time') == (states.input_datetime.riego_bonsais_ch3_start_time.attributes.timestamp | int | timestamp_custom('%H:%M', False)) }}"
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: input_boolean.riego_interruptor_global  # Interruptor General Riego segun Forecast Tiempo
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.riego_bonsais_ch3_dia_ejecucion  # Sensor que indica si es día de ejecución en función de la lista input_select.riego_bonsais_ch1_programador_dias
+        state: 'on'
+  action:
+    # Timer Programador Automático
+    - service: timer.start
+      data_template:
+        entity_id: timer.riego_bonsais_ch3
+        duration: '{{ states.sensor.riego_bonsais_ch3_duracion_planificada.state|int * 60}}'
+    - service: switch.turn_on
+      entity_id: switch.esphome_4ch_sw2_relay_3
+
+- id: S24
+  alias: 'S24 Timer Fuente CH3 Fuente Zen End'
+  trigger:
+    - platform: event
+      event_type: timer.finished
+      event_data:
+        entity_id: timer.riego_bonsais_ch3
+  action:
+    - service: script.riego_bonsais_ch3_timer_cancel
+
+#
+# ESPHOME BAS SW1 RIEGO : BONSAIS PRODUCCION
+#
+- id: S25
+  alias: 'S25 Timer Riego Bonsais Produccion Tramo1'
+  trigger:
+    - platform: template
+      value_template: "{{ states('sensor.time') == (states.input_datetime.riego_bonsais_ch0_start_time_t1.attributes.timestamp | int | timestamp_custom('%H:%M', False)) }}"
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: input_boolean.riego_interruptor_global  # Interruptor General Riego segun Forecast Tiempo
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.riego_bonsais_ch0_dia_ejecucion_t1  # Sensor del programador on/off
+        state: 'on'
+  action:
+    # Timer Programador Automático
+    - service: timer.start
+      data_template:
+        entity_id: timer.riego_bonsais_ch0
+        duration: '{{ states.sensor.riego_bonsais_ch0_duracion_planificada_t1.state|int * 60 }}'
+    - service: switch.turn_on
+      entity_id: switch.esphome_pow_sw1
+
+- id: S26
+  alias: 'S26 Timer Riego Bonsais Produccion Tramo2'
+  trigger:
+    - platform: template
+      value_template: "{{ states('sensor.time') == (states.input_datetime.riego_bonsais_ch0_start_time_t2.attributes.timestamp | int | timestamp_custom('%H:%M', False)) }}"
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: input_boolean.riego_interruptor_global  # Interruptor General Riego segun Forecast Tiempo
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.riego_bonsais_ch0_dia_ejecucion_t2  # Sensor del programador on/off
+        state: 'on'
+  action:
+    # Timer Programador Automático
+    - service: timer.start
+      data_template:
+        entity_id: timer.riego_bonsais_ch0
+        duration: '{{ states.sensor.riego_bonsais_ch0_duracion_planificada_t2.state|int * 60 }}'
+    - service: switch.turn_on
+      entity_id: switch.esphome_pow_sw1
+
+- id: S27
+  alias: 'S27 Timer Riego Bonsais Produccion End'
+  trigger:
+    - platform: event
+      event_type: timer.finished
+      event_data:
+        entity_id: timer.riego_bonsais_ch0
+  action:
+    - service: script.riego_bonsais_ch0_timer_cancel
+
+#
+# ESPHOME POW SW1 : RIEGO HUERTO TOMATERA
+#
+- id: S28
+  alias: 'S28 Timer Riego Huerto Tramo1'
+  trigger:
+    - platform: template
+      value_template: "{{ states('sensor.time') == (states.input_datetime.riego_tomates_ch0_start_time_t1.attributes.timestamp | int | timestamp_custom('%H:%M', False)) }}"
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: input_boolean.riego_interruptor_global  # Interruptor General Riego segun Forecast Tiempo
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.riego_tomates_ch0_dia_ejecucion_t1  # Sensor del programador on/off
+        state: 'on'
+  action:
+    # Timer Programador Automático
+    - service: timer.start
+      data_template:
+        entity_id: timer.riego_tomates_ch0
+        duration: '{{ states.sensor.riego_tomates_ch0_duracion_planificada_t1.state|int * 60 }}'
+    - service: switch.turn_on
+      entity_id: switch.esphome_bas_sw2
+      
+- id: S29
+  alias: 'S29 Timer Riego Huerto Tramo2'
+  trigger:
+    - platform: template
+      value_template: "{{ states('sensor.time') == (states.input_datetime.riego_tomates_ch0_start_time_t2.attributes.timestamp | int | timestamp_custom('%H:%M', False)) }}"
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: input_boolean.riego_interruptor_global  # Interruptor General Riego segun Forecast Tiempo
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.riego_tomates_ch0_dia_ejecucion_t2  # Sensor del programador on/off
+        state: 'on'
+  action:
+    # Timer Programador Automático
+    - service: timer.start
+      data_template:
+        entity_id: timer.riego_tomates_ch0
+        duration: '{{ states.sensor.riego_tomates_ch0_duracion_planificada_t2.state|int * 60 }}'
+    - service: switch.turn_on
+      entity_id: switch.esphome_bas_sw2
+
+- id: S30
+  alias: 'S30 Timer Riego Huerto End'
+  trigger:
+    - platform: event
+      event_type: timer.finished
+      event_data:
+        entity_id: timer.riego_tomates_ch0
+  action:
+    - service: script.riego_tomates_ch0_timer_cancel
+
+#
+# ESPHOME 4CH-R2 SW3 RIEGO CESPED CH1
+#
+- id: S31
+  alias: 'S31 Timer Riego Cesped CH1 Tramo1'
+  trigger:
+    - platform: template
+      value_template: "{{ states('sensor.time') == (states.input_datetime.riego_cesped_ch1_start_time_t1.attributes.timestamp | int | timestamp_custom('%H:%M', False)) }}"
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: input_boolean.riego_interruptor_global  # Interruptor General Riego segun Forecast Tiempo
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.riego_cesped_ch1_dia_ejecucion_t1  # Sensor del programador on/off
+        state: 'on'
+  action:
+    # Timer Programador Diario
+    - service: timer.start
+      data_template:
+        entity_id: timer.riego_cesped_ch1
+        duration: '{{ states.sensor.riego_cesped_ch1_duracion_planificada_t1.state|int * 60}}'
+    - service: switch.turn_on
+      entity_id: switch.esphome_4ch_sw3_relay_1
+
+- id: S31b
+  alias: 'S31b Timer Riego Cesped CH1 Tramo2'
+  trigger:
+    - platform: template
+      value_template: "{{ states('sensor.time') == (states.input_datetime.riego_cesped_ch1_start_time_t2.attributes.timestamp | int | timestamp_custom('%H:%M', False)) }}"
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: input_boolean.riego_interruptor_global  # Interruptor General Riego segun Forecast Tiempo
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.riego_cesped_ch1_dia_ejecucion_t2  # Sensor del programador on/off
+        state: 'on'
+  action:
+    # Timer Programador Diario
+    - service: timer.start
+      data_template:
+        entity_id: timer.riego_cesped_ch1
+        duration: '{{ states.sensor.riego_cesped_ch1_duracion_planificada_t2.state|int * 60}}'
+    - service: switch.turn_on
+      entity_id: switch.esphome_4ch_sw3_relay_1
+
+- id: S31c
+  alias: 'S31c Timer Riego Cesped CH1 Tramo3'
+  trigger:
+    - platform: template
+      value_template: "{{ states('sensor.time') == (states.input_datetime.riego_cesped_ch1_start_time_t3.attributes.timestamp | int | timestamp_custom('%H:%M', False)) }}"
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: input_boolean.riego_interruptor_global  # Interruptor General Riego segun Forecast Tiempo
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.riego_cesped_ch1_dia_ejecucion_t3  # Sensor del programador on/off
+        state: 'on'
+  action:
+    # Timer Programador Diario
+    - service: timer.start
+      data_template:
+        entity_id: timer.riego_cesped_ch1
+        duration: '{{ states.sensor.riego_cesped_ch1_duracion_planificada_t3.state|int * 60}}'
+    - service: switch.turn_on
+      entity_id: switch.esphome_4ch_sw3_relay_1
+
+- id: S31z
+  alias: 'S31z Timer Riego Cesped CH1 End'
+  trigger:
+    - platform: event
+      event_type: timer.finished
+      event_data:
+        entity_id: timer.riego_cesped_ch1
+  action:
+    - service: script.riego_cesped_ch1_timer_cancel
+
+#
+# ESPHOME 4CH-R2 SW3 RIEGO CESPED CH2
+#
+- id: S32
+  alias: 'S32 Timer Riego Cesped CH2 Tramo1'
+  trigger:
+    - platform: template
+      value_template: "{{ states('sensor.time') == (states.input_datetime.riego_cesped_ch2_start_time_t1.attributes.timestamp | int | timestamp_custom('%H:%M', False)) }}"
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: input_boolean.riego_interruptor_global  # Interruptor General Riego segun Forecast Tiempo
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.riego_cesped_ch2_dia_ejecucion_t1  # Sensor del programador on/off
+        state: 'on'
+  action:
+    # Timer Programador Diario
+    - service: timer.start
+      data_template:
+        entity_id: timer.riego_cesped_ch2
+        duration: '{{ states.sensor.riego_cesped_ch2_duracion_planificada_t1.state|int * 60}}'
+    - service: switch.turn_on
+      entity_id: switch.esphome_4ch_sw3_relay_2
+
+- id: S32b
+  alias: 'S32b Timer Riego Cesped CH2 Tramo2'
+  trigger:
+    - platform: template
+      value_template: "{{ states('sensor.time') == (states.input_datetime.riego_cesped_ch2_start_time_t2.attributes.timestamp | int | timestamp_custom('%H:%M', False)) }}"
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: input_boolean.riego_interruptor_global  # Interruptor General Riego segun Forecast Tiempo
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.riego_cesped_ch2_dia_ejecucion_t2  # Sensor del programador on/off
+        state: 'on'
+  action:
+    # Timer Programador Diario
+    - service: timer.start
+      data_template:
+        entity_id: timer.riego_cesped_ch2
+        duration: '{{ states.sensor.riego_cesped_ch2_duracion_planificada_t2.state|int * 60}}'
+    - service: switch.turn_on
+      entity_id: switch.esphome_4ch_sw3_relay_2
+
+- id: S32c
+  alias: 'S32c Timer Riego Cesped CH2 Tramo3'
+  trigger:
+    - platform: template
+      value_template: "{{ states('sensor.time') == (states.input_datetime.riego_cesped_ch2_start_time_t3.attributes.timestamp | int | timestamp_custom('%H:%M', False)) }}"
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: input_boolean.riego_interruptor_global  # Interruptor General Riego segun Forecast Tiempo
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.riego_cesped_ch2_dia_ejecucion_t3  # Sensor del programador on/off
+        state: 'on'
+  action:
+    # Timer Programador Diario
+    - service: timer.start
+      data_template:
+        entity_id: timer.riego_cesped_ch2
+        duration: '{{ states.sensor.riego_cesped_ch2_duracion_planificada_t3.state|int * 60}}'
+    - service: switch.turn_on
+      entity_id: switch.esphome_4ch_sw3_relay_2
+
+- id: S32z
+  alias: 'S31z Timer Riego Cesped CH2 End'
+  trigger:
+    - platform: event
+      event_type: timer.finished
+      event_data:
+        entity_id: timer.riego_cesped_ch2
+  action:
+    - service: script.riego_cesped_ch2_timer_cancel
+
+#
+# ESPHOME 4CH-R2 SW3 RIEGO CESPED CH3
+#
+- id: S33
+  alias: 'S33 Timer Riego Cesped ch3 Tramo1'
+  trigger:
+    - platform: template
+      value_template: "{{ states('sensor.time') == (states.input_datetime.riego_cesped_ch3_start_time_t1.attributes.timestamp | int | timestamp_custom('%H:%M', False)) }}"
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: input_boolean.riego_interruptor_global  # Interruptor General Riego segun Forecast Tiempo
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.riego_cesped_ch3_dia_ejecucion_t1  # Sensor del programador on/off
+        state: 'on'
+  action:
+    # Timer Programador Diario
+    - service: timer.start
+      data_template:
+        entity_id: timer.riego_cesped_ch3
+        duration: '{{ states.sensor.riego_cesped_ch3_duracion_planificada_t1.state|int * 60}}'
+    - service: switch.turn_on
+      entity_id: switch.esphome_4ch_sw3_relay_3
+
+- id: S33b
+  alias: 'S33b Timer Riego Cesped CH3 Tramo2'
+  trigger:
+    - platform: template
+      value_template: "{{ states('sensor.time') == (states.input_datetime.riego_cesped_ch3_start_time_t2.attributes.timestamp | int | timestamp_custom('%H:%M', False)) }}"
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: input_boolean.riego_interruptor_global  # Interruptor General Riego segun Forecast Tiempo
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.riego_cesped_ch3_dia_ejecucion_t2  # Sensor del programador on/off
+        state: 'on'
+  action:
+    # Timer Programador Diario
+    - service: timer.start
+      data_template:
+        entity_id: timer.riego_cesped_ch3
+        duration: '{{ states.sensor.riego_cesped_ch3_duracion_planificada_t2.state|int * 60}}'
+    - service: switch.turn_on
+      entity_id: switch.esphome_4ch_sw3_relay_3
+
+- id: S33c
+  alias: 'S33c Timer Riego Cesped ch3 End'
+  trigger:
+    - platform: event
+      event_type: timer.finished
+      event_data:
+        entity_id: timer.riego_cesped_ch3
+  action:
+    - service: script.riego_cesped_ch3_timer_cancel
+
+#
+# ESPHOME 4CH-R2 SW3 RIEGO CESPED CH4
+#
+- id: S34
+  alias: 'S34 Timer Riego Cesped CH4 Tramo1'
+  trigger:
+    - platform: template
+      value_template: "{{ states('sensor.time') == (states.input_datetime.riego_cesped_ch4_start_time_t1.attributes.timestamp | int | timestamp_custom('%H:%M', False)) }}"
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: input_boolean.riego_interruptor_global  # Interruptor General Riego segun Forecast Tiempo
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.riego_cesped_ch4_dia_ejecucion_t1  # Sensor del programador on/off
+        state: 'on'
+  action:
+    # Timer Programador Diario
+    - service: timer.start
+      data_template:
+        entity_id: timer.riego_cesped_ch4
+        duration: '{{ states.sensor.riego_cesped_ch4_duracion_planificada_t1.state|int * 60}}'
+    - service: switch.turn_on
+      entity_id: switch.esphome_4ch_sw3_relay_4
+
+- id: S34b
+  alias: 'S34b Timer Riego Cesped CH4 Tramo2'
+  trigger:
+    - platform: template
+      value_template: "{{ states('sensor.time') == (states.input_datetime.riego_cesped_ch4_start_time_t2.attributes.timestamp | int | timestamp_custom('%H:%M', False)) }}"
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: input_boolean.riego_interruptor_global  # Interruptor General Riego segun Forecast Tiempo
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.riego_cesped_ch4_dia_ejecucion_t2  # Sensor del programador on/off
+        state: 'on'
+  action:
+    # Timer Programador Diario
+    - service: timer.start
+      data_template:
+        entity_id: timer.riego_cesped_ch4
+        duration: '{{ states.sensor.riego_cesped_ch4_duracion_planificada_t2.state|int * 60}}'
+    - service: switch.turn_on
+      entity_id: switch.esphome_4ch_sw3_relay_4
+
+- id: S34c
+  alias: 'S34c Timer Riego Cesped CH4 End'
+  trigger:
+    - platform: event
+      event_type: timer.finished
+      event_data:
+        entity_id: timer.riego_cesped_ch4
+  action:
+    - service: script.riego_cesped_ch4_timer_cancel
+
+- id: S40
+  alias: 'S40 Control Jardin Sobreriego'
+  trigger:
+    - platform: state
+      entity_id:
+        - switch.esphome_4ch_sw2_relay_1
+        - switch.esphome_4ch_sw2_relay_2
+        - switch.esphome_4ch_sw2_relay_3
+        - switch.esphome_4ch_sw2_relay_4
+        - switch.esphome_4ch_sw3_relay_1
+        - switch.esphome_4ch_sw3_relay_2
+        - switch.esphome_4ch_sw3_relay_3
+        - switch.esphome_4ch_sw3_relay_4
+      to: 'on'
+      for: '00:12:01'
+  action:
+    - service: script.jardin_riego_off
+    # Notifica a Familia
+    - service: script.notifica_evento
+      data:
+        titulo: '*JARDIN: SOBRERIEGO DETECTADO*'
+        mensaje: >
+          >>> EVENTO: Control Riego/Fuentes encendidas > 10'
+          >>> JARDIN: Apagado total del riego
+
+- id: S41
+  alias: 'S41 Switch Desk Power Off'
+  trigger:
+    - platform: time
+      at:
+        - "00:00:00"
+        - "01:00:00"
+        - "02:30:00"
+        - "03:00:00"
+  condition:
+    condition: or
+    conditions:
+      - condition: state
+        entity_id: binary_sensor.macbook_aac_active
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.macbook_aac_active
+        state: 'off'
+  action:
+    - service: switch.turn_off
+      entity_id: switch.esphome_bas_sw3
+
+- id: S42
+  alias: 'S42 Switch Desk Power On'
+  trigger:
+    - platform: time
+      at: "08:00:00"
+  action:
+    - service: switch.turn_on
+      entity_id: switch.esphome_bas_sw3
+
+- id: S43
+  alias: 'S43 Control Depuradora Piscina'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.piscina_depuradora_ch0_motor_on
+      to: 'on'
+      for: '05:00:00'
+  action:
+    - service: script.piscina_depuradora_off
+    # Notifica a Familia
+    - service: script.notifica_evento
+      data:
+        titulo: '*PISCINA: SOBRE-DEPURACION DETECTADO*'
+        mensaje: >
+          >>> EVENTO: Control Motor Depuradora Piscina > 5h'
+          >>> PISCINA: Apagado depuradora piscina
+
+#-----------------------------------------------------------------------------#
+#                                                                             #
+# REGLAS DE CONTROL DE PING DEVICES BINARY SENSOR                             #
+#                                                                             #
+#-----------------------------------------------------------------------------#
+
+#
+# ping_01_router_fibra_movistar:
+#
+- id: P01
+  alias: 'P01_ping_router_fibra'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.ping_00_wan_internet_google
+      from: 'on'
+      to: 'off'
+      for: '00:01:00'
+  action:
+    # Script Notificación Alarma
+    - service: script.notifica_alarma
+      data:
+        voz: 'Fallo Conectividad a Internet. Router sin salida a internet'
+        titulo: '*CONEXION INTERNET*'
+        mensaje: >
+          >>> URGENTE: ERROR CONEXION INTERNET
+
+          >>> DISPOSITIVO: 00 WAN ROUTER FIBRA
+
+#
+#ping_05_router_wifi_tplink:
+#
+- id: P02
+  alias: 'P02_ping_ap_wifi_tplink'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.ping_05_router_wifi_tplink
+      from: 'on'
+      to: 'off'
+      # for: '00:06:00'
+  action:
+    # Script Notificación Alarma
+    - service: script.notifica_alarma
+      data:
+        voz: 'Fallo Conectividad. Punto de acceso wifi no accesible'
+        titulo: '*AVISO ERROR CONECTIVIDAD'
+        mensaje: >
+          >>> URGENTE: FALLO DE PING
+
+          >>> DISPOSITIVO: 05 AP WIFI TPLINK
+
+#
+#nmap_sony_ps4:
+#
+- id: P03
+  alias: 'P03_sony_ps4_on'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.nmap_sony_ps4_lan_wifi
+      from: 'off'
+      to: 'on'
+  action:
+    # Script Notificación Alarma
+    - service: script.notifica_evento
+      data:
+        titulo: '*AVISO CONSOLA PS4*'
+        mensaje: >
+          >>> AVISO: ENCENDIDO
+
+          >>> DISPOSITIVO: CONSOLA SONY PS4
+
+#
+# nmap_sony_ps4:
+#
+- id: P04
+  alias: 'P04_sony_ps4_off'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.nmap_sony_ps4_lan_wifi
+      from: 'on'
+      to: 'off'
+  action:
+    # Script Notificación Alarma
+    - service: script.notifica_evento
+      data:
+        titulo: '*AVISO CONSOLA PS4*'
+        mensaje: >
+          >>> AVISO: APAGADO
+
+          >>> DISPOSITIVO: CONSOLA SONY PS4
+
+#-----------------------------------------------------------------------------#
+#                                                                             #
+# REGLAS DE AUTOMATIZACION CON TAGS NFC                                       #
+#                                                                             #
+#-----------------------------------------------------------------------------#
+
+# Comprueba si el Tag Reader tiene apagado el led verde y sonido cuando lee un tag, para activarlo siempre.
+- id: T00
+  alias: 'Tagreader Check Led'
+  trigger:
+    - platform: state
+      entity_id: switch.tagreader_9a0be4_buzzer_enabled
+      to: 'off'
+    - platform: state
+      entity_id: switch.tagreader_9a0be4_led_enabled
+      to: 'off'
+  action:
+    - service: switch.turn_on
+      data:
+        entity_id: 
+          - switch.tagreader_9a0be4_buzzer_enabled
+          - switch.tagreader_9a0be4_led_enabled
+
+- id: T01
+  alias: 'NFC AAC Tag1 Alarma '
+  trigger:
+    - platform: tag
+      tag_id: 04-50-B6-01-25-3B-03 # AAC Green Tag
+    - platform: tag
+      tag_id: 04-50-4F-01-B5-1D-03 # MFC Red Tag
+    - platform: tag
+      tag_id: 04-50-9A-01-7D-1D-03 # AAF Red Tag
+    - platform: tag
+      tag_id: 04-50-B3-01-0D-3B-03 # PAF Red Tag
+  action:
+    - choose:
+      # IF Alarma Homy = Desarmada => Armado Away
+      - conditions:
+        - condition: state
+          entity_id: alarm_control_panel.ha
+          state: 'disarmed'
+        sequence:
+          # Armardo Away
+          - service: alarm_control_panel.alarm_arm_away
+            data:
+              entity_id: alarm_control_panel.ha
+              code: !secret alarm_control_code
+    #ELSE alarma armado home/away => Desarmado
+      default:
+        # Desarmado
+        - service: alarm_control_panel.alarm_disarm
+          data:
+            entity_id: alarm_control_panel.ha
+            code: !secret alarm_control_code
+
+- id: T02
+  alias: 'NFC Tag Credit Card Botón Pánico'
+  trigger:
+    - platform: tag
+      tag_id: 79-D5-0A-8F # Tag Credit Card
+  action:
+    # BOTON DEL PANICO: Secuencia Alexa ALARMA
+    - service: input_boolean.turn_on
+      entity_id: input_boolean.panic_button
+    - service: script.alarma_boton_panico
+
+- id: T03
+  alias: 'NFC Home Blue Tag - Armado Away'
+  trigger:
+    - platform: tag
+      tag_id: 2C-CA-F0-22
+  action:
+    - service: alarm_control_panel.alarm_arm_away
+      data:
+        entity_id: alarm_control_panel.ha
+        code: !secret alarm_control_code
+
+#-----------------------------------------------------------------------------#
+#                                                                             #
+# REGLAS DE AUTOMATIZACION ACCIONES IOS                                       #
+#                                                                             #
+#-----------------------------------------------------------------------------#
+- id: I01
+  alias: 'IOS Action Luz Salon'
+  initial_state: true
+  trigger:
+    - platform: event
+      event_type: ios.action_fired
+      event_data:
+        actionName: 'luz_salon'
+  action:
+    # Salon
+    - service: light.toggle
+      target:
+        entity_id: light.salon
+
+- id: I02
+  alias: 'IOS Action Luz Estudio'
+  initial_state: true
+  trigger:
+    - platform: event
+      event_type: ios.action_fired
+      event_data:
+        actionName: 'luz_estudio'
+  action:
+    # Estudio
+    - service: light.toggle
+      target:
+        entity_id: group.luces_estudio_grp
+
+- id: I03
+  alias: 'IOS Action Alarma Off'
+  initial_state: true
+  trigger:
+    - platform: event
+      event_type: ios.action_fired
+      event_data:
+        actionName: 'alarma_off'
+  action:
+    # Desarmado de Alarmas
+    - service: alarm_control_panel.alarm_disarm
+      data:
+        entity_id: alarm_control_panel.ha
+        code: !secret alarm_control_code
+
+
+- id: I04
+  alias: 'IOS Action Alarma Away'
+  initial_state: true
+  trigger:
+    - platform: event
+      event_type: ios.action_fired
+      event_data:
+        actionName: 'alarma_armado_total'
+  action:
+    # Desarmado de Alarmas
+    - service: alarm_control_panel.alarm_arm_away
+      data:
+        entity_id: alarm_control_panel.ha
+        code: !secret alarm_control_code
+
+
+#-----------------------------------------------------------------------------#
+#                                                                             #
+# CONTROL PERSIANAS MATISMO                                                   #
+#                                                                             #
+#-----------------------------------------------------------------------------#
+# Control duracion maxima 25SEG, ya que el tiempo total del recorrido 18'
+#
+- id: P01_estudio_persiana_fin_carrera_motor
+  alias: 'P01 estudio persiana fin carrera motor'
+  trigger:
+    - platform: state
+      entity_id: switch.esphome_dual_sw1_relay_1
+      from: 'off'
+      to: 'on'
+      for: '00:00:25'
+    - platform: state
+      entity_id: switch.esphome_dual_sw1_relay_2
+      from: 'off'
+      to: 'on'
+      for: '00:00:25'
+  action:
+    # PARA MOTOR PERSINANA
+    - service: switch.turn_off
+      entity_id: 
+        - switch.esphome_dual_sw1_relay_1
+        - switch.esphome_dual_sw1_relay_2
+
