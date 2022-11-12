@@ -10,6 +10,7 @@
 # ARRANQUE/PARADA DEL SISTEMA                                                 #
 #                                                                             #
 #-----------------------------------------------------------------------------#
+
 - id: hass_startup_automation
   alias: hass_startup_scripts
   trigger:
