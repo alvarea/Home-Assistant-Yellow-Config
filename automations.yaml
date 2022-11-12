@@ -1114,7 +1114,7 @@
       conditions:
         - condition: sun
           after: sunset
-          after_offset: "+01:00:00"
+          after_offset: "+00:30:00"
         - condition: sun
           # before_offset: "+00:30:00"  ==> Horario Invierno GMT+1, en el amanecer -30m
           # before_offset: "+01:30:00" ==> Horario Verano GMT+2, el amanecer 1h-30m
@@ -1129,15 +1129,25 @@
         # 'when dark' condition: either after sunset or before sunrise
   action:
     # Luces On
-    #- service: light.turn_on
-    #  entity_id:
-    #    - light.luz_estudio_techo
-    #    - light.luz_estudio_escalera
-    - service: scene.turn_on
-      target:
-        entity_id: scene.estudio_hall
-      data:
-        transition: 3
+    - service: light.turn_on
+      entity_id:
+        - light.luz_estudio_izquierda
+    #- service: scene.turn_on
+    #  target:
+    #    entity_id: scene.estudio_hall
+    #  data:
+    #    transition: 3
+    # Espera de 5'
+    - delay:
+        minutes: >
+          {% if now().hour >= 1 and now().hour <= 7 %} 1
+          {% else %} 5
+          {% endif %}
+    # Luces Off + Led
+    - service: light.turn_off
+      entity_id: 
+        - light.luz_estudio_izquierda
+
 
 - id: L11
   alias: 'L11 Luces On Armario Estudio Sensor'
