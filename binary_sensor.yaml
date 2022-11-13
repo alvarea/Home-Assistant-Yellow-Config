@@ -474,6 +474,11 @@
         value_template: >-
           {% if is_state('input_select.piscina_depuradora_ch0_programador_dias','Diario') and is_state('input_boolean.piscina_depuradora_ch0_programador_t1','on') %}
             true
+          {% elif is_state('input_select.piscina_depuradora_ch0_programador_dias','Días Pares')
+              and is_state('input_boolean.piscina_depuradora_ch0_programador_t1','on')
+              and (now().weekday() % 2 == 0) 
+          %}
+            true
           {% elif is_state('input_select.piscina_depuradora_ch0_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.piscina_depuradora_ch0_programador_t1','on') %}
             true
           {% elif is_state('input_select.piscina_depuradora_ch0_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.piscina_depuradora_ch0_programador_t1','on') %}
@@ -489,6 +494,11 @@
         icon_template: mdi:calendar-check
         value_template: >-
           {% if is_state('input_select.piscina_depuradora_ch0_programador_dias','Diario') and is_state('input_boolean.piscina_depuradora_ch0_programador_t2','on') %}
+            true
+          {% elif is_state('input_select.piscina_depuradora_ch0_programador_dias','Días Pares') 
+              and is_state('input_boolean.piscina_depuradora_ch0_programador_t1','on')
+              and (now().weekday() % 2 == 0) 
+          %}
             true
           {% elif is_state('input_select.piscina_depuradora_ch0_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.piscina_depuradora_ch0_programador_t2','on') %}
             true
@@ -786,6 +796,11 @@
         value_template: >-
           {% if is_state('input_select.riego_bonsais_ch1_programador_dias','Diario') and is_state('input_boolean.riego_bonsais_ch1_programador_t1','on') %}
             true
+          {% elif is_state('input_select.riego_bonsais_ch1_programador_dias','Días Pares') 
+              and is_state('input_boolean.riego_bonsais_ch1_programador_t1','on')
+              and (now().weekday() % 2 == 0) 
+          %}
+            true
           {% elif is_state('input_select.riego_bonsais_ch1_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_bonsais_ch1_programador_t1','on') %}
             true
           {% elif is_state('input_select.riego_bonsais_ch1_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.riego_bonsais_ch1_programador_t1','on') %}
@@ -801,6 +816,11 @@
         icon_template: mdi:calendar-check
         value_template: >-
           {% if is_state('input_select.riego_bonsais_ch1_programador_dias','Diario') and is_state('input_boolean.riego_bonsais_ch1_programador_t2','on') %}
+            true
+          {% elif is_state('input_select.riego_bonsais_ch1_programador_dias','Días Pares') 
+              and is_state('input_boolean.riego_bonsais_ch1_programador_t2','on')
+              and (now().weekday() % 2 == 0) 
+          %}
             true
           {% elif is_state('input_select.riego_bonsais_ch1_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_bonsais_ch1_programador_t2','on') %}
             true
@@ -842,6 +862,11 @@
         value_template: >-
           {% if is_state('input_select.riego_bonsais_ch2_programador_dias','Diario') and is_state('input_boolean.riego_bonsais_ch2_programador_t1','on') %}
             true
+          {% elif is_state('input_select.riego_bonsais_ch2_programador_dias','Días Pares') 
+              and is_state('input_boolean.riego_bonsais_ch2_programador_t1','on')
+              and (now().weekday() % 2 == 0) 
+          %}
+            true
           {% elif is_state('input_select.riego_bonsais_ch2_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_bonsais_ch2_programador_t1','on') %}
             true
           {% elif is_state('input_select.riego_bonsais_ch2_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.riego_bonsais_ch2_programador_t1','on') %}
@@ -857,6 +882,11 @@
         icon_template: mdi:calendar-check
         value_template: >-
           {% if is_state('input_select.riego_bonsais_ch2_programador_dias','Diario') and is_state('input_boolean.riego_bonsais_ch2_programador_t2','on') %}
+            true
+          {% elif is_state('input_select.riego_bonsais_ch2_programador_dias','Días Pares') 
+              and is_state('input_boolean.riego_bonsais_ch2_programador_t2','on')
+              and (now().weekday() % 2 == 0) 
+          %}
             true
           {% elif is_state('input_select.riego_bonsais_ch2_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_bonsais_ch2_programador_t2','on') %}
             true

@@ -1148,7 +1148,6 @@
       entity_id: 
         - light.luz_estudio_izquierda
 
-
 - id: L11
   alias: 'L11 Luces On Armario Estudio Sensor'
   mode: restart

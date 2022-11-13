@@ -145,7 +145,7 @@
     icon: mdi:dip-switch
 
   # Pendiente sin uso
-  riego_bonsais_ch4_programador:
+  riego_bonsais_ch4_programador_t1:
     name: Programador CH4
     icon: mdi:dip-switch
 
