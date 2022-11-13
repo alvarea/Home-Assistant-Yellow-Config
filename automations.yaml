@@ -1073,7 +1073,6 @@
   condition:
     condition: and
     conditions:
-      #- condition: sun
       #  # after_offset: "-02:00:00"  ==> Horario Invierno GMT+1, en el amanecer -2h
       #  # after_offset: "-00:30:00" ==> Horario Verano GMT+2, el amanecer -30m
       #- condition: sun

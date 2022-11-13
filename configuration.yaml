@@ -353,22 +353,51 @@ cloud:
  alexa:
     filter:
       exclude_domains:
-        - switch
         - alert
         - automation
-        - input_boolean
-        - sensor
-        - light
+        - binary_sensor
+        - button
+        - camera
+        - climate
+        - cover
+        - device_tracker
+        - fan
         - group
+        - input_number
+        - input_datetime
+        - input_select
+        - input_text
+        - input_boolean
+        - light
+        - media_player
+        - person
+        - range
+        - remote
         - script
+        - sensor
+        - scene
+        - sun
+        - switch
+        - timer
+        - weather
+        - zone
       include_entities:
+        # WLED
         - light.wled_tv_salon
         - light.wled_mesa_agu
         - light.wled_estudio_tv
         - light.luz_estudio_techo
+        - light.luz_estudio_escalera
+        - light.luz_estudio_lamparita
+        - light.luz_estudio_armario
+        - light.luz_estudio_beer
+        - light.luz_estudio_tv
+        # ESTUDIO
         - script.homy_armado_parcial
         - script.homy_armado_total
         - script.homy_desarmado_code
+        - media_player.firetv_cocina
+        - media_player.firetv_salon
     entity_config:
       script.homy_armado_parcial:
         name: Armado Parcial
@@ -398,7 +427,6 @@ recorder:
     domains:
       - alarm_control_panel
       - light
-      - input_boolean
       - sensor
       - binary_sensor
       - switch
