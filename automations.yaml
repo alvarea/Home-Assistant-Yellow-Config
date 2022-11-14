@@ -949,17 +949,17 @@
         entity_id: sun.sun
         state: 'below_horizon'
       - condition: state
-        entity_id: light.faroles_exterior
+        entity_id: light.luz_exterior
         state: 'off'
       - condition: numeric_state
         entity_id: sensor.illumination_158d0001e637f6
         below: 10
   action:
     - service: light.turn_on
-      entity_id: light.faroles_exterior
+      entity_id: light.luz_exterior
     - delay: '00:05:00'
     - service: light.turn_off
-      entity_id: light.faroles_exterior
+      entity_id: light.luz_exterior
 
 - id: L06
   alias: 'L06 Luces Off Before Sunrise'

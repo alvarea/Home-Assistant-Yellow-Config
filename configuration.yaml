@@ -382,26 +382,47 @@ cloud:
         - weather
         - zone
       include_entities:
-        # WLED
-        - light.wled_tv_salon
-        - light.wled_mesa_agu
         # ESTUDIO
-        - light.luz_estudio
+        - light.luz_estudio                 # Helper grupo luces de la habitación
+        - light.luz_estudio_alta
+        - light.luz_estudio_media
+        - light.luz_estudio_baja
+        - light.luz_estudio_izquierda
+        - light.luz_estudio_led_mesa
+        - light.luz_estudio_nate
+        - light.luz_estudio_play_i
+        - light.luz_estudio_play_c
+        - light.luz_estudio_play_d
         - light.luz_estudio_techo
         - light.luz_estudio_escalera
         - light.luz_estudio_lamparita
-        - light.luz_estudio_armario
         - light.luz_estudio_beer
         - light.luz_estudio_tv
         - light.wled_estudio_tv
+        #
         # SALON
+        - light.luz_salon                   # Helper grupo luces de la habitación
         - light.luz_salon_vitrina
-        # DORMITORIOS
-        - light.luz_dormitorio
-        - light.luz_dormitorio_agu
-        # GRUPOS
-        - group.luces_salon_grp
-        - group.luces_estudio_grp
+        - light.luz_salon_cilindro
+        - light.luz_salon_lectura
+        - light.wled_tv_salon
+        #
+        # DORMITORIOS 
+        - light.luz_dormitorio              # Helper grupo luces de la habitación
+        - light.luz_dormitorio_aac
+        - light.luz_dormitorio_mfc 
+        - light.luz_dormitorio_agu          # Helper grupo luces de la habitación
+        - light.luz_cueva_agu
+        - light.wled_mesa_agu
+        #
+        # JARDIN 
+        - light.luz_jardin                  # Helper grupo luces de la habitación
+        - light.luz_exterior                # Luces Exterior (MINI_SW1)
+        - light.luz_balizas_cesped          # Balizas Cesped  (switch.esphome_4ch_relay_1)
+        - light.luz_olivo_piscina           # Foco Olivo Piscina (switch.esphome_4ch_relay_2)
+        - light.luz_olivo_nubes             # Foco Olivo Nubes (switch.esphome_4ch_relay_3)
+        - light.luz_entrada_bonsai          # Foco Entrada Bonsai (switch.esphome_4ch_relay_4)
+        - light.luz_porche_jardin           # Porche Salón (MINI_SW2)
         # ALARMA
         - script.homy_armado_parcial
         - script.homy_armado_total
@@ -411,13 +432,6 @@ cloud:
         - media_player.firetv_salon
 
     entity_config:
-      # GRUPOS
-      group.luces_salon_grp:
-        name: Luz Salon
-        display_categories: LIGHT
-      group.luces_estudio_grp:
-        name: Luz Estudio
-        display_categories: LIGHT
       script.homy_armado_parcial:
         name: Armado Parcial
         display_categories: SWITCH

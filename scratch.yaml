@@ -27,7 +27,7 @@ luces_estudio_grp:
     - light.luz_estudio_techo
     - light.luz_estudio_escalera
     - light.luz_estudio_lamparita
-    - light.luz_estudio_beer        
+    - light.luz_estudio_beer
     - light.luz_estudio_tv
     - light.wled_estudio_tv
 
@@ -37,3 +37,13 @@ luces_entrada_grp:
     - light.luz_entrada
     - light.luz_pasillo
     - light.luz_cocina
+
+luces_jardin_grp:
+  name: Luces Jardín
+  entities:
+    - light.luz_exterior                # Luces Exterior (MINI_SW1)
+    - light.luz_balizas_cesped          # Balizas Cesped  (switch.esphome_4ch_relay_1)
+    - light.luz_olivo_piscina           # Foco Olivo Piscina (switch.esphome_4ch_relay_2)
+    - light.luz_olivo_nubes             # Foco Olivo Nubes (switch.esphome_4ch_relay_3)
+    - light.luz_entrada_bonsai          # Foco Entrada Bonsai (switch.esphome_4ch_relay_4)
+    - light.luz_porche_jardin           # Porche Salón (MINI_SW2)

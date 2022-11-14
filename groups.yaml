@@ -71,7 +71,6 @@ alarma_sensores_luz_grp:
 #
 # GRUPOS LUCES - AREAS PARA ALEXA
 #
-
 luces_planta_baja_grp:
   name: Luces Planta Baja
   entities:
@@ -89,16 +88,6 @@ luces_interior_grp:
   entities:
     - group.luces_planta_baja_grp
     - group.luces_planta_alta_grp
-
-luces_jardin_grp:
-  name: Luces Jardín
-  entities:
-    - light.faroles_exterior            # Luces Exterior (MINI_SW1)
-    - light.luz_balizas_cesped          # Balizas Cesped  (switch.esphome_4ch_relay_1)
-    - light.luz_olivo_piscina           # Foco Olivo Piscina (switch.esphome_4ch_relay_2)
-    - light.luz_olivo_nubes             # Foco Olivo Nubes (switch.esphome_4ch_relay_3)
-    - light.luz_entrada_bonsai          # Foco Entrada Bonsai (switch.esphome_4ch_relay_4)
-    - light.porche_jardin               # Porche Salón (MINI_SW2)
 
 luces_casa_grp:
   name: Luces De Toda La Casa
