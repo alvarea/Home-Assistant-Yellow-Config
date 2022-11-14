@@ -68,11 +68,12 @@ alarma_sensores_luz_grp:
     - sensor.hue_movimiento_pasillo_luminosidad
     - sensor.aqara_movimiento_entrada_luminosidad
 
+# GRUPOS LUCES - AREAS PARA ALEXA
 luces_salon_grp:
   name: Luces Salon
   entities:
     - light.luz_cilindro
-    - light.luz_vitrina
+    - light.luz_salon_vitrina
     - light.luz_lectura
     - light.wled_salon_tv
 

@@ -917,7 +917,7 @@
         below: 50
   action:
     - service: light.turn_on
-      entity_id: light.luz_vitrina
+      entity_id: light.luz_salon_vitrina
     # Notifica a Familia
     - service: script.notifica_evento
       data:
