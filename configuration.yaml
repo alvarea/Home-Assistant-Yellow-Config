@@ -386,14 +386,19 @@ cloud:
         - light.wled_tv_salon
         - light.wled_mesa_agu
         # ESTUDIO
-        - light.wled_estudio_tv
+        - light.luz_estudio
         - light.luz_estudio_techo
         - light.luz_estudio_escalera
         - light.luz_estudio_lamparita
         - light.luz_estudio_armario
         - light.luz_estudio_beer
         - light.luz_estudio_tv
+        - light.wled_estudio_tv
+        # SALON
         - light.luz_salon_vitrina
+        # DORMITORIOS
+        - light.luz_dormitorio
+        - light.luz_dormitorio_agu
         # GRUPOS
         - group.luces_salon_grp
         - group.luces_estudio_grp
@@ -408,10 +413,10 @@ cloud:
     entity_config:
       # GRUPOS
       group.luces_salon_grp:
-        name: Salon
+        name: Luz Salon
         display_categories: LIGHT
       group.luces_estudio_grp:
-        name: Estudio
+        name: Luz Estudio
         display_categories: LIGHT
       script.homy_armado_parcial:
         name: Armado Parcial

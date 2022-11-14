@@ -27,10 +27,6 @@ sensor.family_sleep_home:
   icon: mdi:sleep
 
 # GRUPOS DE LUCES / INTERRUPTORES
-group.luces_estudio_grp:
-  icon: mdi:television-ambient-light
-group.luces_entrada_grp:
-  icon: mdi:lightbulb-multiple
 
 group.luces_jardin_grp:
   icon: mdi:theme-light-dark

@@ -1042,7 +1042,7 @@
         after: sunset
         after_offset: "+00:30:00"
       - condition: state
-        entity_id: light.dormitorio
+        entity_id: light.luz_dormitorio
         state: 'off'
       #- condition: sun
       #  # before_offset: "+02:00:00"  ==> Horario Invierno GMT+1, en el amanecer -2h

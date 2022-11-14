@@ -1,0 +1,39 @@
+#
+# GRUPOS LUCES - AREAS PARA ALEXA
+#
+
+# SALON 
+luces_salon_grp:
+  name: Luces Salon
+  entities:
+    - light.luz_cilindro
+    - light.luz_salon_vitrina
+    - light.luz_lectura
+    - light.wled_salon_tv
+
+# ESTUDIO
+luces_estudio_grp:
+  name: Luces Estudio 
+  entities:
+    - light.luz_estudio_alta
+    - light.luz_estudio_media
+    - light.luz_estudio_baja
+    - light.luz_estudio_izquierda
+    - light.luz_estudio_led_mesa
+    - light.luz_estudio_nate
+    - light.luz_estudio_play_i
+    - light.luz_estudio_play_c
+    - light.luz_estudio_play_d
+    - light.luz_estudio_techo
+    - light.luz_estudio_escalera
+    - light.luz_estudio_lamparita
+    - light.luz_estudio_beer        
+    - light.luz_estudio_tv
+    - light.wled_estudio_tv
+
+luces_entrada_grp:
+  name: Luz Entrada/Pasillo
+  entities:
+    - light.luz_entrada
+    - light.luz_pasillo
+    - light.luz_cocina
