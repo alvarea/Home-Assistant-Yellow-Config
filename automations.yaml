@@ -861,11 +861,11 @@
   alias: 'L01 Luces On Exterior Sunset'
   trigger:
       # offset: "+01:00:00"   # Horario Invierno GMT+1 - Enero
-      # offset: "-00:00:00"   # Horario Invierno GMT+1
-      # offset: "-00:00:00"   # Horario Verano GMT+2
+      # offset: "+00:30:00"   # Horario Invierno GMT+1
+      # offset: "-00:30:00"   # Horario Verano GMT+2
     - platform: sun
       event: sunset
-      #offset: "-00:30"
+      #offset: "+00:30:00"
   action:
     # Encendido Luces Exterior y Jardín
     - service: script.luces_exterior_on
@@ -897,35 +897,35 @@
 
           >>> LUCES: Alumbrado Exterior Off
 
-- id: L04
-  alias: 'L04 Luces On Salon Sunset'
-  trigger:
-    - platform: sun
-      # offset: "-00:35:00"   # Horario Invierno GMT+1
-      # offset: "-00:25:00"   # Horario Verano GMT+2
-      event: sunset
-      offset: "-00:35"
-  condition:
-    condition: and
-    conditions:
-        # Hay alguien en casa
-      - condition: state
-        entity_id: binary_sensor.family_any_home
-        state: 'on'
-      - condition: numeric_state
-        entity_id: sensor.illumination_158d0001e05661
-        below: 50
-  action:
-    - service: light.turn_on
-      entity_id: light.luz_salon_vitrina
-    # Notifica a Familia
-    - service: script.notifica_evento
-      data:
-        titulo: '*ALUMBRADO*'
-        mensaje: >
-          >>> EVENTO: Puesta de Sol en breve
-
-          >>> LUCES: Alumbrado Luz Salón On
+#- id: L04
+#  alias: 'L04 Luces On Salon Sunset'
+#  trigger:
+#    - platform: sun
+#      # offset: "-00:35:00"   # Horario Invierno GMT+1
+#      # offset: "-00:25:00"   # Horario Verano GMT+2
+#      event: sunset
+#      offset: "-00:35:00"
+#  condition:
+#    condition: and
+#    conditions:
+#        # Hay alguien en casa
+#      - condition: state
+#        entity_id: binary_sensor.family_any_home
+#        state: 'on'
+#      - condition: numeric_state
+#        entity_id: sensor.illumination_158d0001e05661
+#        below: 50
+#  action:
+#    - service: light.turn_on
+#      entity_id: light.luz_salon_vitrina
+#    # Notifica a Familia
+#    - service: script.notifica_evento
+#      data:
+#        titulo: '*ALUMBRADO*'
+#        mensaje: >
+#          >>> EVENTO: Puesta de Sol en breve
+#
+#          >>> LUCES: Alumbrado Luz Salón On
 
 #
 # La regla de alumbrado exterior según sensor se simplifica para que se encienda por la noche, siempre que esté oscuro.
@@ -976,10 +976,13 @@
     condition: or
     conditions:
       - condition: state
-        entity_id: group.luces_interior_grp # Luces interior
+        entity_id: group.luces_planta_baja_grp # Luces Planta Baja
         state: 'on'
       - condition: state
-        entity_id: group.luces_jardin_grp # Luces exterior
+        entity_id: group.luces_planta_alta_grp # Luces Planta Baja
+        state: 'on'
+      - condition: state
+        entity_id: light.luces_jardin # Luces exterior
         state: 'on'
   action:
     # Apagado Luces Casa
@@ -1107,7 +1110,7 @@
       to: 'on'
   condition:
     - condition: state
-      entity_id: group.luces_estudio_grp
+      entity_id: light.luces_estudio
       state: 'off'
     - condition: or
       conditions:
@@ -1249,7 +1252,7 @@
       action_type: shake_air
   action:
     - service: light.turn_off
-      entity_id: group.luces_estudio_grp
+      entity_id: light.luces_estudio
 
 - id: L14
   alias: 'L14 Cube Flip90 Light Estudio Desk Soft'
@@ -2748,7 +2751,7 @@
     # Estudio
     - service: light.toggle
       target:
-        entity_id: group.luces_estudio_grp
+        entity_id: light.luces_estudio
 
 - id: I03
   alias: 'IOS Action Alarma Off'

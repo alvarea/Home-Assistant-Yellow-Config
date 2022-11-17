@@ -71,34 +71,10 @@ alarma_sensores_luz_grp:
 #
 # GRUPOS LUCES - AREAS PARA ALEXA
 #
-luces_planta_baja_grp:
-  name: Luces Planta Baja
-  entities:
-    - group.luces_entrada_grp
-    - group.luces_salon_grp
-    - group.luces_dormitorios_grp
-
-luces_planta_alta_grp:
-  name: Luces Planta Alta
-  entities:
-    - group.luces_estudio_grp
-
-luces_interior_grp:
-  name: Luces Interior
-  entities:
-    - group.luces_planta_baja_grp
-    - group.luces_planta_alta_grp
-
-luces_casa_grp:
-  name: Luces De Toda La Casa
-  entities:
-    - group.luces_interior_grp
-    - group.luces_jardin_grp
-
 luces_device_sun_light_trigger_grp:
   name: Luces Device Sun Trigger
   entities:
-    - light.luz_vitrina
+    - light.luz_salon_vitrina
     - light.luz_entrada
 
 person_device_sun_light_trigger_grp:

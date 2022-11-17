@@ -57,7 +57,7 @@
 - id: '1662220604194'
   name: Estudio Home Cinema (Z)
   entities:
-    light.wled_estudio_tv:
+    light.led_estudio_tv:
       effect_list:
       - Android
       - Aurora
@@ -435,13 +435,6 @@
       friendly_name: esphome s26 sw1 led
       supported_features: 40
       state: 'off'
-    switch.esphome_s26_sw1:
-      friendly_name: esphome s26 sw1
-      state: 'off'
-    fan.esphome_s26_sw1:
-      friendly_name: esphome s26 sw1
-      supported_features: 0
-      state: 'off'
     media_player.firetv_estudio:
       friendly_name: FireTV Estudio
       supported_features: 22961
@@ -456,7 +449,7 @@
       state: playing
   icon: mdi:dolby
   metadata:
-    light.wled_estudio_tv:
+    light.led_estudio_tv:
       entity_only: true
     light.luz_estudio_led_mesa:
       entity_only: true

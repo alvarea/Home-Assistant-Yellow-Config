@@ -382,6 +382,11 @@ cloud:
         - weather
         - zone
       include_entities:
+        #ENTRADA
+        - light.luz_hall                # Helper grupo luces de la habitación entrada+pasillo
+        - light.luz_entrada
+        - light.luz_pasillo
+        - light.luz_plancha_mecedora
         # ESTUDIO
         - light.luz_estudio                 # Helper grupo luces de la habitación
         - light.luz_estudio_alta
@@ -398,22 +403,25 @@ cloud:
         - light.luz_estudio_lamparita
         - light.luz_estudio_beer
         - light.luz_estudio_tv
-        - light.wled_estudio_tv
+        - light.led_estudio_tv
         #
         # SALON
         - light.luz_salon                   # Helper grupo luces de la habitación
-        - light.luz_salon_vitrina
-        - light.luz_salon_cilindro
-        - light.luz_salon_lectura
-        - light.wled_tv_salon
+        - light.luz_salon_vitrina           # Voz Alexa: Luz Vitrina
+        - light.luz_salon_cilindro          # Voz Alexa: Luz Cilindro
+        - light.luz_salon_lectura           # Voz Alexa: Luz Lectura
+        - light.led_salon_tv                # Voz Alexa: Led Salon TV
         #
         # DORMITORIOS 
         - light.luz_dormitorio              # Helper grupo luces de la habitación
-        - light.luz_dormitorio_aac
-        - light.luz_dormitorio_mfc 
         - light.luz_dormitorio_agu          # Helper grupo luces de la habitación
-        - light.luz_cueva_agu
-        - light.wled_mesa_agu
+        - light.luz_dormitorio_paloma       # Helper grupo luces de la habitación
+        - light.luz_dormitorio_agustin      # Voz Alexa: Luz Agustin
+        - light.luz_dormitorio_malen        # Voz Alexa: Luz Malen
+        - light.luz_plancha_mecedora        # Voz Alexa: Luz Mecedora
+        - light.luz_dormitorio_aaf_mesilla  # Voz Alexa: Luz Agu
+        - light.led_mesa_agu                # Voz Alexa: Led Mesa Agu
+        - light.luz_dormitorio_paf_mesa     # Voz Alexa: Luz Paloma
         #
         # JARDIN 
         - light.luz_jardin                  # Helper grupo luces de la habitación
@@ -441,15 +449,8 @@ cloud:
       script.homy_desarmado_code:
         name: !secret desarmado_code
         display_categories: SWITCH
-      light.wled_tv_salon:
-        display_categories: LIGHT
-        name: LED TV Salon
-      light.wled_mesa_agu:
-        display_categories: LIGHT
-        name: LED Mesa Agu
-      light.wled_estudio_tv:
-        display_categories: LIGHT
-        name: LED Estudio TV
+      light.luz_salon:
+        name: Luz salon
      
 #
 # MariaDB database . 01.11.2021

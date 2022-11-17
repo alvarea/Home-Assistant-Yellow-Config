@@ -10,7 +10,7 @@ esphome:
   board: esp8285
 
 wifi:
-  ssid: !secret wifi_ssid_tc
+  ssid: !secret wifi_ssid_wlan
   password: !secret wifi_pwd
   manual_ip:
     gateway: !secret wifi_gateway
