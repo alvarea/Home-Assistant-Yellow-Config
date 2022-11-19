@@ -1020,75 +1020,66 @@ luces_exterior_on:
   alias: 'Luces Exterior y Jardín On'
   sequence:
     # Llamada a scripts de control programador luces diario
-    - service: script.luces_jardin_check_xia_ext
-    - service: script.luces_jardin_check_bas_sw4
-    - service: script.luces_jardin_check_4ch_ch1
-    - service: script.luces_jardin_check_4ch_ch2
-    - service: script.luces_jardin_check_4ch_ch3
-    - service: script.luces_jardin_check_4ch_ch4
+    - service: script.programador_luz_faroles_exterior
+    - service: script.programador_luz_porche_salon
+    - service: script.programador_luz_balizas_cesped
+    - service: script.programador_luz_olivo_grande
+    - service: script.programador_luz_olivo_nubes
+    - service: script.programador_luz_entrada_bonsais
 
-luces_jardin_check_xia_ext:
-  alias: 'Luces On Faroles Exterior'
+programador_luz_faroles_exterior:
+  alias: 'Programdor Luz Faroles Exterior'
   sequence:
   - condition: state
-    entity_id: input_boolean.jardin_programador_xia_ext
+    entity_id: input_boolean.programador_luz_faroles_exterior
     state: 'on'
   - service: light.turn_on
-    entity_id: light.faroles_exterior
+    entity_id: light.luz_exterior
 
-luces_jardin_check_bas_sw2:
-  alias: 'Luces On Sonoff BAS SW2'
+programador_luz_porche_jardin:
+  alias: 'Programador Luz Porche Jardín'
   sequence:
   - condition: state
-    entity_id: input_boolean.jardin_programador_bas_sw2
+    entity_id: input_boolean.programador_luz_porche_jardin
     state: 'on'
-  - service: switch.turn_on
-    entity_id: switch.jardin_programador_bas_sw2
+  - service: light.turn_on
+    entity_id: light.luz_porche_jardin
 
-luces_jardin_check_bas_sw4:
-  alias: 'Luces On SonoffBAS SW4'
+programador_luz_balizas_cesped:
+  alias: 'Programador Luz Balizas Cesped'
   sequence:
   - condition: state
-    entity_id: input_boolean.jardin_programador_bas_sw4
+    entity_id: input_boolean.programador_luz_balizas_cesped
     state: 'on'
-  - service: switch.turn_on
-    entity_id: switch.jardin_programador_bas_sw4
+  - service: light.turn_on
+    entity_id: light.luz_balizas_cesped
 
-luces_jardin_check_4ch_ch1:
-  alias: 'Luces On Sonoff4ch CH1'
+programador_luz_olivo_grande:
+  alias: 'Programador Luz Olivo Grande'
   sequence:
   - condition: state
-    entity_id: input_boolean.jardin_programador_4ch_ch1
+    entity_id: input_boolean.programador_luz_olivo_grande
     state: 'on'
-  - service: switch.turn_on
-    entity_id: switch.esphome_4ch_sw1_relay_1
+  - service: light.turn_on
+    entity_id: light.luz_olivo_grande
 
-luces_jardin_check_4ch_ch2:
-  alias: 'Luces On Sonoff4ch CH2'
+programador_luz_olivo_nubes:
+  alias: 'Programador Luz Olivo Nubes'
   sequence:
   - condition: state
-    entity_id: input_boolean.jardin_programador_4ch_ch2
+    entity_id: input_boolean.programador_luz_olivo_nubes
     state: 'on'
-  - service: switch.turn_on
-    entity_id: switch.esphome_4ch_sw1_relay_2
+  - service: light.turn_on
+    entity_id: light.luz_olivo_nubes
 
-luces_jardin_check_4ch_ch3:
-  alias: 'Luces On Sonoff4ch CH3'
+programador_luz_entrada_bonsais:
+  alias: 'Programador Luz Bonsais Entrada'
   sequence:
   - condition: state
-    entity_id: input_boolean.jardin_programador_4ch_ch3
+    entity_id: input_boolean.programador_luz_entrada_bonsais
     state: 'on'
-  - service: switch.turn_on
-    entity_id: switch.esphome_4ch_sw1_relay_3
-
-luces_jardin_check_4ch_ch4:
-  alias: 'Luces On Sonoff4ch CH4'
-  sequence:
-  - condition: state
-    entity_id: input_boolean.jardin_programador_4ch_ch4
-    state: 'on'
-  - service: switch.turn_on
-    entity_id: switch.esphome_4ch_sw1_relay_4
+  - service: light.turn_on
+    entity_id: light.luz_entrada_bonsais
 
 
 #-----------------------------------------------------------------------------#

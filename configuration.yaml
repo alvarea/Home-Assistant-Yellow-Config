@@ -427,9 +427,9 @@ cloud:
         - light.luz_jardin                  # Helper grupo luces de la habitación
         - light.luz_exterior                # Luces Exterior (MINI_SW1)
         - light.luz_balizas_cesped          # Balizas Cesped  (switch.esphome_4ch_relay_1)
-        - light.luz_olivo_piscina           # Foco Olivo Piscina (switch.esphome_4ch_relay_2)
+        - light.luz_olivo_grande            # Foco Olivo Grande (switch.esphome_4ch_relay_2)
         - light.luz_olivo_nubes             # Foco Olivo Nubes (switch.esphome_4ch_relay_3)
-        - light.luz_entrada_bonsai          # Foco Entrada Bonsai (switch.esphome_4ch_relay_4)
+        - light.luz_entrada_bonsais         # Foco Entrada Bonsai (switch.esphome_4ch_relay_4)
         - light.luz_porche_jardin           # Porche Salón (MINI_SW2)
         # ALARMA
         - script.homy_armado_parcial
@@ -450,7 +450,11 @@ cloud:
         name: !secret desarmado_code
         display_categories: SWITCH
       light.luz_salon:
-        name: Luz salon
+        name: Luz Salón
+      media_player.firetv_salon:
+        name: Tele
+      media_player.firetv_cocina:
+        name: TV Cocina
      
 #
 # MariaDB database . 01.11.2021

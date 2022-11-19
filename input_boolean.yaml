@@ -216,32 +216,28 @@
 
 # Programador Diario Luces Jardín
 
-  jardin_programador_xia_ext:
-    name: Prog. Faroles Exterior
+  programador_luz_faroles_exterior:
+    name: Programador Faroles Exterior
     icon: mdi:power-settings
 
-  jardin_programador_bas_sw2:
-    name: Prog. Porche Piscina
+  programador_luz_porche_jardin:
+    name: Programador Porche Jardín
     icon: mdi:power-settings
 
-  jardin_programador_bas_sw4:
-    name: Prog. Porche Salón
+  programador_luz_balizas_cesped:
+    name: Programador Balizas Cesped
     icon: mdi:power-settings
 
-  jardin_programador_4ch_ch1:
-    name: Prog. Balizas Cesped
+  programador_luz_olivo_grande:
+    name: Programador Olivo Grande
     icon: mdi:power-settings
 
-  jardin_programador_4ch_ch2:
-    name: Prog. Foco Olivos
+  programador_luz_olivo_nubes:
+    name: Programador Olivo Nubes
     icon: mdi:power-settings
 
-  jardin_programador_4ch_ch3:
-    name: Prog. Foco Olivo Nubes
-    icon: mdi:power-settings
-
-  jardin_programador_4ch_ch4:
-    name: Prog. Foco Bonsai
+  programador_luz_entrada_bonsais:
+    name: Programador Bonsais Entrada
     icon: mdi:power-settings
 
 # Programador Calefacción / Mosquitos
