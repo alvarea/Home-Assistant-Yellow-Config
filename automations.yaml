@@ -510,7 +510,7 @@
   trigger:
     - platform: sun
       event: sunrise
-      offset: "-00:30:00"
+      offset: "-00:15:00"
   condition:
     condition: and
     conditions:
@@ -526,7 +526,7 @@
     - service: input_text.set_value
       entity_id: input_text.alarm_trigger
       data_template:
-        value: " "
+        value: "A9 Armed_Home Auto Disarm Sunrise"
     # Desarmado de Alarmas
     - service: alarm_control_panel.alarm_disarm
       data:
@@ -592,8 +592,8 @@
     - service: script.homy_armado_total
     # Delay para no bloquear notificaciones
     - delay: 0:05
-    # Script Luces Apagado Total
-    - service: script.luces_off
+    # Script  Apagado Total
+    - service: script.home_switch_off
 
 - id: F02
   alias: 'F02 Armado Parcial Midnight'
@@ -616,11 +616,6 @@
 - id: F03
   alias: 'F03 Family Home Armado Home'
   trigger:
-    # Están todos en casa
-    - platform: state
-      entity_id: binary_sensor.family_all_home
-      from: 'off'
-      to: 'on'
     - platform: time
       at:
         - "02:00:00"
@@ -632,14 +627,13 @@
   condition:
     condition: and
     conditions:
-      # Versión original: Están todos en casa y Agu ha llegado
       - condition: state
         entity_id: alarm_control_panel.ha
         state: disarmed
       - condition: time
         after: '00:30:00'
-      - condition: sun
-        before: sunrise
+      - condition: time
+        before: '08:00:00'
       - condition: state
         entity_id: binary_sensor.family_any_home
         state: 'on'
@@ -649,7 +643,7 @@
       data:
         titulo: '*FAMILY HOME*'
         mensaje: >
-          >>> MADRUGADA TODOS EN CASA. EN 5' AUTO ARMADO HOME
+          >>> MADRUGADA ALGUIEN EN CASA. AUTO ARMADO HOME EN 5' 
     - delay: '00:00:05'
     - service: alarm_control_panel.alarm_arm_home
       entity_id: alarm_control_panel.ha
@@ -865,7 +859,7 @@
       # offset: "-00:30:00"   # Horario Verano GMT+2
     - platform: sun
       event: sunset
-      #offset: "+00:30:00"
+      offset: "+00:30:00"
   action:
     # Encendido Luces Exterior y Jardín
     - service: script.luces_exterior_on
@@ -883,10 +877,16 @@
   alias: 'L02 Luces Off Exterior Medianoche'
   trigger:
     - platform: time
-      at: '00:05:00'
+      at: '23:59:00'
+  condition:
+    - condition: state
+      entity_id: light.luz_jardin
+      state: 'on'
   action:
-    # Script Luces Exterior Off
-    - service: script.luces_exterior_off
+    # Apagado Luces Exterior Casa
+    - service: light.turn_off
+      entity_id: light.luz_jardin
+
     # Notifica a Familia
     - service: script.notifica_evento
       data:
@@ -966,6 +966,7 @@
   trigger:
     - platform: time
       at:
+        - "01:00:00"
         - "02:00:00"
         - "03:30:00"
         - "04:00:00"
@@ -976,17 +977,18 @@
     condition: or
     conditions:
       - condition: state
-        entity_id: group.luces_planta_baja_grp # Luces Planta Baja
+        entity_id: light.luz_planta_baja # Luces Planta Baja
         state: 'on'
       - condition: state
-        entity_id: group.luces_planta_alta_grp # Luces Planta Baja
+        entity_id: light.luz_planta_baja # Luces Planta Baja
         state: 'on'
       - condition: state
-        entity_id: light.luces_jardin # Luces exterior
+        entity_id: light.luz_jardin # Luces exterior
         state: 'on'
   action:
-    # Apagado Luces Casa
-    - service: script.luces_off
+    # Apagado Luces Toda la Casa
+    - service: light.turn_off
+      entity_id: light.luz_toda_la_casa
 
 - id: L07
   alias: 'L07 Luces On Entrada Según Sensor'

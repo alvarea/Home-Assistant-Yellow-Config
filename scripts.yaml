@@ -1016,31 +1016,6 @@ luces_on_family_home:
     - service: light.turn_on
       entity_id: light.luz_entrada
 
-# Apagado Luces Toda La Casa
-luces_off:
-  alias: 'Luces Off'
-  sequence:
-    # When a condition does not return true, the script will finish
-    - condition: template
-      value_template: "{% if is_state('group.luces_casa_grp', 'on') %}true{% endif %}"
-    # Apagado Luces Interior Casa
-    - service: light.turn_off
-      entity_id: group.luces_interior_grp
-    # Apagado Luces Exterior
-    - service: script.luces_exterior_off
-
-# Apagado Luces Exterior Casa
-luces_exterior_off:
-  alias: 'Luces Exterior Off'
-  sequence:
-    # When a condition does not return true, the script will finish
-    - condition: template
-      value_template: "{% if is_state('light.luz_jardin', 'on') %}true{% endif %}"
-
-    # Apagado Luces Exterior - Light
-    - service: light.turn_off
-      entity_id: light.luz_jardin
-
 luces_exterior_on:
   alias: 'Luces Exterior y Jardín On'
   sequence:

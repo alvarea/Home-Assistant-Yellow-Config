@@ -383,7 +383,7 @@ cloud:
         - zone
       include_entities:
         #ENTRADA
-        - light.luz_hall                # Helper grupo luces de la habitación entrada+pasillo
+        - light.luz_hall                    # Helper grupo luces de la habitación entrada+pasillo
         - light.luz_entrada
         - light.luz_pasillo
         - light.luz_plancha_mecedora
@@ -630,6 +630,7 @@ cover:
           service: script.estudio_persiana_stop
 
 # 
+# PRESENT BASED LIGHTS 
 # Home Assistant has a built-in integration called device_sun_light_trigger to help you automate your lights. The integration will:
 #  1.Fade in the lights when the sun is setting and there are people home
 #  2.Turn on the lights when people get home after the sun has set

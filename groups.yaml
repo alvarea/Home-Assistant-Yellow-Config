@@ -75,7 +75,6 @@ luces_device_sun_light_trigger_grp:
   name: Luces Device Sun Trigger
   entities:
     - light.luz_salon_vitrina
-    - light.luz_entrada
 
 person_device_sun_light_trigger_grp:
   name: Personas Device Sun Trigger
