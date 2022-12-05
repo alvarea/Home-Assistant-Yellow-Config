@@ -265,12 +265,3 @@
   rack_sensor_vibration_disable:
     name: Bloqueo Sensor Vibración Rack
     icon: mdi:trackpad-lock
-
-#
-# Control Persiana Estudio
-# 
-  # sensor que indica si subir o bajar persiana : UP = on,  DOWN = off
-  estudio_persiana_mode_up:
-    name: Persiana Estudio Modo Up
-    icon: mdi:window-shutter-cog
-    initial: off

@@ -349,6 +349,9 @@ alert:
 #      - light.luces_planta_alta
 
 # Cloud -  Home Assistant Cloud - NABU CASA
+#
+# https://developer.amazon.com/es-ES/docs/alexa/device-apis/alexa-discovery.html#display-categories
+
 cloud:
  alexa:
     filter:
@@ -384,9 +387,9 @@ cloud:
       include_entities:
         #ENTRADA
         - light.luz_hall                    # Helper grupo luces de la habitación entrada+pasillo
-        - light.luz_entrada
-        - light.luz_pasillo
-        - light.luz_plancha_mecedora
+        - light.luz_entrada                 # Voz Alexa: Luz Entrada
+        - light.luz_pasillo                 # Voz Alexa: Luz Pasillo
+        - light.luz_plancha_mecedora        # Voz Alexa: Luz Mecedora
         # ESTUDIO
         - light.luz_estudio                 # Helper grupo luces de la habitación
         - light.luz_estudio_alta
@@ -438,23 +441,29 @@ cloud:
         # MEDIA PLAYER
         - media_player.firetv_cocina
         - media_player.firetv_salon
-
+        - media_player.firetv_estudio
     entity_config:
       script.homy_armado_parcial:
-        name: Armado Parcial
+        name: armado parcial
         display_categories: SWITCH
       script.homy_armado_total:
-        name: Armado Total
+        name: armado total
         display_categories: SWITCH
       script.homy_desarmado_code:
         name: !secret desarmado_code
         display_categories: SWITCH
       light.luz_salon:
         name: Luz Salón
+        display_categories: LIGHT
       media_player.firetv_salon:
-        name: Tele
+        name: TV salon
+        display_categories: TV
       media_player.firetv_cocina:
-        name: TV Cocina
+        name: TV cocina
+        display_categories: TV
+      media_player.firetv_estudio:
+        name: TV estudio
+        display_categories: TV
      
 #
 # MariaDB database . 01.11.2021
@@ -648,7 +657,7 @@ device_sun_light_trigger:
 
 # Sensores Xiaomi BLE Temperatura, utilizando el componente custom HACS: ble_monitor ==> DEPRECATED
 # Paso a componente ESPHOME_ESP32_Hub2_BLE
-#ble_monitor:
+# ble_monitor:
 #  rounding: True
 #  decimals: 1
 #  period: 60

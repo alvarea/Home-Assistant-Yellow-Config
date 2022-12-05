@@ -1021,7 +1021,7 @@ luces_exterior_on:
   sequence:
     # Llamada a scripts de control programador luces diario
     - service: script.programador_luz_faroles_exterior
-    - service: script.programador_luz_porche_salon
+    - service: script.programador_luz_porche_jardin
     - service: script.programador_luz_balizas_cesped
     - service: script.programador_luz_olivo_grande
     - service: script.programador_luz_olivo_nubes
@@ -1490,7 +1490,20 @@ blink_trigger_cam_estudio:
       data:
         entity_id: camera.blink_estudio
         filename: /share/blink_estudio.jpg
-        
+
+blink_trigger_cam_cocina:
+  alias: 'Blink Trigger Camera Cocina'
+  sequence:
+    - service: blink.trigger_camera
+      data:
+        entity_id: camera.blink_cocina
+    - delay: 00:00:05
+    - service: blink.blink_update
+    - service: camera.snapshot
+      data:
+        entity_id: camera.blink_cocina
+        filename: /share/blink_cocina.jpg
+
 #-----------------------------------------------------------------------------#
 #                                                                             #
 # CONTROL PERSIANAS MATISMO                                                   #
@@ -1587,28 +1600,6 @@ estudio_persiana_up_1s:
     - service: switch.turn_off
       entity_id: switch.esphome_dual_sw1_relay_1
 
-estudio_persiana_start_stop:
-  alias: 'Estudio Persiana Start-Stop'
-  sequence:
-    - choose:
-        # IF Persiana está parada y el modo solicitado es UP 
-        - conditions:
-            - condition: template
-              value_template: "{{ is_state('binary_sensor.estudio_persiana_motor_en_marcha','off') and is_state('input_boolean.estudio_persiana_mode_up','on') }}"
-          sequence:
-            # => arranca motor subida
-            - service: script.estudio_persiana_up
-        # IF Persiana está parada y el modo solicitado es DOWN
-        - conditions:
-            - condition: template
-              value_template: "{{ is_state('binary_sensor.estudio_persiana_motor_en_marcha','off') and is_state('input_boolean.estudio_persiana_mode_up','off') }}"
-          sequence:
-            # => arranca motor bajada
-            - service: script.estudio_persiana_down
-      # ELSE : la persiana está en marcha
-      default:
-        # => Para motor
-         - service: script.estudio_persiana_stop
 
 #-----------------------------------------------------------------------------#
 #                                                                             #

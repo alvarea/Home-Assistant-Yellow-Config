@@ -134,6 +134,8 @@
     - service: script.blink_trigger_cam_porche
     - delay: '00:00:10'
     - service: script.blink_trigger_cam_estudio
+    - delay: '00:00:10'
+    - service: script.blink_trigger_cam_cocina
 
 #-----------------------------------------------------------------------------#
 #                                                                             #
@@ -1045,7 +1047,7 @@
     conditions:
       - condition: sun
         after: sunset
-        after_offset: "+00:30:00"
+        after_offset: "+00:15:00"
       - condition: state
         entity_id: light.luz_dormitorio
         state: 'off'
@@ -1055,17 +1057,19 @@
       #  before: sunrise
       #  before_offset: "+02:00:00" # Horario Invierno GMT+1, en el amanecer +60m
   action:
-    - service: scene.turn_on
-      target:
-        entity_id: scene.dormitorio_relax
+    #- service: scene.turn_on
+    #  target:
+    #    entity_id: scene.dormitorio_relax
     - service: light.turn_on
-      entity_id: light.esphome_s20_sw1_led
+      entity_id: 
+        - light.luz_dormitorio
+        - light.esphome_s20_sw1_led
     # Espera de 5'
     - delay: '00:10:00'
     # Luces Off + Led
     - service: light.turn_off
       entity_id: 
-        - light.dormitorio
+        - light.luz_dormitorio
         - light.esphome_s20_sw1_led
 
 - id: L09
@@ -1112,7 +1116,7 @@
       to: 'on'
   condition:
     - condition: state
-      entity_id: light.luces_estudio
+      entity_id: light.luz_estudio
       state: 'off'
     - condition: or
       conditions:
@@ -1177,39 +1181,6 @@
             - light.luz_estudio_armario
             - light.esphome_s26_sw1_led
 
-- id: L12
-  alias: 'L12 Luces On Dormitorio Warning'
-  mode: restart
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.motion_sensor_158d0002ea1d0f       # Sensor Dormitorio
-      to: 'on'
-    - platform: state
-      entity_id: binary_sensor.door_window_sensor_158d00022b393c  # Puerta Entrada
-      to: 'on'
-    - platform: state
-      entity_id: binary_sensor.motion_sensor_158d0001e637f6       # Sensor Exterior
-      to: 'on'
-    - platform: state
-      entity_id: binary_sensor.motion_sensor_158d0001e55903       # Sensor Entrada
-      to: 'on'
-  condition:
-    condition: and
-    conditions:
-      # Dormitorio Warning F-Mode = on
-      - condition: state
-        entity_id: input_boolean.dormitorio_warning
-        state: 'on'
-      - condition: sun
-        after: sunset
-  action:
-    # Luces On
-    - service: script.luces_dormitorio_relax
-    - delay: '00:00:10'
-    - service: light.turn_off
-      entity_id: light.dormitorio
-      data:
-        transition: 10
 #-----------------------------------------------------------------------------#
 #                                                                             #
 # REGLAS MAGIC CUBE                                                           #
@@ -1254,7 +1225,12 @@
       action_type: shake_air
   action:
     - service: light.turn_off
-      entity_id: light.luces_estudio
+      entity_id: light.luz_estudio_izquierda
+    - delay: '00:00:05'
+    - service: light.turn_off
+      entity_id: light.luz_estudio
+      data:
+        transition: 10
 
 - id: L14
   alias: 'L14 Cube Flip90 Light Estudio Desk Soft'
@@ -1290,7 +1266,6 @@
       data:
         transition: 3
 
-
 - id: L16
   alias: 'L16 Cube TapTwice'
   mode: restart
@@ -1305,20 +1280,31 @@
     - service: switch.turn_on
       entity_id: switch.esphome_bas_sw3
 
-- id: L17
-  alias: 'L17 Cube TapTwice Estudio Persiana Mode'
-  mode: restart
+
+#-----------------------------------------------------------------------------#
+#                                                                             #
+# REGLAS PHILIPS SMART SWITCH / BUTTON                                        #
+#                                                                             #
+#-----------------------------------------------------------------------------#
+#
+#
+- id: L18
+  alias: Hue Smart Button Toggle Luz Pasillo
+  mode: single
+  description: ''
   trigger:
-    platform: event
-    event_type: xiaomi_aqara.cube_action
-    event_data:
-      entity_id: binary_sensor.cube_158d00024a4a62
-      action_type: rotate
+    - platform: event
+      event_type: zha_event
+      event_data:
+        data:
+          device_ieee: '00:17:88:01:08:96:bf:40'
+          command: 'on'
+          args: []
+  condition: []
   action:
-    - service: input_boolean.toggle
-      data: {}
-      target:
-        entity_id: input_boolean.estudio_persiana_mode_up
+    - service: light.toggle
+      entity_id: light.luz_estudio_izquierda
+
 
 #-----------------------------------------------------------------------------#
 #                                                                             #
@@ -1575,7 +1561,7 @@
     - service: script.piscina_depuradora_ch0_timer_cancel
 
 
-# ESPHOME S20 - SW1 Smart Pluh Dormitorio Principal
+# ESPHOME S20 - SW1 Smart Plug Dormitorio Principal
 #
 
 - id: S09
