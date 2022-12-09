@@ -1,10 +1,11 @@
+#
 # PANEL CONTROL ALARMA
 #
 alarm_control_panel.ha:
   friendly_name: Panel Control Alarma
 input_select.home_last_change:
   friendly_name: Último Tracking
-input_boolean.panic_button:
+input_boolean.alarm_panic_button:
   icon: mdi:key-variant
 script.alarma_boton_panico:
   icon: mdi:arrow-collapse-down

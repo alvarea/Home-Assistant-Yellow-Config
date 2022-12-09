@@ -430,7 +430,7 @@ views:
               - entity: script.sirena_stop_alarma
               - entity: script.sirena_alarma_micro_aviso
                 name: Micro test sirena
-              - entity: input_boolean.panic_button
+              - entity: input_boolean.alarm_panic_button
               - entity: script.alarma_boton_panico
             show_header_toggle: false
             title: Botón Pánico / Sirena
@@ -5542,7 +5542,7 @@ views:
                 show_icon: false
             type: horizontal-stack
       - entities:
-          - entity: input_boolean.mute_sonido_sirenas
+          - entity: input_boolean.alarm_mute_sonido_sirenas
           - entity: input_select.xiaomi_sound_alarm_armed
           - entity: input_number.xiaomi_volume_alarm_armed
           - entity: input_select.xiaomi_sound_alarm_disarmed

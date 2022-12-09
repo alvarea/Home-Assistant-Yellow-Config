@@ -77,21 +77,25 @@
 
 # Control alarma y notificaciones
 #
-  panic_button:
+  alarm_panic_button:
     name: Alarma Botón Pánico
     initial: off
     icon: mdi:security-home
     # AAC. Interruptores control alarma y notificaciones
   alarm_status:
-    name: Sirena Alarma
+    name: Alarma Sirena
     icon: mdi:alarm-light
   alarm_test_sirenas:
-    name: Test Sirena Alarma
+    name: Alarma Test Sirena 
     initial: off
     icon: mdi:alarm-light
-  mute_sonido_sirenas:
-    name: Mute Sonidos Sirena
+  alarm_mute_sonido_sirenas:
+    name: Alarma Mute Sonidos Sirena
     icon: mdi:volume-off
+  # Reglas para control fallo conectividad PING en cuadros electricos 
+  alarm_ping_conectivity:
+    name: Alarma Test Conectividad Ping
+    icon: mdi:switch
 
 # Depuradora Piscina
 #

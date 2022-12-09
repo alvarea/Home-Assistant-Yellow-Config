@@ -72,10 +72,10 @@
   alias: 'A8 Alarma Boton Panico On'
   trigger:
     platform: state
-    entity_id: input_boolean.panic_button
+    entity_id: input_boolean.alarm_panic_button
     from: 'off'
     to: 'on'
-    #value_template: "{{ states('input_number.panic_button_code') | int = 2309 }}"
+    #value_template: "{{ states('input_number.alarm_panic_button_code') | int = 2309 }}"
   action:
     # Aviso ALARMA con Xiaomi Sirena
     - service: script.turn_on

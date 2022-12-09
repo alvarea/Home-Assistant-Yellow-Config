@@ -11,7 +11,7 @@ alarma_sirena_grp:
   entities:
     - binary_sensor.esphome_bas_sw0_status
     - binary_sensor.esphome_bas_sw0
-    - input_boolean.panic_button
+    - input_boolean.alarm_panic_button
     - script.alarma_boton_panico
     - script.alarma_sirenas_off
 
@@ -121,7 +121,7 @@ setup_reglas_luces_grp:
 setup_sirenas_grp:
   name: Sirenas
   entities:
-    - input_boolean.mute_sonido_sirenas
+    - input_boolean.alarm_mute_sonido_sirenas
     - input_select.xiaomi_sound_alarm_armed
     - input_number.xiaomi_volume_alarm_armed
     - input_select.xiaomi_sound_alarm_disarmed

@@ -551,7 +551,7 @@
   alias: 'A10 Alarm Boton Panico Off'
   trigger:
     platform: state
-    entity_id: input_boolean.panic_button
+    entity_id: input_boolean.alarm_panic_button
     from: 'on'
     to: 'off'
   action:
@@ -1452,54 +1452,6 @@
   action:
     - service: switch.toggle
       entity_id: switch.esphome_4ch_sw3_relay_4
-
-- id: S04
-  alias: 'S04 Sonoff 4CH Status'
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.esphome_4ch_sw1_status
-      from: 'on'
-      to: 'off'
-      for: '00:05:00'
-    - platform: state
-      entity_id: binary_sensor.esphome_4ch_sw2_status
-      from: 'on'
-      to: 'off'
-      for: '00:05:00'
-    - platform: state
-      entity_id: binary_sensor.esphome_4ch_sw3_status
-      from: 'on'
-      to: 'off'
-      for: '00:05:00'
-  action:
-    # Script Notificación Alarma
-    - service: script.notifica_alarma
-      data:
-        voz: 'Fallo Eléctrico. Cuadro del Jardín sin corriente eléctrica'
-        titulo: '*AVISO FALLO ELECTRICO*'
-        mensaje: >
-          >>> URGENTE: CUADRO ELECTRICO JARDIN SIN CORRIENTE
-
-          >>> DISPOSITIVO: ESPHOME SONOFF 4CH SW1
-
-- id: S05
-  alias: 'S05 Sonoff POW Status'
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.esphome_pow_sw3_status
-      from: 'on'
-      to: 'off'
-      for: '00:05:00'
-  action:
-    # Script Notificación Alarma
-    - service: script.notifica_alarma
-      data:
-        #voz: 'Fallo Eléctrico. Cuadro depuradora piscina sin corriente eléctrica'
-        titulo: '*AVISO FALLO ELECTRICO*'
-        mensaje: >
-          >>> URGENTE: CUADRO ELECTRICO DEPURADORA PISCINA SIN CORRIENTE
-
-          >>> DISPOSITIVO: ESPHOME SONOFF POW_SW3
 
 #
 # ESPHOME POW - DEPURADORA PISCINA
@@ -2551,85 +2503,95 @@
 # ping_01_router_fibra_movistar:
 #
 - id: P01
-  alias: 'P01_ping_router_fibra'
+  alias: 'P01_Test_Conectividad_Ping_Router'
   trigger:
     - platform: state
       entity_id: binary_sensor.ping_00_wan_internet_google
       from: 'on'
       to: 'off'
       for: '00:01:00'
+  condition:
+    - condition: state
+      entity_id: input_boolean.alarm_ping_conectivity
+      state: 'on'
   action:
     # Script Notificación Alarma
     - service: script.notifica_alarma
       data:
-        voz: 'Fallo Conectividad a Internet. Router sin salida a internet'
-        titulo: '*CONEXION INTERNET*'
+        voz: 'Alarma Conexión de Red (ping)'
+        titulo: '*AVISO CONECTIVIDAD PING*'
         mensaje: >
-          >>> URGENTE: ERROR CONEXION INTERNET
+          >>> URGENTE: Fallo en conectividad de red (ping)
 
-          >>> DISPOSITIVO: 00 WAN ROUTER FIBRA
-
+          >>> DISPOSITIVO: WAN ROUTER MOVISTAR
 #
 #ping_05_router_wifi_tplink:
 #
 - id: P02
-  alias: 'P02_ping_ap_wifi_tplink'
+  alias: 'P02_Test_Conectividad_Ping_WIFI_TPlink'
   trigger:
     - platform: state
       entity_id: binary_sensor.ping_05_router_wifi_tplink
       from: 'on'
       to: 'off'
-      # for: '00:06:00'
+      for: '00:05:00'
+  condition:
+    - condition: state
+      entity_id: input_boolean.alarm_ping_conectivity
+      state: 'on'
   action:
     # Script Notificación Alarma
     - service: script.notifica_alarma
       data:
-        voz: 'Fallo Conectividad. Punto de acceso wifi no accesible'
-        titulo: '*AVISO ERROR CONECTIVIDAD'
+        voz: 'Alarma Conexión de Red (ping)'
+        titulo: '*AVISO CONECTIVIDAD PING*'
         mensaje: >
-          >>> URGENTE: FALLO DE PING
+          >>> URGENTE: Fallo en conectividad de red (ping)
 
-          >>> DISPOSITIVO: 05 AP WIFI TPLINK
+          >>> DISPOSITIVO: AP WIFI TPLINK
 
-#
-#nmap_sony_ps4:
-#
 - id: P03
-  alias: 'P03_sony_ps4_on'
+  alias: 'P03_Test_Conectividad_Ping_Sonoff_4CH_Status'
   trigger:
     - platform: state
-      entity_id: binary_sensor.nmap_sony_ps4_lan_wifi
-      from: 'off'
-      to: 'on'
-  action:
-    # Script Notificación Alarma
-    - service: script.notifica_evento
-      data:
-        titulo: '*AVISO CONSOLA PS4*'
-        mensaje: >
-          >>> AVISO: ENCENDIDO
-
-          >>> DISPOSITIVO: CONSOLA SONY PS4
-
-#
-# nmap_sony_ps4:
-#
-- id: P04
-  alias: 'P04_sony_ps4_off'
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.nmap_sony_ps4_lan_wifi
+      entity_id: binary_sensor.esphome_4ch_sw1_status
       from: 'on'
       to: 'off'
+      for: '00:05:00'
+    - platform: state
+      entity_id: binary_sensor.esphome_4ch_sw2_status
+      from: 'on'
+      to: 'off'
+      for: '00:05:00'
+    - platform: state
+      entity_id: binary_sensor.esphome_4ch_sw3_status
+      from: 'on'
+      to: 'off'
+      for: '00:05:00'
+    - platform: state
+      entity_id: binary_sensor.esphome_pow_sw3_status # POW SW3 PISCINA
+      from: 'on'
+      to: 'off'
+      for: '00:05:00'
+  condition:
+    - condition: state
+      entity_id: input_boolean.alarm_ping_conectivity
+      state: 'on'
   action:
     # Script Notificación Alarma
-    - service: script.notifica_evento
+    - service: input_text.set_value
+      entity_id: input_text.alarm_trigger
+      data_template:
+        value: "{{ trigger.to_state.attributes.friendly_name }}"
+    - service: script.notifica_alarma
       data:
-        titulo: '*AVISO CONSOLA PS4*'
+        voz: 'Alarma Conexión de Red (ping)'
+        titulo: '*AVISO CONECTIVIDAD PING*'
         mensaje: >
-          >>> AVISO: APAGADO
+          >>> URGENTE: Fallo en conectividad de red (ping)
 
-          >>> DISPOSITIVO: CONSOLA SONY PS4
+          >>> DISPOSITIVO: {{ states('input_text.alarm_trigger') }}
+
 
 #-----------------------------------------------------------------------------#
 #                                                                             #
@@ -2694,7 +2656,7 @@
   action:
     # BOTON DEL PANICO: Secuencia Alexa ALARMA
     - service: input_boolean.turn_on
-      entity_id: input_boolean.panic_button
+      entity_id: input_boolean.alarm_panic_button
     - service: script.alarma_boton_panico
 
 - id: T03

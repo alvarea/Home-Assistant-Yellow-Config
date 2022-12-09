@@ -26,6 +26,8 @@ logger:
 ota:
 
 binary_sensor:
+  - platform: status
+    name: ${device_name}_status
   - platform: gpio
     pin:
       number: GPIO0
@@ -50,8 +52,6 @@ binary_sensor:
       mode: INPUT_PULLUP
       inverted: True
     name: ${device_name}_button_4
-  - platform: status
-    name: ${device_name}_status_sw1
 
 switch:
   - platform: gpio

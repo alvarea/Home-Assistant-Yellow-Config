@@ -45,7 +45,7 @@ sirena_xiaomi_play_alarm_armed:
   sequence:
     # IF Mute_Xiaomi = ON => True => CANCEL SCRIPT
     - condition: template
-      value_template: "{% if is_state('input_boolean.mute_sonido_sirenas', 'off') %}true{% endif %}"
+      value_template: "{% if is_state('input_boolean.alarm_mute_sonido_sirenas', 'off') %}true{% endif %}"
     # Aviso Xiaomi GW
     - service: xiaomi_aqara.stop_ringtone
       data:
@@ -63,7 +63,7 @@ sirena_xiaomi_play_alarm_disarmed:
   sequence:
     # IF Mute_Xiaomi = ON => True => CANCEL SCRIPT
     - condition: template
-      value_template: "{% if is_state('input_boolean.mute_sonido_sirenas', 'off') %}true{% endif %}"
+      value_template: "{% if is_state('input_boolean.alarm_mute_sonido_sirenas', 'off') %}true{% endif %}"
     # SONOFF_SW1_SIRENA INTERIOR ==> OFF
     #- service: switch.turn_off
     #  entity_id: switch.esphome_bas_sw0
@@ -90,7 +90,7 @@ sirena_v0_alarma_armed_away:
   sequence:
     # IF Mute_Xiaomi = ON => True => CANCEL SCRIPT
     - condition: template
-      value_template: "{% if is_state('input_boolean.mute_sonido_sirenas', 'off') %}true{% endif %}"
+      value_template: "{% if is_state('input_boolean.alarm_mute_sonido_sirenas', 'off') %}true{% endif %}"
     - service: xiaomi_aqara.stop_ringtone
       data:
         gw_mac: !secret xiaomi_mac
@@ -117,7 +117,7 @@ sirena_v0_alarma_armed_home:
   sequence:
     # IF Mute_Xiaomi = ON => True => CANCEL SCRIPT
     - condition: template
-      value_template: "{% if is_state('input_boolean.mute_sonido_sirenas', 'off') %}true{% endif %}"
+      value_template: "{% if is_state('input_boolean.alarm_mute_sonido_sirenas', 'off') %}true{% endif %}"
     - service: xiaomi_aqara.stop_ringtone
       data:
         gw_mac: !secret xiaomi_mac
@@ -152,7 +152,7 @@ sirena_alarma_micro_aviso:
   sequence:
     # IF Mute Sonido Sirenas = ON => True => CANCEL SCRIPT
     - condition: template
-      value_template: "{% if is_state('input_boolean.mute_sonido_sirenas', 'off') %}true{% endif %}"
+      value_template: "{% if is_state('input_boolean.alarm_mute_sonido_sirenas', 'off') %}true{% endif %}"
     #
     # CICLO 1:
     - service: switch.turn_on
@@ -165,7 +165,7 @@ sirena_alarma_micro_aviso:
 # SCRIPT PARA ENCENDER SIRENAS INTERIOR TRAS PULSAR EL DOBLE BOTON PANICO DESDE APP HOMY IOS
 #
 # La secuencia requerida es:
-# 1. Activar la "llave del botón pánico" con el interruptor: input_boolean.panic_button
+# 1. Activar la "llave del botón pánico" con el interruptor: input_boolean.alarm_panic_button
 # 2. Pulsar el botón de ESTE script publicado en el frontend: script.alarma_boton_panico
 # 3. Pulsar el botón del script de apagado para cancelar sirenas: script.boton_panico
 #
@@ -179,7 +179,7 @@ alarma_boton_panico:
   sequence:
     # When a condition does not return true, the script will finish
     - condition: template
-      value_template: "{% if is_state('input_boolean.panic_button', 'on') %}true{% endif %}"
+      value_template: "{% if is_state('input_boolean.alarm_panic_button', 'on') %}true{% endif %}"
     # Llamada Scripts SIRENAS ALARMA
     - service: script.sirena_alarma
     # Notifica Telegram
@@ -248,7 +248,7 @@ sirena_alarma_triggered:
   sequence:
     # IF Mute Sirenas = ON => True => CANCEL SCRIPT
     - condition: template
-      value_template: "{% if is_state('input_boolean.mute_sonido_sirenas', 'off') %}true{% endif %}"
+      value_template: "{% if is_state('input_boolean.alarm_mute_sonido_sirenas', 'off') %}true{% endif %}"
 
     #- service: xiaomi_aqara.play_ringtone
     #  data_template:
