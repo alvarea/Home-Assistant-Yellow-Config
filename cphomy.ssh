@@ -1,0 +1,7 @@
+#
+# COPIA ARCHIVOS YAML A HOMY
+#
+# SOURCE: /Users/agustin/Dev/HOMY-Home-Assistant-Config
+# TARGET: /Volumes/config/
+
+cp /Users/agustin/Dev/HOMY-Home-Assistant-Config/*.yaml /Volumes/config/

@@ -36,4 +36,4 @@ esphome/secrets.yaml
 
 # Ignore files created by IDE's
 .vscode
-cphomy.ssh
+.ssh

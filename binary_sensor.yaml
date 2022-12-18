@@ -1604,13 +1604,13 @@
     host: 8.8.8.8
     name: "ping 00 Internet Google"
     count: 5
-    scan_interval: 60
+    scan_interval: 300
 
   - platform: ping
     host: 192.168.0.1
     count: 5
     name: 'ping 01 Router Movistar'
-    scan_interval: 60
+    scan_interval: 300
 
     #ping_02_nas_time_capsule:
   - platform: ping

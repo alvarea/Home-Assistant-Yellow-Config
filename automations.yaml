@@ -573,7 +573,8 @@
     - service: switch.turn_off
       entity_id: switch.esphome_bas_sw0
     - service: light.toggle
-      entity_id: light.esphome_bas_sw0_led
+      target:
+        entity_id: light.esphome_bas_sw0_led
 
 #-----------------------------------------------------------------------------#
 #                                                                             #
@@ -1296,16 +1297,31 @@
     - platform: event
       event_type: zha_event
       event_data:
-        data:
-          device_ieee: '00:17:88:01:08:96:bf:40'
-          command: 'on'
-          args: []
+        device_ieee: 00:17:88:01:08:96:bf:40
+        endpoint_id: 1
+        command: "on"
   condition: []
   action:
     - service: light.toggle
-      entity_id: light.luz_estudio_izquierda
+      target:
+        entity_id: light.luz_dormitorio
 
-
+- id: L18
+  alias: Hue Smart Button Toggle Luz Pasillo
+  mode: single
+  description: ''
+  trigger:
+    - platform: event
+      event_type: zha_event
+      event_data:
+        device_ieee: 00:17:88:01:08:96:bf:40
+        endpoint_id: 1
+        command: "REMOTE_BUTTON_DOUBLE_PRESS"
+  condition: []
+  action:
+    - service: light.toggle
+      target:
+        entity_id: light.luz_estudio_izquierda
 #-----------------------------------------------------------------------------#
 #                                                                             #
 # REGLAS DE CONTROL DE SMART SWITCH ESPHOME                                   #
@@ -1687,7 +1703,8 @@
       entity_id: binary_sensor.esphome_pow_sw2_lavadora_lavando
   action:
     - service: light.toggle
-      entity_id: light.esphome_pow_sw2_led
+      target:
+        entity_id: light.esphome_pow_sw2_led
 
 - id: S16c
   alias: 'Auto-Apagado Warning Lavadora (S16c)'
