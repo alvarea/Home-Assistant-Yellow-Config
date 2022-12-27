@@ -395,7 +395,7 @@ cloud:
         - light.luz_estudio                 # Helper grupo luces de la habitación
         - light.luz_estudio_alta
         - light.luz_estudio_media
-        - light.luz_estudio_baja
+        - light.luz_estudio_derecha
         - light.luz_estudio_izquierda
         - light.luz_estudio_led_mesa
         - light.luz_estudio_nate
@@ -415,6 +415,7 @@ cloud:
         - light.luz_salon_cilindro          # Voz Alexa: Luz Cilindro
         - light.luz_salon_lectura           # Voz Alexa: Luz Lectura
         - light.led_salon_tv                # Voz Alexa: Led Salon TV
+        - light.luz_arbol_navidad           # Voz Alexa: Arbol Navidad  TEMPORAL SONOFF S26
         #
         # DORMITORIOS 
         - light.luz_dormitorio              # Helper grupo luces de la habitación
@@ -455,6 +456,9 @@ cloud:
         display_categories: SWITCH
       light.luz_salon:
         name: Luz Salón
+        display_categories: LIGHT
+      light.luz_arbol_navidad:
+        name: Arbol Navidad
         display_categories: LIGHT
       media_player.firetv_salon:
         name: Tele
@@ -650,11 +654,12 @@ cover:
 #  2.Turn on the lights when people get home after the sun has set
 #  3.Turn off the lights when all people leave the house
 #
-device_sun_light_trigger:
-  light_group: group.luces_device_sun_light_trigger_grp
-  #light_profile: relax
-  device_group: group.person_device_sun_light_trigger_grp
-  disable_turn_off: true
+# 25.12.2022. DESCARTADO por mal funcionamiento. Enciende las luces de madrugada al llegar alguien nuevo a casa.
+#device_sun_light_trigger:
+#  light_group: group.luces_device_sun_light_trigger_grp
+#  #light_profile: relax
+#  device_group: group.person_device_sun_light_trigger_grp
+#  disable_turn_off: true
 
 # Sensores Xiaomi BLE Temperatura, utilizando el componente custom HACS: ble_monitor ==> DEPRECATED
 # Paso a componente ESPHOME_ESP32_Hub2_BLE

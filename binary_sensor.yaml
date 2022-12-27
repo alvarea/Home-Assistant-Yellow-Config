@@ -223,11 +223,11 @@
       # La alarma usa estos sensores en el grupo <group.alarma_sensores_presencia_interior_grp> durante el armado away.
       #
       #
-      # AQARA Movimiento Pasillo - ZHA PENDING
+      # AQARA Movimiento Pasillo - ZHA OK
       alarma_sensor_movimiento_salon:
         value_template: >-
           {%  if is_state('input_boolean.alarma_sensor_movimiento_salon','on')
-              and is_state('binary_sensor.motion_sensor_158d0001e05661','on')
+              and is_state('binary_sensor.aqara_movimiento_salon','on')
           %}
             true
           {% else %}
@@ -253,7 +253,7 @@
           {% else %} mdi:motion-sensor-off
           {% endif %}
 
-      # AQARA Movimiento Entrada
+      # AQARA Movimiento Entrada - ZHA OK
       alarma_sensor_movimiento_entrada_hall:
         value_template: >-
           {%  if is_state('input_boolean.alarma_sensor_movimiento_entrada_hall','on')

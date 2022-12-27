@@ -900,36 +900,35 @@
 
           >>> LUCES: Alumbrado Exterior Off
 
-#- id: L04
-#  alias: 'L04 Luces On Salon Sunset'
-#  trigger:
-#    - platform: sun
-#      # offset: "-00:35:00"   # Horario Invierno GMT+1
-#      # offset: "-00:25:00"   # Horario Verano GMT+2
-#      event: sunset
-#      offset: "-00:35:00"
-#  condition:
-#    condition: and
-#    conditions:
-#        # Hay alguien en casa
-#      - condition: state
-#        entity_id: binary_sensor.family_any_home
-#        state: 'on'
-#      - condition: numeric_state
-#        entity_id: sensor.illumination_158d0001e05661
-#        below: 50
-#  action:
-#    - service: light.turn_on
-#      entity_id: light.luz_salon_vitrina
-#    # Notifica a Familia
-#    - service: script.notifica_evento
-#      data:
-#        titulo: '*ALUMBRADO*'
-#        mensaje: >
-#          >>> EVENTO: Puesta de Sol en breve
-#
-#          >>> LUCES: Alumbrado Luz Salón On
+- id: L04
+  alias: 'L04 Luces On Salon Sunset'
+  trigger:
+    - platform: sun
+      # offset: "-00:35:00"   # Horario Invierno GMT+1
+      # offset: "-00:25:00"   # Horario Verano GMT+2
+      event: sunset
+      offset: "-00:35:00"
+  condition:
+    condition: and
+    conditions:
+        # Hay alguien en casa
+      - condition: state
+        entity_id: binary_sensor.family_any_home
+        state: 'on'
+      - condition: numeric_state
+        entity_id: sensor.aqara_movimiento_salon_luminosidad
+        below: 50
+  action:
+    - service: light.turn_on
+      entity_id: light.luz_salon_vitrina
+    # Notifica a Familia
+    - service: script.notifica_evento
+      data:
+        titulo: '*ALUMBRADO*'
+        mensaje: >
+          >>> EVENTO: Puesta de Sol en breve
 
+          >>> LUCES: Alumbrado Luz Salón On
 #
 # La regla de alumbrado exterior según sensor se simplifica para que se encienda por la noche, siempre que esté oscuro.
 # La idea es que por programacion horaria y puesta de sol la regla de encendido en la puesta de sol encienda y mantenga
@@ -937,7 +936,7 @@
 # A partir de esa hora se apagan las luces y entraria a funcionar esta regla,
 # de forma que al pasar alguien por la entrada si está oscuro, encienda los faroles exterior.
 # Se elimina la notificación Telegram.
-  #
+#
 - id: L05
   alias: 'L05 Luces On Exterior Segun Sensor'
   mode: restart
@@ -1199,7 +1198,7 @@
 # ROTATE:       ESTUDIO PERSIANA CAMBIO MODO UP/DOWN
 #
 - id: L12
-  alias: 'L12 Cube FreeFall Light Estudio Azul'
+  alias: 'L12 Cube FreeFall Light Estudio Noche'
   mode: restart
   trigger:
     platform: event
@@ -1211,7 +1210,7 @@
     #- service: script.luces_estudio_top
     - service: scene.turn_on
       target:
-        entity_id: scene.estudio_azul
+        entity_id: scene.estudio_setup_night
       data:
         transition: 3
 
@@ -1234,7 +1233,7 @@
         transition: 10
 
 - id: L14
-  alias: 'L14 Cube Flip90 Light Estudio Desk Soft'
+  alias: 'L14 Cube Flip90 Light Estudio Setup Soft'
   mode: restart
   trigger:
     platform: event
@@ -1247,7 +1246,7 @@
     #  entity_id: light.sonoff_mini_sw2
     - service: scene.turn_on
       target:
-        entity_id: scene.estudio_desk_soft
+        entity_id: scene.estudio_setup_soft
       data:
         transition: 3
 
@@ -1263,7 +1262,7 @@
   action:
     - service: scene.turn_on
       target:
-        entity_id: scene.estudio_desk_high
+        entity_id: scene.estudio_setup_high
       data:
         transition: 3
 
@@ -1278,8 +1277,11 @@
       action_type: tap_twice
   action:
     # Encendido Led Azul Tag Reader
-    - service: switch.turn_on
-      entity_id: switch.esphome_bas_sw3
+    - service: scene.turn_on
+      target:
+        entity_id: scene.estudio_setup_call
+      data:
+        transition: 3
 
 
 #-----------------------------------------------------------------------------#

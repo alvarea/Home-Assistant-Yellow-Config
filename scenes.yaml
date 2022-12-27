@@ -1,3 +1,347 @@
+#
+# ESCENA ESTUDIO SETUP - MODO SUAVE LECTURA LUZ DIA TENUE
+#
+- id: Estudio_Setup_Soft
+  name: Estudio Setup Soft
+  icon: mdi:monitor-arrow-down
+  entities:
+    light.luz_estudio_izquierda:
+      state: 'on'
+      brightness_pct: 50
+    light.luz_estudio_led_mesa:
+      state: 'on'
+      brightness_pct: 50
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_play_i:
+      state: 'on'
+      brightness_pct: 50
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_play_c:
+      state: 'on'
+      brightness_pct: 50
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_play_d:
+      state: 'on'
+      brightness_pct: 50
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_alta:
+      state: 'off'
+    light.luz_estudio_media:
+      state: 'off'
+    light.luz_estudio_derecha:
+      state: 'off'
+    light.luz_estudio_nate:
+      state: 'off'
+    light.luz_estudio_techo:
+      state: 'off'
+    light.luz_estudio_escalera:
+      state: 'off'
+    light.luz_estudio_lamparita:
+      state: 'off'
+    light.luz_estudio_beer:
+      state: 'off'
+    light.luz_estudio_tv:
+      state: 'off'
+    light.led_estudio_tv:
+      state: 'off'
+
+#
+# ESCENA ESTUDIO SETUP - MODO FUERTE LECTURA LUZ AMANECER
+#
+- id: Estudio_Setup_High
+  name: Estudio Setup High
+  icon: mdi:monitor-arrow-share
+  entities:
+    light.luz_estudio_izquierda:
+      state: 'on'
+      brightness_pct: 75
+    light.luz_estudio_nate:
+      state: 'on'
+      brightness_pct: 30
+    light.luz_estudio_derecha:
+      state: 'on'
+      brightness_pct: 30
+    light.luz_estudio_led_mesa:
+      state: 'on'
+      brightness_pct: 75
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_play_i:
+      state: 'on'
+      brightness_pct: 75
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_play_c:
+      state: 'on'
+      brightness_pct: 75
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_play_d:
+      state: 'on'
+      brightness_pct: 75
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_alta:
+      state: 'off'
+    light.luz_estudio_media:
+      state: 'off'
+    light.luz_estudio_techo:
+      state: 'off'
+    light.luz_estudio_escalera:
+      state: 'off'
+    light.luz_estudio_lamparita:
+      state: 'off'
+    light.luz_estudio_beer:
+      state: 'off'
+    light.luz_estudio_tv:
+      state: 'off'
+    light.led_estudio_tv:
+      state: 'off'
+
+#
+# ESCENA ESTUDIO SETUP - MODO NOCHE SIN LUZ EXTERIOR
+#
+- id: Estudio_Setup_Night
+  name: Estudio Setup Night
+  icon: mdi:monitor-shimmer
+  entities:
+    light.luz_estudio_izquierda:
+      state: 'on'
+      brightness_pct: 75
+    light.luz_estudio_nate:
+      state: 'on'
+      brightness_pct: 40
+    light.luz_estudio_derecha:
+      state: 'on'
+      brightness_pct: 40
+    light.luz_estudio_led_mesa:
+      state: 'on'
+      brightness_pct: 85
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_play_i:
+      state: 'on'
+      brightness_pct: 85
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_play_c:
+      state: 'on'
+      brightness_pct: 85
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_play_d:
+      state: 'on'
+      brightness_pct: 85
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_alta:
+      state: 'on'
+      brightness: 255
+      rgb_color:
+        - 255
+        - 64
+        - 255
+    light.luz_estudio_media:
+      state: 'on'
+      brightness: 255
+      rgb_color:
+        - 4
+        - 51
+        - 255
+    light.luz_estudio_techo:
+      state: 'on'
+      brightness_pct: 50
+    light.luz_estudio_tv:
+      state: 'on'
+    light.luz_estudio_escalera:
+      state: 'off'
+    light.luz_estudio_lamparita:
+      state: 'off'
+    light.luz_estudio_beer:
+      state: 'off'
+    light.led_estudio_tv:
+      state: 'off'
+
+#
+# ESCENA ESTUDIO FULL - MODO NOCHE TODAS ENCENDIDAS
+#
+- id: Estudio_Full
+  name: Estudio Full
+  icon: mdi:monitor-dashboard
+  entities:
+    light.luz_estudio_izquierda:
+      state: 'on'
+      brightness_pct: 75
+    light.luz_estudio_nate:
+      state: 'on'
+      brightness_pct: 40
+    light.luz_estudio_derecha:
+      state: 'on'
+      brightness_pct: 40
+    light.luz_estudio_led_mesa:
+      state: 'on'
+      brightness_pct: 60
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_play_i:
+      state: 'on'
+      brightness_pct: 60
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_play_c:
+      state: 'on'
+      brightness_pct: 60
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_play_d:
+      state: 'on'
+      brightness_pct: 50
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_alta:
+      state: 'on'
+      brightness: 255
+      rgb_color:
+        - 255
+        - 64
+        - 255
+    light.luz_estudio_media:
+      state: 'on'
+      brightness: 255
+      rgb_color:
+        - 4
+        - 51
+        - 255
+    light.luz_estudio_techo:
+      state: 'on'
+      brightness_pct: 50
+    light.luz_estudio_tv:
+      state: 'on'
+    light.luz_estudio_escalera:
+      state: 'on'
+      brightness_pct: 50
+    light.luz_estudio_lamparita:
+      state: 'on'
+    light.luz_estudio_beer:
+      state: 'on'
+    light.led_estudio_tv:
+      state: 'on'
+      brightness_pct: 50
+      effect: solid      
+      rgb_color:
+        - 255
+        - 64
+        - 255
+
+#
+# ESCENA ESTUDIO WEBCAM
+#
+- id: Estudio_Setup_Call
+  name: Estudio Setup Call
+  icon: mdi:webcam
+  entities:
+    light.luz_estudio_izquierda:
+      state: 'on'
+      brightness_pct: 100
+    light.luz_estudio_nate:
+      state: 'on'
+      brightness_pct: 75
+    light.luz_estudio_derecha:
+      state: 'on'
+      brightness_pct: 75
+    light.luz_estudio_led_mesa:
+      state: 'on'
+      brightness_pct: 100
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_play_i:
+      state: 'on'
+      brightness_pct: 100
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_play_c:
+      state: 'on'
+      brightness_pct: 100
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_play_d:
+      state: 'on'
+      brightness_pct: 100
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_alta:
+      state: 'off'
+      brightness: 255
+      rgb_color:
+        - 255
+        - 64
+        - 255
+    light.luz_estudio_media:
+      state: 'off'
+      brightness: 255
+      rgb_color:
+        - 4
+        - 51
+        - 255
+    light.luz_estudio_techo:
+      state: 'on'
+      brightness_pct: 50
+    light.luz_estudio_tv:
+      state: 'on'
+    light.luz_estudio_escalera:
+      state: 'on'
+      brightness_pct: 50
+    light.luz_estudio_lamparita:
+      state: 'on'
+    light.luz_estudio_beer:
+      state: 'off'
+    light.led_estudio_tv:
+      state: 'off'
+
 - id: Z_Estudio Work Sunrise
   name: Estudio Work Sunrise (Z)
   entities:
