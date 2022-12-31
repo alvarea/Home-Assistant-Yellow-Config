@@ -979,7 +979,7 @@
     condition: or
     conditions:
       - condition: state
-        entity_id: light.luz_planta_baja # Luces Planta Baja
+        entity_id: light.luz_planta_alta # Luces Planta Alta
         state: 'on'
       - condition: state
         entity_id: light.luz_planta_baja # Luces Planta Baja

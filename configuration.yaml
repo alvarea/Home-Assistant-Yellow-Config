@@ -386,6 +386,8 @@ cloud:
         - weather
         - zone
       include_entities:
+        #COCINA
+        - light.luz_cocina
         #ENTRADA
         - light.luz_hall                    # Helper grupo luces de la habitación entrada+pasillo
         - light.luz_entrada                 # Voz Alexa: Luz Entrada
