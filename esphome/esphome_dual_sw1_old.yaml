@@ -1,0 +1,113 @@
+#
+# ESPHOME SONOFF DUAL-POW-R3 SW1 - PERSIANAS ESTUDIOO
+#
+
+esphome:
+  name: esphome_dual_sw1
+  platform: ESP32
+  board: esp32dev
+
+wifi:
+  ssid: !secret wifi_ssid_tc
+  password: !secret wifi_pwd
+  manual_ip:
+    static_ip: 192.168.0.44
+    gateway: !secret wifi_gateway
+    subnet: 255.255.255.0
+
+api:
+
+ota:
+
+# Enable logging
+logger:
+
+#external_components:
+#  - source: github://berfenger/esphome_components
+#    components: [ cse7761 ]
+
+
+# remove # below to enable ble tracking
+#esp32_ble_tracker:
+
+uart:
+  tx_pin: GPIO25
+  rx_pin: GPIO26
+  baud_rate: 4800
+  parity: NONE
+  stop_bits: 1
+
+sensor:
+  - platform: wifi_signal
+    name: "esphome dual sw1 WiFi Signal"
+    update_interval: 60s
+  - platform: cse7766
+    update_interval: 60s
+    current:
+      name: "esphome dual sw1 Current"
+    voltage:
+      name: "esphome dual sw1 Voltage"
+    power:
+      name: "esphome dual sw1 Power"
+  #- platform: cse7761
+  #  update_interval: 5s
+  #  voltage:
+  #    name: "esphome dual sw1 Voltage"
+  #  current_1:
+  #    name: "esphome dual sw1 Current 1"
+  #  current_2:
+  #    name: "esphome dual sw1 Current 2"
+  #  active_power_1:
+  #    name: "esphome dual sw1 Power 1"
+  #  active_power_2:
+  #    name: "esphome dual sw1 Power 2"
+
+output:
+  - platform: gpio
+    pin: GPIO27
+    id: relay1
+  - platform: gpio
+    pin: GPIO14
+    id: relay2
+switch:
+  - platform: output
+    name: "esphome dual sw1 - relay 1"
+    output: relay1
+    id: sw1
+  - platform: output
+    name: "esphome dual sw1 - relay 2"
+    output: relay2
+    id: sw2
+status_led:
+  pin:
+    number: GPIO13
+    inverted: yes
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "esphome dual sw1 button"
+    on_press:
+      - logger.log: "esphome dual sw1 button"
+      - switch.toggle: sw1
+  - platform: gpio
+    pin:
+      number: GPIO32
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "esphome dual sw1 switch 1"
+    on_press:
+      - logger.log: "esphome dual sw1 switch 1"
+      - switch.toggle: sw1
+  - platform: gpio
+    pin:
+      number: GPIO33
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "esphome dual sw1 switch 2"
+    on_press:
+      - logger.log: "esphome dual sw1 switch 2"
+      - switch.toggle: sw2
+

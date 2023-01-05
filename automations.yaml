@@ -1061,16 +1061,14 @@
     #  target:
     #    entity_id: scene.dormitorio_relax
     - service: light.turn_on
-      entity_id: 
-        - light.luz_dormitorio
-        - light.esphome_s20_sw1_led
+      entity_id: light.luz_dormitorio
+      #  - light.esphome_s20_sw1_led
     # Espera de 5'
     - delay: '00:10:00'
     # Luces Off + Led
     - service: light.turn_off
-      entity_id: 
-        - light.luz_dormitorio
-        - light.esphome_s20_sw1_led
+      entity_id: light.luz_dormitorio
+      #  - light.esphome_s20_sw1_led
 
 - id: L09
   alias: 'L09 Luces On Pasillo Según Sensor'
@@ -2473,15 +2471,12 @@
         - "01:00:00"
         - "02:30:00"
         - "03:00:00"
+        - "04:00:00"
+        - "05:00:00"
   condition:
-    condition: or
-    conditions:
-      - condition: state
-        entity_id: binary_sensor.macbook_aac_active
-        state: 'off'
-      - condition: state
-        entity_id: binary_sensor.macbook_aac_active
-        state: 'off'
+    - condition: state
+      entity_id: light.luz_estudio_setup
+      state: 'off'
   action:
     - service: switch.turn_off
       entity_id: switch.esphome_bas_sw3

@@ -446,6 +446,12 @@ cloud:
         - media_player.firetv_cocina
         - media_player.firetv_salon
         - media_player.firetv_estudio
+        # ESCENAS
+        - scene.estudio_full
+        - scene.estudio_setup_call
+        - scene.estudio_setup_soft
+        - scene.estudio_setup_high
+        - scene.estudio_setup_night
     entity_config:
       script.homy_armado_parcial:
         name: armado parcial
@@ -626,28 +632,28 @@ calendar:
         search: "*"
 
 #
-# COVER TEMPLATE - PERSIANAS
+# COVER TEMPLATE - PERSIANAS  => Paso a generar el cover directamente en ESPHOME - SONOFF DUAL R3
 #
-cover:
-  - platform: template
-    covers:
-      estudio_persiana:
-        device_class: shutter
-        friendly_name: "Persiana Estudio"
-        #value_template: "{{is_state('cover.tapparelle_studio', 'open')}}"
-        position_template: "{{ state_attr('cover.estudio_persiana', 'current_position') }}"
-        set_cover_position:
-          service: cover.set_cover_position 
-          target:
-            entity_id: cover.estudio_persiana
-          data:
-            position: "{{ position }}"
-        open_cover:
-          service: script.estudio_persiana_up_full
-        close_cover:
-          service: script.estudio_persiana_down_full
-        stop_cover:
-          service: script.estudio_persiana_stop
+#cover:
+#  - platform: template
+#    covers:
+#      estudio_persiana:
+#        device_class: shutter
+#        friendly_name: "Persiana Estudio"
+#        #value_template: "{{is_state('cover.tapparelle_studio', 'open')}}"
+#        position_template: "{{ state_attr('cover.estudio_persiana', 'current_position') }}"
+#        set_cover_position:
+#          service: cover.set_cover_position 
+#          target:
+#            entity_id: cover.estudio_persiana
+#          data:
+#            position: "{{ position }}"
+#        open_cover:
+#          service: script.estudio_persiana_up_full
+#        close_cover:
+#          service: script.estudio_persiana_down_full
+#        stop_cover:
+#          service: script.estudio_persiana_stop
 
 # 
 # PRESENT BASED LIGHTS 

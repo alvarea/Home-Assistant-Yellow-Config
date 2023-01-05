@@ -23,7 +23,7 @@ alarma_sensores_perimetro_grp:
   name: Grupo Sensores Perímetro
   entities:
     - binary_sensor.aqara_puerta_entrada_principal          # Puerta Entrada
-    - binary_sensor.door_window_sensor_158d000201e2e7       # Puerta Salón
+    - binary_sensor.aqara_puerta_salon                      # Puerta Salón
     - binary_sensor.aqara_ventana_estudio_izquierda         # Ventana Estudio Izquierda
     - binary_sensor.aqara_ventana_estudio_derecha           # Ventana Estudio Derecha
     - binary_sensor.door_window_sensor_158d000847effe       # Ventana M&D

@@ -247,15 +247,15 @@
 # Programador Calefacción / Mosquitos
 
   calefac_programador_mfc:
-    name: Prog. Dormitorio MFC
+    name: Programador Dormitorio Principal
     icon: mdi:power-settings
 
   calefac_programador_paf:
-    name: Prog. Dormitorio PAF
+    name: Programador Dormitorio PAF
     icon: mdi:power-settings
 
   calefac_programador_aaf:
-    name: Prog. Dormitorio AAF
+    name: Programador Dormitorio AAF
     icon: mdi:power-settings
 
 # Dormitorio Warning Mode
