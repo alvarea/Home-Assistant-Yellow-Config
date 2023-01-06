@@ -452,6 +452,8 @@ cloud:
         - scene.estudio_setup_soft
         - scene.estudio_setup_high
         - scene.estudio_setup_night
+        # PERSIANAS
+        - cover.persiana_estudio
     entity_config:
       script.homy_armado_parcial:
         name: armado parcial
@@ -477,6 +479,9 @@ cloud:
       media_player.firetv_estudio:
         name: TV estudio
         display_categories: TV
+      cover.persiana_estudio:
+        name: Persiana Estudio
+        display_categories: SWITCH
      
 #
 # MariaDB database . 01.11.2021

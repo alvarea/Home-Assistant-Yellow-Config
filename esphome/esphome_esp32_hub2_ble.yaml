@@ -33,30 +33,15 @@ ota:
 esp32_ble_tracker:
 
 sensor:
-  # LY02 Estudio Desk-Setup
-  - platform: atc_mithermometer
-    mac_address: "A4:C1:38:4B:D6:7C"
-    temperature:
-      name: "LY1 Desk_Setup Temperatura"
-    humidity:
-      name: "LY1 Desk_Setup Humedad"
-    battery_level:
-      name: "LY1 Desk_Setup Batería Nivel"
-    #battery_voltage:
-    #  name: "LY1 Desk_Setup Batería (V)"
-    # signal_strength:
-    #  name: "LY1 Desk_Setup Señal"
-
-
-  # LY02 Entrada Interior
+  # LY02 Entrada Interior => PENDIENTE DE UBICAR
   - platform: atc_mithermometer
     mac_address: "A4:C1:38:6B:AA:C8"
     temperature:
-      name: "LY2 Estudio Temperatura"
+      name: "LY2 Temperatura"
     humidity:
-      name: "LY2 Estudio Humedad"
+      name: "LY2 Humedad"
     battery_level:
-      name: "LY2 Estudio Batería"
+      name: "LY2 Batería"
 
 #  Configuración Inicial con el Firmware Orignal de Xiaomi.
 #  - platform: xiaomi_lywsd03mmc

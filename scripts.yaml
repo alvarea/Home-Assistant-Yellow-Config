@@ -1512,51 +1512,24 @@ blink_trigger_cam_cocina:
 #                                                                             #
 #-----------------------------------------------------------------------------#
 
-estudio_persiana_stop:
-  alias: 'Estudio Persiana Stop'
-  sequence:
-    - service: switch.turn_off
-      entity_id: 
-        - switch.esphome_dual_sw1_relay_1
-        - switch.esphome_dual_sw1_relay_2
-
-estudio_persiana_down:
-  alias: 'Estudio Persiana Down'
-  sequence:
-    - service: switch.turn_off
-      entity_id: switch.esphome_dual_sw1_relay_1
-    - service: switch.turn_on
-      entity_id: switch.esphome_dual_sw1_relay_2
-
-estudio_persiana_up:
-  alias: 'Estudio Persiana Up'
-  sequence:
-    - service: switch.turn_off
-      entity_id: switch.esphome_dual_sw1_relay_2
-    - service: switch.turn_on
-      entity_id: switch.esphome_dual_sw1_relay_1
 
 estudio_persiana_down_full:
-  alias: 'Estudio Persiana Down 20s'
+  alias: 'Estudio Persiana Cerrada'
   sequence:
-    - service: switch.turn_off
-      entity_id: switch.esphome_dual_sw1_relay_1
-    - service: switch.turn_on
-      entity_id: switch.esphome_dual_sw1_relay_2
-    - delay: 00:00:20
-    - service: switch.turn_off
-      entity_id: switch.esphome_dual_sw1_relay_2
+    service: cover.set_cover_position
+    data:
+      position: 0
+    target:
+      entity_id: cover.persiana_estudio
 
 estudio_persiana_up_full:
-  alias: 'Estudio Persiana Up 20'
+  alias: 'Estudio Persiana Abierta'
   sequence:
-    - service: switch.turn_off
-      entity_id: switch.esphome_dual_sw1_relay_2
-    - service: switch.turn_on
-      entity_id: switch.esphome_dual_sw1_relay_1
-    - delay: 00:00:20
-    - service: switch.turn_off
-      entity_id: switch.esphome_dual_sw1_relay_1
+    service: cover.set_cover_position
+    data:
+      position: 100
+    target:
+      entity_id: cover.persiana_estudio
 
 estudio_persiana_down_3s:
   alias: 'Estudio Persiana Down 3s'
@@ -1568,39 +1541,6 @@ estudio_persiana_down_3s:
     - delay: 00:00:03
     - service: switch.turn_off
       entity_id: switch.esphome_dual_sw1_relay_2
-
-estudio_persiana_up_3s:
-  alias: 'Estudio Persiana Up 3s'
-  sequence:
-    - service: switch.turn_off
-      entity_id: switch.esphome_dual_sw1_relay_2
-    - service: switch.turn_on
-      entity_id: switch.esphome_dual_sw1_relay_1
-    - delay: 00:00:03
-    - service: switch.turn_off
-      entity_id: switch.esphome_dual_sw1_relay_1
-
-estudio_persiana_down_1s:
-  alias: 'Estudio Persiana Down 1s'
-  sequence:
-    - service: switch.turn_off
-      entity_id: switch.esphome_dual_sw1_relay_1
-    - service: switch.turn_on
-      entity_id: switch.esphome_dual_sw1_relay_2
-    - delay: 00:00:01
-    - service: switch.turn_off
-      entity_id: switch.esphome_dual_sw1_relay_2
-
-estudio_persiana_up_1s:
-  alias: 'Estudio Persiana Up 1s'
-  sequence:
-    - service: switch.turn_off
-      entity_id: switch.esphome_dual_sw1_relay_2
-    - service: switch.turn_on
-      entity_id: switch.esphome_dual_sw1_relay_1
-    - delay: 00:00:01
-    - service: switch.turn_off
-      entity_id: switch.esphome_dual_sw1_relay_1
 
 
 #-----------------------------------------------------------------------------#

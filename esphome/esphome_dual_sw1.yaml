@@ -1,9 +1,14 @@
 #
 # ESPHOME SONOFF DUAL-POW-R3 SW1 - PERSIANAS ESTUDIO - NEW VERSION
 #
-# https://community.home-assistant.io/t/template-cover-how-to-get-position-in-set-cover-position/191058/24
+# PINOUT => https://esphome.io/devices/sonoff.html?highlight=dual+r3#sonoff-dual-r3-v1-x
 #
-# https://esphome.io/cookbook/dual-r2-cover.html?highlight=sonoff+dual
+# The new Sonoff DualR3 is here! => https://www.espthings.io/index.php/2021/03/01/the-new-sonoff-dual-r3-is-here/
+#
+# Dual relay cover motor control R2 => https://esphome.io/cookbook/dual-r2-cover.html?highlight=dual+r2
+# (el código está adaptado al pinout del DUAL R3 V2 POW)
+# 
+# SENSOR BL0939 POWER => https://esphome.io/components/sensor/bl0939.html
 #
 
 substitutions:
@@ -28,11 +33,20 @@ ota:
 
 # Enable logging
 logger:
+  baud_rate: 0
 
+# ESP32 Bluetooth Low Energy Tracker Hub
+esp32_ble_tracker:
+
+status_led:
+  pin:
+    number: GPIO13
+    inverted: yes
+    
 binary_sensor:
 - platform: gpio
   pin:
-    number: GPIO10
+    number: GPIO00
     inverted: true
   id: button
   on_press:
@@ -42,14 +56,22 @@ binary_sensor:
           if (id(my_cover).current_operation == COVER_OPERATION_IDLE) {
             // Cover is idle, check current state and either open or close cover.
             if (id(my_cover).is_fully_closed()) {
-              id(my_cover).open();
-              //id(my_cover).set_command_open() 
+              //id(my_cover).open();
+              auto call = id(my_cover).make_call();
+              call.set_command_open();
+              call.perform();
             } else {
-              id(my_cover).close();
+              //id(my_cover).close();
+              auto call = id(my_cover).make_call();
+              call.set_command_close();
+              call.perform();
             }
           } else {
             // Cover is opening/closing. Stop it.
-            id(my_cover).stop();
+            //id(my_cover).stop();
+            auto call = id(my_cover).make_call();
+            call.set_command_stop();
+            call.perform();
           }
 
 switch:
@@ -75,3 +97,49 @@ cover:
   stop_action:
     - switch.turn_off: open_cover
     - switch.turn_off: close_cover
+
+uart:
+  tx_pin: GPIO25
+  rx_pin: GPIO26
+  baud_rate: 4800
+  parity: NONE
+  stop_bits: 2
+
+sensor:
+  - platform: bl0939
+    update_interval: 60s
+    voltage:
+      name: '${device_name} Voltage'
+    current_1:
+      name: '${device_name} Current 1'
+    current_2:
+      name: '${device_name} Current 2'
+    active_power_1:
+      name: '${device_name} Active Power 1'
+    active_power_2:
+      name: '${device_name} Active Power 2'
+    energy_1:
+      name: '${device_name} Energy 1'
+    energy_2:
+      name: '${device_name} Energy 2'
+    energy_total:
+      name: '${device_name} Energy Total'
+  #- platform: wifi_signal
+  #    name: "${device_name} WiFi Signal"
+  #    update_interval: 60s
+
+  # LY02 Estudio Desk-Setup
+  - platform: atc_mithermometer
+    mac_address: "A4:C1:38:4B:D6:7C"
+    temperature:
+      name: "LY1 Desk_Setup Temperatura"
+    humidity:
+      name: "LY1 Desk_Setup Humedad"
+    battery_level:
+      name: "LY1 Desk_Setup Batería Nivel"
+    #battery_voltage:
+    #  name: "LY1 Desk_Setup Batería (V)"
+    # signal_strength:
+    #  name: "LY1 Desk_Setup Señal"
+
+
