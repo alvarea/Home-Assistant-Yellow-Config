@@ -452,6 +452,8 @@ cloud:
         - scene.estudio_setup_soft
         - scene.estudio_setup_high
         - scene.estudio_setup_night
+        - scene.estudio_sunrise
+        - scene.estudio_sunset
         # PERSIANAS
         - cover.persiana_estudio
     entity_config:
@@ -482,7 +484,13 @@ cloud:
       cover.persiana_estudio:
         name: Persiana Estudio
         display_categories: SWITCH
-     
+      scene.estudio_sunrise:
+        name: Estudio Amanecer
+        display_categories: SCENE_TRIGGER
+      scene.estudio_sunset:
+        name: Estudio Anochecer
+        display_categories: SCENE_TRIGGER
+
 #
 # MariaDB database . 01.11.2021
 #

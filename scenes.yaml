@@ -1,4 +1,133 @@
 #
+# ESCENA ESTUDIO SETUP SUNRISE - Configuración del setup en modo trabajo al amanecer.
+#
+- id: Estudio Sunrise
+  name: Estudio Sunrise
+  entities:
+    # Regleta enchufes mesa
+    #
+    switch.esphome_bas_sw3:
+      state: 'on'
+    # Alexa Estudio Cadena COPE
+    #
+    media_player.echo_alexa_estudio:
+      source_list:
+      - Local Speaker
+      - iPhone-AAC
+      volume_level: 0.4
+      is_volume_muted: false
+      media_content_type: music
+      media_title: COPE Sevilla
+      media_position_updated_at: '2022-09-16T20:15:35.788893+00:00'
+      source: Local Speaker
+      available: true
+      last_called:
+      last_called_timestamp:
+      last_called_summary:
+      friendly_name: Echo Alexa Estudio
+      supported_features: 56253
+      state: playing
+    # Persiana
+    #
+    cover.persiana_estudio:
+      current_position: 80
+      assumed_state: true
+      friendly_name: Persiana Estudio
+      supported_features: 15
+      state: open
+    # Luces Setup High 
+    #
+    light.luz_estudio_izquierda:
+      state: 'on'
+      brightness_pct: 75
+    light.luz_estudio_nate:
+      state: 'on'
+      brightness_pct: 30
+    light.luz_estudio_derecha:
+      state: 'on'
+      brightness_pct: 30
+    light.luz_estudio_led_mesa:
+      state: 'on'
+      brightness_pct: 75
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_play_i:
+      state: 'on'
+      brightness_pct: 75
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_play_c:
+      state: 'on'
+      brightness_pct: 75
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_play_d:
+      state: 'on'
+      brightness_pct: 75
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_alta:
+      state: 'off'
+    light.luz_estudio_media:
+      state: 'off'
+    light.luz_estudio_techo:
+      state: 'off'
+    light.luz_estudio_escalera:
+      state: 'off'
+    light.luz_estudio_lamparita:
+      state: 'off'
+    light.luz_estudio_beer:
+      state: 'off'
+    light.luz_estudio_tv:
+      state: 'off'
+    light.led_estudio_tv:
+      state: 'off'
+  icon: mdi:weather-sunset-up
+
+#
+# ESCENA ESTUDIO SETUP SUNSET - Configuración del setup estudio en modo apagado
+#
+- id: Estudio Sunset
+  name: Estudio Sunset
+  entities:
+    # Regleta enchufes mesa
+    #
+    switch.esphome_bas_sw3:
+      state: 'off'
+    # Alexa Estudio Cadena COPE
+    #
+    media_player.echo_alexa_estudio:
+      source_list:
+      - Local Speaker
+      - iPhone-AAC
+      is_volume_muted: true
+      media_content_type: standby
+      media_title: COPE Sevilla
+      available: true
+      state: standby
+    # Persiana
+    #
+    cover.persiana_estudio:
+      current_position: 0
+      assumed_state: true
+      friendly_name: Persiana Estudio
+      supported_features: 15
+      state: closed
+    # Luces Estudio Off
+    #
+    light.luz_estudio:
+      state: 'off'
+  icon: mdi:weather-sunset-down
+
+#
 # ESCENA ESTUDIO SETUP - MODO SUAVE LECTURA LUZ DIA TENUE
 #
 - id: Estudio_Setup_Soft
@@ -342,64 +471,8 @@
     light.led_estudio_tv:
       state: 'off'
 
-- id: Z_Estudio Work Sunrise
-  name: Estudio Work Sunrise (Z)
-  entities:
-    light.esphome_bas_sw3_led:
-      supported_color_modes:
-      - brightness
-      friendly_name: esphome bas sw3 led
-      supported_features: 40
-      state: 'off'
-    switch.esphome_bas_sw3:
-      icon: mdi:desk
-      friendly_name: BAS.SW3 Regleta Desk Setup
-      state: 'on'
-    media_player.echo_alexa_estudio:
-      source_list:
-      - Local Speaker
-      - iPhone-AAC
-      is_volume_muted: false
-      media_content_type: standby
-      media_position_updated_at: '2022-09-16T20:15:35.788893+00:00'
-      source: Local Speaker
-      available: true
-      last_called:
-      last_called_timestamp:
-      last_called_summary:
-      connected_bluetooth:
-      bluetooth_list:
-      - iPhone-AAC
-      friendly_name: Echo Alexa Estudio
-      supported_features: 56253
-      volume_level: 0.2
-      state: standby
-    cover.estudio_persiana:
-      device_class: shutter
-      friendly_name: Persiana Estudio
-      supported_features: 15
-      state: open
-    scene.estudio_desk_high:
-      friendly_name: Estudio Desk_High
-      group_name: Estudio
-      group_type: room
-      name: Desk_High
-      speed: 0.6031746031746031
-      brightness: 42.91
-      is_dynamic: false
-      state: '2022-09-16T19:43:22.537745+00:00'
-    media_player.firetv_estudio:
-      friendly_name: FireTV Estudio
-      supported_features: 22961
-      source: YouTube (FireTV)
-      entity_picture: /api/media_player_proxy/media_player.firetv_estudio?token=bbfaf66a2c48f352adbac3377dd2bb37bff0a87986a14bda826971cf836add99&cache=1663359573.333498
-      state: standby
-  icon: mdi:weather-sunset-up
-  metadata:
-    scene.estudio_desk_high:
-      entity_only: true
-- id: '1662220604194'
-  name: Estudio Home Cinema (Z)
+- id: Estudio Home Cinema
+  name: Estudio Home Cinema
   entities:
     light.led_estudio_tv:
       effect_list:

@@ -851,6 +851,61 @@
 
 #-----------------------------------------------------------------------------#
 #                                                                             #
+# REGLAS DE CONTROL DE ESCENAS                                                #
+#                                                                             #
+#-----------------------------------------------------------------------------#
+
+- id: E01
+  alias: 'E01 Escena Estudio Sunrise al Amanecer'
+  mode: restart
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.aqara_movimiento_estudio
+      to: 'on'
+  condition:
+    - condition: and
+      conditions:
+        # Si la fecha de última ejecucion de la escena es diferente a la del día (no se ha ejecutado ese día)
+        - condition: template
+          value_template: "{{ states('sensor.date') <> (as_timestamp(states('scene.estudio_sunrise')) | timestamp_custom('%Y-%m-%d', True)) }}"
+        - condition: sun
+          before: sunset
+        - condition: sun
+          after: sunrise
+          after_offset: "-01:00:00"
+  action:
+    - service: scene.turn_on
+      target:
+        entity_id: scene.estudio_sunrise
+
+- id: E02
+  alias: 'E02 Escena Estudio Sunset'
+  mode: restart
+  trigger:
+    - platform: time
+      at:
+        - "00:00:00"
+        - "01:00:00"
+        - "02:00:00"
+        - "03:30:00"
+        - "04:00:00"
+  condition:
+    - condition: and
+      conditions:
+        # Si la fecha de última ejecucion de la escena es diferente a la del día (no se ha ejecutado ese día)
+        - condition: state
+          entity_id:
+            - cover.persiana_estudio
+          state: 'closed'
+        - condition: template
+          value_template: "{{ states('sensor.date') <> (as_timestamp(states('scene.estudio_sunset')) | timestamp_custom('%Y-%m-%d', True)) }}"
+  action:
+    - service: scene.turn_on
+      target:
+        entity_id: scene.estudio_sunset
+
+#-----------------------------------------------------------------------------#
+#                                                                             #
 # REGLAS DE CONTROL DE LUCES Y ALUMBRADO                                      #
 #                                                                             #
 #-----------------------------------------------------------------------------#
@@ -886,9 +941,11 @@
       entity_id: light.luz_jardin
       state: 'on'
   action:
-    # Apagado Luces Exterior Casa
+    # Apagado Luces Exterior Casa + Luces Jardín
     - service: light.turn_off
-      entity_id: light.luz_jardin
+      entity_id: 
+        - light.luz_jardin
+        - light.luz_exterior
 
     # Notifica a Familia
     - service: script.notifica_evento
@@ -898,7 +955,7 @@
         mensaje: >
           >>> EVENTO: Casi Medianoche
 
-          >>> LUCES: Alumbrado Exterior Off
+          >>> LUCES: Apagado Alumbrado Exterior + Jardín
 
 - id: L04
   alias: 'L04 Luces On Salon Sunset'
@@ -1020,7 +1077,14 @@
   action:
     # Luces Entrada ON
     - service: light.turn_on
-      entity_id: light.luz_entrada
+      data:
+        brightness_pct: >
+          {% if now().hour >= 0 and now().hour <= 9 %} 10
+          {% elif now().hour >= 10 and now().hour <= 17 %} 30
+          {% else %} 50
+          {% endif %}
+      target:
+        entity_id: light.luz_entrada
     # Si Alarm.Armed_Home => Piloto ON
     - service: script.luz_on_armed_home
     # Espera de x minutos en función de la hora
@@ -1093,7 +1157,14 @@
         state: 'off'
   action:
     - service: light.turn_on
-      entity_id: light.luz_pasillo
+      data:
+        brightness_pct: >
+          {% if now().hour >= 0 and now().hour <= 9 %} 10
+          {% elif now().hour >= 10 and now().hour <= 17 %} 30
+          {% else %} 50
+          {% endif %}
+      target:
+        entity_id: light.luz_pasillo
     # Espera de 5'
     - delay:
         minutes: >
@@ -1306,22 +1377,6 @@
       target:
         entity_id: light.luz_dormitorio
 
-- id: L18
-  alias: Hue Smart Button Toggle Luz Pasillo
-  mode: single
-  description: ''
-  trigger:
-    - platform: event
-      event_type: zha_event
-      event_data:
-        device_ieee: 00:17:88:01:08:96:bf:40
-        endpoint_id: 1
-        command: "REMOTE_BUTTON_DOUBLE_PRESS"
-  condition: []
-  action:
-    - service: light.toggle
-      target:
-        entity_id: light.luz_estudio_izquierda
 #-----------------------------------------------------------------------------#
 #                                                                             #
 # REGLAS DE CONTROL DE SMART SWITCH ESPHOME                                   #
@@ -2462,33 +2517,14 @@
           >>> EVENTO: Control Riego/Fuentes encendidas > 10'
           >>> JARDIN: Apagado total del riego
 
-- id: S41
-  alias: 'S41 Switch Desk Power Off'
-  trigger:
-    - platform: time
-      at:
-        - "00:00:00"
-        - "01:00:00"
-        - "02:30:00"
-        - "03:00:00"
-        - "04:00:00"
-        - "05:00:00"
-  condition:
-    - condition: state
-      entity_id: light.luz_estudio_setup
-      state: 'off'
-  action:
-    - service: switch.turn_off
-      entity_id: switch.esphome_bas_sw3
-
-- id: S42
-  alias: 'S42 Switch Desk Power On'
-  trigger:
-    - platform: time
-      at: "08:00:00"
-  action:
-    - service: switch.turn_on
-      entity_id: switch.esphome_bas_sw3
+#- id: S42
+#  alias: 'S42 Switch Desk Power On'
+#  trigger:
+#    - platform: time
+#      at: "08:00:00"
+#  action:
+#    - service: switch.turn_on
+#      entity_id: switch.esphome_bas_sw3
 
 - id: S43
   alias: 'S43 Control Depuradora Piscina'
