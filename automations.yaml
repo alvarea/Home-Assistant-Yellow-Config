@@ -867,7 +867,8 @@
       conditions:
         # Si la fecha de última ejecucion de la escena es diferente a la del día (no se ha ejecutado ese día)
         - condition: template
-          value_template: "{{ states('sensor.date') <> (as_timestamp(states('scene.estudio_sunrise')) | timestamp_custom('%Y-%m-%d', True)) }}"
+          value_template: "{{ states('scene.estudio_sunrise') == 'unknown' or 
+            states('sensor.date') != (as_timestamp(states('scene.estudio_sunrise')) | timestamp_custom('%Y-%m-%d', True)) }}"
         - condition: sun
           before: sunset
         - condition: sun
@@ -879,11 +880,35 @@
         entity_id: scene.estudio_sunrise
 
 - id: E02
-  alias: 'E02 Escena Estudio Sunset'
+  alias: 'E02 Escena Estudio Sunset al Atardecer'
+  mode: restart
+  trigger:
+    - platform: sun
+      event: sunset
+      offset: "-00:15:00"
+  condition:
+    - condition: and
+      conditions:
+        # Si la fecha de última ejecucion de la escena es diferente a la del día (no se ha ejecutado ese día)
+        - condition: template
+          value_template: "{{ states('scene.estudio_sunset') == 'unknown' or 
+            states('sensor.date') != (as_timestamp(states('scene.estudio_sunset')) | timestamp_custom('%Y-%m-%d', True)) }}"
+        # Si AAC está en casa
+        - condition: state
+          entity_id: binary_sensor.family_home_aac
+          state: 'on'
+  action:
+    - service: scene.turn_on
+      target:
+        entity_id: scene.estudio_sunset
+
+- id: E03
+  alias: 'E03 Escena Estudio Sleep'
   mode: restart
   trigger:
     - platform: time
       at:
+        - "23:00:00"
         - "00:00:00"
         - "01:00:00"
         - "02:00:00"
@@ -896,13 +921,14 @@
         - condition: state
           entity_id:
             - cover.persiana_estudio
-          state: 'closed'
+          state: 'open'
         - condition: template
-          value_template: "{{ states('sensor.date') <> (as_timestamp(states('scene.estudio_sunset')) | timestamp_custom('%Y-%m-%d', True)) }}"
+          value_template: "{{ states('scene.estudio_sleep') == 'unknown' or
+            states('sensor.date') != (as_timestamp(states('scene.estudio_sleep')) | timestamp_custom('%Y-%m-%d', True)) }}"
   action:
     - service: scene.turn_on
       target:
-        entity_id: scene.estudio_sunset
+        entity_id: scene.estudio_sleep
 
 #-----------------------------------------------------------------------------#
 #                                                                             #

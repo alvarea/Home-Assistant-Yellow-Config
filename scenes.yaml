@@ -93,10 +93,81 @@
   icon: mdi:weather-sunset-up
 
 #
-# ESCENA ESTUDIO SETUP SUNSET - Configuración del setup estudio en modo apagado
+# ESCENA ESTUDIO SETUP SUNSET - Configuración del setup en modo trabajo al anochecer
 #
 - id: Estudio Sunset
   name: Estudio Sunset
+  icon: mdi:weather-sunset-down
+  entities:
+    # Persiana
+    #
+    cover.persiana_estudio:
+      current_position: 100
+      assumed_state: true
+      friendly_name: Persiana Estudio
+      supported_features: 15
+      state: open
+    # Luces Noche - Techo
+    #
+    light.luz_estudio_izquierda:
+      state: 'on'
+      brightness_pct: 50
+    light.luz_estudio_nate:
+      state: 'on'
+      brightness_pct: 30
+    light.luz_estudio_derecha:
+      state: 'on'
+      brightness_pct: 30
+    light.luz_estudio_led_mesa:
+      state: 'on'
+      brightness_pct: 85
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_play_i:
+      state: 'on'
+      brightness_pct: 85
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_play_c:
+      state: 'on'
+      brightness_pct: 85
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_play_d:
+      state: 'on'
+      brightness_pct: 85
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_tv:
+      state: 'on'
+    light.luz_estudio_alta:
+      state: 'off'
+    light.luz_estudio_media:
+      state: 'off'
+    light.luz_estudio_techo:
+      state: 'off'
+    light.luz_estudio_escalera:
+      state: 'off'
+    light.luz_estudio_lamparita:
+      state: 'off'
+    light.luz_estudio_beer:
+      state: 'off'
+    light.led_estudio_tv:
+      state: 'off'
+
+#
+# ESCENA ESTUDIO SETUP SLEEP - Configuración del setup estudio en modo apagado por la noche a partir de las 23.00
+#
+- id: Estudio Sleep
+  name: Estudio Sleep
   entities:
     # Regleta enchufes mesa
     #
@@ -125,10 +196,10 @@
     #
     light.luz_estudio:
       state: 'off'
-  icon: mdi:weather-sunset-down
+  icon: mdi:sleep
 
 #
-# ESCENA ESTUDIO SETUP - MODO SUAVE LECTURA LUZ DIA TENUE
+# ESCENA ESTUDIO SETUP SOFT - MODO SUAVE LECTURA LUZ DIA TENUE
 #
 - id: Estudio_Setup_Soft
   name: Estudio Setup Soft
@@ -187,7 +258,7 @@
       state: 'off'
 
 #
-# ESCENA ESTUDIO SETUP - MODO FUERTE LECTURA LUZ AMANECER
+# ESCENA ESTUDIO SETUP HIGH - MODO FUERTE LECTURA LUZ AMANECER
 #
 - id: Estudio_Setup_High
   name: Estudio Setup High
@@ -247,10 +318,11 @@
     light.led_estudio_tv:
       state: 'off'
 
+
 #
 # ESCENA ESTUDIO SETUP - MODO NOCHE SIN LUZ EXTERIOR
 #
-- id: Estudio_Setup_Night
+- id: Estudio Setup Night
   name: Estudio Setup Night
   icon: mdi:monitor-shimmer
   entities:
@@ -322,7 +394,7 @@
 #
 # ESCENA ESTUDIO FULL - MODO NOCHE TODAS ENCENDIDAS
 #
-- id: Estudio_Full
+- id: Estudio Full
   name: Estudio Full
   icon: mdi:monitor-dashboard
   entities:
