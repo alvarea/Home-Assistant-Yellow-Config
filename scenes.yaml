@@ -8,25 +8,6 @@
     #
     switch.esphome_bas_sw3:
       state: 'on'
-    # Alexa Estudio Cadena COPE
-    #
-    media_player.echo_alexa_estudio:
-      source_list:
-      - Local Speaker
-      - iPhone-AAC
-      volume_level: 0.4
-      is_volume_muted: false
-      media_content_type: music
-      media_title: COPE Sevilla
-      media_position_updated_at: '2022-09-16T20:15:35.788893+00:00'
-      source: Local Speaker
-      available: true
-      last_called:
-      last_called_timestamp:
-      last_called_summary:
-      friendly_name: Echo Alexa Estudio
-      supported_features: 56253
-      state: playing
     # Persiana
     #
     cover.persiana_estudio:
@@ -173,17 +154,6 @@
     #
     switch.esphome_bas_sw3:
       state: 'off'
-    # Alexa Estudio Cadena COPE
-    #
-    media_player.echo_alexa_estudio:
-      source_list:
-      - Local Speaker
-      - iPhone-AAC
-      is_volume_muted: true
-      media_content_type: standby
-      media_title: COPE Sevilla
-      available: true
-      state: standby
     # Persiana
     #
     cover.persiana_estudio:

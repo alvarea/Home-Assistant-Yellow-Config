@@ -874,10 +874,18 @@
         - condition: sun
           after: sunrise
           after_offset: "-01:00:00"
+        - condition: state
+          entity_id: binary_sensor.family_home_aac
+          state: 'on'
   action:
     - service: scene.turn_on
       target:
         entity_id: scene.estudio_sunrise
+    # Alexa Estudio Cadena COPE
+    #
+    - service: media_player.media_play
+      target:
+        entity_id: media_player.echo_alexa_estudio
 
 - id: E02
   alias: 'E02 Escena Estudio Sunset al Atardecer'
@@ -897,10 +905,17 @@
         - condition: state
           entity_id: binary_sensor.family_home_aac
           state: 'on'
+        # Algún portátil AAC deben estar encendido
+        - condition: state
+          entity_id: binary_sensor.laptop_aac
+          state: 'on'
   action:
     - service: scene.turn_on
       target:
         entity_id: scene.estudio_sunset
+    - service: media_player.media_pause
+      target:
+        entity_id: media_player.echo_alexa_estudio
 
 - id: E03
   alias: 'E03 Escena Estudio Sleep'
@@ -925,10 +940,18 @@
         - condition: template
           value_template: "{{ states('scene.estudio_sleep') == 'unknown' or
             states('sensor.date') != (as_timestamp(states('scene.estudio_sleep')) | timestamp_custom('%Y-%m-%d', True)) }}"
+        # Los dos portátiles AAC deben estar apagados
+        - condition: state
+          entity_id: binary_sensor.laptop_aac
+          state: 'off'
   action:
     - service: scene.turn_on
       target:
         entity_id: scene.estudio_sleep
+    - service: media_player.media_pause
+      target:
+        entity_id: media_player.echo_alexa_estudio
+
 
 #-----------------------------------------------------------------------------#
 #                                                                             #
@@ -1092,11 +1115,11 @@
         # after_offset: "-01:00:00"  ==> HORARIO INVIERNO GMT+1
         # after_offset: "-00:30:00"  ==> HORARIO VERANO GMT+2
         after: sunset
-        after_offset: "-01:00:00"
+        after_offset: "-02:00:00"
       - condition: sun
         before: sunrise
         # en el amanecer +3h'
-        before_offset: "+06:00:00"
+        before_offset: "+03:00:00"
       - condition: numeric_state
         entity_id: sensor.aqara_movimiento_entrada_luminosidad
         below: 4
@@ -1105,8 +1128,8 @@
     - service: light.turn_on
       data:
         brightness_pct: >
-          {% if now().hour >= 0 and now().hour <= 9 %} 10
-          {% elif now().hour >= 10 and now().hour <= 17 %} 30
+          {% if now().hour >= 0 and now().hour <= 7 %} 10
+          {% elif now().hour >= 8 and now().hour <= 17 %} 40
           {% else %} 50
           {% endif %}
       target:

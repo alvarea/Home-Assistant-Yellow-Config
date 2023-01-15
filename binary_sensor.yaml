@@ -1500,105 +1500,70 @@
 # NMAP - COMPUTER LAPTOP DEVICES
 # =====================================================================
 #
-      nmap_macbook_pro_aac_lan:
+      laptop_aac:
         value_template: >-
-          {% if is_state('device_tracker.nmap_macbook_pro_aac_lan','home') %}
+          {% if is_state('binary_sensor.laptop_macbook_aac','on') 
+              or is_state('binary_sensor.laptop_dell_aac','on')%}
             true
           {% else %}
             false
           {% endif %}
-        friendly_name: 'Apple Macbook Pro AAC LAN'
-        icon_template: mdi:laptop-mac
-        #entity_id: device_tracker.nmap_macbook_pro_aac_lan
-
-      nmap_macbook_pro_aac_wifi:
-        value_template: >-
-          {% if is_state('device_tracker.nmap_macbook_pro_aac_wifi','home') %}
-            true
-          {% else %}
-            false
-          {% endif %}
-        friendly_name: 'Apple Macbook Pro AAC Wifi'
-        icon_template: mdi:laptop-mac
-        #entity_id: device_tracker.nmap_macbook_pro_aac_wifi
-
-      nmap_macbook_pro_mfc_lan:
-        value_template: >-
-          {% if is_state('device_tracker.nmap_macbook_pro_mfc_lan','home') %}
-            true
-          {% else %}
-            false
-          {% endif %}
-        friendly_name: 'Apple Macbook Pro MFC LAN'
-        icon_template: mdi:laptop-mac
-        #entity_id: device_tracker.nmap_macbook_pro_mfc_lan
-
-      nmap_macbook_pro_mfc_wifi:
-        value_template: >-
-          {% if is_state('device_tracker.nmap_macbook_pro_mfc_wifi','home') %}
-            true
-          {% else %}
-            false
-          {% endif %}
-        friendly_name: 'Apple Macbook Pro MFC Wifi'
-        icon_template: mdi:laptop-mac
-        #entity_id: device_tracker.nmap_macbook_pro_mfc_wifi
-
-      nmap_asus_zenbook_wifi:
-        value_template: >-
-          {% if is_state('device_tracker.nmap_asus_zenbook_wifi','home') %}
-            true
-          {% else %}
-            false
-          {% endif %}
-        friendly_name: 'Asus Zenbook AAF'
+        friendly_name: 'Portátiles Mac/Dell AAC '
         icon_template: mdi:laptop
-        #entity_id: device_tracker.nmap_asus_zenbook_wifi
 
-      nmap_macbook_air_paf:
+      laptop_macbook_aac:
         value_template: >-
-          {% if is_state('device_tracker.nmap_macbook_air_paf','home') %}
+          {% if is_state('device_tracker.apple_13_b4_97_mac_aac_lan','home') 
+              or is_state('device_tracker.apple_69_64_86_mac_aac','home') 
+              or is_state('binary_sensor.ping_macbook_aac_lan','on')
+              or is_state('binary_sensor.ping_macbook_aac_wifi','on')%}
             true
           {% else %}
             false
           {% endif %}
-        friendly_name: 'Macbook Air PAF'
-        icon_template: mdi:laptop-mac
-        #entity_id: device_tracker.nmap_macbook_air_paf
-
-      nmap_toshiba_satellite:
-        value_template: >-
-          {% if is_state('device_tracker.toshiba_D7_84_D0_satellite_wifi','home')
-             or is_state('device_tracker.toshiba_91_41_44_satellite_lan','home') %}
-            true
-          {% else %}
-            false
-          {% endif %}
-        friendly_name: 'Toshiba Satélite CMC'
+        friendly_name: 'Portátil Macbook AAC '
         icon_template: mdi:laptop
-        #entity_id: device_tracker.toshiba_91_41_44_satelite_cmc_lan
 
-      nmap_alexa_entrada:
+      laptop_macbook_mfc:
         value_template: >-
-          {% if is_state('device_tracker.nmap_alexa_entrada','home') %}
+          {% if is_state('device_tracker.apple_1a_fb_1c_mac_mfc','home') %}
             true
           {% else %}
             false
           {% endif %}
-        friendly_name: 'Alexa Entrada'
-        icon_template: mdi:speaker-wireless
-        #entity_id: device_tracker.nmap_alexa_entrada
+        friendly_name: 'Portátil Macbook MFC'
+        icon_template: mdi:laptop
 
-      nmap_alexa_dormitorio:
+      laptop_macbook_paf:
         value_template: >-
-          {% if is_state('device_tracker.nmap_alexa_dormitorio','home') %}
+          {% if is_state('device_tracker.apple_43_6d_ca_mac_paf','home') %}
             true
           {% else %}
             false
           {% endif %}
-        friendly_name: 'Alexa Dormitorio'
-        icon_template: mdi:speaker-wireless
-        #entity_id: device_tracker.nmap_alexa_dormitorio
+        friendly_name: 'Portátil Macbook PAF'
+        icon_template: mdi:laptop
+
+      laptop_dell_aac:
+        value_template: >-
+          {% if is_state('device_tracker.dell_6c_55_bf_win_aac','home') 
+              or is_state('binary_sensor.ping_dell_windows_cgi_aac','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        friendly_name: 'Portátil Dell CGI AAC'
+        icon_template: mdi:laptop
+
+      laptop_zenbook_aaf:
+        value_template: >-
+          {% if is_state('device_tracker.asus_59_60_50_win_aaf','home') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        friendly_name: 'Portátil Zenbook AAF'
+        icon_template: mdi:laptop
 
   - platform: ping
     host: 8.8.8.8
@@ -1617,12 +1582,6 @@
     host: 192.168.0.2
     count: 2
     name: 'ping 02 NAS Time Capsule'
-
-    #ping_04_router_wifi_zte:
-  #- platform: ping
-  #  host: 192.168.0.4
-  #  count: 2
-  #  name: 'ping 04 Router WIFI ZTE'
 
     #ping_05_router_wifi_tplink:
   - platform: ping
@@ -1654,18 +1613,26 @@
     count: 2
     name: 'ping 09 Switch Estudio'
 
-    # PING - HOME & HUB DEVICES
-    # =====================================================================
-    #
-    # ping_xiaomi_gateway
-    # ping_philips_hue
-
+    #ping_dell_macbook_aac LAN
   - platform: ping
-    host: 192.168.0.20
+    host: 192.168.0.60
     count: 2
-    name: 'Hub Philips Hue'
+    name: 'ping macbook aac lan'
 
+    #ping_dell_macbook_aac WIFI
   - platform: ping
-    host: 192.168.0.120
+    host: 192.168.0.61
     count: 2
-    name: 'Xiaomi Aqara Gateway'
+    name: 'ping macbook aac wifi'
+
+    #ping_dell_windows_cgi_aac
+  - platform: ping
+    host: 192.168.0.70
+    count: 2
+    name: 'ping Dell Windows CGI AAC'
+    
+    #ping_asus_windows_aaf
+  - platform: ping
+    host: 192.168.0.72
+    count: 2
+    name: 'ping Asus Windows AAF'

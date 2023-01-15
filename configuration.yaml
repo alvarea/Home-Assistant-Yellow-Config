@@ -252,22 +252,11 @@ camera:
 #    - mac: !secret xiaomi_mac
 #      key: !secret xiaomi_gateway
 
-# NMAP
+# PING DEVICE TRACKER
 #device_tracker:
-#  - platform: nmap_tracker
-#    hosts: !secret device_tracker_range1
-#    home_interval: 10
-#    consider_home: 0:10:00
-#    interval_seconds: 90
-#    track_new_devices: no
-#    scan_options: -Pn --host-timeout 5s
-#    exclude:
-#      - !secret device_tracker_host1
-#      - !secret device_tracker_host2
-
 #  - platform: ping
 #    hosts:
-#      ping_57_amazon_kindle: 192.168.0.57
+#      nmap_dell_6c_55_bf_win_aac: 192.168.0.70
 
 # NOTIFICACIONES
 notify:
