@@ -1048,7 +1048,7 @@
   mode: restart
   trigger:
     - platform: state
-      entity_id: binary_sensor.motion_sensor_158d0001e637f6
+      entity_id: binary_sensor.aqara_movimiento_entrada_exterior
       to: 'on'
   condition:
     condition: and
@@ -1060,7 +1060,7 @@
         entity_id: light.luz_exterior
         state: 'off'
       - condition: numeric_state
-        entity_id: sensor.illumination_158d0001e637f6
+        entity_id: sensor.aqara_movimiento_exterior_luminosidad
         below: 10
   action:
     - service: light.turn_on
@@ -1662,10 +1662,10 @@
   alias: 'S10 Switch Dormitorio MFC On'
   trigger:
     - platform: sun
-      # offset: "+03:30:00"   # Horario Invierno GMT+2  => 18:30 + 3:30 = 22:00
+      # offset: "+02:30:00"   # Horario Invierno GMT+2  => 18:30 + 3:30 = 22:00
       # offset: "+00:30:00"   # Horario Verano GMT+1  => 21:30 + 0:30 = 22:00
       event: sunset
-      offset: "+00:30:00"
+      offset: "+02:30:00"
     #- platform: time # Solo Invierno Calefacción
     #  at: '06:45:00'
     #- platform: sun  # solo para calefacción
@@ -1681,9 +1681,6 @@
       - condition: state
         entity_id: input_boolean.family_sleep_home_mfc
         state: 'on'
-      - condition: state
-        entity_id: binary_sensor.family_any_home
-        state: 'on'
   action:
     - service: switch.turn_on
       entity_id: switch.esphome_s20_sw1
@@ -1692,10 +1689,10 @@
   alias: 'S10b Switch Dormitorio PAF On'
   trigger:
     - platform: sun
-      # offset: "+03:30:00"   # Horario Invierno GMT+1  => 18:30 + 3:30 = 22:00
+      # offset: "+02:30:00"   # Horario Invierno GMT+1  => 18:30 + 3:30 = 22:00
       # offset: "+00:30:00"   # Horario Verano GMT+2  => 21:30 + 0:30 = 22:00
       event: sunset
-      offset: "+00:30:00"
+      offset: "+02:30:00"
   condition:
     condition: and
     conditions:
@@ -1706,9 +1703,6 @@
       - condition: state
         entity_id: input_boolean.family_sleep_home_paf
         state: 'on'
-      - condition: state
-        entity_id: binary_sensor.family_any_home
-        state: 'on'
   action:
     - service: switch.turn_on
       entity_id: switch.esphome_s20_sw3
@@ -1717,10 +1711,10 @@
 #  alias: 'S10c Switch Dormitorio AAF On'
 #  trigger:
 #    - platform: sun
-#      # offset: "+03:30:00"   # Horario Invierno GMT+1  => 18:30 + 3:30 = 22:00
+#      # offset: "+02:30:00"   # Horario Invierno GMT+1  => 18:30 + 3:30 = 22:00
 #      # offset: "+00:30:00"   # Horario Verano GMT+2  => 21:30 + 0:30 = 22:00
 #      event: sunset
-#      offset: "+00:30:00"
+#      offset: "+02:30:00"
 #  condition:
 #    condition: and
 #    conditions:
@@ -1731,9 +1725,6 @@
 #      - condition: state
 #        entity_id: input_boolean.family_sleep_home_aaf
 #        state: 'on'
-#      - condition: state
-#        entity_id: binary_sensor.family_any_home
-#        state: 'on'
 #  action:
 #    - service: switch.turn_on
 #      entity_id: switch.sonoff_S26_sw1
@@ -1741,8 +1732,13 @@
 - id: S12
   alias: 'S12 Switch Dormitorios Off'
   trigger:
-    # - platform: time # Solo Invierno Calefacción
-    # at: '00:05:00'
+    - platform: time # Solo Invierno Calefacción
+      at: 
+        - "00:00:00"
+        - "01:00:00"
+        - "02:00:00"
+        - "03:00:00"
+        - "04:00:00"
     - platform: sun
       event: sunrise
   condition:
@@ -1754,16 +1750,11 @@
       - condition: state
         entity_id: switch.esphome_s20_sw3
         state: 'on'
-      #- condition: state
-      #  entity_id: switch.sonoff_S26_sw1
-      #  state: 'on'
   action:
     - service: switch.turn_off
-      entity_id: switch.esphome_s20_sw1
-    - service: switch.turn_off
-      entity_id: switch.esphome_s20_sw3
-    #- service: switch.turn_off
-    #  entity_id: switch.sonoff_S26_sw1
+      entity_id: 
+        - switch.esphome_s20_sw1
+        - switch.esphome_s20_sw3
 
 #
 # SAI RACK COMUNICACIONES

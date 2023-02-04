@@ -426,24 +426,27 @@ views:
         type: vertical-stack
       - entities:
           - entity: group.alarma_sensores_presencia_interior_grp
-            name: Grupo Sensores Presencia Interior
-          - entity: binary_sensor.blink_hall_motion_detected
-            name: Sensor Alarma Cámara Hall Entrada
+            name: Grupo Sensores Alarma  Interior
+          - entity: binary_sensor.alarma_sensor_movimiento_blink_hall
+            name: Alarma Cámara Hall Entrada
             secondary_info: last-changed
           - entity: binary_sensor.alarma_sensor_movimiento_entrada_hall
-            name: Sensor Alarma Entrada Hall
+            name: Alarma Entrada Hall
+            secondary_info: last-changed
+          - entity: binary_sensor.alarma_sensor_movimiento_blink_estudio
+            name: Alarma Cámara Estudio
             secondary_info: last-changed
           - entity: binary_sensor.alarma_sensor_movimiento_estudio
-            name: Sensor Alarma Estudio
+            name: Alarma Estudio
             secondary_info: last-changed
           - entity: binary_sensor.alarma_sensor_movimiento_salon
-            name: Sensor Alarma Salón
+            name: Alarma Salón
             secondary_info: last-changed
           - entity: binary_sensor.alarma_sensor_movimiento_dormitorio_principal
-            name: Sensor Alarma Dormitorio Principal
+            name: Alarma Dormitorio Principal
             secondary_info: last-changed
           - entity: binary_sensor.alarma_sensor_movimiento_pasillo
-            name: Sensor Alarma Pasillo
+            name: Alarma Pasillo
             secondary_info: last-changed
         show_header_toggle: false
         title: Sensores Presencia Interior
@@ -451,29 +454,29 @@ views:
         type: entities
       - entities:
           - entity: group.alarma_sensores_presencia_exterior_grp
-            name: Grupo Sensores Exterior
+            name: Grupo Sensores Alarma Exterior
           - entity: binary_sensor.alarma_sensor_movimiento_entrada_exterior
-            name: Presencia Entrada Exterior
             secondary_info: last-changed
-          - entity: binary_sensor.blink_puerta_garaje_motion_detected
+            name: Alarma Presencia Entrada Exterior
+          - entity: binary_sensor.alarma_sensor_movimiento_blink_puerta_garaje
             secondary_info: last-changed
-            name: Cámara Puerta Garage
-          - entity: binary_sensor.blink_puerta_principal_motion_detected
-            name: Cámara Puerta Principal Exterior
+            name: Alarma Cámara Puerta Garaje
+          - entity: binary_sensor.alarma_sensor_movimiento_blink_puerta_principal
             secondary_info: last-changed
-          - entity: binary_sensor.blink_piscina_motion_detected
-            name: Cámara Piscina
+            name: Alarma Cámara Puerta Principal
+          - entity: binary_sensor.alarma_sensor_movimiento_blink_piscina
             secondary_info: last-changed
-          - entity: binary_sensor.blink_porche_motion_detected
-            name: Cámara Porche Salon
+            name: Alarma Cámara Piscina
+          - entity: binary_sensor.alarma_sensor_movimiento_blink_porche
             secondary_info: last-changed
+            name: Alarma Cámara Porche
         show_header_toggle: false
-        title: Sensores Presencia Exterior
+        title: Sensores Alarma Presencia Exterior
         state_color: true
         type: entities
       - entities:
-          - entity: binary_sensor.motion_sensor_158d0001e637f6
-            name: Entrada Exterior
+          - entity: binary_sensor.aqara_movimiento_entrada_exterior
+            name: Aqara Entrada Exterior
             secondary_info: last-changed
           - entity: binary_sensor.aqara_movimiento_entrada
             name: Aqara Movimiento Entrada Hall
@@ -497,9 +500,8 @@ views:
           - entity: binary_sensor.aqara_puerta_entrada_principal
             secondary_info: last-changed
             name: Aqara Puerta Entrada Principal
-          - entity: binary_sensor.door_window_sensor_158d000201e2e7
+          - entity: binary_sensor.aqara_puerta_salon
             secondary_info: last-changed
-            name: Puerta Salón
           - entity: binary_sensor.aqara_ventana_estudio_izquierda
             secondary_info: last-changed
             name: Aqara Ventana Estudio Izquierda
@@ -739,7 +741,7 @@ views:
             secondary_info: last-changed
           - entity: device_tracker.iphone_paf
             secondary_info: last-changed
-          - entity: device_tracker.apple_46_ef_30_iphone_paf
+          - entity: device_tracker.apple_c8_49_a6_iphone_paf
           - entity: sensor.iphone_paf_ssid
             name: Red Wifi
           - entity: sensor.baye_probability_paf
@@ -1425,7 +1427,7 @@ views:
             entity: binary_sensor.riego_cesped_ch1_dia_ejecucion
             image: /local/Riego_Cesped_s1_1900x800.jpeg
             name: 'SECTOR 1: Turbinas Cesped'
-            aspect_ratio: '3'
+            aspect_ratio: '5'
           - type: vertical-stack
             cards:
               - type: horizontal-stack
@@ -1554,7 +1556,7 @@ views:
             entity: binary_sensor.riego_cesped_ch2_dia_ejecucion
             image: /local/Riego_Cesped_s2_1991x821.jpeg
             name: SECTOR 2:Difusores Cesped
-            aspect_ratio: '3'
+            aspect_ratio: '5'
           - type: vertical-stack
             cards:
               - type: horizontal-stack
@@ -1687,7 +1689,7 @@ views:
             entity: binary_sensor.riego_cesped_ch3_dia_ejecucion
             image: /local/Riego_Cesped_s3_1900x801.jpeg
             name: 'SECTOR 3: Goteo Perímetro'
-            aspect_ratio: '3'
+            aspect_ratio: '5'
           - type: vertical-stack
             cards:
               - type: horizontal-stack
@@ -2692,18 +2694,26 @@ views:
           - cards:
               - entities:
                   - entity: sensor.humidity_158d00025d9289
-                font_size: 50
+                font_size: 75
                 line_color: blue
                 line_width: 6
-                name: '%Humedad'
+                name: ' '
                 type: custom:mini-graph-card
+                show:
+                  icon: true
+                  labels: true
+                  state: true
               - entities:
                   - entity: sensor.pressure_158d00025d9289
-                font_size: 50
+                font_size: 75
                 line_color: green
                 line_width: 6
-                name: Presión Atm.
+                name: ' '
                 type: custom:mini-graph-card
+                show:
+                  icon: true
+                  labels: true
+                  state: true
             type: horizontal-stack
         type: vertical-stack
       - cards:
@@ -2748,18 +2758,464 @@ views:
           - cards:
               - entities:
                   - entity: sensor.ly3_entrada_exterior_humedad
-                font_size: 50
                 line_color: blue
                 line_width: 6
-                name: '%Humedad'
+                name: ' '
                 type: custom:mini-graph-card
+                show:
+                  icon: true
+                  labels: true
+                  state: true
+                font_size: 75
               - entities:
                   - entity: sensor.pressure_158d00025d9289
-                font_size: 50
                 line_color: green
                 line_width: 6
-                name: Presión Atm.
+                name: ' '
                 type: custom:mini-graph-card
+                font_size: 75
+            type: horizontal-stack
+        type: vertical-stack
+      - cards:
+          - color_thresholds:
+              - color: purple
+                value: 46
+              - color: magenta
+                value: 44
+              - color: red
+                value: 42
+              - color: vermillion
+                value: 40
+              - color: orange
+                value: 38
+              - color: amber
+                value: 35
+              - color: yellow
+                value: 30
+              - color: chartreuse
+                value: 25
+              - color: green
+                value: 20
+              - color: teal
+                value: 15
+              - color: blue
+                value: 10
+              - color: violet
+                value: 5
+              - color: black
+                value: 0
+            entities:
+              - entity: sensor.aqara_temperatura_salon
+            font_size: 120
+            line_width: 10
+            points_per_hour: 1
+            show:
+              icon: true
+              labels: true
+              state: true
+            name: Salón
+            type: custom:mini-graph-card
+          - cards:
+              - entities:
+                  - entity: sensor.aqara_temperatura_salon_humedad
+                font_size: 75
+                line_color: blue
+                line_width: 6
+                name: ' '
+                type: custom:mini-graph-card
+                show:
+                  icon: true
+                  labels: true
+                  state: true
+              - entities:
+                  - entity: sensor.aqara_temperatura_salon_presionatm
+                font_size: 75
+                line_color: green
+                line_width: 6
+                name: ' '
+                type: custom:mini-graph-card
+                show:
+                  icon: true
+                  labels: true
+                  state: true
+            type: horizontal-stack
+        type: vertical-stack
+      - cards:
+          - color_thresholds:
+              - color: purple
+                value: 46
+              - color: magenta
+                value: 44
+              - color: red
+                value: 42
+              - color: vermillion
+                value: 40
+              - color: orange
+                value: 38
+              - color: amber
+                value: 35
+              - color: yellow
+                value: 30
+              - color: chartreuse
+                value: 25
+              - color: green
+                value: 20
+              - color: teal
+                value: 15
+              - color: blue
+                value: 10
+              - color: violet
+                value: 5
+              - color: black
+                value: 0
+            entities:
+              - entity: sensor.ly1_desk_setup_temperatura
+            font_size: 120
+            line_width: 10
+            name: Estudio Desk Setup
+            points_per_hour: 1
+            show:
+              icon: true
+              labels: true
+              state: true
+            type: custom:mini-graph-card
+          - cards:
+              - entities:
+                  - entity: sensor.ly1_desk_setup_humedad
+                font_size: 75
+                line_color: blue
+                line_width: 6
+                name: ' '
+                type: custom:mini-graph-card
+                show:
+                  icon: true
+                  labels: true
+                  state: true
+              - entities:
+                  - entity: sensor.aa_estudio_room_temperature
+                font_size: 75
+                line_color: green
+                line_width: 6
+                name: ' '
+                type: custom:mini-graph-card
+            type: horizontal-stack
+        type: vertical-stack
+      - cards:
+          - color_thresholds:
+              - color: purple
+                value: 46
+              - color: magenta
+                value: 44
+              - color: red
+                value: 42
+              - color: vermillion
+                value: 40
+              - color: orange
+                value: 38
+              - color: amber
+                value: 35
+              - color: yellow
+                value: 30
+              - color: chartreuse
+                value: 25
+              - color: green
+                value: 20
+              - color: teal
+                value: 15
+              - color: blue
+                value: 10
+              - color: violet
+                value: 5
+            entities:
+              - entity: sensor.aqara_temperatura_cocina
+            font_size: 120
+            line_width: 10
+            points_per_hour: 1
+            show:
+              icon: true
+              labels: true
+              state: true
+            type: custom:mini-graph-card
+            name: Cocina
+          - cards:
+              - entities:
+                  - entity: sensor.aqara_temperatura_cocina_humedad
+                font_size: 75
+                line_color: blue
+                line_width: 6
+                name: ' '
+                type: custom:mini-graph-card
+                show:
+                  icon: true
+                  labels: true
+                  state: true
+              - entities:
+                  - entity: sensor.aqara_temperatura_cocina_presionatm
+                font_size: 75
+                line_color: green
+                line_width: 6
+                name: ' '
+                type: custom:mini-graph-card
+                show:
+                  icon: true
+                  labels: true
+                  state: true
+            type: horizontal-stack
+        type: vertical-stack
+      - cards:
+          - color_thresholds:
+              - color: purple
+                value: 46
+              - color: magenta
+                value: 44
+              - color: red
+                value: 42
+              - color: vermillion
+                value: 40
+              - color: orange
+                value: 38
+              - color: amber
+                value: 35
+              - color: yellow
+                value: 30
+              - color: chartreuse
+                value: 25
+              - color: green
+                value: 20
+              - color: teal
+                value: 15
+              - color: blue
+                value: 10
+              - color: violet
+                value: 5
+              - color: black
+                value: 0
+            entities:
+              - entity: sensor.temperature_158d00025efda4
+            font_size: 120
+            line_width: 10
+            name: Dormitorio Principal
+            points_per_hour: 1
+            show:
+              icon: true
+              labels: true
+              state: true
+            type: custom:mini-graph-card
+          - cards:
+              - entities:
+                  - entity: sensor.humidity_158d00025efda4
+                font_size: 75
+                line_color: blue
+                line_width: 6
+                name: ' '
+                type: custom:mini-graph-card
+                show:
+                  icon: true
+                  labels: true
+                  state: true
+              - entities:
+                  - entity: sensor.pressure_158d00025efda4
+                font_size: 75
+                line_color: green
+                line_width: 6
+                name: ' '
+                type: custom:mini-graph-card
+                show:
+                  icon: true
+                  labels: true
+                  state: true
+            type: horizontal-stack
+        type: vertical-stack
+      - cards:
+          - color_thresholds:
+              - color: purple
+                value: 46
+              - color: magenta
+                value: 44
+              - color: red
+                value: 42
+              - color: vermillion
+                value: 40
+              - color: orange
+                value: 38
+              - color: amber
+                value: 35
+              - color: yellow
+                value: 30
+              - color: chartreuse
+                value: 25
+              - color: green
+                value: 20
+              - color: teal
+                value: 15
+              - color: blue
+                value: 10
+              - color: violet
+                value: 5
+              - color: black
+                value: 0
+            entities:
+              - entity: sensor.temperature_158d0002e97092
+            font_size: 120
+            line_width: 10
+            name: Dormitorio Paloma
+            points_per_hour: 1
+            show:
+              icon: true
+              labels: true
+              state: true
+            type: custom:mini-graph-card
+          - cards:
+              - entities:
+                  - entity: sensor.humidity_158d0002e97092
+                font_size: 75
+                line_color: blue
+                line_width: 6
+                name: ' '
+                type: custom:mini-graph-card
+                show:
+                  icon: true
+                  labels: true
+                  state: true
+              - entities:
+                  - entity: sensor.pressure_158d0002e97092
+                font_size: 75
+                line_color: green
+                line_width: 6
+                name: ' '
+                type: custom:mini-graph-card
+                show:
+                  icon: true
+                  labels: true
+                  state: true
+            type: horizontal-stack
+        type: vertical-stack
+      - cards:
+          - color_thresholds:
+              - color: purple
+                value: 46
+              - color: magenta
+                value: 44
+              - color: red
+                value: 42
+              - color: vermillion
+                value: 40
+              - color: orange
+                value: 38
+              - color: amber
+                value: 35
+              - color: yellow
+                value: 30
+              - color: chartreuse
+                value: 25
+              - color: green
+                value: 20
+              - color: teal
+                value: 15
+              - color: blue
+                value: 10
+              - color: violet
+                value: 5
+              - color: black
+                value: 0
+            entities:
+              - entity: sensor.temperature_158d00022c6a47
+            font_size: 120
+            line_width: 10
+            name: Dormitorio Agu
+            points_per_hour: 1
+            show:
+              icon: true
+              labels: true
+              state: true
+            type: custom:mini-graph-card
+          - cards:
+              - entities:
+                  - entity: sensor.humidity_158d00022c6a47
+                font_size: 75
+                line_color: blue
+                line_width: 6
+                name: ' '
+                type: custom:mini-graph-card
+                show:
+                  icon: true
+                  labels: true
+                  state: true
+              - entities:
+                  - entity: sensor.pressure_158d00022c6a47
+                font_size: 75
+                line_color: green
+                line_width: 6
+                name: ' '
+                type: custom:mini-graph-card
+                show:
+                  icon: true
+                  labels: true
+                  state: true
+            type: horizontal-stack
+        type: vertical-stack
+      - cards:
+          - color_thresholds:
+              - color: purple
+                value: 46
+              - color: magenta
+                value: 44
+              - color: red
+                value: 42
+              - color: vermillion
+                value: 40
+              - color: orange
+                value: 38
+              - color: amber
+                value: 35
+              - color: yellow
+                value: 30
+              - color: chartreuse
+                value: 25
+              - color: green
+                value: 20
+              - color: teal
+                value: 15
+              - color: blue
+                value: 10
+              - color: violet
+                value: 5
+              - color: black
+                value: 0
+            entities:
+              - entity: sensor.hue_movimiento_pasillo_temperatura
+            font_size: 120
+            line_width: 10
+            name: Pasillo
+            points_per_hour: 1
+            show:
+              icon: true
+              labels: true
+              state: true
+            type: custom:mini-graph-card
+          - cards:
+              - entities:
+                  - entity: sensor.humidity_158d0002e97092
+                font_size: 75
+                line_color: blue
+                line_width: 6
+                name: ' '
+                type: custom:mini-graph-card
+                show:
+                  icon: true
+                  labels: true
+                  state: true
+              - entities:
+                  - entity: sensor.pressure_158d0002e97092
+                font_size: 75
+                line_color: green
+                line_width: 6
+                name: ' '
+                type: custom:mini-graph-card
+                show:
+                  icon: true
+                  labels: true
+                  state: true
             type: horizontal-stack
         type: vertical-stack
       - cards:
@@ -2816,394 +3272,6 @@ views:
                 line_width: 6
                 type: custom:mini-graph-card
                 name: Bateria (LY2)
-            type: horizontal-stack
-        type: vertical-stack
-      - cards:
-          - color_thresholds:
-              - color: purple
-                value: 46
-              - color: magenta
-                value: 44
-              - color: red
-                value: 42
-              - color: vermillion
-                value: 40
-              - color: orange
-                value: 38
-              - color: amber
-                value: 35
-              - color: yellow
-                value: 30
-              - color: chartreuse
-                value: 25
-              - color: green
-                value: 20
-              - color: teal
-                value: 15
-              - color: blue
-                value: 10
-              - color: violet
-                value: 5
-              - color: black
-                value: 0
-            entities:
-              - entity: sensor.ly1_desk_setup_temperatura
-            font_size: 120
-            line_width: 10
-            name: Estudio Desk Setup
-            points_per_hour: 1
-            show:
-              icon: true
-              labels: true
-              state: true
-            type: custom:mini-graph-card
-          - cards:
-              - entities:
-                  - entity: sensor.ly1_desk_setup_humedad
-                font_size: 50
-                line_color: blue
-                line_width: 6
-                name: Desk Setup
-                type: custom:mini-graph-card
-              - entities:
-                  - entity: sensor.aa_estudio_room_temperature
-                font_size: 50
-                line_color: green
-                line_width: 6
-                name: Estudio (AA)
-                type: custom:mini-graph-card
-            type: horizontal-stack
-        type: vertical-stack
-      - cards:
-          - color_thresholds:
-              - color: purple
-                value: 46
-              - color: magenta
-                value: 44
-              - color: red
-                value: 42
-              - color: vermillion
-                value: 40
-              - color: orange
-                value: 38
-              - color: amber
-                value: 35
-              - color: yellow
-                value: 30
-              - color: chartreuse
-                value: 25
-              - color: green
-                value: 20
-              - color: teal
-                value: 15
-              - color: blue
-                value: 10
-              - color: violet
-                value: 5
-              - color: black
-                value: 0
-            entities:
-              - entity: sensor.aqara_temperatura_salon
-            font_size: 120
-            line_width: 10
-            points_per_hour: 1
-            show:
-              icon: true
-              labels: true
-              state: true
-            type: custom:mini-graph-card
-          - cards:
-              - entities:
-                  - entity: sensor.aqara_temperatura_salon_humedad
-                font_size: 50
-                line_color: blue
-                line_width: 6
-                name: '%Humedad'
-                type: custom:mini-graph-card
-              - entities:
-                  - entity: sensor.aqara_temperatura_salon_presionatm
-                font_size: 50
-                line_color: green
-                line_width: 6
-                name: Presión Atm.
-                type: custom:mini-graph-card
-            type: horizontal-stack
-        type: vertical-stack
-      - cards:
-          - color_thresholds:
-              - color: purple
-                value: 46
-              - color: magenta
-                value: 44
-              - color: red
-                value: 42
-              - color: vermillion
-                value: 40
-              - color: orange
-                value: 38
-              - color: amber
-                value: 35
-              - color: yellow
-                value: 30
-              - color: chartreuse
-                value: 25
-              - color: green
-                value: 20
-              - color: teal
-                value: 15
-              - color: blue
-                value: 10
-              - color: violet
-                value: 5
-            entities:
-              - entity: sensor.aqara_temperatura_cocina
-            font_size: 120
-            line_width: 10
-            points_per_hour: 1
-            show:
-              icon: true
-              labels: true
-              state: true
-            type: custom:mini-graph-card
-          - cards:
-              - entities:
-                  - entity: sensor.aqara_temperatura_cocina_humedad
-                font_size: 50
-                line_color: blue
-                line_width: 6
-                name: '%Humedad'
-                type: custom:mini-graph-card
-              - entities:
-                  - entity: sensor.aqara_temperatura_cocina_presionatm
-                font_size: 50
-                line_color: green
-                line_width: 6
-                name: Presión Atm.
-                type: custom:mini-graph-card
-            type: horizontal-stack
-        type: vertical-stack
-      - cards:
-          - color_thresholds:
-              - color: purple
-                value: 46
-              - color: magenta
-                value: 44
-              - color: red
-                value: 42
-              - color: vermillion
-                value: 40
-              - color: orange
-                value: 38
-              - color: amber
-                value: 35
-              - color: yellow
-                value: 30
-              - color: chartreuse
-                value: 25
-              - color: green
-                value: 20
-              - color: teal
-                value: 15
-              - color: blue
-                value: 10
-              - color: violet
-                value: 5
-              - color: black
-                value: 0
-            entities:
-              - entity: sensor.temperature_158d00025efda4
-            font_size: 120
-            line_width: 10
-            name: Dormitorio Principal
-            points_per_hour: 1
-            show:
-              icon: true
-              labels: true
-              state: true
-            type: custom:mini-graph-card
-          - cards:
-              - entities:
-                  - entity: sensor.humidity_158d00025efda4
-                font_size: 50
-                line_color: blue
-                line_width: 6
-                name: '%Humedad'
-                type: custom:mini-graph-card
-              - entities:
-                  - entity: sensor.pressure_158d00025efda4
-                font_size: 50
-                line_color: green
-                line_width: 6
-                name: Presión Atm.
-                type: custom:mini-graph-card
-            type: horizontal-stack
-        type: vertical-stack
-      - cards:
-          - color_thresholds:
-              - color: purple
-                value: 46
-              - color: magenta
-                value: 44
-              - color: red
-                value: 42
-              - color: vermillion
-                value: 40
-              - color: orange
-                value: 38
-              - color: amber
-                value: 35
-              - color: yellow
-                value: 30
-              - color: chartreuse
-                value: 25
-              - color: green
-                value: 20
-              - color: teal
-                value: 15
-              - color: blue
-                value: 10
-              - color: violet
-                value: 5
-              - color: black
-                value: 0
-            entities:
-              - entity: sensor.hue_movimiento_pasillo_temperatura
-            font_size: 120
-            line_width: 10
-            name: Pasillo
-            points_per_hour: 1
-            show:
-              icon: true
-              labels: true
-              state: true
-            type: custom:mini-graph-card
-          - cards:
-              - entities:
-                  - entity: sensor.humidity_158d0002e97092
-                font_size: 50
-                line_color: blue
-                line_width: 6
-                name: '%Humedad'
-                type: custom:mini-graph-card
-              - entities:
-                  - entity: sensor.pressure_158d0002e97092
-                font_size: 50
-                line_color: green
-                line_width: 6
-                name: Presión Atm.
-                type: custom:mini-graph-card
-            type: horizontal-stack
-        type: vertical-stack
-      - cards:
-          - color_thresholds:
-              - color: purple
-                value: 46
-              - color: magenta
-                value: 44
-              - color: red
-                value: 42
-              - color: vermillion
-                value: 40
-              - color: orange
-                value: 38
-              - color: amber
-                value: 35
-              - color: yellow
-                value: 30
-              - color: chartreuse
-                value: 25
-              - color: green
-                value: 20
-              - color: teal
-                value: 15
-              - color: blue
-                value: 10
-              - color: violet
-                value: 5
-              - color: black
-                value: 0
-            entities:
-              - entity: sensor.temperature_158d00022c6a47
-            font_size: 120
-            line_width: 10
-            name: Dormitorio Agu
-            points_per_hour: 1
-            show:
-              icon: true
-              labels: true
-              state: true
-            type: custom:mini-graph-card
-          - cards:
-              - entities:
-                  - entity: sensor.humidity_158d00022c6a47
-                font_size: 50
-                line_color: blue
-                line_width: 6
-                name: '%Humedad'
-                type: custom:mini-graph-card
-              - entities:
-                  - entity: sensor.pressure_158d00022c6a47
-                font_size: 50
-                line_color: green
-                line_width: 6
-                name: Presión Atm.
-                type: custom:mini-graph-card
-            type: horizontal-stack
-        type: vertical-stack
-      - cards:
-          - color_thresholds:
-              - color: purple
-                value: 46
-              - color: magenta
-                value: 44
-              - color: red
-                value: 42
-              - color: vermillion
-                value: 40
-              - color: orange
-                value: 38
-              - color: amber
-                value: 35
-              - color: yellow
-                value: 30
-              - color: chartreuse
-                value: 25
-              - color: green
-                value: 20
-              - color: teal
-                value: 15
-              - color: blue
-                value: 10
-              - color: violet
-                value: 5
-              - color: black
-                value: 0
-            entities:
-              - entity: sensor.temperature_158d0002e97092
-            font_size: 120
-            line_width: 10
-            name: Dormitorio Paloma
-            points_per_hour: 1
-            show:
-              icon: true
-              labels: true
-              state: true
-            type: custom:mini-graph-card
-          - cards:
-              - entities:
-                  - entity: sensor.humidity_158d0002e97092
-                font_size: 50
-                line_color: blue
-                line_width: 6
-                name: '%Humedad'
-                type: custom:mini-graph-card
-              - entities:
-                  - entity: sensor.pressure_158d0002e97092
-                font_size: 50
-                line_color: green
-                line_width: 6
-                name: Presión Atm.
-                type: custom:mini-graph-card
             type: horizontal-stack
         type: vertical-stack
     icon: mdi:thermometer-lines
@@ -3674,544 +3742,6 @@ views:
             show_header_toggle: false
             type: entities
         type: vertical-stack
-  - badges: []
-    cards:
-      - cards:
-          - show_state: true
-            show_name: true
-            camera_view: auto
-            type: picture-entity
-            image: /local/Home_Room_Estudio_Desksetup_RGB.jpg
-            hold_action:
-              action: toggle
-            name: Luz Estudio Setup
-            aspect_ratio: '4'
-            entity: light.luz_estudio_setup
-          - cards:
-              - type: custom:mushroom-entity-card
-                entity: scene.estudio_setup_high
-                fill_container: true
-                layout: horizontal
-                tap_action:
-                  action: call-service
-                  service: scene.turn_on
-                  target:
-                    entity_id: scene.estudio_setup_high
-                  data: {}
-                name: High
-                icon: ''
-                icon_color: blue-grey
-              - type: custom:mushroom-entity-card
-                fill_container: true
-                layout: horizontal
-                tap_action:
-                  action: call-service
-                  service: scene.turn_on
-                  target:
-                    entity_id: scene.estudio_setup_soft
-                  data:
-                    transition: 3
-                name: Soft
-                icon: ''
-                icon_color: blue-grey
-                entity: scene.estudio_setup_soft
-              - type: custom:mushroom-entity-card
-                entity: scene.estudio_setup_call
-                fill_container: true
-                layout: horizontal
-                tap_action:
-                  action: call-service
-                  service: scene.turn_on
-                  target:
-                    entity_id: scene.estudio_setup_call
-                  data:
-                    transition: 3
-                name: Webcam
-                icon: mdi:webcam
-                icon_color: blue-grey
-                secondary_info: last-changed
-            type: horizontal-stack
-          - cards:
-              - type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: false
-                show_color_control: true
-                collapsible_controls: false
-                entity: light.luz_estudio_nate
-                name: Nate
-                tap_action:
-                  action: toggle
-              - type: custom:mushroom-entity-card
-                fill_container: true
-                name: Desk
-                entity: switch.esphome_bas_sw3
-                icon_color: pink
-                secondary_info: last-changed
-                tap_action:
-                  action: toggle
-              - type: custom:mushroom-entity-card
-                fill_container: true
-                name: Fan
-                entity: switch.esphome_s26_sw1
-                icon_color: black
-                secondary_info: last-changed
-                tap_action:
-                  action: toggle
-            type: horizontal-stack
-          - cards:
-              - type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: false
-                show_color_control: true
-                collapsible_controls: false
-                entity: light.luz_estudio_izquierda
-                name: Izqda.
-              - type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: false
-                show_color_control: true
-                collapsible_controls: false
-                name: Led Desk
-                entity: light.luz_estudio_led_mesa
-              - type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: true
-                show_color_control: true
-                collapsible_controls: false
-                entity: light.luz_estudio_derecha
-                name: Dcha.
-            type: horizontal-stack
-          - cards:
-              - type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: false
-                show_color_control: false
-                collapsible_controls: false
-                entity: light.luz_estudio_play_i
-                name: Play I
-              - type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: false
-                show_color_control: false
-                collapsible_controls: false
-                entity: light.luz_estudio_play_c
-                name: Play C
-              - type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: false
-                show_color_control: false
-                collapsible_controls: false
-                entity: light.luz_estudio_play_d
-                name: Play D
-            type: horizontal-stack
-        type: vertical-stack
-      - cards:
-          - show_state: true
-            show_name: true
-            camera_view: auto
-            type: picture-entity
-            image: /local/Home_Room_Estudio_Sala_RGB.jpg
-            hold_action:
-              action: toggle
-            name: Luz Estudio Sala
-            entity: light.luz_estudio_sala
-            aspect_ratio: '4'
-          - cards:
-              - type: custom:mushroom-entity-card
-                entity: scene.estudio_full
-                fill_container: true
-                layout: horizontal
-                tap_action:
-                  action: call-service
-                  service: scene.turn_on
-                  target:
-                    entity_id: scene.estudio_full
-                  data:
-                    transition: 3
-                name: Full
-                icon: ''
-                icon_color: yellow
-              - type: custom:mushroom-entity-card
-                entity: scene.estudio_setup_night
-                fill_container: true
-                layout: horizontal
-                tap_action:
-                  action: call-service
-                  service: scene.turn_on
-                  target:
-                    entity_id: scene.estudio_setup_night
-                  data:
-                    transition: 3
-                name: Noche
-                icon: ''
-                icon_color: light-blue
-              - type: custom:mushroom-entity-card
-                entity: scene.estudio_home_cinema_z
-                fill_container: true
-                layout: horizontal
-                tap_action:
-                  action: call-service
-                  service: scene.turn_on
-                  target:
-                    entity_id: scene.estudio_home_cinema_z
-                  data:
-                    transition: 3
-                icon: mdi:dolby
-                icon_color: purple
-                name: Cinema
-            type: horizontal-stack
-          - cards:
-              - type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: true
-                show_color_control: true
-                collapsible_controls: false
-                entity: light.luz_estudio_techo
-                name: Techo
-              - type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: true
-                show_color_control: true
-                collapsible_controls: false
-                entity: light.luz_estudio_armario
-                name: Closet
-              - type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: false
-                show_color_control: true
-                collapsible_controls: false
-                entity: light.luz_estudio_alta
-                name: Alta
-            type: horizontal-stack
-          - cards:
-              - type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: true
-                show_color_control: true
-                collapsible_controls: false
-                entity: light.luz_estudio_escalera
-                name: Escalera
-              - type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: false
-                show_color_control: true
-                collapsible_controls: false
-                name: Beer
-                entity: light.luz_estudio_beer
-              - type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: false
-                show_color_control: true
-                collapsible_controls: false
-                name: Media
-                entity: light.luz_estudio_media
-            type: horizontal-stack
-          - cards:
-              - type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: false
-                show_color_control: false
-                collapsible_controls: false
-                entity: light.luz_estudio_lamparita
-                name: TV I
-              - type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: false
-                show_color_control: false
-                collapsible_controls: false
-                name: LED TV
-                entity: light.led_estudio_tv
-              - type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: false
-                show_color_control: false
-                collapsible_controls: false
-                entity: light.luz_estudio_tv
-                name: TV D
-            type: horizontal-stack
-        type: vertical-stack
-      - type: vertical-stack
-        cards:
-          - show_state: true
-            show_name: true
-            camera_view: auto
-            type: picture-entity
-            image: /local/Estudio_AA_s0_1600x800.jpg
-            entity: binary_sensor.melcloud_estudio_estate
-            name: A/A Estudio
-            tap_action:
-              action: call-service
-              service: climate.turn_on
-              service_data: {}
-              target:
-                device_id: e3baccf0bd493b061ec0fd82f41e5622
-            hold_action:
-              action: call-service
-              service: climate.turn_off
-              service_data: {}
-              target:
-                device_id: e3baccf0bd493b061ec0fd82f41e5622
-            aspect_ratio: '4'
-          - cards:
-              - type: custom:mushroom-entity-card
-                fill_container: false
-                name: Mode
-                layout: horizontal
-                entity: sensor.melcloud_estudio_state
-              - type: custom:mushroom-entity-card
-                fill_container: false
-                name: Fan
-                layout: horizontal
-                entity: sensor.melcloud_estudio_fan_mode
-              - type: custom:mushroom-entity-card
-                entity: sensor.melcloud_estudio_swing_mode
-                fill_container: true
-                name: Swing
-                layout: horizontal
-            type: horizontal-stack
-          - type: custom:mushroom-climate-card
-            entity: climate.aa_estudio
-            fill_container: true
-            show_temperature_control: true
-            collapsible_controls: false
-            hvac_modes:
-              - heat
-              - cool
-              - 'off'
-              - fan_only
-            secondary_info: state
-            tap_action:
-              action: more-info
-          - color_thresholds:
-              - color: purple
-                value: 46
-              - color: magenta
-                value: 44
-              - color: red
-                value: 42
-              - color: vermillion
-                value: 40
-              - color: orange
-                value: 38
-              - color: amber
-                value: 35
-              - color: yellow
-                value: 30
-              - color: chartreuse
-                value: 25
-              - color: green
-                value: 20
-              - color: teal
-                value: 15
-              - color: blue
-                value: 10
-              - color: violet
-                value: 5
-              - color: black
-                value: 0
-            entities:
-              - entity: sensor.ly1_desk_setup_temperatura
-            name: Temperatura Estudio
-            font_size: 120
-            line_width: 3
-            points_per_hour: 1
-            show:
-              icon: true
-              labels: true
-              state: true
-            type: custom:mini-graph-card
-      - cards:
-          - entity: media_player.echo_alexa_estudio
-            type: media-control
-          - cards:
-              - type: custom:mushroom-entity-card
-                fill_container: true
-                name: Alexa No Molestar
-                icon_color: pink
-                secondary_info: last-changed
-                entity: switch.echo_alexa_estudio_do_not_disturb_switch
-                tap_action:
-                  action: toggle
-              - type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: false
-                show_color_control: true
-                collapsible_controls: false
-                entity: sensor.echo_alexa_estudio_next_alarm
-                name: Alarma
-            type: horizontal-stack
-          - type: horizontal-stack
-            cards:
-              - type: custom:mushroom-entity-card
-                entity: binary_sensor.aqara_puerta_estudio_armario
-                name: Armario
-                fill_container: false
-                layout: vertical
-                icon_type: none
-              - entity: binary_sensor.aqara_ventana_estudio_izquierda
-                type: custom:mushroom-entity-card
-                fill_container: false
-                layout: vertical
-                name: Izquierda
-                icon_type: none
-              - type: custom:mushroom-entity-card
-                name: Derecha
-                fill_container: false
-                icon_type: none
-                layout: vertical
-                entity: binary_sensor.aqara_ventana_estudio_derecha
-              - type: custom:mushroom-entity-card
-                fill_container: false
-                icon_type: none
-                layout: vertical
-                entity: binary_sensor.aqara_puerta_estudio_desvan
-                name: Desván
-          - type: custom:mushroom-cover-card
-            entity: cover.estudio_persiana
-            name: Persiana
-            fill_container: true
-            show_position_control: true
-            show_buttons_control: true
-            icon_type: icon
-          - cards:
-              - entity: switch.esphome_dual_sw1_relay_1
-                tap_action:
-                  action: call-service
-                  service: script.estudio_persiana_up_full
-                  data: {}
-                  target: {}
-                type: custom:mushroom-entity-card
-                name: Up
-                icon: mdi:window-shutter-open
-                fill_container: true
-                layout: horizontal
-                icon_color: red
-                secondary_info: none
-              - entity: switch.esphome_dual_sw1_relay_1
-                tap_action:
-                  action: call-service
-                  service: script.estudio_persiana_up_1s
-                  data: {}
-                  target: {}
-                type: custom:mushroom-entity-card
-                name: 1"
-                icon: mdi:upload
-                fill_container: true
-                icon_color: amber
-                secondary_info: none
-              - entity: switch.esphome_dual_sw1_relay_2
-                tap_action:
-                  action: call-service
-                  service: script.estudio_persiana_down_1s
-                  data: {}
-                  target: {}
-                type: custom:mushroom-entity-card
-                name: 1"
-                icon: mdi:download
-                icon_color: indigo
-                fill_container: true
-                secondary_info: none
-              - entity: switch.esphome_dual_sw1_relay_1
-                tap_action:
-                  action: call-service
-                  service: script.estudio_persiana_up_3s
-                  data: {}
-                  target: {}
-                type: custom:mushroom-entity-card
-                name: 3"
-                icon: mdi:upload-multiple
-                icon_color: amber
-                fill_container: true
-                secondary_info: none
-              - entity: switch.esphome_dual_sw1_relay_2
-                tap_action:
-                  action: call-service
-                  service: script.estudio_persiana_down_3s
-                  data: {}
-                  target: {}
-                type: custom:mushroom-entity-card
-                name: 3"
-                icon: mdi:download-multiple
-                icon_color: indigo
-                fill_container: true
-                secondary_info: none
-            type: horizontal-stack
-          - cards:
-              - entity: switch.esphome_dual_sw1_relay_2
-                tap_action:
-                  action: call-service
-                  service: script.estudio_persiana_down_full
-                  data: {}
-                  target: {}
-                type: custom:mushroom-entity-card
-                name: Down
-                icon: mdi:window-shutter
-                icon_color: pink
-                fill_container: true
-                secondary_info: none
-              - entity: switch.esphome_dual_sw1_relay_2
-                tap_action:
-                  action: call-service
-                  service: script.estudio_persiana_down_1s
-                  data: {}
-                  target: {}
-                type: custom:mushroom-entity-card
-                name: 1"
-                icon: mdi:download
-                icon_color: indigo
-                fill_container: true
-                secondary_info: none
-              - entity: switch.esphome_dual_sw1_relay_2
-                tap_action:
-                  action: call-service
-                  service: script.estudio_persiana_down_3s
-                  data: {}
-                  target: {}
-                type: custom:mushroom-entity-card
-                name: 3"
-                icon: mdi:download-multiple
-                icon_color: indigo
-                fill_container: true
-                secondary_info: none
-            type: horizontal-stack
-        type: vertical-stack
-    icon: mdi:desktop-mac-dashboard
-    path: estudio_view
-    title: Estudio
   - title: Areas
     path: areas_view
     icon: mdi:home-floor-a
@@ -4419,406 +3949,140 @@ views:
     badges: []
     cards:
       - cards:
-          - color_thresholds:
-              - color: black
-                value: 0
-              - color: violet
-                value: 5
-              - color: blue
-                value: 10
-              - color: teal
-                value: 15
-              - color: green
-                value: 20
-              - color: chartreuse
-                value: 25
-              - color: yellow
-                value: 30
-              - color: amber
-                value: 35
-              - color: orange
-                value: 38
-              - color: vermillion
-                value: 40
-              - color: red
-                value: 42
-              - color: magenta
-                value: 44
-              - color: purple
-                value: 46
-            entities:
-              - sensor.temperature_158d0002e97092
-            font_size: 120
-            line_width: 8
-            name: Temperatura Dormitorio PAF
-            points_per_hour: 1
-            show:
-              icon: true
-              labels: true
-              state: true
-            type: custom:mini-graph-card
-          - color_thresholds:
-              - color: black
-                value: 0
-              - color: violet
-                value: 5
-              - color: blue
-                value: 10
-              - color: teal
-                value: 20
-              - color: green
-                value: 30
-              - color: chartreuse
-                value: 40
-              - color: orange
-                value: 50
-              - color: amber
-                value: 60
-              - color: yellow
-                value: 70
-              - color: red
-                value: 80
-              - color: magenta
-                value: 90
-              - color: purple
-                value: 100
-            entities:
-              - sensor.illumination_158d0002e97092
-            font_size: 120
-            line_width: 8
-            name: Sensor Luz
-            points_per_hour: 0.5
-            show:
-              icon: true
-              labels: true
-              state: true
-            type: custom:mini-graph-card
+          - type: area
+            area: 8e63aa03d2e54d86919f00630adbc11d
+          - cards:
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: true
+                show_color_temp_control: true
+                show_color_control: true
+                collapsible_controls: false
+                entity: light.luz_dormitorio_agustin
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: true
+                show_color_temp_control: true
+                show_color_control: true
+                collapsible_controls: false
+                entity: light.luz_dormitorio_malen
+            type: horizontal-stack
+          - entities:
+              - input_boolean.calefac_programador_mfc
+              - switch.esphome_s20_sw1
+              - light.esphome_s20_sw1_led
+            show_header_toggle: false
+            state_color: true
+            type: entities
           - cards:
               - entities:
-                  - sensor.humidity_158d0002e97092
-                font_size: 50
-                line_color: blue
-                line_width: 6
-                name: Sensor Humedad
-                type: custom:mini-graph-card
-              - entities:
-                  - sensor.pressure_158d0002e97092
+                  - sensor.temperature_158d00025efda4
                 font_size: 50
                 line_color: green
                 line_width: 6
-                name: Sensor P.Atm
+                name: Temperatura
                 type: custom:mini-graph-card
+              - entities:
+                  - sensor.humidity_158d00025efda4
+                font_size: 50
+                line_color: blue
+                line_width: 6
+                name: Humedad
+                type: custom:mini-graph-card
+              - entities:
+                  - sensor.illumination_158d0002ea1d0f
+                font_size: 50
+                line_color: green
+                line_width: 6
+                name: Luz
+                type: custom:mini-graph-card
+            type: horizontal-stack
+        type: vertical-stack
+      - cards:
+          - type: area
+            area: dormitorio_paf
+          - cards:
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: true
+                show_color_temp_control: true
+                show_color_control: true
+                collapsible_controls: false
+                entity: light.luz_dormitorio_paf_mesa
+                layout: vertical
             type: horizontal-stack
           - entities:
               - input_boolean.calefac_programador_paf
               - switch.esphome_s20_sw3
               - light.esphome_s20_sw3_led
             show_header_toggle: false
-            title: Dormitorio PAF
             state_color: true
             type: entities
+          - cards:
+              - entities:
+                  - sensor.temperature_158d0002e97092
+                font_size: 50
+                line_color: green
+                line_width: 6
+                name: Temperatura
+                type: custom:mini-graph-card
+              - entities:
+                  - sensor.humidity_158d0002e97092
+                font_size: 50
+                line_color: blue
+                line_width: 6
+                name: Humedad
+                type: custom:mini-graph-card
+            type: horizontal-stack
         type: vertical-stack
       - cards:
-          - color_thresholds:
-              - color: black
-                value: 0
-              - color: violet
-                value: 5
-              - color: blue
-                value: 10
-              - color: teal
-                value: 15
-              - color: green
-                value: 20
-              - color: chartreuse
-                value: 25
-              - color: yellow
-                value: 30
-              - color: amber
-                value: 35
-              - color: orange
-                value: 38
-              - color: vermillion
-                value: 40
-              - color: red
-                value: 42
-              - color: magenta
-                value: 44
-              - color: purple
-                value: 46
-            entities:
-              - sensor.temperature_158d00022c6a47
-            font_size: 120
-            line_width: 8
-            name: Temperatura Dormitorio AAF
-            points_per_hour: 1
-            show:
-              icon: true
-              labels: true
-              state: true
-            type: custom:mini-graph-card
-          - color_thresholds:
-              - color: black
-                value: 0
-              - color: violet
-                value: 5
-              - color: blue
-                value: 10
-              - color: teal
-                value: 20
-              - color: green
-                value: 30
-              - color: chartreuse
-                value: 40
-              - color: orange
-                value: 50
-              - color: amber
-                value: 60
-              - color: yellow
-                value: 70
-              - color: red
-                value: 80
-              - color: magenta
-                value: 90
-              - color: purple
-                value: 100
-            entities:
-              - sensor.illumination_158d00022c6a47
-            font_size: 120
-            line_width: 8
-            name: Sensor Luz
-            points_per_hour: 0.5
-            show:
-              icon: true
-              labels: true
-              state: true
-            type: custom:mini-graph-card
+          - type: area
+            area: dormitorio_aaf
           - cards:
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: true
+                show_color_temp_control: true
+                show_color_control: true
+                collapsible_controls: false
+                entity: light.led_mesa_agu
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: true
+                show_color_temp_control: true
+                show_color_control: true
+                collapsible_controls: false
+                entity: light.luz_dormitorio_aaf_mesilla
+            type: horizontal-stack
+          - entities:
+              - input_boolean.calefac_programador_aaf
+              - switch.esphome_s20_sw3
+              - light.esphome_s20_sw3_led
+            show_header_toggle: false
+            state_color: true
+            type: entities
+          - cards:
+              - entities:
+                  - sensor.temperature_158d00022c6a47
+                font_size: 50
+                line_color: green
+                line_width: 6
+                name: Temperatura
+                type: custom:mini-graph-card
               - entities:
                   - sensor.humidity_158d00022c6a47
                 font_size: 50
                 line_color: blue
                 line_width: 6
-                name: Sensor Humedad
-                type: custom:mini-graph-card
-              - entities:
-                  - sensor.pressure_158d00022c6a47
-                font_size: 50
-                line_color: green
-                line_width: 6
-                name: Sensor P.Atm
-                type: custom:mini-graph-card
-            type: horizontal-stack
-          - entities:
-              - entity: input_boolean.calefac_programador_aaf
-            show_header_toggle: false
-            title: Dormitorio AAF
-            state_color: true
-            type: entities
-        type: vertical-stack
-  - badges: []
-    cards:
-      - type: area
-        area: 8e63aa03d2e54d86919f00630adbc11d
-      - entities:
-          - binary_sensor.motion_sensor_158d0002ea1d0f
-          - sensor.illumination_158d0002ea1d0f
-          - switch.esphome_s20_sw1
-          - entity: light.luz_dormitorio_mfc
-          - entity: light.luz_dormitorio_aac
-        entity: light.dormitorio
-        state_image:
-          'off': /local/Home_Room_Dormitorio_BW.jpg
-          'on': /local/Home_Room_Dormitorio_RGB.jpg
-        title: Dormitorio
-        type: picture-glance
-      - cards:
-          - entities:
-              - entity: input_boolean.dormitorio_warning
-                name: Lectura Warning Mode
-              - entity: light.luz_dormitorio_malen
-              - entity: light.luz_dormitorio_agustin
-            show_header_toggle: false
-            title: Luces Dormitorio
-            state_color: true
-            type: entities
-          - cards:
-              - show_name: true
-                show_icon: true
-                entity: light.luz_dormitorio
-                hold_action:
-                  action: call-service
-                  service: light.turn_off
-                  service_data:
-                    entity_id: light.dormitorio
-                name: Lectura
-                type: entity-button
-                tap_action:
-                  action: call-service
-                  service: scene.turn_on
-                  data:
-                    transition: 3
-                  target:
-                    entity_id: scene.dormitorio_lectura
-              - show_name: true
-                show_icon: true
-                entity: light.luz_dormitorio
-                hold_action:
-                  action: call-service
-                  service: light.turn_off
-                  service_data:
-                    entity_id: light.dormitorio
-                name: Relax
-                type: entity-button
-                tap_action:
-                  action: call-service
-                  service: scene.turn_on
-                  data:
-                    transition: 3
-                  target:
-                    entity_id: scene.dormitorio_relax
-            type: horizontal-stack
-          - cards:
-              - show_name: true
-                show_icon: true
-                entity: light.luz_dormitorio
-                hold_action:
-                  action: call-service
-                  service: light.turn_off
-                  service_data:
-                    entity_id: light.dormitorio
-                name: Tenue
-                type: entity-button
-                tap_action:
-                  action: call-service
-                  service: scene.turn_on
-                  data:
-                    transition: 3
-                  target:
-                    entity_id: scene.dormitorio_tenue
-              - show_name: true
-                show_icon: true
-                entity: light.luz_dormitorio
-                hold_action:
-                  action: call-service
-                  service: light.turn_off
-                  service_data:
-                    entity_id: light.dormitorio
-                name: Noche
-                type: entity-button
-                tap_action:
-                  action: call-service
-                  service: scene.turn_on
-                  data:
-                    transition: 3
-                  target:
-                    entity_id: scene.dormitorio_noche
-            type: horizontal-stack
-        type: vertical-stack
-      - cards:
-          - color_thresholds:
-              - color: black
-                value: 0
-              - color: violet
-                value: 5
-              - color: blue
-                value: 10
-              - color: teal
-                value: 15
-              - color: green
-                value: 20
-              - color: chartreuse
-                value: 25
-              - color: yellow
-                value: 30
-              - color: amber
-                value: 35
-              - color: orange
-                value: 38
-              - color: vermillion
-                value: 40
-              - color: red
-                value: 42
-              - color: magenta
-                value: 44
-              - color: purple
-                value: 46
-            entities:
-              - sensor.temperature_158d00025efda4
-            font_size: 120
-            line_width: 8
-            name: Sensor Temperatura
-            points_per_hour: 1
-            show:
-              icon: true
-              labels: true
-              state: true
-            type: custom:mini-graph-card
-          - color_thresholds:
-              - color: black
-                value: 0
-              - color: violet
-                value: 5
-              - color: blue
-                value: 10
-              - color: teal
-                value: 15
-              - color: green
-                value: 20
-              - color: chartreuse
-                value: 25
-              - color: orange
-                value: 30
-              - color: amber
-                value: 35
-              - color: yellow
-                value: 38
-              - color: red
-                value: 40
-              - color: magenta
-                value: 42
-              - color: purple
-                value: 44
-            entities:
-              - sensor.illumination_158d0002ea1d0f
-            font_size: 120
-            line_width: 8
-            name: Sensor Luz
-            points_per_hour: 0.5
-            show:
-              icon: true
-              labels: true
-              state: true
-            type: custom:mini-graph-card
-          - cards:
-              - entities:
-                  - sensor.humidity_158d00025efda4
-                font_size: 50
-                line_color: blue
-                line_width: 6
-                name: Sensor Humedad
-                type: custom:mini-graph-card
-              - entities:
-                  - sensor.pressure_158d00025efda4
-                font_size: 50
-                line_color: green
-                line_width: 6
-                name: Sensor P.Atm.
-                show_header_toggle: false
+                name: '%Humedad'
                 type: custom:mini-graph-card
             type: horizontal-stack
         type: vertical-stack
-      - entities:
-          - input_boolean.calefac_programador_mfc
-          - switch.esphome_s20_sw1
-          - light.esphome_s20_sw1_led
-        show_header_toggle: false
-        title: Smart Switch (s20_sw1)
-        state_color: true
-        type: entities
-    icon: mdi:bed-empty
-    path: dormitorio_view
-    title: Dormitorio Principal
   - badges: []
     cards:
       - cards:
@@ -5146,22 +4410,6 @@ views:
             state_color: true
             type: entities
         type: vertical-stack
-      - cards:
-          - entities:
-              - entity: binary_sensor.hub_philips_hue
-              - entity: binary_sensor.xiaomi_aqara_gateway
-            show_header_toggle: false
-            title: IOT Hubs Devices
-            state_color: true
-            type: entities
-        type: vertical-stack
-      - entities:
-          - entity: automation.p02_ping_ap_wifi_tplink
-          - entity: automation.s04_sonoff_4ch_status
-        show_header_toggle: false
-        title: Reglas Conectividad Ping
-        state_color: true
-        type: entities
       - color_thresholds:
           - color: '#e45e65'
             value: 40
@@ -5190,14 +4438,29 @@ views:
           name: true
           state: true
         type: custom:mini-graph-card
+      - entities:
+          - entity: automation.p01_test_conectividad_ping_router
+          - entity: automation.p02_test_conectividad_ping_wifi_tplink
+          - entity: automation.p03_test_conectividad_ping_sonoff_4ch_status
+        show_header_toggle: true
+        title: Test Conectividad Ping
+        state_color: true
+        type: entities
       - cards:
           - entities:
-              - entity: binary_sensor.nmap_macbook_pro_aac_lan
-              - entity: binary_sensor.nmap_macbook_pro_mfc_wifi
-              - entity: binary_sensor.nmap_asus_zenbook_wifi
-              - entity: binary_sensor.nmap_macbook_air_paf
+              - entity: binary_sensor.laptop_aac
+              - entity: binary_sensor.laptop_macbook_aac
+              - entity: binary_sensor.laptop_macbook_mfc
+              - entity: binary_sensor.laptop_dell_aac
+              - entity: binary_sensor.laptop_macbook_paf
+              - entity: binary_sensor.ping_dell_windows_cgi_aac
+              - entity: binary_sensor.ping_asus_windows_aaf
+              - entity: device_tracker.apple_13_b4_97_mac_aac_lan
+              - entity: device_tracker.apple_69_64_86_mac_aac
+              - entity: device_tracker.asus_59_60_50_win_aaf
+              - entity: device_tracker.dell_6c_55_bf_win_aac
             show_header_toggle: false
-            title: Computers Devices (nmap)
+            title: Computers Devices (nmap+ping)
             state_color: true
             type: entities
         type: vertical-stack
@@ -5401,7 +4664,7 @@ views:
         title: Sensores Movimiento Interior
         entities:
           - type: custom:battery-entity-row
-            entity: binary_sensor.motion_sensor_158d0001e637f6
+            entity: sensor.aqara_movimiento_exterior_bateria
             attribute: battery_percent
             unit: '%'
             secondary_info: last-changed
@@ -5994,193 +5257,77 @@ views:
                 icon: mdi:leaf
             type: horizontal-stack
         type: vertical-stack
-      - entities:
-          - entity: group.luces_interior_grp
-            icon: mdi:home-lightbulb-outline
-          - entity: group.luces_planta_alta_grp
-            icon: mdi:lightbulb-group
-          - entity: group.luces_planta_baja_grp
-            icon: mdi:lightbulb-group-outline
-          - entity: light.luz_jardin
-            icon: mdi:tree-outline
-          - entity: group.luces_casa_grp
-            icon: mdi:home-lightbulb
-        show_header_toggle: false
-        title: Luces De Toda La Casa
-        state_color: true
-        type: entities
       - cards:
           - cards:
-              - type: custom:mushroom-light-card
-                entity: light.luz_estudio_nate
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: true
-                show_color_control: true
-                layout: vertical
-                collapsible_controls: true
-                name: Nate
-              - type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: true
-                show_color_control: true
-                layout: vertical
-                collapsible_controls: true
-                entity: light.luz_estudio_izquierda
-                name: Izquierda
-              - entity: light.luz_estudio_led_mesa
-                type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: false
-                show_color_control: false
-                layout: vertical
-                collapsible_controls: true
-                name: Led Mesa
-              - entity: light.luz_estudio_alta
-                type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: false
-                show_color_control: false
-                layout: vertical
-                collapsible_controls: true
-                name: Alta
+              - show_name: true
+                show_icon: true
+                entity: light.luz_dormitorio
+                hold_action:
+                  action: call-service
+                  service: light.turn_off
+                  service_data:
+                    entity_id: light.dormitorio
+                name: Lectura
+                type: entity-button
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  data:
+                    transition: 3
+                  target:
+                    entity_id: scene.dormitorio_lectura
+              - show_name: true
+                show_icon: true
+                entity: light.luz_dormitorio
+                hold_action:
+                  action: call-service
+                  service: light.turn_off
+                  service_data:
+                    entity_id: light.dormitorio
+                name: Relax
+                type: entity-button
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  data:
+                    transition: 3
+                  target:
+                    entity_id: scene.dormitorio_relax
             type: horizontal-stack
           - cards:
-              - entity: light.luz_estudio_play_i
-                type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: false
-                show_color_control: false
-                layout: vertical
-                collapsible_controls: true
-                name: Play Izq
-              - entity: light.luz_estudio_play_c
-                type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: false
-                show_color_control: false
-                layout: vertical
-                collapsible_controls: true
-                name: Play Centro
-              - entity: light.luz_estudio_play_d
-                type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: false
-                show_color_control: false
-                layout: vertical
-                collapsible_controls: true
-                name: Play Der
-              - entity: light.luz_estudio_media
-                type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: false
-                show_color_control: false
-                layout: vertical
-                collapsible_controls: true
-                name: Media
-            type: horizontal-stack
-          - cards:
-              - entity: light.luz_estudio_tv
-                type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: false
-                show_color_control: false
-                layout: vertical
-                collapsible_controls: true
-                name: TV
-              - entity: light.led_estudio_tv
-                type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: false
-                show_color_control: false
-                layout: vertical
-                collapsible_controls: true
-                name: Led TV
-              - entity: light.luz_estudio_techo
-                type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: false
-                show_color_control: false
-                layout: vertical
-                collapsible_controls: true
-                name: Hue Techo
-              - type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: true
-                show_color_control: true
-                collapsible_controls: true
-                entity: light.luz_estudio_baja
-                name: Baja
-                layout: vertical
-            type: horizontal-stack
-          - cards:
-              - entity: light.luz_estudio_armario
-                type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: false
-                show_color_control: false
-                layout: vertical
-                collapsible_controls: true
-                name: Armario
-                secondary_info: last-changed
-              - entity: light.luz_estudio_beer
-                type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: false
-                show_color_control: false
-                layout: vertical
-                collapsible_controls: true
-                name: Cuadro Beer
-                secondary_info: last-changed
-              - entity: light.luz_estudio_lamparita
-                type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: false
-                show_color_control: false
-                layout: vertical
-                collapsible_controls: true
-                name: Lamparita
-                secondary_info: last-changed
-              - type: custom:mushroom-light-card
-                entity: light.luz_estudio_escalera
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: false
-                show_color_control: false
-                layout: vertical
-                collapsible_controls: true
-                name: Escalera
-                icon: ''
-                secondary_info: last-changed
+              - show_name: true
+                show_icon: true
+                entity: light.luz_dormitorio
+                hold_action:
+                  action: call-service
+                  service: light.turn_off
+                  service_data:
+                    entity_id: light.dormitorio
+                name: Tenue
+                type: entity-button
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  data:
+                    transition: 3
+                  target:
+                    entity_id: scene.dormitorio_tenue
+              - show_name: true
+                show_icon: true
+                entity: light.luz_dormitorio
+                hold_action:
+                  action: call-service
+                  service: light.turn_off
+                  service_data:
+                    entity_id: light.dormitorio
+                name: Noche
+                type: entity-button
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  data:
+                    transition: 3
+                  target:
+                    entity_id: scene.dormitorio_noche
             type: horizontal-stack
         type: vertical-stack

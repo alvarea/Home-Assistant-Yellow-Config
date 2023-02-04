@@ -42,21 +42,24 @@ alarma_sensores_presencia_interior_grp:
   # Binary sensors Z calculados como sensor_movimiento_X = on AND input_boleean_X = on
   # Permite desactivar sensores de movimiento.
   entities:
-    - binary_sensor.blink_hall_motion_detected
-    - binary_sensor.alarma_sensor_movimiento_salon
-    - binary_sensor.alarma_sensor_movimiento_estudio
-    - binary_sensor.alarma_sensor_movimiento_entrada_hall
-    - binary_sensor.alarma_sensor_movimiento_dormitorio_principal
-    - binary_sensor.alarma_sensor_movimiento_pasillo
+    - binary_sensor.alarma_sensor_movimiento_blink_hall                 # Blink Entrada Hall
+    - binary_sensor.alarma_sensor_movimiento_blink_estudio              # Blink Estudio
+    - binary_sensor.alarma_sensor_movimiento_salon                      # Aqara Presencia Salón
+    - binary_sensor.alarma_sensor_movimiento_estudio                    # Aqara Presencia Estudio
+    - binary_sensor.alarma_sensor_movimiento_entrada_hall               # Aqara Presencia Salón
+    - binary_sensor.alarma_sensor_movimiento_dormitorio_principal       # Aqara Presencia Salón
+    - binary_sensor.alarma_sensor_movimiento_pasillo                    # Hue Presencia Salón
 
 alarma_sensores_presencia_exterior_grp:
   name: Grupo Sensores Presencia Exterior
   entities:
-    - binary_sensor.alarma_sensor_presencia_entrada_exterior    # Presencia Entrada Exterior
-    - binary_sensor.blink_puerta_garaje_motion_detected         # Blink Puerta Garaje
-    - binary_sensor.blink_puerta_principal_motion_detected      # Blink Puerta Principal
-    - binary_sensor.blink_piscina_motion_detected               # Blink Piscina
-    - binary_sensor.blink_porche_motion_detected                # Blink Porche
+  # Binary sensors Z calculados como sensor_movimiento_X = on AND input_boleean_X = on
+  # Permite desactivar sensores de movimiento.
+    - binary_sensor.alarma_sensor_movimiento_entrada_exterior            # Presencia Entrada Exterior
+    - binary_sensor.alarma_sensor_movimiento_blink_puerta_garaje         # Blink Puerta Garaje
+    - binary_sensor.alarma_sensor_movimiento_blink_puerta_principal      # Blink Puerta Principal
+    - binary_sensor.alarma_sensor_movimiento_blink_piscina               # Blink Piscina
+    - binary_sensor.alarma_sensor_movimiento_blink_porche                # Blink Porche
 
 alarma_sensores_luz_grp:
   name: Grupo Sensores Luz

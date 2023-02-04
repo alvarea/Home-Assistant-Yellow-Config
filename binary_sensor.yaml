@@ -223,7 +223,9 @@
       # La alarma usa estos sensores en el grupo <group.alarma_sensores_presencia_interior_grp> durante el armado away.
       #
       #
-      # AQARA Movimiento Pasillo - ZHA OK
+      # SENSORES PRESENCIA INTERIOR
+      #
+      # AQARA Movimiento Salón - ZHA OK
       alarma_sensor_movimiento_salon:
         value_template: >-
           {%  if is_state('input_boolean.alarma_sensor_movimiento_salon','on')
@@ -253,7 +255,7 @@
           {% else %} mdi:motion-sensor-off
           {% endif %}
 
-      # AQARA Movimiento Entrada - ZHA OK
+      # AQARA Movimiento Entrada Hall Interior - ZHA OK
       alarma_sensor_movimiento_entrada_hall:
         value_template: >-
           {%  if is_state('input_boolean.alarma_sensor_movimiento_entrada_hall','on')
@@ -265,21 +267,6 @@
           {% endif %}
         icon_template: >-
           {% if is_state('binary_sensor.alarma_sensor_movimiento_entrada_hall','on') %} mdi:motion-sensor
-          {% else %} mdi:motion-sensor-off
-          {% endif %}
-
-      # AQARA Movimiento Entrada Exterior - ZHA PENDING
-      alarma_sensor_movimiento_entrada_exterior:
-        value_template: >-
-          {%  if is_state('input_boolean.alarma_sensor_movimiento_entrada_exterior','on')
-              and is_state('binary_sensor.motion_sensor_158d0001e637f6','on')
-          %}
-            true
-          {% else %}
-            false
-          {% endif %}
-        icon_template: >-
-          {% if is_state('binary_sensor.alarma_sensor_movimiento_entrada_exterior','on') %} mdi:motion-sensor
           {% else %} mdi:motion-sensor-off
           {% endif %}
 
@@ -302,7 +289,7 @@
       alarma_sensor_movimiento_pasillo:
         value_template: >-
           {%  if is_state('input_boolean.alarma_sensor_movimiento_pasillo','on')
-              and is_state('binary_sensor.binary_sensor.hue_movimiento_pasillo','on')
+              and is_state('binary_sensor.hue_movimiento_pasillo_presencia','on')
           %}
             true
           {% else %}
@@ -310,6 +297,116 @@
           {% endif %}
         icon_template: >-
           {% if is_state('binary_sensor.alarma_sensor_movimiento_pasillo','on') %} mdi:motion-sensor
+          {% else %} mdi:motion-sensor-off
+          {% endif %}
+
+      # BLINK Cámara Hall Entrada 
+      # Se genera un binary_sensor nuevo a partir del switch nativo (binary_sensor.blink_hall_camera_armed) que se cambia en Blink App
+      # y el estado del binary_sensor de movimiento real de la camara.
+      alarma_sensor_movimiento_blink_hall:
+        # {{  states.binary_sensor.blink_hall_motion_detected.state }} ==> ON/OFF
+        value_template: >-
+          {%  if is_state('binary_sensor.blink_hall_camera_armed','on')
+              and is_state('binary_sensor.blink_hall_motion_detected','on')
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        icon_template: >-
+          {% if is_state('binary_sensor.alarma_sensor_movimiento_blink_hall','on') %} mdi:motion-sensor
+          {% else %} mdi:motion-sensor-off
+          {% endif %}
+
+      alarma_sensor_movimiento_blink_estudio:
+        value_template: >-
+          {%  if is_state('binary_sensor.blink_estudio_camera_armed','on')
+              and is_state('binary_sensor.blink_estudio_motion_detected','on')
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        icon_template: >-
+          {% if is_state('binary_sensor.alarma_sensor_movimiento_blink_estudio','on') %} mdi:motion-sensor
+          {% else %} mdi:motion-sensor-off
+          {% endif %}
+
+      #
+      # SENSORES PRESENCIA EXTERIOR
+      #
+      # AQARA Movimiento Entrada Exterior - ZHA OK
+      alarma_sensor_movimiento_entrada_exterior:
+        value_template: >-
+          {%  if is_state('input_boolean.alarma_sensor_movimiento_entrada_exterior','on')
+              and is_state('binary_sensor.aqara_movimiento_entrada_exterior','on')
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        icon_template: >-
+          {% if is_state('binary_sensor.alarma_sensor_movimiento_entrada_exterior','on') %} mdi:motion-sensor
+          {% else %} mdi:motion-sensor-off
+          {% endif %}
+
+      # BLINK Cámara Puerta Garaje
+      alarma_sensor_movimiento_blink_puerta_garaje:
+        value_template: >-
+          {%  if is_state('binary_sensor.blink_puerta_garaje_camera_armed','on')
+              and is_state('binary_sensor.blink_puerta_garaje_motion_detected','on')
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        icon_template: >-
+          {% if is_state('binary_sensor.alarma_sensor_movimiento_blink_puerta_garaje','on') %} mdi:motion-sensor
+          {% else %} mdi:motion-sensor-off
+          {% endif %}
+
+      # BLINK Cámara Puerta Principal
+      alarma_sensor_movimiento_blink_puerta_principal:
+        value_template: >-
+          {%  if is_state('binary_sensor.blink_puerta_principal_camera_armed','on')
+              and is_state('binary_sensor.blink_puerta_principal_motion_detected','on')
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        icon_template: >-
+          {% if is_state('binary_sensor.alarma_sensor_movimiento_blink_puerta_principal','on') %} mdi:motion-sensor
+          {% else %} mdi:motion-sensor-off
+          {% endif %}
+
+      # BLINK Cámara Piscina
+      alarma_sensor_movimiento_blink_piscina:
+        value_template: >-
+          {%  if is_state('binary_sensor.blink_piscina_camera_armed','on')
+              and is_state('binary_sensor.blink_piscina_motion_detected','on')
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        icon_template: >-
+          {% if is_state('binary_sensor.alarma_sensor_movimiento_blink_piscina','on') %} mdi:motion-sensor
+          {% else %} mdi:motion-sensor-off
+          {% endif %}
+
+      # BLINK Cámara Jardín Porche
+      alarma_sensor_movimiento_blink_porche:
+        value_template: >-
+          {%  if is_state('binary_sensor.blink_porche_camera_armed','on')
+              and is_state('binary_sensor.blink_porche_motion_detected','on')
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        icon_template: >-
+          {% if is_state('binary_sensor.alarma_sensor_movimiento_blink_porche','on') %} mdi:motion-sensor
           {% else %} mdi:motion-sensor-off
           {% endif %}
 

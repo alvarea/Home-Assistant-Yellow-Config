@@ -383,9 +383,12 @@ cloud:
         - light.luz_pasillo                 # Voz Alexa: Luz Pasillo
         - light.luz_plancha_mecedora        # Voz Alexa: Luz Mecedora
         # ESTUDIO
-        - light.luz_estudio                 # Helper grupo luces de la habitación
+        - light.luz_estudio                 # Helper grupo luces del Estudio
+        - light.luz_estudio_setup           # Helper grupo luces del Setup
+        - light.luz_estudio_sala            # Helper grupo luces del Estudio Sala
         - light.luz_estudio_alta
         - light.luz_estudio_media
+        - light.luz_estudio_baja
         - light.luz_estudio_derecha
         - light.luz_estudio_izquierda
         - light.luz_estudio_led_mesa
@@ -395,9 +398,9 @@ cloud:
         - light.luz_estudio_play_d
         - light.luz_estudio_techo
         - light.luz_estudio_escalera
-        - light.luz_estudio_lamparita
         - light.luz_estudio_beer
         - light.luz_estudio_tv
+        - light.luz_estudio_tv_izq
         - light.led_estudio_tv
         #
         # SALON

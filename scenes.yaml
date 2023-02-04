@@ -11,7 +11,7 @@
     # Persiana
     #
     cover.persiana_estudio:
-      current_position: 80
+      current_position: 90
       assumed_state: true
       friendly_name: Persiana Estudio
       supported_features: 15
@@ -59,13 +59,13 @@
       state: 'off'
     light.luz_estudio_media:
       state: 'off'
+    light.luz_estudio_baja:
+      state: 'off'
     light.luz_estudio_techo:
       state: 'off'
     light.luz_estudio_escalera:
       state: 'off'
-    light.luz_estudio_lamparita:
-      state: 'off'
-    light.luz_estudio_beer:
+    light.luz_estudio_tv_izq:
       state: 'off'
     light.luz_estudio_tv:
       state: 'off'
@@ -133,13 +133,13 @@
       state: 'off'
     light.luz_estudio_media:
       state: 'off'
+    light.luz_estudio_baja:
+      state: 'off'
     light.luz_estudio_techo:
       state: 'off'
     light.luz_estudio_escalera:
       state: 'off'
-    light.luz_estudio_lamparita:
-      state: 'off'
-    light.luz_estudio_beer:
+    light.luz_estudio_tv_izq:
       state: 'off'
     light.led_estudio_tv:
       state: 'off'
@@ -210,6 +210,8 @@
       state: 'off'
     light.luz_estudio_media:
       state: 'off'
+    light.luz_estudio_baja:
+      state: 'off'
     light.luz_estudio_derecha:
       state: 'off'
     light.luz_estudio_nate:
@@ -218,9 +220,7 @@
       state: 'off'
     light.luz_estudio_escalera:
       state: 'off'
-    light.luz_estudio_lamparita:
-      state: 'off'
-    light.luz_estudio_beer:
+    light.luz_estudio_tv_izq:
       state: 'off'
     light.luz_estudio_tv:
       state: 'off'
@@ -275,13 +275,13 @@
       state: 'off'
     light.luz_estudio_media:
       state: 'off'
+    light.luz_estudio_baja:
+      state: 'off'
     light.luz_estudio_techo:
       state: 'off'
     light.luz_estudio_escalera:
       state: 'off'
-    light.luz_estudio_lamparita:
-      state: 'off'
-    light.luz_estudio_beer:
+    light.luz_estudio_tv_izq:
       state: 'off'
     light.luz_estudio_tv:
       state: 'off'
@@ -337,15 +337,22 @@
       state: 'on'
       brightness: 255
       rgb_color:
-        - 255
-        - 64
+        - 4
+        - 51
         - 255
     light.luz_estudio_media:
       state: 'on'
       brightness: 255
       rgb_color:
-        - 4
-        - 51
+        - 255
+        - 64
+        - 255
+    light.luz_estudio_baja:
+      state: 'on'
+      brightness: 255
+      rgb_color:
+        - 255
+        - 64
         - 255
     light.luz_estudio_techo:
       state: 'on'
@@ -354,9 +361,7 @@
       state: 'on'
     light.luz_estudio_escalera:
       state: 'off'
-    light.luz_estudio_lamparita:
-      state: 'off'
-    light.luz_estudio_beer:
+    light.luz_estudio_tv_izq:
       state: 'off'
     light.led_estudio_tv:
       state: 'off'
@@ -409,15 +414,22 @@
       state: 'on'
       brightness: 255
       rgb_color:
-        - 255
-        - 64
+        - 4
+        - 51
         - 255
     light.luz_estudio_media:
       state: 'on'
       brightness: 255
       rgb_color:
-        - 4
-        - 51
+        - 255
+        - 64
+        - 255
+    light.luz_estudio_baja:
+      state: 'on'
+      brightness: 255
+      rgb_color:
+        - 255
+        - 64
         - 255
     light.luz_estudio_techo:
       state: 'on'
@@ -427,9 +439,7 @@
     light.luz_estudio_escalera:
       state: 'on'
       brightness_pct: 50
-    light.luz_estudio_lamparita:
-      state: 'on'
-    light.luz_estudio_beer:
+    light.luz_estudio_tv_izq:
       state: 'on'
     light.led_estudio_tv:
       state: 'on'
@@ -485,18 +495,25 @@
         - 147
         - 0
     light.luz_estudio_alta:
-      state: 'off'
+      state: 'on'
+      brightness: 255
+      rgb_color:
+        - 4
+        - 51
+        - 255
+    light.luz_estudio_media:
+      state: 'on'
       brightness: 255
       rgb_color:
         - 255
         - 64
         - 255
-    light.luz_estudio_media:
-      state: 'off'
+    light.luz_estudio_baja:
+      state: 'on'
       brightness: 255
       rgb_color:
-        - 4
-        - 51
+        - 255
+        - 64
         - 255
     light.luz_estudio_techo:
       state: 'on'
@@ -506,10 +523,8 @@
     light.luz_estudio_escalera:
       state: 'on'
       brightness_pct: 50
-    light.luz_estudio_lamparita:
+    light.luz_estudio_tv_izq:
       state: 'on'
-    light.luz_estudio_beer:
-      state: 'off'
     light.led_estudio_tv:
       state: 'off'
 
@@ -814,13 +829,6 @@
       mode: normal
       dynamics: none
       state: 'on'
-    light.estudio_beer:
-      supported_color_modes:
-      - onoff
-      icon: mdi:light-flood-down
-      friendly_name: Cuadro Beer
-      supported_features: 0
-      state: 'off'
     light.luz_estudio_nate:
       effect_list:
       - None
@@ -869,11 +877,11 @@
       mode: normal
       dynamics: none
       state: 'off'
-    light.estudio_lamparita:
+    light.luz_estudio_tv_izq:
       supported_color_modes:
       - onoff
       icon: mdi:lamp-outline
-      friendly_name: Lamparita Estudio
+      friendly_name: Estudio TV Izq
       supported_features: 0
       state: 'off'
     light.luz_estudio_izquierda:
@@ -922,8 +930,6 @@
       entity_only: true
     light.luz_estudio_play_d:
       entity_only: true
-    light.estudio_beer:
-      entity_only: true
     light.luz_estudio_nate:
       entity_only: true
     light.luz_estudio_baja:
@@ -932,7 +938,7 @@
       entity_only: true
     light.luz_estudio_escalera:
       entity_only: true
-    light.estudio_lamparita:
+    light.luz_estudio_tv_izq:
       entity_only: true
     light.luz_estudio_izquierda:
       entity_only: true
