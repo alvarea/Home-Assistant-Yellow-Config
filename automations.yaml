@@ -411,9 +411,13 @@
     # MUY IMPORTANTE: EN EL ARM AWAY SE CHEQUEA GRUPO SENSORES HOME + AWAY
     - platform: state
       entity_id:
-        - group.alarma_sensores_perimetro_grp                   # Grupo Sensores PERIMETRO
-        - group.alarma_sensores_presencia_interior_grp          # Grupo Sensores Presencia INTERIOR
-        - group.alarma_sensores_presencia_exterior_grp          # Grupo Sensores Presencia EXTERIOR
+        #- group.alarma_sensores_perimetro_grp                   # Grupo Sensores PERIMETRO
+        #- group.alarma_sensores_presencia_interior_grp          # Grupo Sensores Presencia INTERIOR
+        #- group.alarma_sensores_presencia_exterior_grp          # Grupo Sensores Presencia EXTERIOR
+        - binary_sensor.alarma_sensores_perimetro                # Grupo Sensores PERIMETRO
+        - binary_sensor.alarma_sensores_presencia_interior       # Grupo Sensores Presencia INTERIOR
+        - binary_sensor.alarma_sensores_presencia_exterior       # Grupo Sensores Presencia EXTERIOR
+
       to: 'on'
     # Los sensores vibración solo saltan por trigger = event
     - platform: event
@@ -456,7 +460,7 @@
   trigger:
     - platform: state
       # Grupo Sensores PERIMETRO
-      entity_id: group.alarma_sensores_perimetro_grp
+      entity_id: binary_sensor.alarma_sensores_perimetro
       to: 'on'
     # Los sensores vibración solo saltan por trigger = event
     - platform: event

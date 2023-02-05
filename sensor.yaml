@@ -751,7 +751,6 @@
           {{
           ((
            states('sensor.ly1_desk_setup_temperatura')|float(0) + 
-           states('sensor.ly2_estudio_temperatura')|float(0) + 
            states('sensor.temperature_158d00022b65ff')|float(0) + 
            states('sensor.aqara_temperatura_cocina')|float(0) +
            states('sensor.temperature_158d00022c6a47')|float(0) +

@@ -1,9 +1,25 @@
+# 
+# TABLA CONVERSION BRILLO% en BRILLO 0-255
+# 10% = 25
+# 20% = 51
+# 30% = 76
+# 40% = 102
+# 50% = 128
+# 60% = 153
+# 70% = 179
+# 80% = 204
+# 90% = 230
+# 100% = 256
+#
+
 #
 # ESCENA ESTUDIO SETUP SUNRISE - Configuración del setup en modo trabajo al amanecer.
 #
 - id: Estudio Sunrise
   name: Estudio Sunrise
   entities:
+    switch.echo_alexa_estudio_do_not_disturb_switch:
+      state: 'off'
     # Regleta enchufes mesa
     #
     switch.esphome_bas_sw3:
@@ -18,39 +34,41 @@
       state: open
     # Luces Setup High 
     #
+    light.luz_estudio_mesa:
+      state: 'on'
     light.luz_estudio_izquierda:
       state: 'on'
-      brightness_pct: 75
+      brightness: 204
     light.luz_estudio_nate:
       state: 'on'
-      brightness_pct: 30
+      brightness: 76
     light.luz_estudio_derecha:
       state: 'on'
-      brightness_pct: 30
+      brightness: 76
     light.luz_estudio_led_mesa:
       state: 'on'
-      brightness_pct: 75
+      brightness: 204
       rgb_color:
         - 255
         - 147
         - 0
     light.luz_estudio_play_i:
       state: 'on'
-      brightness_pct: 75
+      brightness: 204
       rgb_color:
         - 255
         - 147
         - 0
     light.luz_estudio_play_c:
       state: 'on'
-      brightness_pct: 75
+      brightness: 204
       rgb_color:
         - 255
         - 147
         - 0
     light.luz_estudio_play_d:
       state: 'on'
-      brightness_pct: 75
+      brightness: 204
       rgb_color:
         - 255
         - 147
@@ -74,12 +92,14 @@
   icon: mdi:weather-sunset-up
 
 #
-# ESCENA ESTUDIO SETUP SUNSET - Configuración del setup en modo trabajo al anochecer
+# ESCENA ESTUDIO SETUP SUNSET - Configuración del setup en modo trabajo justo antes del anochecer
 #
 - id: Estudio Sunset
   name: Estudio Sunset
   icon: mdi:weather-sunset-down
   entities:
+    switch.echo_alexa_estudio_do_not_disturb_switch:
+      state: 'off'
     # Persiana
     #
     cover.persiana_estudio:
@@ -90,39 +110,41 @@
       state: open
     # Luces Noche - Techo
     #
+    light.luz_estudio_mesa:
+     state: 'on'
     light.luz_estudio_izquierda:
       state: 'on'
-      brightness_pct: 50
+      brightness: 128
     light.luz_estudio_nate:
       state: 'on'
-      brightness_pct: 30
+      brightness: 76
     light.luz_estudio_derecha:
       state: 'on'
-      brightness_pct: 30
+      brightness: 76
     light.luz_estudio_led_mesa:
       state: 'on'
-      brightness_pct: 85
+      brightness: 204
       rgb_color:
         - 255
         - 147
         - 0
     light.luz_estudio_play_i:
       state: 'on'
-      brightness_pct: 85
+      brightness: 204
       rgb_color:
         - 255
         - 147
         - 0
     light.luz_estudio_play_c:
       state: 'on'
-      brightness_pct: 85
+      brightness: 204
       rgb_color:
         - 255
         - 147
         - 0
     light.luz_estudio_play_d:
       state: 'on'
-      brightness_pct: 85
+      brightness: 204
       rgb_color:
         - 255
         - 147
@@ -175,37 +197,41 @@
   name: Estudio Setup Soft
   icon: mdi:monitor-arrow-down
   entities:
+    switch.echo_alexa_estudio_do_not_disturb_switch:
+      state: 'off'
     light.luz_estudio_izquierda:
       state: 'on'
-      brightness_pct: 50
+      brightness: 128
     light.luz_estudio_led_mesa:
       state: 'on'
-      brightness_pct: 50
+      brightness: 128
       rgb_color:
         - 255
         - 147
         - 0
     light.luz_estudio_play_i:
       state: 'on'
-      brightness_pct: 50
+      brightness: 128
       rgb_color:
         - 255
         - 147
         - 0
     light.luz_estudio_play_c:
       state: 'on'
-      brightness_pct: 50
+      brightness: 128
       rgb_color:
         - 255
         - 147
         - 0
     light.luz_estudio_play_d:
       state: 'on'
-      brightness_pct: 50
+      brightness: 128
       rgb_color:
         - 255
         - 147
         - 0
+    light.luz_estudio_mesa:
+      state: 'off'
     light.luz_estudio_alta:
       state: 'off'
     light.luz_estudio_media:
@@ -234,39 +260,43 @@
   name: Estudio Setup High
   icon: mdi:monitor-arrow-share
   entities:
+    switch.echo_alexa_estudio_do_not_disturb_switch:
+      state: 'off'
+    light.luz_estudio_mesa:
+     state: 'on'
     light.luz_estudio_izquierda:
       state: 'on'
-      brightness_pct: 75
+      brightness: 204
     light.luz_estudio_nate:
       state: 'on'
-      brightness_pct: 30
+      brightness: 76
     light.luz_estudio_derecha:
       state: 'on'
-      brightness_pct: 30
+      brightness: 76
     light.luz_estudio_led_mesa:
       state: 'on'
-      brightness_pct: 75
+      brightness: 204
       rgb_color:
         - 255
         - 147
         - 0
     light.luz_estudio_play_i:
       state: 'on'
-      brightness_pct: 75
+      brightness: 204
       rgb_color:
         - 255
         - 147
         - 0
     light.luz_estudio_play_c:
       state: 'on'
-      brightness_pct: 75
+      brightness: 204
       rgb_color:
         - 255
         - 147
         - 0
     light.luz_estudio_play_d:
       state: 'on'
-      brightness_pct: 75
+      brightness: 204
       rgb_color:
         - 255
         - 147
@@ -288,9 +318,8 @@
     light.led_estudio_tv:
       state: 'off'
 
-
 #
-# ESCENA ESTUDIO SETUP - MODO NOCHE SIN LUZ EXTERIOR
+# ESCENA ESTUDIO SETUP - MODO NOCHE TRAS ANOCHECER (OSCURO)
 #
 - id: Estudio Setup Night
   name: Estudio Setup Night
@@ -298,37 +327,37 @@
   entities:
     light.luz_estudio_izquierda:
       state: 'on'
-      brightness_pct: 50
+      brightness: 128
     light.luz_estudio_nate:
       state: 'on'
-      brightness_pct: 30
+      brightness: 76
     light.luz_estudio_derecha:
       state: 'on'
-      brightness_pct: 30
+      brightness: 76
     light.luz_estudio_led_mesa:
       state: 'on'
-      brightness_pct: 85
+      brightness: 204
       rgb_color:
         - 255
         - 147
         - 0
     light.luz_estudio_play_i:
       state: 'on'
-      brightness_pct: 85
+      brightness: 204
       rgb_color:
         - 255
         - 147
         - 0
     light.luz_estudio_play_c:
       state: 'on'
-      brightness_pct: 85
+      brightness: 204
       rgb_color:
         - 255
         - 147
         - 0
     light.luz_estudio_play_d:
       state: 'on'
-      brightness_pct: 85
+      brightness: 204
       rgb_color:
         - 255
         - 147
@@ -356,7 +385,7 @@
         - 255
     light.luz_estudio_techo:
       state: 'on'
-      brightness_pct: 50
+      brightness: 128
     light.luz_estudio_tv:
       state: 'on'
     light.luz_estudio_escalera:
@@ -365,47 +394,51 @@
       state: 'off'
     light.led_estudio_tv:
       state: 'off'
+    light.luz_estudio_mesa:
+     state: 'off'
 
 #
-# ESCENA ESTUDIO FULL - MODO NOCHE TODAS ENCENDIDAS
+# ESCENA ESTUDIO FULL - MODO NOCHE TODAS ENCENDIDAS A FULL
 #
 - id: Estudio Full
   name: Estudio Full
   icon: mdi:monitor-dashboard
   entities:
+    light.luz_estudio_mesa:
+     state: 'on'
     light.luz_estudio_izquierda:
       state: 'on'
-      brightness_pct: 75
+      brightness: 255
     light.luz_estudio_nate:
       state: 'on'
-      brightness_pct: 40
+      brightness: 255
     light.luz_estudio_derecha:
       state: 'on'
-      brightness_pct: 40
+      brightness: 255
     light.luz_estudio_led_mesa:
       state: 'on'
-      brightness_pct: 60
+      brightness: 255
       rgb_color:
         - 255
         - 147
         - 0
     light.luz_estudio_play_i:
       state: 'on'
-      brightness_pct: 60
+      brightness: 255
       rgb_color:
         - 255
         - 147
         - 0
     light.luz_estudio_play_c:
       state: 'on'
-      brightness_pct: 60
+      brightness: 255
       rgb_color:
         - 255
         - 147
         - 0
     light.luz_estudio_play_d:
       state: 'on'
-      brightness_pct: 50
+      brightness: 255
       rgb_color:
         - 255
         - 147
@@ -433,17 +466,17 @@
         - 255
     light.luz_estudio_techo:
       state: 'on'
-      brightness_pct: 50
+      brightness: 255
     light.luz_estudio_tv:
       state: 'on'
     light.luz_estudio_escalera:
       state: 'on'
-      brightness_pct: 50
+      brightness: 255
     light.luz_estudio_tv_izq:
       state: 'on'
     light.led_estudio_tv:
       state: 'on'
-      brightness_pct: 50
+      brightness: 255
       effect: solid      
       rgb_color:
         - 255
@@ -457,39 +490,43 @@
   name: Estudio Setup Call
   icon: mdi:webcam
   entities:
+    switch.echo_alexa_estudio_do_not_disturb_switch:
+      state: 'on'
+    light.luz_estudio_mesa:
+     state: 'on'
     light.luz_estudio_izquierda:
       state: 'on'
-      brightness_pct: 100
+      brightness: 255
     light.luz_estudio_nate:
       state: 'on'
-      brightness_pct: 75
+      brightness: 204
     light.luz_estudio_derecha:
       state: 'on'
-      brightness_pct: 75
+      brightness: 204
     light.luz_estudio_led_mesa:
       state: 'on'
-      brightness_pct: 100
+      brightness: 255
       rgb_color:
         - 255
         - 147
         - 0
     light.luz_estudio_play_i:
       state: 'on'
-      brightness_pct: 100
+      brightness: 255
       rgb_color:
         - 255
         - 147
         - 0
     light.luz_estudio_play_c:
       state: 'on'
-      brightness_pct: 100
+      brightness: 255
       rgb_color:
         - 255
         - 147
         - 0
     light.luz_estudio_play_d:
       state: 'on'
-      brightness_pct: 100
+      brightness: 255
       rgb_color:
         - 255
         - 147
@@ -517,12 +554,12 @@
         - 255
     light.luz_estudio_techo:
       state: 'on'
-      brightness_pct: 50
+      brightness: 128
     light.luz_estudio_tv:
       state: 'on'
     light.luz_estudio_escalera:
       state: 'on'
-      brightness_pct: 50
+      brightness: 128
     light.luz_estudio_tv_izq:
       state: 'on'
     light.led_estudio_tv:
@@ -532,125 +569,6 @@
   name: Estudio Home Cinema
   entities:
     light.led_estudio_tv:
-      effect_list:
-      - Android
-      - Aurora
-      - Blends
-      - Blink
-      - Blink Rainbow
-      - Bouncing Balls
-      - Bpm
-      - Breathe
-      - Candle
-      - Candle Multi
-      - Candy Cane
-      - Chase
-      - Chase 2
-      - Chase 3
-      - Chase Flash
-      - Chase Flash Rnd
-      - Chase Rainbow
-      - Chase Random
-      - Chunchun
-      - Colorful
-      - Colorloop
-      - Colortwinkles
-      - Colorwaves
-      - Dancing Shadows
-      - Dissolve
-      - Dissolve Rnd
-      - Drip
-      - Dynamic
-      - Dynamic Smooth
-      - Fade
-      - Fairy
-      - Fairytwinkle
-      - Fill Noise
-      - Fire 2012
-      - Fire Flicker
-      - Fireworks
-      - Fireworks 1D
-      - Fireworks Starburst
-      - Flow
-      - Glitter
-      - Gradient
-      - Halloween
-      - Halloween Eyes
-      - Heartbeat
-      - ICU
-      - Juggle
-      - Lake
-      - Lighthouse
-      - Lightning
-      - Loading
-      - Meteor
-      - Meteor Smooth
-      - Multi Comet
-      - Noise 1
-      - Noise 2
-      - Noise 3
-      - Noise 4
-      - Noise Pal
-      - Oscillate
-      - Pacifica
-      - Palette
-      - Percent
-      - Phased
-      - Phased Noise
-      - Plasma
-      - Police
-      - Popcorn
-      - Pride 2015
-      - Railway
-      - Rain
-      - Rainbow
-      - Rainbow Runner
-      - Random Colors
-      - Ripple
-      - Ripple Rainbow
-      - Running
-      - Running Dual
-      - Saw
-      - Scan
-      - Scan Dual
-      - Scanner
-      - Scanner Dual
-      - Sine
-      - Sinelon
-      - Sinelon Dual
-      - Sinelon Rainbow
-      - Solid
-      - Solid Glitter
-      - Solid Pattern
-      - Solid Pattern Tri
-      - Sparkle
-      - Sparkle Dark
-      - Sparkle+
-      - Spots
-      - Spots Fade
-      - Stream
-      - Stream 2
-      - Strobe
-      - Strobe Mega
-      - Strobe Rainbow
-      - Sunrise
-      - Sweep
-      - Sweep Random
-      - TV Simulator
-      - Tetrix
-      - Theater
-      - Theater Rainbow
-      - Traffic Light
-      - Tri Fade
-      - Tri Wipe
-      - Twinkle
-      - Twinklecat
-      - Twinklefox
-      - Twinkleup
-      - Two Dots
-      - Washing Machine
-      - Wipe
-      - Wipe Random
       supported_color_modes:
       - rgb
       color_mode: rgb
