@@ -38,13 +38,16 @@
       state: 'on'
     light.luz_estudio_izquierda:
       state: 'on'
-      brightness: 204
+      brightness: 153
+    light.luz_estudio_derecha:
+      state: 'on'
+      brightness: 153
     light.luz_estudio_nate:
       state: 'on'
       brightness: 76
-    light.luz_estudio_derecha:
+    light.luz_estudio_tv_dcha:
       state: 'on'
-      brightness: 76
+      brightness: 204
     light.luz_estudio_led_mesa:
       state: 'on'
       brightness: 204
@@ -81,13 +84,13 @@
       state: 'off'
     light.luz_estudio_techo:
       state: 'off'
-    light.luz_estudio_escalera:
+    light.luz_estudio_lectura:
       state: 'off'
     light.luz_estudio_tv_izq:
       state: 'off'
-    light.luz_estudio_tv:
-      state: 'off'
     light.led_estudio_tv:
+      state: 'off'
+    light.luz_estudio_taller:
       state: 'off'
   icon: mdi:weather-sunset-up
 
@@ -106,7 +109,6 @@
       current_position: 100
       assumed_state: true
       friendly_name: Persiana Estudio
-      supported_features: 15
       state: open
     # Luces Noche - Techo
     #
@@ -114,43 +116,44 @@
      state: 'on'
     light.luz_estudio_izquierda:
       state: 'on'
-      brightness: 128
-    light.luz_estudio_nate:
-      state: 'on'
-      brightness: 76
+      brightness: 102
     light.luz_estudio_derecha:
+      state: 'on'
+      brightness: 102
+    light.luz_estudio_nate:
       state: 'on'
       brightness: 76
     light.luz_estudio_led_mesa:
       state: 'on'
-      brightness: 204
+      brightness: 255
       rgb_color:
         - 255
         - 147
         - 0
     light.luz_estudio_play_i:
       state: 'on'
-      brightness: 204
+      brightness: 255
       rgb_color:
         - 255
         - 147
         - 0
     light.luz_estudio_play_c:
       state: 'on'
-      brightness: 204
+      brightness: 255
       rgb_color:
         - 255
         - 147
         - 0
     light.luz_estudio_play_d:
       state: 'on'
-      brightness: 204
+      brightness: 255
       rgb_color:
         - 255
         - 147
         - 0
-    light.luz_estudio_tv:
+    light.luz_estudio_tv_dcha:
       state: 'on'
+      brightness: 204
     light.luz_estudio_alta:
       state: 'off'
     light.luz_estudio_media:
@@ -159,11 +162,13 @@
       state: 'off'
     light.luz_estudio_techo:
       state: 'off'
-    light.luz_estudio_escalera:
+    light.luz_estudio_lectura:
       state: 'off'
     light.luz_estudio_tv_izq:
       state: 'off'
     light.led_estudio_tv:
+      state: 'off'
+    light.luz_estudio_taller:
       state: 'off'
 
 #
@@ -202,6 +207,9 @@
     light.luz_estudio_izquierda:
       state: 'on'
       brightness: 128
+    light.luz_estudio_derecha:
+      state: 'on'
+      brightness: 128
     light.luz_estudio_led_mesa:
       state: 'on'
       brightness: 128
@@ -238,19 +246,19 @@
       state: 'off'
     light.luz_estudio_baja:
       state: 'off'
-    light.luz_estudio_derecha:
-      state: 'off'
     light.luz_estudio_nate:
       state: 'off'
     light.luz_estudio_techo:
       state: 'off'
-    light.luz_estudio_escalera:
+    light.luz_estudio_lectura:
       state: 'off'
     light.luz_estudio_tv_izq:
       state: 'off'
-    light.luz_estudio_tv:
+    light.luz_estudio_tv_dcha:
       state: 'off'
     light.led_estudio_tv:
+      state: 'off'
+    light.luz_estudio_taller:
       state: 'off'
 
 #
@@ -267,10 +275,10 @@
     light.luz_estudio_izquierda:
       state: 'on'
       brightness: 204
-    light.luz_estudio_nate:
-      state: 'on'
-      brightness: 76
     light.luz_estudio_derecha:
+      state: 'on'
+      brightness: 204
+    light.luz_estudio_nate:
       state: 'on'
       brightness: 76
     light.luz_estudio_led_mesa:
@@ -309,13 +317,15 @@
       state: 'off'
     light.luz_estudio_techo:
       state: 'off'
-    light.luz_estudio_escalera:
+    light.luz_estudio_lectura:
       state: 'off'
     light.luz_estudio_tv_izq:
       state: 'off'
-    light.luz_estudio_tv:
+    light.luz_estudio_tv_dcha:
       state: 'off'
     light.led_estudio_tv:
+      state: 'off'
+    light.luz_estudio_taller:
       state: 'off'
 
 #
@@ -327,30 +337,30 @@
   entities:
     light.luz_estudio_izquierda:
       state: 'on'
-      brightness: 128
-    light.luz_estudio_nate:
-      state: 'on'
       brightness: 76
     light.luz_estudio_derecha:
       state: 'on'
       brightness: 76
+    light.luz_estudio_nate:
+      state: 'on'
+      brightness: 51
     light.luz_estudio_led_mesa:
       state: 'on'
-      brightness: 204
+      brightness: 255
       rgb_color:
         - 255
         - 147
         - 0
     light.luz_estudio_play_i:
       state: 'on'
-      brightness: 204
+      brightness: 255
       rgb_color:
         - 255
         - 147
         - 0
     light.luz_estudio_play_c:
       state: 'on'
-      brightness: 204
+      brightness: 255
       rgb_color:
         - 255
         - 147
@@ -365,123 +375,43 @@
     light.luz_estudio_alta:
       state: 'on'
       brightness: 255
+      # Azul: gb_color: 255,41,255
       rgb_color:
-        - 4
-        - 51
+        - 255
+        - 41
         - 255
     light.luz_estudio_media:
       state: 'on'
       brightness: 255
+      # Azul: gb_color: 70, 6, 255
       rgb_color:
-        - 255
-        - 64
+        - 76
+        - 6
         - 255
     light.luz_estudio_baja:
       state: 'on'
       brightness: 255
+      # Azul: gb_color: 70, 6, 255
       rgb_color:
+        - 76
+        - 6
         - 255
-        - 64
-        - 255
-    light.luz_estudio_techo:
+    light.luz_estudio_tv_dcha:
+      state: 'on'
+      brightness: 204
+    light.luz_estudio_lectura:
       state: 'on'
       brightness: 128
-    light.luz_estudio_tv:
-      state: 'on'
-    light.luz_estudio_escalera:
-      state: 'off'
-    light.luz_estudio_tv_izq:
-      state: 'off'
     light.led_estudio_tv:
-      state: 'off'
+      state: 'on'
     light.luz_estudio_mesa:
      state: 'off'
-
-#
-# ESCENA ESTUDIO FULL - MODO NOCHE TODAS ENCENDIDAS A FULL
-#
-- id: Estudio Full
-  name: Estudio Full
-  icon: mdi:monitor-dashboard
-  entities:
-    light.luz_estudio_mesa:
-     state: 'on'
-    light.luz_estudio_izquierda:
-      state: 'on'
-      brightness: 255
-    light.luz_estudio_nate:
-      state: 'on'
-      brightness: 255
-    light.luz_estudio_derecha:
-      state: 'on'
-      brightness: 255
-    light.luz_estudio_led_mesa:
-      state: 'on'
-      brightness: 255
-      rgb_color:
-        - 255
-        - 147
-        - 0
-    light.luz_estudio_play_i:
-      state: 'on'
-      brightness: 255
-      rgb_color:
-        - 255
-        - 147
-        - 0
-    light.luz_estudio_play_c:
-      state: 'on'
-      brightness: 255
-      rgb_color:
-        - 255
-        - 147
-        - 0
-    light.luz_estudio_play_d:
-      state: 'on'
-      brightness: 255
-      rgb_color:
-        - 255
-        - 147
-        - 0
-    light.luz_estudio_alta:
-      state: 'on'
-      brightness: 255
-      rgb_color:
-        - 4
-        - 51
-        - 255
-    light.luz_estudio_media:
-      state: 'on'
-      brightness: 255
-      rgb_color:
-        - 255
-        - 64
-        - 255
-    light.luz_estudio_baja:
-      state: 'on'
-      brightness: 255
-      rgb_color:
-        - 255
-        - 64
-        - 255
+    light.luz_estudio_taller:
+      state: 'off'
     light.luz_estudio_techo:
-      state: 'on'
-      brightness: 255
-    light.luz_estudio_tv:
-      state: 'on'
-    light.luz_estudio_escalera:
-      state: 'on'
-      brightness: 255
+      state: 'off'
     light.luz_estudio_tv_izq:
-      state: 'on'
-    light.led_estudio_tv:
-      state: 'on'
-      brightness: 255
-      effect: solid      
-      rgb_color:
-        - 255
-        - 64
-        - 255
+      state: 'off'
 
 #
 # ESCENA ESTUDIO WEBCAM
@@ -534,292 +464,143 @@
     light.luz_estudio_alta:
       state: 'on'
       brightness: 255
+      # Azul: gb_color: 255,41,255
       rgb_color:
-        - 4
-        - 51
+        - 255
+        - 41
         - 255
     light.luz_estudio_media:
       state: 'on'
       brightness: 255
+      # Azul: gb_color: 70, 6, 255
       rgb_color:
-        - 255
-        - 64
+        - 76
+        - 6
         - 255
     light.luz_estudio_baja:
       state: 'on'
       brightness: 255
+      # Azul: gb_color: 70, 6, 255
+      rgb_color:
+        - 76
+        - 6
+        - 255
+    light.luz_estudio_tv_dcha:
+      state: 'on'
+      brightness: 204
+    light.luz_estudio_tv_izq:
+      state: 'off'
+    light.led_estudio:
+      state: 'off'
+    light.luz_estudio_taller:
+      state: 'off'
+    light.luz_estudio_lectura:
+      state: 'off'
+    light.luz_estudio_techo:
+      state: 'off'
+
+#
+# ESCENA ESTUDIO FULL - MODO TODAS ENCENDIDAS A FULL
+#
+- id: Estudio Full
+  name: Estudio Full
+  icon: mdi:monitor-dashboard
+  entities:
+    light.luz_estudio_mesa:
+     state: 'on'
+    light.luz_estudio_izquierda:
+      state: 'on'
+      brightness: 255
+    light.luz_estudio_nate:
+      state: 'on'
+      brightness: 255
+    light.luz_estudio_derecha:
+      state: 'on'
+      brightness: 255
+    light.luz_estudio_led_mesa:
+      state: 'on'
+      brightness: 255
       rgb_color:
         - 255
-        - 64
+        - 147
+        - 0
+    light.luz_estudio_play_i:
+      state: 'on'
+      brightness: 255
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_play_c:
+      state: 'on'
+      brightness: 255
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_play_d:
+      state: 'on'
+      brightness: 255
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_alta:
+      state: 'on'
+      brightness: 255
+      # Azul: gb_color: 255,41,255
+      rgb_color:
+        - 255
+        - 41
+        - 255
+    light.luz_estudio_media:
+      state: 'on'
+      brightness: 255
+      # Azul: gb_color: 70, 6, 255
+      rgb_color:
+        - 76
+        - 6
+        - 255
+    light.luz_estudio_baja:
+      state: 'on'
+      brightness: 255
+      # Azul: gb_color: 70, 6, 255
+      rgb_color:
+        - 76
+        - 6
         - 255
     light.luz_estudio_techo:
       state: 'on'
-      brightness: 128
-    light.luz_estudio_tv:
-      state: 'on'
-    light.luz_estudio_escalera:
-      state: 'on'
-      brightness: 128
+      brightness: 255
     light.luz_estudio_tv_izq:
       state: 'on'
+    light.luz_estudio_tv_dcha:
+      state: 'on'
+      brightness: 255
     light.led_estudio_tv:
-      state: 'off'
+      state: 'on'
+      brightness: 255
+    light.luz_estudio_lectura:
+      state: 'on'
+      brightness: 255
+    light.luz_estudio_taller:
+      state: 'om'
 
 - id: Estudio Home Cinema
   name: Estudio Home Cinema
   entities:
-    light.led_estudio_tv:
-      supported_color_modes:
-      - rgb
-      color_mode: rgb
-      brightness: 153
-      hs_color:
-      - 300
-      - 100
-      rgb_color:
-      - 255
-      - 0
-      - 255
-      xy_color:
-      - 0.385
-      - 0.155
-      effect: Gradient
-      icon: mdi:led-strip-variant
-      friendly_name: Led TV Estudio
-      supported_features: 36
+    # Alexa Estudio Modo No Molestar
+    switch.echo_alexa_estudio_do_not_disturb_switch:
       state: 'on'
-    light.luz_estudio_led_mesa:
-      min_mireds: 153
-      max_mireds: 500
-      supported_color_modes:
-      - color_temp
-      - xy
-      icon: mdi:led-strip-variant
-      friendly_name: Luz Estudio LED Mesa
-      supported_features: 40
-      color_mode: xy
-      brightness: 191
-      hs_color:
-      - 303.962
-      - 83.137
-      rgb_color:
-      - 255
-      - 43
-      - 241
-      xy_color:
-      - 0.4006
-      - 0.1678
-      mode: normal
-      dynamics: none
-      state: 'on'
-    light.luz_estudio_alta:
-      min_mireds: 153
-      max_mireds: 500
-      supported_color_modes:
-      - color_temp
-      - xy
-      icon: mdi:floor-lamp-dual
-      friendly_name: Luz Estudio Alta
-      supported_features: 40
-      color_mode: xy
-      brightness: 255
-      hs_color:
-      - 247.671
-      - 85.882
-      rgb_color:
-      - 64
-      - 36
-      - 255
-      xy_color:
-      - 0.1534
-      - 0.0541
-      mode: normal
-      dynamics: none
-      state: 'on'
-    light.luz_estudio_media:
-      min_mireds: 153
-      max_mireds: 500
-      supported_color_modes:
-      - color_temp
-      - xy
-      icon: mdi:floor-lamp-dual
-      friendly_name: Luz Estudio Media
-      supported_features: 40
-      color_mode: xy
-      brightness: 253
-      hs_color:
-      - 260.941
-      - 100
-      rgb_color:
-      - 89
-      - 0
-      - 255
-      xy_color:
-      - 0.1723
-      - 0.0506
-      mode: normal
-      dynamics: none
-      state: 'on'
-    light.luz_estudio_play_i:
-      min_mireds: 153
-      max_mireds: 500
-      effect_list:
-      - None
-      - candle
-      - fire
-      supported_color_modes:
-      - color_temp
-      - xy
-      icon: mdi:floor-lamp-torchiere-variant
-      friendly_name: Luz Play Izquierda
-      supported_features: 44
-      color_mode: xy
-      brightness: 191
-      hs_color:
-      - 303.962
-      - 83.137
-      rgb_color:
-      - 255
-      - 43
-      - 241
-      xy_color:
-      - 0.4006
-      - 0.1678
-      effect: None
-      mode: normal
-      dynamics: none
-      state: 'on'
-    light.luz_estudio_play_c:
-      min_mireds: 153
-      max_mireds: 500
-      effect_list:
-      - None
-      - candle
-      - fire
-      supported_color_modes:
-      - color_temp
-      - xy
-      icon: mdi:floor-lamp-torchiere-variant-outline
-      friendly_name: Luz Play Centro
-      supported_features: 44
-      color_mode: xy
-      brightness: 191
-      hs_color:
-      - 303.962
-      - 83.137
-      rgb_color:
-      - 255
-      - 43
-      - 241
-      xy_color:
-      - 0.4006
-      - 0.1678
-      effect: None
-      mode: normal
-      dynamics: none
-      state: 'on'
-    light.luz_estudio_play_d:
-      min_mireds: 153
-      max_mireds: 500
-      effect_list:
-      - None
-      - candle
-      - fire
-      supported_color_modes:
-      - color_temp
-      - xy
-      icon: mdi:floor-lamp-torchiere-variant
-      friendly_name: Luz Play Derecha
-      supported_features: 44
-      color_mode: xy
-      brightness: 191
-      hs_color:
-      - 303.962
-      - 83.137
-      rgb_color:
-      - 255
-      - 43
-      - 241
-      xy_color:
-      - 0.4006
-      - 0.1678
-      effect: None
-      mode: normal
-      dynamics: none
-      state: 'on'
-    light.luz_estudio_nate:
-      effect_list:
-      - None
-      - candle
-      supported_color_modes:
-      - brightness
-      icon: mdi:lightbulb-variant
-      friendly_name: Hue Nate
-      supported_features: 44
-      mode: normal
-      dynamics: none
-      state: 'off'
-    light.luz_estudio_baja:
-      effect_list:
-      - None
-      - candle
-      supported_color_modes:
-      - brightness
-      icon: mdi:floor-lamp-dual
-      friendly_name: Luz Estudio Baja
-      supported_features: 44
-      mode: normal
-      dynamics: none
-      state: 'off'
-    light.luz_estudio_techo:
-      effect_list:
-      - None
-      - candle
-      supported_color_modes:
-      - brightness
-      icon: mdi:ceiling-light
-      friendly_name: Hue Estudio Techo
-      supported_features: 44
-      mode: normal
-      dynamics: none
-      state: 'off'
-    light.luz_estudio_escalera:
-      effect_list:
-      - None
-      - candle
-      supported_color_modes:
-      - brightness
-      icon: mdi:floor-lamp
-      friendly_name: Luz Estudio Escalera
-      supported_features: 44
-      mode: normal
-      dynamics: none
-      state: 'off'
-    light.luz_estudio_tv_izq:
-      supported_color_modes:
-      - onoff
-      icon: mdi:lamp-outline
-      friendly_name: Estudio TV Izq
-      supported_features: 0
-      state: 'off'
-    light.luz_estudio_izquierda:
-      effect_list:
-      - None
-      - candle
-      supported_color_modes:
-      - brightness
-      icon: mdi:light-flood-down
-      friendly_name: Luz Estudio Izquierda
-      supported_features: 44
-      mode: normal
-      dynamics: none
-      state: 'off'
-    light.esphome_s26_sw1_led:
-      supported_color_modes:
-      - brightness
-      friendly_name: esphome s26 sw1 led
-      supported_features: 40
-      state: 'off'
+    # Persiana Cerrada
+    #
+    cover.persiana_estudio:
+      current_position: 0
+      assumed_state: true
+      friendly_name: Persiana Estudio
+      supported_features: 15
+      state: open
+    # FIRE TV Estudio
     media_player.firetv_estudio:
       friendly_name: FireTV Estudio
       supported_features: 22961
@@ -832,31 +613,82 @@
       - Netflix
       app_id: com.amazon.firetv.youtube
       state: playing
-  icon: mdi:dolby
-  metadata:
+    # Luces
     light.led_estudio_tv:
-      entity_only: true
+      color_mode: rgb
+      brightness: 153
+      effect: Gradient
+      state: 'on'
     light.luz_estudio_led_mesa:
-      entity_only: true
-    light.luz_estudio_alta:
-      entity_only: true
-    light.luz_estudio_media:
-      entity_only: true
+      state: 'on'
+      brightness: 76
+      rgb_color:
+        - 255
+        - 147
+        - 0
     light.luz_estudio_play_i:
-      entity_only: true
+      state: 'on'
+      brightness: 76
+      rgb_color:
+        - 255
+        - 147
+        - 0
     light.luz_estudio_play_c:
-      entity_only: true
+      state: 'on'
+      brightness: 76
+      rgb_color:
+        - 255
+        - 147
+        - 0
     light.luz_estudio_play_d:
-      entity_only: true
-    light.luz_estudio_nate:
-      entity_only: true
+      state: 'on'
+      brightness: 76
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_alta:
+      state: 'on'
+      brightness: 76
+      # Azul: gb_color: 255,41,255
+      rgb_color:
+        - 255
+        - 41
+        - 255
+    light.luz_estudio_media:
+      state: 'on'
+      brightness: 76
+      # Azul: gb_color: 70, 6, 255
+      rgb_color:
+        - 76
+        - 6
+        - 255
     light.luz_estudio_baja:
-      entity_only: true
-    light.luz_estudio_techo:
-      entity_only: true
-    light.luz_estudio_escalera:
-      entity_only: true
-    light.luz_estudio_tv_izq:
-      entity_only: true
+      state: 'on'
+      brightness: 76
+      # Azul: gb_color: 70, 6, 255
+      rgb_color:
+        - 76
+        - 6
+        - 255
+    light.luz_estudio_tv_dcha:
+      state: 'on'
+      brightness: 76
     light.luz_estudio_izquierda:
-      entity_only: true
+      state: 'off'
+    light.luz_estudio_derecha:
+      state: 'off'
+    light.luz_estudio_nate:
+      state: 'off'
+    light.luz_estudio_lectura:
+      state: 'off'
+    light.luz_estudio_mesa:
+     state: 'off'
+    light.luz_estudio_taller:
+      state: 'off'
+    light.luz_estudio_techo:
+      state: 'off'
+    light.luz_estudio_tv_izq:
+      state: 'off'
+  icon: mdi:dolby
+

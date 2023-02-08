@@ -390,18 +390,19 @@ cloud:
         - light.luz_estudio_media
         - light.luz_estudio_baja
         - light.luz_estudio_derecha
-        - light.luz_estudio_izquierda
         - light.luz_estudio_led_mesa
+        - light.luz_estudio_izquierda
         - light.luz_estudio_nate
+        - light.luz_estudio_mesa
+        - light.luz_estudio_lectura
         - light.luz_estudio_play_i
         - light.luz_estudio_play_c
         - light.luz_estudio_play_d
         - light.luz_estudio_techo
-        - light.luz_estudio_escalera
-        - light.luz_estudio_beer
-        - light.luz_estudio_tv
         - light.luz_estudio_tv_izq
+        - light.luz_estudio_tv_dcha
         - light.led_estudio_tv
+        - light.luz_estudio_taller
         #
         # SALON
         - light.luz_salon                   # Helper grupo luces de la habitación
@@ -461,8 +462,11 @@ cloud:
       light.luz_salon:
         name: Luz Salón
         display_categories: LIGHT
-      light.luz_arbol_navidad:
-        name: Arbol Navidad
+      light.luz_estudio_tv_izq:
+        name: Luz Estudio Izquierda
+        display_categories: LIGHT
+      light.luz_estudio_tv_dcha:
+        name: Luz Estudio Derecha
         display_categories: LIGHT
       media_player.firetv_salon:
         name: Tele
