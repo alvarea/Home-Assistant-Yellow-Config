@@ -92,6 +92,8 @@
       state: 'off'
     light.luz_estudio_taller:
       state: 'off'
+    light.luz_estudio_webcam:
+      state: 'off'
   icon: mdi:weather-sunset-up
 
 #
@@ -113,7 +115,7 @@
     # Luces Noche - Techo
     #
     light.luz_estudio_mesa:
-     state: 'on'
+     state: 'off'
     light.luz_estudio_izquierda:
       state: 'on'
       brightness: 102
@@ -169,6 +171,8 @@
     light.led_estudio_tv:
       state: 'off'
     light.luz_estudio_taller:
+      state: 'off'
+    light.luz_estudio_webcam:
       state: 'off'
 
 #
@@ -260,6 +264,8 @@
       state: 'off'
     light.luz_estudio_taller:
       state: 'off'
+    light.luz_estudio_webcam:
+      state: 'off'
 
 #
 # ESCENA ESTUDIO SETUP HIGH - MODO FUERTE LECTURA LUZ AMANECER
@@ -271,7 +277,7 @@
     switch.echo_alexa_estudio_do_not_disturb_switch:
       state: 'off'
     light.luz_estudio_mesa:
-     state: 'on'
+     state: 'off'
     light.luz_estudio_izquierda:
       state: 'on'
       brightness: 204
@@ -327,6 +333,8 @@
       state: 'off'
     light.luz_estudio_taller:
       state: 'off'
+    light.luz_estudio_webcam:
+      state: 'off'
 
 #
 # ESCENA ESTUDIO SETUP - MODO NOCHE TRAS ANOCHECER (OSCURO)
@@ -337,13 +345,13 @@
   entities:
     light.luz_estudio_izquierda:
       state: 'on'
-      brightness: 76
+      brightness: 204
     light.luz_estudio_derecha:
       state: 'on'
-      brightness: 76
+      brightness: 205
     light.luz_estudio_nate:
       state: 'on'
-      brightness: 51
+      brightness: 128
     light.luz_estudio_led_mesa:
       state: 'on'
       brightness: 255
@@ -367,7 +375,7 @@
         - 0
     light.luz_estudio_play_d:
       state: 'on'
-      brightness: 204
+      brightness: 255
       rgb_color:
         - 255
         - 147
@@ -399,18 +407,20 @@
     light.luz_estudio_tv_dcha:
       state: 'on'
       brightness: 204
-    light.luz_estudio_lectura:
+    light.luz_estudio_techo:
       state: 'on'
-      brightness: 128
+      brightness: 204
     light.led_estudio_tv:
       state: 'on'
+    light.luz_estudio_lectura:
+      state: 'off'
     light.luz_estudio_mesa:
      state: 'off'
     light.luz_estudio_taller:
       state: 'off'
-    light.luz_estudio_techo:
-      state: 'off'
     light.luz_estudio_tv_izq:
+      state: 'off'
+    light.luz_estudio_webcam:
       state: 'off'
 
 #
@@ -423,7 +433,7 @@
     switch.echo_alexa_estudio_do_not_disturb_switch:
       state: 'on'
     light.luz_estudio_mesa:
-     state: 'on'
+     state: 'off'
     light.luz_estudio_izquierda:
       state: 'on'
       brightness: 255
@@ -498,6 +508,8 @@
       state: 'off'
     light.luz_estudio_techo:
       state: 'off'
+    light.luz_estudio_webcam:
+      state: 'off'
 
 #
 # ESCENA ESTUDIO FULL - MODO TODAS ENCENDIDAS A FULL
@@ -507,7 +519,7 @@
   icon: mdi:monitor-dashboard
   entities:
     light.luz_estudio_mesa:
-     state: 'on'
+     state: 'off'
     light.luz_estudio_izquierda:
       state: 'on'
       brightness: 255
@@ -583,8 +595,11 @@
     light.luz_estudio_lectura:
       state: 'on'
       brightness: 255
+    light.luz_estudio_webcam:
+      state: 'on'
+      brightness: 255
     light.luz_estudio_taller:
-      state: 'om'
+      state: 'on'
 
 - id: Estudio Home Cinema
   name: Estudio Home Cinema
@@ -690,5 +705,45 @@
       state: 'off'
     light.luz_estudio_tv_izq:
       state: 'off'
+    light.luz_estudio_webcam:
+      state: 'off'
   icon: mdi:dolby
+
+#
+# ESCENA SALON SUNSET - Configuración del Salón al atardecer
+#
+- id: Salon Sunset
+  name: Salón Sunset
+  entities:
+    light.luz_salon_vitrina:
+      state: 'on'
+      brightness: 102
+    light.luz_salon_cilindro:
+      state: 'off'
+    light.luz_salon_lectura:
+      state: 'off'
+    light.led_salon_tv:
+      state: 'off'
+  icon: mdi:weather-sunset-down
+
+#
+# ESCENA SALON NOCHE - Configuración del Salón en modo noche para ver la tv
+#
+- id: Salon Noche
+  name: Salón Noche
+  entities:
+    light.luz_salon_cilindro:
+      state: 'on'
+      brightness: 153
+    light.luz_salon_vitrina:
+      state: 'on'
+      brightness: 153
+    light.luz_salon_lectura:
+      state: 'on'
+      brightness: 153
+    light.led_salon_tv:
+      state: 'on'
+      brightness: 204
+  icon: mdi:lamp
+
 
