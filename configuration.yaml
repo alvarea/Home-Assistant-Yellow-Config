@@ -389,19 +389,18 @@ cloud:
         - light.luz_estudio_alta
         - light.luz_estudio_media
         - light.luz_estudio_baja
+        - light.luz_estudio_izquierda
         - light.luz_estudio_derecha
         - light.luz_estudio_led_mesa
-        - light.luz_estudio_izquierda
         - light.luz_estudio_nate
         - light.luz_estudio_mesa
         - light.luz_estudio_lectura
         - light.luz_estudio_play_i
-        - light.luz_estudio_play_c
         - light.luz_estudio_play_d
         - light.luz_estudio_techo
         - light.luz_estudio_tv_izq
-        - light.luz_estudio_tv_dcha
         - light.led_estudio_tv
+        - light.luz_estudio_play_tv
         - light.luz_estudio_taller
         #
         # SALON

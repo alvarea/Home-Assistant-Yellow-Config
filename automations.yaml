@@ -1113,22 +1113,16 @@
       entity_id: binary_sensor.aqara_puerta_entrada_principal
       to: 'on'
   condition:
-    condition: or  # 'when dark' condition: either after sunset or before sunrise
+    condition: and
     conditions:
-      - condition: sun
-        # after_offset: "-01:00:00"  ==> HORARIO INVIERNO GMT+1
-        # after_offset: "-00:30:00"  ==> HORARIO VERANO GMT+2
-        after: sunset
-        after_offset: "-02:00:00"
       - condition: template
         value_template: "{{ (now().hour >= 0 and now().hour <= 11) or (now().hour > 17 and now().hour <= 23) }}"
-      - condition: sun
-        before: sunrise
-        # en el amanecer +3h'
-        before_offset: "+03:00:00"
+      - condition: state
+        entity_id: light.luz_entrada
+        state: 'off'
       - condition: numeric_state
         entity_id: sensor.aqara_movimiento_entrada_luminosidad
-        below: 4
+        below: 100
   action:
     # Luces Entrada ON
     - service: light.turn_on
