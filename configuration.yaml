@@ -440,12 +440,16 @@ cloud:
         - media_player.firetv_estudio
         # ESCENAS
         - scene.estudio_full
-        - scene.estudio_setup_call
-        - scene.estudio_setup_soft
+        - scene.estudio_home_cinema
+        - scene.estudio_noche
+        - scene.estudio_setup_webcam
         - scene.estudio_setup_high
-        - scene.estudio_setup_night
+        - scene.estudio_setup_soft
+        - scene.estudio_noche
         - scene.estudio_sunrise
         - scene.estudio_sunset
+        - scene.salon_noche
+        - scene.salon_sunset
         # PERSIANAS
         - cover.persiana_estudio
     entity_config:

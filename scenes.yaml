@@ -15,7 +15,7 @@
 #
 # ESCENA ESTUDIO SETUP SUNRISE - Configuración del setup en modo trabajo al amanecer.
 #
-- id: Estudio Sunrise
+- id: estudio_sunrise
   name: Estudio Sunrise
   entities:
     switch.echo_alexa_estudio_do_not_disturb_switch:
@@ -35,49 +35,69 @@
     # Luces Setup High 
     #
     light.luz_estudio_mesa:
-      state: 'on'
+      state: 'off'
     light.luz_estudio_izquierda:
       state: 'on'
       brightness: 153
     light.luz_estudio_derecha:
-      state: 'on'
-      brightness: 153
+      state: 'off'
     light.luz_estudio_nate:
       state: 'on'
-      brightness: 76
+      brightness: 102
     light.luz_estudio_led_mesa:
       state: 'on'
       brightness: 204
-      rgb_color:
+      rgb_color: 
         - 255
         - 147
         - 0
     light.luz_estudio_play_i:
       state: 'on'
       brightness: 204
-      rgb_color:
-        - 255
-        - 147
-        - 0
     light.luz_estudio_play_d:
       state: 'on'
       brightness: 204
-      rgb_color:
-        - 255
-        - 147
-        - 0
-    light.luz_estudio_play_tv:
-      state: 'on'
-      brightness: 204
-      rgb_color:
+      rgb_color: 
         - 255
         - 147
         - 0
     light.luz_estudio_alta:
-      state: 'off'
+      state: 'on'
+      brightness: 255
+      rgb_color: 
+        - 254
+        - 254
+        - 254
+      color_temp_kelvin: 6535
+      color_temp: 153
     light.luz_estudio_media:
-      state: 'off'
+      state: 'on'
+      brightness: 204
+      rgb_color: 
+        - 254
+        - 254
+        - 254
+      color_temp_kelvin: 6535
+      color_temp: 153
     light.luz_estudio_baja:
+      state: 'on'
+      brightness: 153
+      rgb_color: 
+        - 254
+        - 254
+        - 254
+      color_temp_kelvin: 6535
+      color_temp: 153
+    light.luz_estudio_webcam:
+      state: 'on'
+      brightness: 128
+      rgb_color: 
+        - 254
+        - 254
+        - 254
+      color_temp_kelvin: 6535
+      color_temp: 153
+    light.luz_estudio_play_tv:
       state: 'off'
     light.luz_estudio_techo:
       state: 'off'
@@ -89,14 +109,12 @@
       state: 'off'
     light.luz_estudio_taller:
       state: 'off'
-    light.luz_estudio_webcam:
-      state: 'off'
   icon: mdi:weather-sunset-up
 
 #
 # ESCENA ESTUDIO SETUP SUNSET - Configuración del setup en modo trabajo justo antes del anochecer
 #
-- id: Estudio Sunset
+- id: estudio_sunset
   name: Estudio Sunset
   icon: mdi:weather-sunset-down
   entities:
@@ -115,41 +133,61 @@
      state: 'off'
     light.luz_estudio_izquierda:
       state: 'on'
-      brightness: 102
+      brightness: 204
     light.luz_estudio_derecha:
-      state: 'on'
-      brightness: 102
+      state: 'off'
     light.luz_estudio_nate:
       state: 'on'
-      brightness: 76
+      brightness: 102
     light.luz_estudio_led_mesa:
       state: 'on'
       brightness: 255
-      rgb_color:
+      rgb_color: 
         - 255
         - 147
         - 0
     light.luz_estudio_play_i:
       state: 'on'
       brightness: 255
-      rgb_color:
+      rgb_color: 
         - 255
         - 147
         - 0
     light.luz_estudio_play_d:
       state: 'on'
       brightness: 255
-      rgb_color:
+      rgb_color: 
         - 255
         - 147
         - 0
-    light.luz_estudio_play_tv:
-      state: 'off'
     light.luz_estudio_alta:
-      state: 'off'
+      state: 'on'
+      brightness: 255
+      rgb_color: 
+        - 254
+        - 254
+        - 254
+      color_temp_kelvin: 6535
+      color_temp: 153
     light.luz_estudio_media:
-      state: 'off'
+      state: 'on'
+      brightness: 204
+      rgb_color: 
+        - 254
+        - 254
+        - 254
+      color_temp_kelvin: 6535
+      color_temp: 153
     light.luz_estudio_baja:
+      state: 'on'
+      brightness: 153
+      rgb_color: 
+        - 254
+        - 254
+        - 254
+      color_temp_kelvin: 6535
+      color_temp: 153
+    light.luz_estudio_play_tv:
       state: 'off'
     light.luz_estudio_techo:
       state: 'off'
@@ -191,7 +229,7 @@
 #
 # ESCENA ESTUDIO SETUP SOFT - MODO SUAVE LECTURA LUZ DIA TENUE
 #
-- id: Estudio_Setup_Soft
+- id: estudio_setup_soft
   name: Estudio Setup Soft
   icon: mdi:monitor-arrow-down
   entities:
@@ -252,9 +290,9 @@
 #
 # ESCENA ESTUDIO SETUP HIGH - MODO FUERTE LECTURA LUZ AMANECER
 #
-- id: Estudio_Setup_High
+- id: estudio_setup_high
   name: Estudio Setup High
-  icon: mdi:monitor-arrow-share
+  icon: mdi:monitor-share
   entities:
     switch.echo_alexa_estudio_do_not_disturb_switch:
       state: 'off'
@@ -312,10 +350,10 @@
       state: 'off'
 
 #
-# ESCENA ESTUDIO SETUP - MODO NOCHE TRAS ANOCHECER (OSCURO)
+# ESCENA ESTUDIO NOCHE - TRAS ANOCHECER (OSCURO)
 #
-- id: Estudio Setup Night
-  name: Estudio Setup Night
+- id: estudio_noche
+  name: Estudio Noche
   icon: mdi:monitor-shimmer
   entities:
     light.luz_estudio_izquierda:
@@ -323,10 +361,10 @@
       brightness: 204
     light.luz_estudio_derecha:
       state: 'on'
-      brightness: 205
+      brightness: 204
     light.luz_estudio_nate:
       state: 'on'
-      brightness: 128
+      brightness: 102
     light.luz_estudio_led_mesa:
       state: 'on'
       brightness: 255
@@ -375,10 +413,11 @@
     light.luz_estudio_play_tv:
       state: 'on'
       brightness: 255
+      # Azul: gb_color: 70, 6, 255
       rgb_color:
+        - 76
+        - 6
         - 255
-        - 147
-        - 0
     light.luz_estudio_techo:
       state: 'on'
       brightness: 204
@@ -398,8 +437,8 @@
 #
 # ESCENA ESTUDIO WEBCAM
 #
-- id: Estudio_Setup_Call
-  name: Estudio Setup Call
+- id: estudio_setup_webcam
+  name: Estudio Setup Webcam
   icon: mdi:webcam
   entities:
     switch.echo_alexa_estudio_do_not_disturb_switch:
@@ -411,10 +450,9 @@
       brightness: 255
     light.luz_estudio_nate:
       state: 'on'
-      brightness: 204
+      brightness: 102
     light.luz_estudio_derecha:
-      state: 'on'
-      brightness: 204
+      state: 'off'
     light.luz_estudio_led_mesa:
       state: 'on'
       brightness: 255
@@ -425,46 +463,48 @@
     light.luz_estudio_play_i:
       state: 'on'
       brightness: 255
-      rgb_color:
+      rgb_color: 
         - 255
         - 147
         - 0
     light.luz_estudio_play_d:
       state: 'on'
       brightness: 255
-      rgb_color:
+      rgb_color: 
         - 255
         - 147
         - 0
+    light.luz_estudio_webcam:
+      state: 'on'
+      brightness: 153
+      color_temp_kelvin: 6535
+      color_temp: 153
     light.luz_estudio_alta:
       state: 'on'
       brightness: 255
-      # Azul: gb_color: 255,41,255
-      rgb_color:
-        - 255
-        - 41
-        - 255
+      color_temp_kelvin: 6535
+      color_temp: 153
     light.luz_estudio_media:
       state: 'on'
-      brightness: 255
-      # Azul: gb_color: 70, 6, 255
-      rgb_color:
-        - 76
-        - 6
-        - 255
+      brightness: 204
+      color_temp_kelvin: 6535
+      color_temp: 153
     light.luz_estudio_baja:
       state: 'on'
-      brightness: 255
-      # Azul: gb_color: 70, 6, 255
-      rgb_color:
-        - 76
-        - 6
-        - 255
+      brightness: 153
+      color_temp_kelvin: 6535
+      color_temp: 153
     light.luz_estudio_play_tv:
-      state: 'off'
+      state: 'on'
+      brightness: 255
+      rgb_color: 
+        - 255
+        - 147
+        - 0
+    light.led_estudio_tv:
+      state: 'on'
+      brightness: 204
     light.luz_estudio_tv_izq:
-      state: 'off'
-    light.led_estudio:
       state: 'off'
     light.luz_estudio_taller:
       state: 'off'
@@ -472,13 +512,11 @@
       state: 'off'
     light.luz_estudio_techo:
       state: 'off'
-    light.luz_estudio_webcam:
-      state: 'off'
 
 #
 # ESCENA ESTUDIO FULL - MODO TODAS ENCENDIDAS A FULL
 #
-- id: Estudio Full
+- id: estudio_full
   name: Estudio Full
   icon: mdi:monitor-dashboard
   entities:
@@ -496,28 +534,25 @@
     light.luz_estudio_led_mesa:
       state: 'on'
       brightness: 255
-      rgb_color:
-        - 255
-        - 147
-        - 0
+      rgb_color: 255, 147, 0
     light.luz_estudio_play_i:
       state: 'on'
       brightness: 255
-      rgb_color:
+      rgb_color: 
         - 255
         - 147
         - 0
     light.luz_estudio_play_d:
       state: 'on'
       brightness: 255
-      rgb_color:
+      rgb_color: 
         - 255
         - 147
         - 0
     light.luz_estudio_play_tv:
       state: 'on'
       brightness: 255
-      rgb_color:
+      rgb_color: 
         - 255
         - 147
         - 0
@@ -525,7 +560,7 @@
       state: 'on'
       brightness: 255
       # Azul: gb_color: 255,41,255
-      rgb_color:
+      rgb_color: 
         - 255
         - 41
         - 255
@@ -533,16 +568,16 @@
       state: 'on'
       brightness: 255
       # Azul: gb_color: 70, 6, 255
-      rgb_color:
-        - 76
+      rgb_color: 
+        - 70
         - 6
         - 255
     light.luz_estudio_baja:
       state: 'on'
       brightness: 255
       # Azul: gb_color: 70, 6, 255
-      rgb_color:
-        - 76
+      rgb_color: 
+        - 70
         - 6
         - 255
     light.luz_estudio_techo:
@@ -562,7 +597,7 @@
     light.luz_estudio_taller:
       state: 'on'
 
-- id: Estudio Home Cinema
+- id: estudio_home_cinema
   name: Estudio Home Cinema
   entities:
     # Alexa Estudio Modo No Molestar
@@ -670,7 +705,7 @@
 #
 # ESCENA SALON SUNSET - Configuración del Salón al atardecer
 #
-- id: Salon Sunset
+- id: salon_sunset
   name: Salón Sunset
   entities:
     light.luz_salon_vitrina:
@@ -687,7 +722,7 @@
 #
 # ESCENA SALON NOCHE - Configuración del Salón en modo noche para ver la tv
 #
-- id: Salon Noche
+- id: salon_noche
   name: Salón Noche
   entities:
     light.luz_salon_cilindro:
@@ -704,4 +739,19 @@
       brightness: 204
   icon: mdi:lamp
 
+- id: salon_home_cinema
+  name: Salón Home Cinema
+  entities:
+    light.luz_salon_cilindro:
+      state: 'on'
+      brightness: 76
+    light.luz_salon_vitrina:
+      state: 'on'
+      brightness: 76
+    light.luz_salon_lectura:
+      state: 'off'
+    light.led_salon_tv:
+      state: 'on'
+      brightness: 204
+  icon: mdi:lamp
 
