@@ -440,6 +440,17 @@ alexa_dormitorio_restaura_volumen:
           - media_player.echo_alexa_dormitorio
           - media_player.echo_alexa_dormitorio_aac
 
+alexa_estudio_restaura_volumen:
+  alias: 'Alexa Estudio Restaura Vol'
+  mode: restart
+  sequence:
+    # Restablece el Volumen Anterior al mensaje
+    - service: media_player.volume_set
+      data:
+        volume_level: "{{ states('input_number.alexa_estudio_volumen_anterior')|float }}"
+      target:
+        entity_id: media_player.echo_alexa_estudio
+
 #
 # Script completo para enviar un SONIDO varias repeticiones a un Alexa
 #
@@ -594,7 +605,7 @@ alexa_entrada_secuencia:
         alexa: 'entrada'
         sonido: "{{ sonido }}"
         repeticion: "{{ repeticion }}"
-    - delay: 00:00:10
+    - delay: 00:00:1
     - service: script.alexa_entrada_restaura_volumen
 
 alexa_dormitorio_secuencia:
@@ -611,8 +622,23 @@ alexa_dormitorio_secuencia:
         alexa: 'dormitorio'
         sonido: "{{ sonido }}"
         repeticion: "{{ repeticion }}"
-    - delay: 00:00:10
     - service: script.alexa_dormitorio_restaura_volumen
+
+alexa_estudio_secuencia:
+  alias: 'Alexa Estudio Secuencia'
+  mode: restart
+  sequence:
+    - service: script.alexa_estudio_set_volumen
+    - service: script.alexa_anuncio
+      data_template:
+        alexa: 'estudio'
+        voz: "{{ voz }}"
+    - service: script.alexa_sonido_alarma
+      data_template:
+        alexa: 'estudio'
+        sonido: "{{ sonido }}"
+        repeticion: "{{ repeticion }}"
+    - service: script.alexa_estudio_restaura_volumen
 
 #
 # Script completo para enviar un sonido de cuenta atrás durante el proceso de ARMADO
@@ -778,7 +804,7 @@ alexa_secuencia_alarma_disparada:
                 - media_player.echo_alexa_dormitorio
               media_content_type: sound
               media_content_id: "{{ states('input_select.alarma_sonido_disparado') }}"
-          - delay: 00:00:03
+          #- delay: 00:00:03
     #######################################
     # SONOFF_SW1_SIRENA INTERIOR ==> OFF
     #######################################

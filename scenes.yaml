@@ -125,7 +125,6 @@
     cover.persiana_estudio:
       current_position: 100
       assumed_state: true
-      friendly_name: Persiana Estudio
       state: open
     # Luces Noche - Techo
     #
@@ -446,13 +445,13 @@
     light.luz_estudio_mesa:
      state: 'off'
     light.luz_estudio_izquierda:
-      state: 'on'
+      state: 'off'
       brightness: 255
-    light.luz_estudio_nate:
-      state: 'on'
-      brightness: 102
     light.luz_estudio_derecha:
       state: 'off'
+    light.luz_estudio_nate:
+      state: 'on'
+      brightness: 153
     light.luz_estudio_led_mesa:
       state: 'on'
       brightness: 255
@@ -481,7 +480,7 @@
       color_temp: 153
     light.luz_estudio_alta:
       state: 'on'
-      brightness: 255
+      brightness: 204
       color_temp_kelvin: 6535
       color_temp: 153
     light.luz_estudio_media:
@@ -491,12 +490,12 @@
       color_temp: 153
     light.luz_estudio_baja:
       state: 'on'
-      brightness: 153
+      brightness: 204
       color_temp_kelvin: 6535
       color_temp: 153
     light.luz_estudio_play_tv:
       state: 'on'
-      brightness: 255
+      brightness: 204
       rgb_color: 
         - 255
         - 147
@@ -738,6 +737,24 @@
       state: 'on'
       brightness: 204
   icon: mdi:lamp
+
+- id: salon_lectura
+  name: Salón Lectura
+  entities:
+    light.luz_salon_cilindro:
+      state: 'on'
+      brightness: 153
+    light.luz_salon_vitrina:
+      state: 'on'
+      brightness: 230
+    light.luz_salon_lectura:
+      state: 'on'
+      brightness: 153
+    light.led_salon_tv:
+      state: 'on'
+      brightness: 204
+  icon: mdi:mdi:lamps-outline
+
 
 - id: salon_home_cinema
   name: Salón Home Cinema

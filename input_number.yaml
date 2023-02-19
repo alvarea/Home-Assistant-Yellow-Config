@@ -249,7 +249,6 @@
     step: 0.1
     icon: mdi:volume-source
 
-
 # Volumen Anuncios Normales Alexa Estudio de Día
   alexa_estudio_volumen_anuncio_dia:
     name: Anuncio Día Estudio

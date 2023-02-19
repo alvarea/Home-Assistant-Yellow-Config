@@ -174,7 +174,7 @@
     - service: script.alexa_secuencia
       data_template:
         sonido: "{{ states('input_select.alarma_sonido_disparado') }}"
-        repeticion: 5
+        repeticion: 1
         voz: 'ATENCION! ¡ALARMA HUMO COCINA!. Sensor Humo Cocina. ¡ATENCION! ¡ALARMA!'
 
     # Script Notificaciones Alarma
@@ -202,7 +202,7 @@
     - service: script.alexa_secuencia
       data_template:
         sonido: "{{ states('input_select.alarma_sonido_disparado') }}"
-        repeticion: 5
+        repeticion: 1
         voz: 'ATENCION! ¡ALARMA AGUA ARQUETA!. Sensor Agua Arqueta. ¡ATENCION! ¡ALARMA!'
 
     # Script Notificación Alarma
@@ -292,7 +292,7 @@
       data_template:
         voz: "ATENCION!. Armado Total activado."
         sonido: "{{ states('input_select.alarma_sonido_armado') }}"
-        repeticion: 2
+        repeticion: 1
 
     # Notifica Evento
     - service: script.notifica_evento
@@ -341,7 +341,7 @@
       data_template:
         voz: "ATENCION!. Armado parcial activado."
         sonido: "{{ states('input_select.alarma_sonido_armado') }}"
-        repeticion: 2
+        repeticion: 1
 
     # Notifica Evento
     - service: script.notifica_evento
@@ -1327,10 +1327,14 @@
       entity_id: binary_sensor.cube_158d00024a4a62
       action_type: free_fall
   action:
-    #- service: script.luces_estudio_top
+    - service: script.alexa_estudio_secuencia
+      data_template:
+        sonido: 'clock_01'
+        repeticion: 1
+        voz: "Vale, activando escena Estudio Noche"
     - service: scene.turn_on
       target:
-        entity_id: scene.estudio_setup_night
+        entity_id: scene.estudio_noche
       data:
         transition: 3
 
@@ -1346,11 +1350,17 @@
   action:
     - service: light.turn_off
       entity_id: light.luz_estudio_izquierda
-    - delay: '00:00:05'
+    - service: script.alexa_estudio_secuencia
+      data_template:
+        sonido: 'clock_01'
+        repeticion: 1
+        voz: "Vale, apago luces en 30 segundos"
+    # Apaga luces estudio
+    #
     - service: light.turn_off
       entity_id: light.luz_estudio
       data:
-        transition: 10
+        transition: 30
 
 - id: L14
   alias: 'L14 Cube Flip90 Light Estudio Setup Soft'
@@ -1362,13 +1372,16 @@
       entity_id: binary_sensor.cube_158d00024a4a62
       action_type: flip90
   action:
-    #- service: light.toggle
-    #  entity_id: light.sonoff_mini_sw2
+    - service: script.alexa_estudio_secuencia
+      data_template:
+        sonido: 'clock_01'
+        repeticion: 1
+        voz: "Vale, activando escena setup soft"
     - service: scene.turn_on
       target:
         entity_id: scene.estudio_setup_soft
       data:
-        transition: 3
+        transition: 5
 
 - id: L15
   alias: 'L15 Cube Flip180 Light Estudio Desk High'
@@ -1380,11 +1393,16 @@
       entity_id: binary_sensor.cube_158d00024a4a62
       action_type: flip180
   action:
+    - service: script.alexa_estudio_secuencia
+      data_template:
+        sonido: 'clock_01'
+        repeticion: 1
+        voz: "Vale, activando escena setup high"
     - service: scene.turn_on
       target:
         entity_id: scene.estudio_setup_high
       data:
-        transition: 3
+        transition: 5
 
 - id: L16
   alias: 'L16 Cube TapTwice'
@@ -1396,13 +1414,16 @@
       entity_id: binary_sensor.cube_158d00024a4a62
       action_type: tap_twice
   action:
-    # Encendido Led Azul Tag Reader
+    - service: script.alexa_estudio_secuencia
+      data_template:
+        sonido: 'clock_01'
+        repeticion: 1
+        voz: "Vale, activando escena setup webcam"
     - service: scene.turn_on
       target:
-        entity_id: scene.estudio_setup_call
+        entity_id: scene.estudio_setup_webcam
       data:
-        transition: 3
-
+        transition: 1
 
 #-----------------------------------------------------------------------------#
 #                                                                             #
