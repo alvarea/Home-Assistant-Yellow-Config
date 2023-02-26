@@ -442,14 +442,21 @@ cloud:
         - scene.estudio_full
         - scene.estudio_home_cinema
         - scene.estudio_noche
+        - scene.estudio_azul
         - scene.estudio_setup_webcam
         - scene.estudio_setup_high
         - scene.estudio_setup_soft
         - scene.estudio_noche
         - scene.estudio_sunrise
         - scene.estudio_sunset
-        - scene.salon_noche
         - scene.salon_sunset
+        - scene.salon_noche
+        - scene.salon_lectura
+        - scene.salon_home_cinema
+        - scene.dormitorio_full
+        - scene.dormitorio_lectura
+        - scene.dormitorio_relax
+        - scene.dormitorio_noche
         # PERSIANAS
         - cover.persiana_estudio
     entity_config:

@@ -965,22 +965,22 @@
 - id: L01
   alias: 'L01 Luces On Exterior Sunset'
   trigger:
-      # offset: "+01:00:00"   # Horario Invierno GMT+1 - Enero
       # offset: "+00:30:00"   # Horario Invierno GMT+1
+      # offset: "+00:10:00"   # Horario Invierno GMT+1 - Febrero
       # offset: "-00:30:00"   # Horario Verano GMT+2
     - platform: sun
       event: sunset
-      offset: "+00:30:00"
+      offset: "+00:10:00"
   action:
     # Encendido Luces Exterior y Jardín
     - service: script.luces_exterior_on
     # Notifica a Familia
     - service: script.notifica_evento
       data:
-        voz: 'Se va a poner el sol. Enciendo luces del jardín'
+        voz: 'Se ha puesto el sol. Enciendo luces del jardín'
         titulo: '*ALUMBRADO*'
         mensaje: >
-          >>> EVENTO: Puesta de Sol en 10'
+          >>> EVENTO: Puesta de Sol hace 10'
 
           >>> LUCES: Alumbrado Exterior On
 
@@ -1029,8 +1029,11 @@
         entity_id: sensor.aqara_movimiento_salon_luminosidad
         below: 50
   action:
-    - service: light.turn_on
-      entity_id: light.luz_salon_vitrina
+    - service: scene.turn_on
+      target:
+        entity_id: scene.salon_sunset
+      data:
+        transition: 30
     # Notifica a Familia
     - service: script.notifica_evento
       data:
@@ -1116,7 +1119,7 @@
     condition: and
     conditions:
       - condition: template
-        value_template: "{{ (now().hour >= 0 and now().hour <= 11) or (now().hour > 17 and now().hour <= 23) }}"
+        value_template: "{{ (now().hour >= 0 and now().hour < 11) or (now().hour > 17 and now().hour <= 23) }}"
       - condition: state
         entity_id: light.luz_entrada
         state: 'off'
@@ -1199,7 +1202,7 @@
       #  after: sunset
       #  after_offset: "-02:00:00"
       - condition: template
-        value_template: "{{ (now().hour >= 0 and now().hour <= 11) or (now().hour > 17 and now().hour <= 23) }}"
+        value_template: "{{ (now().hour >= 0 and now().hour < 11) or (now().hour > 17 and now().hour <= 23) }}"
       - condition: numeric_state
         entity_id: sensor.hue_movimiento_pasillo_luminosidad
         below: 4

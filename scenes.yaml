@@ -89,14 +89,7 @@
       color_temp_kelvin: 6535
       color_temp: 153
     light.luz_estudio_webcam:
-      state: 'on'
-      brightness: 128
-      rgb_color: 
-        - 254
-        - 254
-        - 254
-      color_temp_kelvin: 6535
-      color_temp: 153
+      state: 'off'
     light.luz_estudio_play_tv:
       state: 'off'
     light.luz_estudio_techo:
@@ -189,6 +182,87 @@
     light.luz_estudio_play_tv:
       state: 'off'
     light.luz_estudio_techo:
+      state: 'off'
+    light.luz_estudio_lectura:
+      state: 'off'
+    light.luz_estudio_tv_izq:
+      state: 'off'
+    light.led_estudio_tv:
+      state: 'off'
+    light.luz_estudio_taller:
+      state: 'off'
+    light.luz_estudio_webcam:
+      state: 'off'
+
+#
+# ESCENA ESTUDIO NOCHE - Configuración del setup en modo trabajo cuando es de noche, no toca persiana.
+#
+- id: estudio_noche
+  name: Estudio Noche
+  icon: mdi:lightbulb-night-outline
+  entities:
+    light.luz_estudio_mesa:
+     state: 'off'
+    light.luz_estudio_izquierda:
+      state: 'on'
+      brightness: 204
+    light.luz_estudio_derecha:
+      state: 'off'
+    light.luz_estudio_nate:
+      state: 'on'
+      brightness: 102
+    light.luz_estudio_led_mesa:
+      state: 'on'
+      brightness: 255
+      rgb_color: 
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_play_i:
+      state: 'on'
+      brightness: 255
+      rgb_color: 
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_play_d:
+      state: 'on'
+      brightness: 255
+      rgb_color: 
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_alta:
+      state: 'on'
+      brightness: 255
+      rgb_color: 
+        - 254
+        - 254
+        - 254
+      color_temp_kelvin: 6535
+      color_temp: 153
+    light.luz_estudio_media:
+      state: 'on'
+      brightness: 204
+      rgb_color: 
+        - 254
+        - 254
+        - 254
+      color_temp_kelvin: 6535
+      color_temp: 153
+    light.luz_estudio_baja:
+      state: 'on'
+      brightness: 153
+      rgb_color: 
+        - 254
+        - 254
+        - 254
+      color_temp_kelvin: 6535
+      color_temp: 153
+    light.luz_estudio_techo:
+      state: 'on'
+      brightness: 204
+    light.luz_estudio_play_tv:
       state: 'off'
     light.luz_estudio_lectura:
       state: 'off'
@@ -349,10 +423,10 @@
       state: 'off'
 
 #
-# ESCENA ESTUDIO NOCHE - TRAS ANOCHECER (OSCURO)
+# ESCENA ESTUDIO AZUL - TRAS ANOCHECER SETUP AZUL+MAGENTA
 #
-- id: estudio_noche
-  name: Estudio Noche
+- id: estudio_azul
+  name: Estudio Azul
   icon: mdi:monitor-shimmer
   entities:
     light.luz_estudio_izquierda:
@@ -755,7 +829,6 @@
       brightness: 204
   icon: mdi:mdi:lamps-outline
 
-
 - id: salon_home_cinema
   name: Salón Home Cinema
   entities:
@@ -772,3 +845,49 @@
       brightness: 204
   icon: mdi:lamp
 
+#
+# ESCENAs DORMITORIO PRINCIPAL
+#
+- id: dormitorio_full
+  name: Dormitorio Full
+  entities:
+    light.luz_dormitorio_malen:
+      state: 'on'
+      brightness: 255
+    light.luz_dormitorio_agustin:
+      state: 'on'
+      brightness: 255
+  icon: mdi:lightbulb-on
+
+- id: dormitorio_lectura
+  name: Dormitorio Lectura
+  entities:
+    light.luz_dormitorio_malen:
+      state: 'on'
+      brightness: 128
+    light.luz_dormitorio_agustin:
+      state: 'on'
+      brightness: 128
+  icon: mdi:lightbulb-on-50
+
+- id: dormitorio_relax
+  name: Dormitorio Relax
+  entities:
+    light.luz_dormitorio_malen:
+      state: 'on'
+      brightness: 76
+    light.luz_dormitorio_agustin:
+      state: 'on'
+      brightness: 76
+  icon: mdi:lightbulb-on-30
+
+- id: dormitorio_noche
+  name: Dormitorio Noche
+  entities:
+    light.luz_dormitorio_malen:
+      state: 'on'
+      brightness: 25
+    light.luz_dormitorio_agustin:
+      state: 'on'
+      brightness: 25
+  icon: mdi:lightbulb-on-10

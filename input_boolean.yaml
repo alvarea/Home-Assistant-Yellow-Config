@@ -218,6 +218,21 @@
     name: Programador CH3 Timer3
     icon: mdi:dip-switch
 
+  # Riego Cesped CH4
+  riego_cesped_ch_programador_t1:
+    name: Programador CH3 Timer1
+    icon: mdi:dip-switch
+
+  # Riego Cesped CH4 - Tramo2
+  riego_cesped_ch4_programador_t2:
+    name: Programador CH3 Timer2
+    icon: mdi:dip-switch
+
+  # Riego Cesped CH4 - Tramo3
+  riego_cesped_ch4_programador_t3:
+    name: Programador CH4 Timer3
+    icon: mdi:dip-switch
+
 # Programador Diario Luces Jardín
 
   programador_luz_faroles_exterior:

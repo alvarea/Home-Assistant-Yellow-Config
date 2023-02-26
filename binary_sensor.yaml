@@ -893,8 +893,7 @@
         value_template: >-
           {% if is_state('input_select.riego_bonsais_ch1_programador_dias','Diario') and is_state('input_boolean.riego_bonsais_ch1_programador_t1','on') %}
             true
-          {% elif is_state('input_select.riego_bonsais_ch1_programador_dias','Días Pares') 
-              and is_state('input_boolean.riego_bonsais_ch1_programador_t1','on')
+          {% elif is_state('input_select.riego_bonsais_ch1_programador_dias','Días Pares') and is_state('input_boolean.riego_bonsais_ch1_programador_t1','on')
               and (now().weekday() % 2 == 0) 
           %}
             true
@@ -914,8 +913,7 @@
         value_template: >-
           {% if is_state('input_select.riego_bonsais_ch1_programador_dias','Diario') and is_state('input_boolean.riego_bonsais_ch1_programador_t2','on') %}
             true
-          {% elif is_state('input_select.riego_bonsais_ch1_programador_dias','Días Pares') 
-              and is_state('input_boolean.riego_bonsais_ch1_programador_t2','on')
+          {% elif is_state('input_select.riego_bonsais_ch1_programador_dias','Días Pares') and is_state('input_boolean.riego_bonsais_ch1_programador_t2','on')
               and (now().weekday() % 2 == 0) 
           %}
             true
@@ -959,8 +957,7 @@
         value_template: >-
           {% if is_state('input_select.riego_bonsais_ch2_programador_dias','Diario') and is_state('input_boolean.riego_bonsais_ch2_programador_t1','on') %}
             true
-          {% elif is_state('input_select.riego_bonsais_ch2_programador_dias','Días Pares') 
-              and is_state('input_boolean.riego_bonsais_ch2_programador_t1','on')
+          {% elif is_state('input_select.riego_bonsais_ch2_programador_dias','Días Pares') and is_state('input_boolean.riego_bonsais_ch2_programador_t1','on')
               and (now().weekday() % 2 == 0) 
           %}
             true
@@ -980,8 +977,7 @@
         value_template: >-
           {% if is_state('input_select.riego_bonsais_ch2_programador_dias','Diario') and is_state('input_boolean.riego_bonsais_ch2_programador_t2','on') %}
             true
-          {% elif is_state('input_select.riego_bonsais_ch2_programador_dias','Días Pares') 
-              and is_state('input_boolean.riego_bonsais_ch2_programador_t2','on')
+          {% elif is_state('input_select.riego_bonsais_ch2_programador_dias','Días Pares') and is_state('input_boolean.riego_bonsais_ch2_programador_t2','on')
               and (now().weekday() % 2 == 0) 
           %}
             true
@@ -1093,6 +1089,10 @@
         value_template: >-
           {% if is_state('input_select.riego_bonsais_ch0_programador_dias','Diario') and is_state('input_boolean.riego_bonsais_ch0_programador_t1','on') %}
             true
+          {% elif is_state('input_select.riego_bonsais_ch0_programador_dias','Días Pares') and is_state('input_boolean.riego_bonsais_ch0_programador_t1','on')
+              and (now().weekday() % 2 == 0) 
+          %}
+            true
           {% elif is_state('input_select.riego_bonsais_ch0_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_bonsais_ch0_programador_t1','on') %}
             true
           {% elif is_state('input_select.riego_bonsais_ch0_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.riego_bonsais_ch0_programador_t1','on') %}
@@ -1108,6 +1108,10 @@
         icon_template: mdi:calendar-check
         value_template: >-
           {% if is_state('input_select.riego_bonsais_ch0_programador_dias','Diario') and is_state('input_boolean.riego_bonsais_ch0_programador_t2','on') %}
+            true
+          {% elif is_state('input_select.riego_bonsais_ch0_programador_dias','Días Pares') and is_state('input_boolean.riego_bonsais_ch0_programador_t2','on')
+              and (now().weekday() % 2 == 0) 
+          %}
             true
           {% elif is_state('input_select.riego_bonsais_ch0_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_bonsais_ch0_programador_t2','on') %}
             true
@@ -1149,6 +1153,10 @@
         value_template: >-
           {% if is_state('input_select.riego_tomates_ch0_programador_dias','Diario') and is_state('input_boolean.riego_tomates_ch0_programador_t1','on') %}
             true
+          {% elif is_state('input_select.riego_tomates_ch0_programador_dias','Días Pares') and is_state('input_boolean.riego_tomates_ch0_programador_t1','on')
+              and (now().weekday() % 2 == 0) 
+          %}
+            true
           {% elif is_state('input_select.riego_tomates_ch0_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_tomates_ch0_programador_t1','on') %}
             true
           {% elif is_state('input_select.riego_tomates_ch0_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.riego_tomates_ch0_programador_t1','on') %}
@@ -1164,6 +1172,10 @@
         icon_template: mdi:calendar-check
         value_template: >-
           {% if is_state('input_select.riego_tomates_ch0_programador_dias','Diario') and is_state('input_boolean.riego_tomates_ch0_programador_t2','on') %}
+            true
+          {% elif is_state('input_select.riego_tomates_ch0_programador_dias','Días Pares') and is_state('input_boolean.riego_tomates_ch0_programador_t2','on')
+              and (now().weekday() % 2 == 0) 
+          %}
             true
           {% elif is_state('input_select.riego_tomates_ch0_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_tomates_ch0_programador_t2','on') %}
             true
@@ -1200,11 +1212,15 @@
         friendly_name: 'Riego Cesped CH1 on/off'
         icon_template: mdi:sprinkler
 
+      # ALVAREA
       riego_cesped_ch1_dia_ejecucion_t1:
         friendly_name: '¿Próxima Ejecución Hoy? (CH1-T1)'
         icon_template: mdi:calendar-check
         value_template: >-
           {% if is_state('input_select.riego_cesped_ch1_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch1_programador_t1','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch1_programador_dias','Días Pares') and is_state('input_boolean.riego_cesped_ch1_programador_t1','on')
+                  and (now().weekday() % 2 == 0) %}
             true
           {% elif is_state('input_select.riego_cesped_ch1_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_cesped_ch1_programador_t1','on') %}
             true
@@ -1222,6 +1238,9 @@
         value_template: >-
           {% if is_state('input_select.riego_cesped_ch1_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch1_programador_t2','on') %}
             true
+          {% elif is_state('input_select.riego_cesped_ch1_programador_dias','Días Pares') and is_state('input_boolean.riego_cesped_ch1_programador_t2','on')
+                  and (now().weekday() % 2 == 0) %}
+            true
           {% elif is_state('input_select.riego_cesped_ch1_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_cesped_ch1_programador_t2','on') %}
             true
           {% elif is_state('input_select.riego_cesped_ch1_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.riego_cesped_ch1_programador_t2','on') %}
@@ -1237,6 +1256,9 @@
         icon_template: mdi:calendar-check
         value_template: >-
           {% if is_state('input_select.riego_cesped_ch1_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch1_programador_t3','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch1_programador_dias','Días Pares') and is_state('input_boolean.riego_cesped_ch1_programador_t3','on')
+                  and (now().weekday() % 2 == 0) %}
             true
           {% elif is_state('input_select.riego_cesped_ch1_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_cesped_ch1_programador_t3','on') %}
             true
@@ -1282,6 +1304,9 @@
         value_template: >-
           {% if is_state('input_select.riego_cesped_ch2_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch2_programador_t1','on') %}
             true
+          {% elif is_state('input_select.riego_cesped_ch2_programador_dias','Días Pares') and is_state('input_boolean.riego_cesped_ch2_programador_t1','on')
+                  and (now().weekday() % 2 == 0) %}   
+            true
           {% elif is_state('input_select.riego_cesped_ch2_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_cesped_ch2_programador_t1','on') %}
             true
           {% elif is_state('input_select.riego_cesped_ch2_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.riego_cesped_ch2_programador_t1','on') %}
@@ -1298,6 +1323,9 @@
         value_template: >-
           {% if is_state('input_select.riego_cesped_ch2_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch2_programador_t2','on') %}
             true
+          {% elif is_state('input_select.riego_cesped_ch2_programador_dias','Días Pares') and is_state('input_boolean.riego_cesped_ch2_programador_t2','on')
+                  and (now().weekday() % 2 == 0) %}   
+            true
           {% elif is_state('input_select.riego_cesped_ch2_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_cesped_ch2_programador_t2','on') %}
             true
           {% elif is_state('input_select.riego_cesped_ch2_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.riego_cesped_ch2_programador_t2','on') %}
@@ -1313,6 +1341,9 @@
         icon_template: mdi:calendar-check
         value_template: >-
           {% if is_state('input_select.riego_cesped_ch2_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch2_programador_t3','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch2_programador_dias','Días Pares') and is_state('input_boolean.riego_cesped_ch2_programador_t3','on')
+                  and (now().weekday() % 2 == 0) %}   
             true
           {% elif is_state('input_select.riego_cesped_ch2_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_cesped_ch2_programador_t3','on') %}
             true
@@ -1358,6 +1389,9 @@
         value_template: >-
           {% if is_state('input_select.riego_cesped_ch3_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch3_programador_t1','on') %}
             true
+          {% elif is_state('input_select.riego_cesped_ch3_programador_dias','Días Pares') and is_state('input_boolean.riego_cesped_ch3_programador_t1','on')
+                  and (now().weekday() % 2 == 0) %}   
+            true
           {% elif is_state('input_select.riego_cesped_ch3_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_cesped_ch3_programador_t1','on') %}
             true
           {% elif is_state('input_select.riego_cesped_ch3_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.riego_cesped_ch3_programador_t1','on') %}
@@ -1374,6 +1408,9 @@
         value_template: >-
           {% if is_state('input_select.riego_cesped_ch3_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch3_programador_t2','on') %}
             true
+          {% elif is_state('input_select.riego_cesped_ch3_programador_dias','Días Pares') and is_state('input_boolean.riego_cesped_ch3_programador_t2','on')
+                  and (now().weekday() % 2 == 0) %}   
+            true
           {% elif is_state('input_select.riego_cesped_ch3_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_cesped_ch3_programador_t2','on') %}
             true
           {% elif is_state('input_select.riego_cesped_ch3_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.riego_cesped_ch3_programador_t2','on') %}
@@ -1384,12 +1421,34 @@
             false
           {% endif %}
 
+      riego_cesped_ch3_dia_ejecucion_t3:
+        friendly_name: '¿Próxima Ejecución Hoy? (CH3-T3)'
+        icon_template: mdi:calendar-check
+        value_template: >-
+          {% if is_state('input_select.riego_cesped_ch3_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch3_programador_t3','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch3_programador_dias','Días Pares') and is_state('input_boolean.riego_cesped_ch3_programador_t3','on')
+                  and (now().weekday() % 2 == 0) %}   
+            true
+          {% elif is_state('input_select.riego_cesped_ch3_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_cesped_ch3_programador_t3','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch3_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.riego_cesped_ch3_programador_t3','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch3_programador_dias','Weekend') and now().weekday() | int in (5,6) and is_state('input_boolean.riego_cesped_ch3_programador_t3','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
       riego_cesped_ch3_dia_ejecucion:
         friendly_name: '¿Próxima Ejecución Hoy? (CH3)'
         icon_template: mdi:tree
         value_template: >-
           {% if is_state('input_boolean.riego_interruptor_global','on')
-                and (is_state('binary_sensor.riego_cesped_ch3_dia_ejecucion_t1','on') or is_state('binary_sensor.riego_cesped_ch3_dia_ejecucion_t2','on'))
+                and (is_state('binary_sensor.riego_cesped_ch3_dia_ejecucion_t1','on') 
+                      or is_state('binary_sensor.riego_cesped_ch3_dia_ejecucion_t2','on')
+                      or is_state('binary_sensor.riego_cesped_ch3_dia_ejecucion_t3','on')
+                    )
           %}
             true
           {% else %}
@@ -1415,6 +1474,9 @@
         value_template: >-
           {% if is_state('input_select.riego_cesped_ch4_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch4_programador_t1','on') %}
             true
+          {% elif is_state('input_select.riego_cesped_ch4_programador_dias','Días Pares') and is_state('input_boolean.riego_cesped_ch4_programador_t1','on')
+                  and (now().weekday() % 2 == 0) %}   
+            true
           {% elif is_state('input_select.riego_cesped_ch4_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_cesped_ch4_programador_t1','on') %}
             true
           {% elif is_state('input_select.riego_cesped_ch4_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.riego_cesped_ch4_programador_t1','on') %}
@@ -1431,6 +1493,9 @@
         value_template: >-
           {% if is_state('input_select.riego_cesped_ch4_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch4_programador_t2','on') %}
             true
+          {% elif is_state('input_select.riego_cesped_ch4_programador_dias','Días Pares') and is_state('input_boolean.riego_cesped_ch4_programador_t2','on')
+                  and (now().weekday() % 2 == 0) %}   
+            true
           {% elif is_state('input_select.riego_cesped_ch4_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_cesped_ch4_programador_t2','on') %}
             true
           {% elif is_state('input_select.riego_cesped_ch4_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.riego_cesped_ch4_programador_t2','on') %}
@@ -1441,12 +1506,34 @@
             false
           {% endif %}
 
+      riego_cesped_ch4_dia_ejecucion_t3:
+        friendly_name: '¿Próxima Ejecución Hoy? (CH4-T3)'
+        icon_template: mdi:calendar-check
+        value_template: >-
+          {% if is_state('input_select.riego_cesped_ch4_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch4_programador_t3','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch4_programador_dias','Días Pares') and is_state('input_boolean.riego_cesped_ch4_programador_t3','on')
+                  and (now().weekday() % 2 == 0) %}   
+            true
+          {% elif is_state('input_select.riego_cesped_ch4_programador_dias','Sábado') and now().weekday() | int == 5 and is_state('input_boolean.riego_cesped_ch4_programador_t3','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch4_programador_dias','Domingo') and now().weekday() | int == 6 and is_state('input_boolean.riego_cesped_ch4_programador_t3','on') %}
+            true
+          {% elif is_state('input_select.riego_cesped_ch4_programador_dias','Weekend') and now().weekday() | int in (5,6) and is_state('input_boolean.riego_cesped_ch4_programador_t3','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+
       riego_cesped_ch4_dia_ejecucion:
         friendly_name: '¿Próxima Ejecución Hoy? (CH4)'
         icon_template: mdi:tree
         value_template: >-
           {% if is_state('input_boolean.riego_interruptor_global','on')
-                and (is_state('binary_sensor.riego_cesped_ch4_dia_ejecucion_t1','on') or is_state('binary_sensor.riego_cesped_ch4_dia_ejecucion_t2','on'))
+                and (is_state('binary_sensor.riego_cesped_ch4_dia_ejecucion_t1','on') 
+                      or is_state('binary_sensor.riego_cesped_ch4_dia_ejecucion_t2','on')
+                      or is_state('binary_sensor.riego_cesped_ch4_dia_ejecucion_t3','on')
+                )
           %}
             true
           {% else %}
