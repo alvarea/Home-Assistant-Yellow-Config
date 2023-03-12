@@ -593,7 +593,7 @@
           {% if is_state('input_select.piscina_depuradora_ch0_programador_dias','Diario') and is_state('input_boolean.piscina_depuradora_ch0_programador_t2','on') %}
             true
           {% elif is_state('input_select.piscina_depuradora_ch0_programador_dias','Días Pares') 
-              and is_state('input_boolean.piscina_depuradora_ch0_programador_t1','on')
+              and is_state('input_boolean.piscina_depuradora_ch0_programador_t2','on')
               and (now().weekday() % 2 == 0) 
           %}
             true

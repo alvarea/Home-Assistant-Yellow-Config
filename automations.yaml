@@ -1351,20 +1351,23 @@
       entity_id: binary_sensor.cube_158d00024a4a62
       action_type: shake_air
   action:
+    # Aviso apagando luces estudio izquierda solo
+    #
     - service: light.turn_off
       entity_id: light.luz_estudio_izquierda
-    - service: script.alexa_estudio_secuencia
-      data_template:
-        sonido: 'clock_01'
-        repeticion: 1
-        voz: "Vale, apago luces en 30 segundos"
-    # Apaga luces estudio
+    # Apaga luces estudio con retardo variable en función de la hora
     #
     - service: light.turn_off
       entity_id: light.luz_estudio
       data:
-        transition: 30
-
+        transition: >
+          {% if now().hour >= 0 and now().hour <= 7 %} 30
+          {% elif now().hour >= 8 and now().hour <= 18 %} 1
+          {% else %} 30
+          {% endif %}
+      target:
+        entity_id: light.luz_pasillo
+        
 - id: L14
   alias: 'L14 Cube Flip90 Light Estudio Setup Soft'
   mode: restart

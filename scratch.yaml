@@ -47,3 +47,77 @@ luces_jardin_grp:
     - light.luz_olivo_nubes             # Foco Olivo Nubes (switch.esphome_4ch_relay_3)
     - light.luz_entrada_bonsai          # Foco Entrada Bonsai (switch.esphome_4ch_relay_4)
     - light.luz_porche_jardin           # Porche Salón (MINI_SW2)
+
+
+
+
+
+type: entities
+entities:
+  - entity: binary_sensor.riego_bonsais_ch1_status
+    secondary_info: last-changed
+  - entity: switch.esphome_4ch_sw2_relay_1
+    secondary_info: none
+  - entity: timer.riego_bonsais_ch1
+  - entity: sensor.riego_bonsais_ch1_duracion_planificada_total
+  - entity: input_boolean.riego_bonsais_ch1_programador_t1
+    name: Programador Tramo1
+  - entity: input_boolean.riego_bonsais_ch1_programador_t2
+    name: Programador Tramo2
+  - entity: input_select.riego_bonsais_ch1_programador_dias
+show_header_toggle: false
+state_color: true
+
+
+cards:
+  - type: custom:mushroom-entity-card
+    fill_container: true
+    layout: vertical
+    tap_action:
+      action: toggle
+    name: Producción
+    entity: switch.esphome_pow_sw1
+    icon_color: teal
+  - type: custom:mushroom-entity-card
+    entity: timer.riego_bonsais_ch0
+    fill_container: true
+    layout: vertical
+    name: Timer
+    icon: ''
+  - type: custom:mushroom-entity-card
+    fill_container: true
+    layout: vertical
+    name: Duración
+    icon: ''
+    entity: sensor.riego_bonsais_ch0_duracion_planificada_total
+type: horizontal-stack
+
+cards:
+  - type: custom:mushroom-entity-card
+    fill_container: false
+    layout: horizontal
+    tap_action:
+      action: toggle
+    name: T1
+    entity: input_boolean.riego_bonsais_ch0_programador_t1
+  - type: custom:mushroom-entity-card
+    fill_container: false
+    layout: horizontal
+    tap_action:
+      action: toggle
+    name: T2
+    entity: input_boolean.riego_bonsais_ch0_programador_t2
+type: horizontal-stack
+
+
+type: gauge
+entity: sensor.riego_bonsais_ch0_duracion_planificada_total
+name: Tiempo Total
+min: 0
+max: 12
+unit: Min
+needle: true
+severity:
+  green: 1
+  yellow: 6
+  red: 10

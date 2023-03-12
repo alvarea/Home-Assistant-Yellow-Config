@@ -288,11 +288,11 @@
     # Persiana
     #
     cover.persiana_estudio:
-      current_position: 0
+      current_position: 40
       assumed_state: true
       friendly_name: Persiana Estudio
       supported_features: 15
-      state: closed
+      state: open
     # Luces Estudio Off
     #
     light.luz_estudio:

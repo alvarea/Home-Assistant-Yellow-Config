@@ -179,7 +179,7 @@ views:
                 entities:
                   - entity: sensor.ly3_entrada_exterior_temperatura
                     name: Entrada Exterior
-                  - entity: sensor.temp_interior
+                  - entity: sensor.temperatura_interior
                     name: Media Interior
                 font_size: 120
                 line_width: 4
@@ -425,8 +425,8 @@ views:
             type: entities
         type: vertical-stack
       - entities:
-          - entity: group.alarma_sensores_presencia_interior_grp
-            name: Grupo Sensores Alarma  Interior
+          - entity: binary_sensor.alarma_sensores_presencia_interior
+            name: Helper Sensores Alarma  Interior
           - entity: binary_sensor.alarma_sensor_movimiento_blink_hall
             name: Alarma Cámara Hall Entrada
             secondary_info: last-changed
@@ -453,8 +453,8 @@ views:
         state_color: true
         type: entities
       - entities:
-          - entity: group.alarma_sensores_presencia_exterior_grp
-            name: Grupo Sensores Alarma Exterior
+          - entity: binary_sensor.alarma_sensores_presencia_exterior
+            name: Helper Sensores Alarma Exterior
           - entity: binary_sensor.alarma_sensor_movimiento_entrada_exterior
             secondary_info: last-changed
             name: Alarma Presencia Entrada Exterior
@@ -497,6 +497,9 @@ views:
         state_color: true
         type: entities
       - entities:
+          - entity: binary_sensor.alarma_sensores_perimetro
+            secondary_info: last-changed
+            name: Helper Sensores Perímetro
           - entity: binary_sensor.aqara_puerta_entrada_principal
             secondary_info: last-changed
             name: Aqara Puerta Entrada Principal
@@ -685,8 +688,7 @@ views:
           - entity: input_boolean.family_sleep_home_aac
           - entity: binary_sensor.family_home_aac
             secondary_info: last-changed
-          - entity: device_tracker.b8b52a3b_f038_4e72_a268_705d9b06e496
-            secondary_info: last-changed
+          - entity: device_tracker.c059137e_07d2_49ea_ae8b_3865a1b71619
           - entity: device_tracker.iphone_aac
             secondary_info: last-changed
           - entity: device_tracker.apple_94_ac_c4_iphone_aac
@@ -802,6 +804,50 @@ views:
             name: LUCES HALL (ENTRADA-PASILLO)
             entity: light.luz_hall
           - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.salon_home_cinema
+                  data:
+                    transition: 5
+                name: Full
+                icon: ''
+                icon_color: yellow
+                entity: scene.salon_home_cinema
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.salon_sunset
+                  data:
+                    transition: 5
+                name: Sunset
+                icon: ''
+                icon_color: orange
+                entity: scene.salon_sunset
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.salon_noche
+                  data:
+                    transition: 5
+                name: Noche
+                icon: mdi:weather-sunset-down
+                icon_color: indigo
+                entity: scene.salon_noche
+            type: horizontal-stack
+          - cards:
               - type: custom:mushroom-light-card
                 fill_container: true
                 use_light_color: true
@@ -847,7 +893,6 @@ views:
               - sensor.hue_movimiento_pasillo_luminosidad
             stat_types:
               - max
-            title: Luminosidad Pasillo
         type: vertical-stack
       - cards:
           - show_state: true
@@ -862,6 +907,64 @@ views:
             entity: light.luz_salon
             aspect_ratio: '4'
             name: LUCES SALON
+          - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.salon_sunset
+                  data:
+                    transition: 5
+                name: Sunset
+                icon: ''
+                icon_color: orange
+                entity: scene.salon_sunset
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.salon_lectura
+                  data:
+                    transition: 5
+                name: Lectura
+                icon: mdi:lamps-outline
+                icon_color: amber
+                entity: scene.salon_lectura
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.salon_noche
+                  data:
+                    transition: 5
+                name: Noche
+                icon: mdi:weather-sunset-down
+                icon_color: indigo
+                entity: scene.salon_noche
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.salon_home_cinema
+                  data:
+                    transition: 5
+                name: Home Cine
+                icon: mdi:dolby
+                icon_color: blue-grey
+                entity: scene.salon_home_cinema
+            type: horizontal-stack
           - cards:
               - type: custom:mushroom-light-card
                 fill_container: true
@@ -898,15 +1001,6 @@ views:
                 show_color_control: true
                 collapsible_controls: false
                 entity: light.led_salon_tv
-              - type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: true
-                show_color_control: true
-                collapsible_controls: false
-                entity: light.luz_arbol_navidad
-                name: Arbol
             type: horizontal-stack
           - chart_type: line
             period: hour
@@ -916,7 +1010,6 @@ views:
               - sensor.aqara_movimiento_salon_luminosidad
             stat_types:
               - max
-            title: Luminosidad Salon
         type: vertical-stack
       - cards:
           - show_state: true
@@ -931,6 +1024,61 @@ views:
             aspect_ratio: '4'
             name: LUCES DORMITORIOS
             entity: light.luz_dormitorios
+          - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.dormitorio_full
+                  data:
+                    transition: 5
+                name: Full
+                icon: ''
+                icon_color: amber
+                entity: scene.dormitorio_full
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.dormitorio_lectura
+                  data:
+                    transition: 5
+                icon_color: orange
+                entity: scene.dormitorio_lectura
+                name: Lectura
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.dormitorio_relax
+                  data:
+                    transition: 5
+                name: Relax
+                icon_color: deep-orange
+                entity: scene.dormitorio_relax
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.dormitorio_noche
+                  data:
+                    transition: 5
+                name: Noche
+                icon_color: brown
+                entity: scene.dormitorio_noche
+            type: horizontal-stack
           - cards:
               - type: custom:mushroom-light-card
                 fill_container: true
@@ -988,7 +1136,6 @@ views:
               - sensor.illumination_158d0002ea1d0f
             stat_types:
               - max
-            title: Luminosidad Dormitorio
         type: vertical-stack
       - cards:
           - show_state: true
@@ -1001,6 +1148,50 @@ views:
             aspect_ratio: '4'
             name: LUCES JARDIN
             entity: light.luz_jardin
+          - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.salon_home_cinema
+                  data:
+                    transition: 5
+                name: Full
+                icon: ''
+                icon_color: yellow
+                entity: scene.salon_home_cinema
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.salon_sunset
+                  data:
+                    transition: 5
+                name: Sunset
+                icon: ''
+                icon_color: orange
+                entity: scene.salon_sunset
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.salon_noche
+                  data:
+                    transition: 5
+                name: Noche
+                icon: mdi:weather-sunset-down
+                icon_color: indigo
+                entity: scene.salon_noche
+            type: horizontal-stack
           - cards:
               - type: custom:mushroom-light-card
                 fill_container: true
@@ -1060,1598 +1251,71 @@ views:
             days_to_show: 1
             type: statistics-graph
             entities:
-              - sensor.illumination_158d0001e637f6
+              - sensor.aqara_movimiento_exterior_luminosidad
             stat_types:
-              - max
               - mean
-            title: Luminosidad Exterior
         type: vertical-stack
     icon: mdi:lightbulb-on
     path: luces_view
     title: Luces
-  - theme: Backend-selected
-    title: Calendar
-    path: calendar
-    icon: mdi:calendar
-    badges: []
-    cards:
-      - type: calendar
-        entities:
-          - calendar.universidad_universidad_aaf
-          - calendar.universidad_universidad_paf
-          - calendar.family_almuerzo
-          - calendar.family_cena
-          - calendar.family_eventos
-        initial_view: dayGridMonth
-        title: CALENDARIO FAMILY
-      - type: calendar
-        entities:
-          - calendar.universidad_universidad_aaf
-          - calendar.universidad_universidad_paf
-          - calendar.family_almuerzo
-          - calendar.family_cena
-          - calendar.family_eventos
-        initial_view: listWeek
-        title: CALENDARIO FAMILY
-  - title: Plan Riego
-    path: planriego_view
-    icon: mdi:head-snowflake-outline
-    badges: []
-    cards:
-      - type: vertical-stack
-        cards:
-          - show_state: true
-            show_name: true
-            camera_view: auto
-            type: picture-entity
-            image: /local/Riego_General_s0_1900x800.jpg
-            tap_action:
-              action: more-info
-            hold_action:
-              action: toggle
-            entity: input_boolean.riego_interruptor_global
-            name: Interruptor General Riego
-            aspect_ratio: '5'
-          - color: blue
-            entity: binary_sensor.riego_algun_sector_activo
-            name: ¿Regando Ahora?
-            icon: mdi:sprinkler-variant
-            type: tile
-            show_entity_picture: false
-          - cards:
-              - show_name: true
-                show_icon: true
-                entity: binary_sensor.riego_cesped_ch1_dia_ejecucion
-                hold_action:
-                  action: none
-                icon: mdi:sprinkler
-                name: Césped S1
-                tap_action:
-                  action: more-info
-                type: entity-button
-              - show_name: true
-                show_icon: true
-                entity: binary_sensor.riego_cesped_ch2_dia_ejecucion
-                hold_action:
-                  action: none
-                icon: mdi:sprinkler-variant
-                name: Césped S2
-                tap_action:
-                  action: more-info
-                type: entity-button
-              - show_name: true
-                show_icon: true
-                entity: binary_sensor.riego_cesped_ch3_dia_ejecucion
-                hold_action:
-                  action: none
-                name: Goteo S3
-                tap_action:
-                  action: more-info
-                type: entity-button
-                icon: mdi:sprinkler-fire
-              - show_name: true
-                show_icon: true
-                entity: switch.esphome_4ch_sw2_relay_3
-                icon: mdi:water-pump
-                name: Fuente Zen
-                show_state: false
-                tap_action:
-                  action: more-info
-                type: entity-button
-                hold_action:
-                  action: toggle
-            type: horizontal-stack
-          - cards:
-              - show_name: true
-                show_icon: true
-                entity: binary_sensor.riego_bonsais_ch1_dia_ejecucion
-                hold_action:
-                  action: none
-                icon: mdi:leaf
-                name: Bonsais Top
-                tap_action:
-                  action: more-info
-                type: entity-button
-              - entity: binary_sensor.riego_bonsais_ch2_dia_ejecucion
-                hold_action:
-                  action: none
-                icon: mdi:flower
-                name: Plantas Entrada
-                tap_action:
-                  action: more-info
-                type: entity-button
-              - show_name: true
-                show_icon: true
-                entity: binary_sensor.riego_tomates_ch0_dia_ejecucion
-                hold_action:
-                  action: none
-                name: Tomateras
-                tap_action:
-                  action: more-info
-                type: entity-button
-                icon: mdi:sprout
-              - show_name: true
-                show_icon: true
-                entity: binary_sensor.riego_bonsais_ch0_dia_ejecucion
-                icon: mdi:tree
-                name: Bonsais Prod
-                tap_action:
-                  action: more-info
-                type: entity-button
-            type: horizontal-stack
-          - cards:
-              - show_name: true
-                show_icon: true
-                entity: sensor.riego_cesped_ch1_duracion_planificada_total
-                hold_action:
-                  action: none
-                icon: mdi:sprinkler
-                name: Césped S1
-                tap_action:
-                  action: more-info
-                type: entity-button
-                show_state: true
-              - show_name: true
-                show_icon: true
-                entity: sensor.riego_cesped_ch2_duracion_planificada_total
-                hold_action:
-                  action: none
-                icon: mdi:sprinkler-variant
-                name: Césped S2
-                tap_action:
-                  action: more-info
-                type: entity-button
-                show_state: true
-              - show_name: true
-                show_icon: true
-                entity: sensor.riego_cesped_ch3_duracion_planificada_total
-                hold_action:
-                  action: none
-                icon: mdi:sprinkler-fire
-                name: Goteo S3
-                tap_action:
-                  action: more-info
-                type: entity-button
-                show_state: true
-              - show_name: true
-                show_icon: true
-                entity: sensor.riego_cesped_ch3_duracion_planificada_total
-                hold_action:
-                  action: none
-                name: Libre
-                tap_action:
-                  action: more-info
-                type: entity-button
-                show_state: false
-            type: horizontal-stack
-          - cards:
-              - show_name: true
-                show_icon: true
-                show_state: true
-                entity: sensor.riego_bonsais_ch0_duracion_planificada_total
-                hold_action:
-                  action: none
-                icon: mdi:leaf
-                name: Bonsais Top
-                tap_action:
-                  action: more-info
-                type: entity-button
-              - show_name: true
-                show_icon: true
-                show_state: true
-                entity: sensor.riego_bonsais_ch2_duracion_planificada_total
-                hold_action:
-                  action: none
-                icon: mdi:flower
-                name: Plantas Entrada
-                tap_action:
-                  action: more-info
-                type: entity-button
-              - show_name: true
-                show_icon: true
-                show_state: true
-                entity: sensor.riego_tomates_ch0_duracion_planificada_total
-                hold_action:
-                  action: none
-                name: Tomateras
-                tap_action:
-                  action: more-info
-                type: entity-button
-                icon: mdi:sprout
-              - show_name: true
-                show_icon: true
-                show_state: true
-                entity: sensor.riego_bonsais_ch1_duracion_planificada_total
-                icon: mdi:tree
-                name: Bonsais Prod
-                tap_action:
-                  action: more-info
-                type: entity-button
-            type: horizontal-stack
-      - type: vertical-stack
-        cards:
-          - show_state: true
-            show_name: true
-            camera_view: auto
-            type: picture-entity
-            image: /local/Riego_Bonsais_x1_900x362.jpg
-            tap_action:
-              action: more-info
-            hold_action:
-              action: toggle
-            entity: switch.esphome_pow_sw4
-            name: Cuadro Control Bomba Pozo
-            aspect_ratio: '5'
-          - color: yellow
-            type: tile
-            entity: binary_sensor.riego_bomba_pozo_motor_on
-            name: Motor Bomba Pozo Activa (>100W)
-            show_entity_picture: false
-          - color: red
-            type: tile
-            entity: binary_sensor.riego_bomba_pozo_warning_consumo
-            name: Warning Consumo Motor  (>1.900W)
-          - color: pink
-            type: tile
-            entity: binary_sensor.riego_bomba_pozo_warning_motor_off
-            name: Warning Riego Bomba Apagada
-          - type: horizontal-stack
-            cards:
-              - type: gauge
-                entity: sensor.esphome_pow_sw4_voltage
-                name: Voltage
-                unit: V
-                needle: false
-              - type: gauge
-                entity: sensor.esphome_pow_sw4_current
-                name: Amperios
-                unit: A
-                needle: true
-                severity:
-                  green: 0
-                  yellow: 8
-                  red: 10
-                min: 0
-                max: 12
-              - type: gauge
-                entity: sensor.esphome_pow_sw4_power
-                name: Watios
-                unit: W
-                severity:
-                  green: 1000
-                  yellow: 1500
-                  red: 1800
-                min: 0
-                max: 2000
-                needle: true
-          - cards:
-              - entities:
-                  - entity: sensor.esphome_pow_sw4_current
-                font_size: 50
-                line_color: blue
-                line_width: 6
-                name: Consumo
-                type: custom:mini-graph-card
-              - entities:
-                  - entity: sensor.esphome_pow_sw4_power
-                font_size: 50
-                line_color: green
-                line_width: 6
-                name: Potencia
-                type: custom:mini-graph-card
-            type: horizontal-stack
-      - type: vertical-stack
-        cards:
-          - show_state: true
-            show_name: true
-            camera_view: auto
-            type: picture-entity
-            image: /local/Riego_Bonsais_x2_1600x400.jpg
-            tap_action:
-              action: more-info
-            hold_action:
-              action: toggle
-            entity: automation.s18_control_interruptor_general_riego
-            name: 'IA Control Riego según Previsión AEMET '
-            aspect_ratio: '5'
-          - color: brown
-            type: tile
-            entity: automation.s18_control_interruptor_general_riego
-            name: S18 Regla Control Interruptor General Riego
-          - color: indigo
-            type: tile
-            entity: binary_sensor.riego_interruptor_global
-            icon: mdi:water-pump
-          - color: amber
-            type: tile
-            show_entity_picture: true
-            tap_action:
-              action: more-info
-            entity: binary_sensor.riego_automatico_hoy
-          - type: horizontal-stack
-            cards:
-              - color: blue
-                type: tile
-                name: Hoy
-                entity: sensor.aemet_tiempo_0d
-                show_entity_picture: true
-                tap_action:
-                  action: more-info
-              - color: cyan
-                type: tile
-                name: Mañana
-                show_entity_picture: true
-                tap_action:
-                  action: more-info
-                entity: sensor.aemet_tiempo_1d
-          - type: tile
-            entity: binary_sensor.aemet_prevision_lluvia_0d
-            name: AEMET Pronóstico Lluvia Día+0
-          - type: tile
-            entity: binary_sensor.aemet_prevision_lluvia_1d
-            name: AEMET Pronóstico Lluvia Día+1
-          - type: tile
-            entity: binary_sensor.aemet_prevision_lluvia_2d
-            name: AEMET Pronóstico Lluvia Día+2
-  - theme: Backend-selected
-    title: Riego Césped
-    path: riego_cesped_view
-    icon: mdi:sprinkler
-    badges: []
-    cards:
-      - cards:
-          - show_state: true
-            show_name: true
-            camera_view: auto
-            type: picture-entity
-            entity: binary_sensor.riego_cesped_ch1_dia_ejecucion
-            image: /local/Riego_Cesped_s1_1900x800.jpeg
-            name: 'SECTOR 1: Turbinas Cesped'
-            aspect_ratio: '5'
-          - type: vertical-stack
-            cards:
-              - type: horizontal-stack
-                cards:
-                  - type: gauge
-                    entity: sensor.riego_cesped_ch1_duracion_planificada_t1
-                    name: TRAMO 1
-                    min: 0
-                    max: 12
-                    unit: Min
-                    needle: true
-                    severity:
-                      green: 1
-                      yellow: 6
-                      red: 10
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_cesped_ch1_start_time_t1
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    hide:
-                      name: true
-                    link_values: true
-                    layout:
-                      embedded: true
-                    second_step: 5
-                    name: ''
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_cesped_ch1_end_time_t1
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    hide:
-                      name: true
-                    layout:
-                      embedded: true
-                    link_values: true
-              - type: horizontal-stack
-                cards:
-                  - type: gauge
-                    entity: sensor.riego_cesped_ch1_duracion_planificada_t2
-                    name: TRAMO 2
-                    min: 0
-                    max: 12
-                    unit: Min
-                    needle: true
-                    severity:
-                      green: 1
-                      yellow: 6
-                      red: 10
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_cesped_ch1_start_time_t2
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    hide:
-                      name: true
-                    link_values: true
-                    layout:
-                      embedded: true
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_cesped_ch1_end_time_t2
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    hide:
-                      name: true
-                    layout:
-                      embedded: true
-                    link_values: true
-              - type: horizontal-stack
-                cards:
-                  - type: gauge
-                    entity: sensor.riego_cesped_ch1_duracion_planificada_t3
-                    name: TRAMO 3
-                    min: 0
-                    max: 12
-                    unit: Min
-                    needle: true
-                    severity:
-                      green: 1
-                      yellow: 6
-                      red: 10
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_cesped_ch1_start_time_t3
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    hide:
-                      name: true
-                    link_values: true
-                    layout:
-                      embedded: true
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_cesped_ch1_end_time_t3
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    hide:
-                      name: true
-                    layout:
-                      embedded: true
-                    link_values: true
-          - type: entities
-            entities:
-              - entity: binary_sensor.riego_cesped_ch1_status
-                secondary_info: last-changed
-              - entity: switch.esphome_4ch_sw3_relay_1
-              - entity: timer.riego_cesped_ch1
-              - entity: sensor.riego_cesped_ch1_duracion_planificada_total
-              - entity: input_boolean.riego_cesped_ch1_programador_t1
-                name: Programador Tramo1
-              - entity: input_boolean.riego_cesped_ch1_programador_t2
-                name: Programador Tramo2
-              - entity: input_boolean.riego_cesped_ch1_programador_t3
-                name: Programador Tramo3
-              - entity: input_select.riego_cesped_ch1_programador_dias
-            show_header_toggle: false
-            state_color: true
-        type: vertical-stack
-      - cards:
-          - show_state: true
-            show_name: true
-            camera_view: auto
-            type: picture-entity
-            entity: binary_sensor.riego_cesped_ch2_dia_ejecucion
-            image: /local/Riego_Cesped_s2_1991x821.jpeg
-            name: SECTOR 2:Difusores Cesped
-            aspect_ratio: '5'
-          - type: vertical-stack
-            cards:
-              - type: horizontal-stack
-                cards:
-                  - type: gauge
-                    entity: sensor.riego_cesped_ch2_duracion_planificada_t1
-                    name: TRAMO 1
-                    min: 0
-                    max: 12
-                    unit: Min
-                    needle: true
-                    severity:
-                      green: 1
-                      yellow: 6
-                      red: 10
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_cesped_ch2_start_time_t1
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    name: ''
-                    hide:
-                      name: true
-                    link_values: true
-                    layout:
-                      embedded: true
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_cesped_ch2_end_time_t1
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    name: ''
-                    hide:
-                      name: true
-                    layout:
-                      embedded: true
-                    link_values: true
-              - type: horizontal-stack
-                cards:
-                  - type: gauge
-                    entity: sensor.riego_cesped_ch2_duracion_planificada_t2
-                    name: TRAMO 2
-                    min: 0
-                    max: 12
-                    unit: Min
-                    needle: true
-                    severity:
-                      green: 1
-                      yellow: 6
-                      red: 10
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_cesped_ch2_start_time_t2
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    name: ''
-                    hide:
-                      name: true
-                    link_values: true
-                    layout:
-                      embedded: true
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_cesped_ch2_end_time_t2
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    name: ''
-                    hide:
-                      name: true
-                    layout:
-                      embedded: true
-                    link_values: true
-              - type: horizontal-stack
-                cards:
-                  - type: gauge
-                    entity: sensor.riego_cesped_ch2_duracion_planificada_t3
-                    name: TRAMO 3
-                    min: 0
-                    max: 12
-                    unit: Min
-                    needle: true
-                    severity:
-                      green: 1
-                      yellow: 6
-                      red: 10
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_cesped_ch2_start_time_t3
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    name: ''
-                    hide:
-                      name: true
-                    link_values: true
-                    layout:
-                      embedded: true
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_cesped_ch2_end_time_t3
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    name: ''
-                    hide:
-                      name: true
-                    layout:
-                      embedded: true
-                    link_values: true
-          - type: entities
-            entities:
-              - entity: binary_sensor.riego_cesped_ch2_status
-                secondary_info: last-changed
-              - entity: switch.esphome_4ch_sw3_relay_2
-              - entity: timer.riego_cesped_ch2
-              - entity: sensor.riego_cesped_ch2_duracion_planificada_total
-              - entity: input_boolean.riego_cesped_ch2_programador_t1
-                name: Programador Tramo1
-              - entity: input_boolean.riego_cesped_ch2_programador_t2
-                name: Programador Tramo2
-              - entity: input_boolean.riego_cesped_ch2_programador_t3
-                name: Programador Tramo3
-              - entity: input_select.riego_cesped_ch2_programador_dias
-            show_header_toggle: false
-            state_color: true
-        type: vertical-stack
-      - cards:
-          - show_state: true
-            show_name: true
-            camera_view: auto
-            type: picture-entity
-            entity: binary_sensor.riego_cesped_ch3_dia_ejecucion
-            image: /local/Riego_Cesped_s3_1900x801.jpeg
-            name: 'SECTOR 3: Goteo Perímetro'
-            aspect_ratio: '5'
-          - type: vertical-stack
-            cards:
-              - type: horizontal-stack
-                cards:
-                  - type: gauge
-                    entity: sensor.riego_cesped_ch3_duracion_planificada_t1
-                    name: TRAMO 1
-                    min: 0
-                    max: 12
-                    unit: Min
-                    needle: true
-                    severity:
-                      green: 1
-                      yellow: 6
-                      red: 10
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_cesped_ch3_start_time_t1
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    name: ''
-                    hide:
-                      name: true
-                    link_values: true
-                    layout:
-                      embedded: true
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_cesped_ch3_end_time_t1
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    name: ''
-                    hide:
-                      name: true
-                    layout:
-                      embedded: true
-                    link_values: true
-              - type: horizontal-stack
-                cards:
-                  - type: gauge
-                    entity: sensor.riego_cesped_ch3_duracion_planificada_t2
-                    name: TRAMO 2
-                    min: 0
-                    max: 12
-                    unit: Min
-                    needle: true
-                    severity:
-                      green: 1
-                      yellow: 6
-                      red: 10
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_cesped_ch3_start_time_t2
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    name: ''
-                    hide:
-                      name: true
-                    link_values: true
-                    layout:
-                      embedded: true
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_cesped_ch3_end_time_t2
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    name: ''
-                    hide:
-                      name: true
-                    layout:
-                      embedded: true
-                    link_values: true
-              - type: horizontal-stack
-                cards:
-                  - type: gauge
-                    entity: sensor.riego_cesped_ch3_duracion_planificada_t3
-                    name: TRAMO 2
-                    min: 0
-                    max: 12
-                    unit: Min
-                    needle: true
-                    severity:
-                      green: 1
-                      yellow: 6
-                      red: 10
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_cesped_ch3_start_time_t3
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    name: ''
-                    hide:
-                      name: true
-                    link_values: true
-                    layout:
-                      embedded: true
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_cesped_ch3_end_time_t3
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    name: ''
-                    hide:
-                      name: true
-                    layout:
-                      embedded: true
-                    link_values: true
-          - type: entities
-            entities:
-              - entity: binary_sensor.riego_cesped_ch3_status
-                secondary_info: last-changed
-              - entity: switch.esphome_4ch_sw3_relay_3
-              - entity: timer.riego_cesped_ch3
-              - entity: sensor.riego_cesped_ch3_duracion_planificada_total
-              - entity: input_boolean.riego_cesped_ch3_programador_t1
-                name: Programador Tramo1
-              - entity: input_boolean.riego_cesped_ch3_programador_t2
-                name: Programador Tramo2
-              - entity: input_boolean.riego_cesped_ch3_programador_t3
-                name: Programador Tramo3
-              - entity: input_select.riego_cesped_ch3_programador_dias
-            show_header_toggle: false
-            state_color: true
-        type: vertical-stack
-  - icon: mdi:watering-can
-    path: riego_view
-    title: Programador Riego
-    badges: []
-    cards:
-      - cards:
-          - show_state: true
-            show_name: true
-            camera_view: auto
-            type: picture-entity
-            entity: binary_sensor.riego_bonsais_ch0_dia_ejecucion
-            image: /local/Riego_Bonsais_s1_1536x634.jpeg
-            name: 'SECTOR 1: Bonsais Producción'
-            aspect_ratio: '3'
-          - type: vertical-stack
-            cards:
-              - type: horizontal-stack
-                cards:
-                  - type: gauge
-                    entity: sensor.riego_bonsais_ch0_duracion_planificada_t1
-                    name: TRAMO 1
-                    min: 0
-                    max: 12
-                    unit: Min
-                    needle: true
-                    severity:
-                      green: 1
-                      yellow: 6
-                      red: 10
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_bonsais_ch0_start_time_t1
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    hide:
-                      name: true
-                    link_values: true
-                    layout:
-                      embedded: true
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_bonsais_ch0_end_time_t1
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    hide:
-                      name: true
-                    layout:
-                      embedded: true
-                    link_values: true
-              - type: horizontal-stack
-                cards:
-                  - type: gauge
-                    entity: sensor.riego_bonsais_ch0_duracion_planificada_t2
-                    name: TRAMO 2
-                    min: 0
-                    max: 12
-                    unit: Min
-                    needle: true
-                    severity:
-                      green: 1
-                      yellow: 6
-                      red: 10
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_bonsais_ch0_start_time_t2
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    hide:
-                      name: true
-                    link_values: true
-                    layout:
-                      embedded: true
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_bonsais_ch0_end_time_t2
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    hide:
-                      name: true
-                    layout:
-                      embedded: true
-                    link_values: true
-          - type: entities
-            entities:
-              - entity: binary_sensor.riego_bonsais_ch0_status
-                secondary_info: last-changed
-              - entity: switch.esphome_pow_sw1
-                secondary_info: none
-              - entity: timer.riego_bonsais_ch0
-              - entity: sensor.riego_bonsais_ch0_duracion_planificada_total
-              - entity: input_boolean.riego_bonsais_ch0_programador_t1
-                name: Programador Tramo1
-              - entity: input_boolean.riego_bonsais_ch0_programador_t2
-                name: Programador Tramo2
-              - entity: input_select.riego_bonsais_ch0_programador_dias
-            show_header_toggle: false
-            state_color: true
-        type: vertical-stack
-      - cards:
-          - show_state: true
-            show_name: true
-            camera_view: auto
-            type: picture-entity
-            entity: binary_sensor.riego_tomates_ch0_dia_ejecucion
-            image: /local/Riego_Bonsais_s2_1024x579.jpg
-            aspect_ratio: '3'
-            name: 'SECTOR 2: Huerto Tomates'
-          - type: vertical-stack
-            cards:
-              - type: horizontal-stack
-                cards:
-                  - type: gauge
-                    entity: sensor.riego_tomates_ch0_duracion_planificada_t1
-                    name: TRAMO 1
-                    min: 0
-                    max: 12
-                    unit: Min
-                    needle: true
-                    severity:
-                      green: 1
-                      yellow: 6
-                      red: 10
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_tomates_ch0_start_time_t1
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    hide:
-                      name: true
-                    link_values: true
-                    layout:
-                      embedded: true
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_tomates_ch0_end_time_t1
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    hide:
-                      name: true
-                    layout:
-                      embedded: true
-                    link_values: true
-              - type: horizontal-stack
-                cards:
-                  - type: gauge
-                    entity: sensor.riego_tomates_ch0_duracion_planificada_t2
-                    name: TRAMO 2
-                    min: 0
-                    max: 12
-                    unit: Min
-                    needle: true
-                    severity:
-                      green: 1
-                      yellow: 6
-                      red: 10
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_tomates_ch0_start_time_t2
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    hide:
-                      name: true
-                    link_values: true
-                    layout:
-                      embedded: true
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_tomates_ch0_end_time_t2
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    hide:
-                      name: true
-                    layout:
-                      embedded: true
-                    link_values: true
-          - type: entities
-            entities:
-              - entity: binary_sensor.riego_tomates_ch0_status
-                secondary_info: last-changed
-              - entity: switch.esphome_bas_sw2
-                secondary_info: none
-              - entity: timer.riego_tomates_ch0
-              - entity: sensor.riego_tomates_ch0_duracion_planificada_total
-              - entity: input_boolean.riego_tomates_ch0_programador_t1
-                name: Programador Tramo1
-              - entity: input_boolean.riego_tomates_ch0_programador_t2
-                name: Programador Tramo2
-              - entity: input_select.riego_tomates_ch0_programador_dias
-            show_header_toggle: false
-            state_color: true
-        type: vertical-stack
-      - cards:
-          - show_state: true
-            show_name: true
-            camera_view: auto
-            type: picture-entity
-            entity: binary_sensor.riego_bonsais_ch2_dia_ejecucion
-            image: /local/Riego_Bonsais_s4_768x434.jpg
-            name: 'SECTOR 3: Plantas Aromáticas'
-            aspect_ratio: '3'
-          - type: vertical-stack
-            cards:
-              - type: horizontal-stack
-                cards:
-                  - type: gauge
-                    entity: sensor.riego_bonsais_ch2_duracion_planificada_t1
-                    name: TRAMO 1
-                    min: 0
-                    max: 12
-                    unit: Min
-                    needle: true
-                    severity:
-                      green: 1
-                      yellow: 6
-                      red: 10
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_bonsais_ch2_start_time_t1
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    hide:
-                      name: true
-                      icon: true
-                      seconds: true
-                    link_values: true
-                    layout:
-                      embedded: true
-                      thin: true
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_bonsais_ch2_end_time_t1
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    hide:
-                      name: true
-                      icon: true
-                      seconds: true
-                    layout:
-                      embedded: true
-                    link_values: true
-              - type: horizontal-stack
-                cards:
-                  - type: gauge
-                    entity: sensor.riego_bonsais_ch2_duracion_planificada_t2
-                    name: TRAMO 2
-                    min: 0
-                    max: 12
-                    unit: Min
-                    needle: true
-                    severity:
-                      green: 1
-                      yellow: 6
-                      red: 10
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_bonsais_ch2_start_time_t2
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    hide:
-                      name: true
-                      icon: true
-                      seconds: true
-                    link_values: true
-                    layout:
-                      embedded: true
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_bonsais_ch2_end_time_t2
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    hide:
-                      name: true
-                      icon: true
-                      seconds: true
-                    layout:
-                      embedded: true
-                    link_values: true
-          - type: entities
-            entities:
-              - entity: binary_sensor.riego_bonsais_ch2_status
-                secondary_info: last-changed
-              - entity: switch.esphome_4ch_sw2_relay_2
-                secondary_info: none
-              - entity: timer.riego_bonsais_ch2
-              - entity: sensor.riego_bonsais_ch2_duracion_planificada_total
-              - entity: input_boolean.riego_bonsais_ch2_programador_t1
-                name: Programador Tramo1
-              - entity: input_boolean.riego_bonsais_ch2_programador_t2
-                name: Programador Tramo2
-              - entity: input_select.riego_bonsais_ch2_programador_dias
-            show_header_toggle: false
-            state_color: true
-        type: vertical-stack
-      - cards:
-          - type: horizontal-stack
-            cards:
-              - show_state: true
-                show_name: true
-                camera_view: auto
-                type: picture-entity
-                entity: binary_sensor.riego_bonsais_ch1_dia_ejecucion
-                image: /local/Riego_Bonsais_s3_1900x884.jpeg
-                name: 'SECTOR 4: Bonsais Top'
-                aspect_ratio: '3'
-          - type: vertical-stack
-            cards:
-              - type: horizontal-stack
-                cards:
-                  - type: gauge
-                    entity: sensor.riego_bonsais_ch1_duracion_planificada_t1
-                    name: TRAMO 1
-                    min: 0
-                    max: 12
-                    unit: Min
-                    needle: true
-                    severity:
-                      green: 1
-                      yellow: 6
-                      red: 10
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_bonsais_ch1_start_time_t1
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    hide:
-                      name: true
-                      icon: true
-                      seconds: true
-                    link_values: true
-                    layout:
-                      embedded: true
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_bonsais_ch1_end_time_t1
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    hide:
-                      name: true
-                      icon: true
-                      seconds: true
-                    layout:
-                      embedded: true
-                    link_values: true
-              - type: horizontal-stack
-                cards:
-                  - type: gauge
-                    entity: sensor.riego_bonsais_ch1_duracion_planificada_t2
-                    name: TRAMO 2
-                    min: 0
-                    max: 12
-                    unit: Min
-                    needle: true
-                    severity:
-                      green: 1
-                      yellow: 6
-                      red: 10
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_bonsais_ch1_start_time_t2
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    hide:
-                      name: true
-                      icon: true
-                      seconds: true
-                    link_values: true
-                    layout:
-                      embedded: true
-                  - type: custom:time-picker-card
-                    entity: input_datetime.riego_bonsais_ch1_end_time_t2
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    hide:
-                      name: true
-                      icon: true
-                      seconds: true
-                    layout:
-                      embedded: true
-                    link_values: true
-          - type: entities
-            entities:
-              - entity: binary_sensor.riego_bonsais_ch1_status
-                secondary_info: last-changed
-              - entity: switch.esphome_4ch_sw2_relay_1
-                secondary_info: none
-              - entity: timer.riego_bonsais_ch1
-              - entity: sensor.riego_bonsais_ch1_duracion_planificada_total
-              - entity: input_boolean.riego_bonsais_ch1_programador_t1
-                name: Programador Tramo1
-              - entity: input_boolean.riego_bonsais_ch1_programador_t2
-                name: Programador Tramo2
-              - entity: input_select.riego_bonsais_ch1_programador_dias
-            show_header_toggle: false
-            state_color: true
-        type: vertical-stack
-  - theme: Backend-selected
-    icon: mdi:leaf
-    path: bonsais_view
-    title: Bonsais
-    badges: []
-    cards:
-      - cards:
-          - entity: plant.mp_01
-            type: plant-status
-            name: Ficus Tigerbark
-          - color_thresholds:
-              - color: magenta
-                value: 0
-              - color: red
-                value: 10
-              - color: yellow
-                value: 20
-              - color: green
-                value: 30
-              - color: teal
-                value: 40
-              - color: blue
-                value: 50
-              - color: violet
-                value: 90
-            entities:
-              - entity: sensor.humedad_plant_monitor_pm01
-            font_size: 50
-            line_width: 3
-            show:
-              icon: true
-              labels: true
-              state: true
-            name: Humedad
-            type: custom:mini-graph-card
-          - color_thresholds:
-              - color: purple
-                value: 46
-              - color: magenta
-                value: 44
-              - color: red
-                value: 42
-              - color: vermillion
-                value: 40
-              - color: orange
-                value: 38
-              - color: amber
-                value: 35
-              - color: yellow
-                value: 30
-              - color: chartreuse
-                value: 25
-              - color: green
-                value: 20
-              - color: teal
-                value: 15
-              - color: blue
-                value: 10
-              - color: violet
-                value: 5
-              - color: black
-                value: 0
-            entities:
-              - entity: sensor.temperatura_plant_monitor_pm01
-            font_size: 50
-            name: Temperatura
-            line_width: 3
-            points_per_hour: 4
-            show:
-              icon: true
-              labels: true
-              state: true
-            type: custom:mini-graph-card
-          - cards:
-              - entities:
-                  - entity: sensor.fertilidad_plant_monitor_pm01
-                font_size: 50
-                line_color: blue
-                line_width: 6
-                name: Fertilidad
-                type: custom:mini-graph-card
-              - entities:
-                  - entity: sensor.luminosidad_plant_monitor_pm01
-                font_size: 50
-                line_color: green
-                line_width: 6
-                name: Luminosidad
-                type: custom:mini-graph-card
-            type: horizontal-stack
-        type: vertical-stack
-      - cards:
-          - entity: plant.mp_02
-            name: Juniperus Proc. Nana
-            type: plant-status
-          - color_thresholds:
-              - color: magenta
-                value: 0
-              - color: red
-                value: 10
-              - color: yellow
-                value: 20
-              - color: green
-                value: 30
-              - color: teal
-                value: 40
-              - color: blue
-                value: 50
-              - color: violet
-                value: 90
-            entities:
-              - entity: sensor.humedad_plant_monitor_pm02
-            font_size: 50
-            line_width: 3
-            show:
-              icon: true
-              labels: true
-              state: true
-            name: Humedad
-            type: custom:mini-graph-card
-          - color_thresholds:
-              - color: purple
-                value: 46
-              - color: magenta
-                value: 44
-              - color: red
-                value: 42
-              - color: vermillion
-                value: 40
-              - color: orange
-                value: 38
-              - color: amber
-                value: 35
-              - color: yellow
-                value: 30
-              - color: chartreuse
-                value: 25
-              - color: green
-                value: 20
-              - color: teal
-                value: 15
-              - color: blue
-                value: 10
-              - color: violet
-                value: 5
-              - color: black
-                value: 0
-            entities:
-              - entity: sensor.temperatura_plant_monitor_pm02
-            font_size: 50
-            line_width: 3
-            points_per_hour: 4
-            name: Temperatura
-            show:
-              icon: true
-              labels: true
-              state: true
-            type: custom:mini-graph-card
-          - cards:
-              - entities:
-                  - entity: sensor.fertilidad_plant_monitor_pm02
-                font_size: 50
-                line_color: blue
-                line_width: 6
-                name: Fertilidad
-                type: custom:mini-graph-card
-              - entities:
-                  - entity: sensor.luminosidad_plant_monitor_pm02
-                font_size: 50
-                line_color: green
-                line_width: 6
-                name: Luminosidad
-                type: custom:mini-graph-card
-            type: horizontal-stack
-        type: vertical-stack
-      - cards:
-          - entity: plant.mp_03
-            name: Buganvilla
-            type: plant-status
-          - color_thresholds:
-              - color: magenta
-                value: 0
-              - color: red
-                value: 10
-              - color: yellow
-                value: 20
-              - color: green
-                value: 30
-              - color: teal
-                value: 40
-              - color: blue
-                value: 50
-              - color: violet
-                value: 90
-            entities:
-              - entity: sensor.humedad_plant_monitor_pm03
-            font_size: 50
-            line_width: 3
-            name: Humedad
-            show:
-              icon: true
-              labels: true
-              state: true
-            type: custom:mini-graph-card
-          - color_thresholds:
-              - color: purple
-                value: 46
-              - color: magenta
-                value: 44
-              - color: red
-                value: 42
-              - color: vermillion
-                value: 40
-              - color: orange
-                value: 38
-              - color: amber
-                value: 35
-              - color: yellow
-                value: 30
-              - color: chartreuse
-                value: 25
-              - color: green
-                value: 20
-              - color: teal
-                value: 15
-              - color: blue
-                value: 10
-              - color: violet
-                value: 5
-              - color: black
-                value: 0
-            entities:
-              - entity: sensor.temperatura_plant_monitor_pm03
-            font_size: 50
-            line_width: 3
-            points_per_hour: 4
-            name: Temperatura
-            show:
-              icon: true
-              labels: true
-              state: true
-            type: custom:mini-graph-card
-          - cards:
-              - entities:
-                  - entity: sensor.fertilidad_plant_monitor_pm03
-                font_size: 50
-                line_color: blue
-                line_width: 6
-                name: Fertilidad
-                type: custom:mini-graph-card
-              - entities:
-                  - entity: sensor.luminosidad_plant_monitor_pm03
-                font_size: 50
-                line_color: green
-                line_width: 6
-                name: Luminosidad
-                type: custom:mini-graph-card
-            type: horizontal-stack
-        type: vertical-stack
   - badges: []
     cards:
       - cards:
-          - show_state: true
-            show_name: true
-            camera_view: auto
-            type: picture-entity
-            image: /local/Piscina_Fondo_s0_1555x800.jpg
-            tap_action:
-              action: more-info
-            hold_action:
-              action: toggle
-            entity: input_boolean.piscina_interruptor_global
-            name: Interruptor General Piscina
-            aspect_ratio: '5'
-          - type: entity
-            entity: binary_sensor.piscina_depuradora_ch0_status
-            name: Programa Depuradora Piscina
-            state_color: true
-          - type: entity
-            entity: binary_sensor.piscina_depuradora_ch0_motor_on
-            name: Motor Depuradora Encendido (>1.6W)
-            icon: mdi:flash-outline
-            state_color: true
-          - type: entity
-            entity: binary_sensor.piscina_depuradora_ch0_warning
-            state_color: true
-            name: Alerta Rango Potencia Electrica
-            icon: mdi:flash-alert
-          - type: horizontal-stack
-            cards:
-              - type: gauge
-                entity: sensor.esphome_pow_sw3_voltage
-                name: Voltage
-                unit: V
-                needle: false
-              - type: gauge
-                entity: sensor.esphome_pow_sw3_current
-                name: Amperios
-                unit: A
-                needle: true
-                severity:
-                  green: 0.05
-                  yellow: 0.3
-                  red: 0.5
-                min: 0
-                max: 1
-              - type: gauge
-                entity: sensor.esphome_pow_sw3_power
-                name: Watios
-                unit: W
-                severity:
-                  green: 2
-                  yellow: 4
-                  red: 5
-                min: 0
-                max: 10
-                needle: true
+          - color_thresholds:
+              - color: purple
+                value: 46
+              - color: magenta
+                value: 44
+              - color: red
+                value: 42
+              - color: vermillion
+                value: 40
+              - color: orange
+                value: 38
+              - color: amber
+                value: 35
+              - color: yellow
+                value: 30
+              - color: chartreuse
+                value: 25
+              - color: green
+                value: 20
+              - color: teal
+                value: 15
+              - color: blue
+                value: 10
+              - color: violet
+                value: 5
+              - color: black
+                value: 0
+            entities:
+              - entity: sensor.temperatura_interior
+            font_size: 120
+            line_width: 10
+            name: Media Interior
+            points_per_hour: 1
+            show:
+              icon: true
+              labels: true
+              state: true
+            type: custom:mini-graph-card
           - cards:
               - entities:
-                  - entity: sensor.esphome_pow_sw3_current
+                  - entity: sensor.ly2_estudio_humedad
                 font_size: 50
                 line_color: blue
                 line_width: 6
-                name: Consumo
                 type: custom:mini-graph-card
+                name: Humedad (LY2)
               - entities:
-                  - entity: sensor.esphome_pow_sw3_power
+                  - entity: sensor.ly2_estudio_bateria
                 font_size: 50
                 line_color: green
                 line_width: 6
-                name: Potencia
                 type: custom:mini-graph-card
+                name: Bateria (LY2)
             type: horizontal-stack
         type: vertical-stack
-      - cards:
-          - show_state: true
-            show_name: true
-            camera_view: auto
-            type: picture-entity
-            entity: binary_sensor.piscina_depuradora_ch0_dia_ejecucion
-            image: /local/Piscina_Depuradora_s1_1900x800.jpg
-            name: 'PISCINA: Programa Automático Depuradora'
-            aspect_ratio: '3'
-          - type: entities
-            entities:
-              - entity: switch.esphome_pow_sw3
-                secondary_info: last-changed
-              - entity: binary_sensor.piscina_depuradora_ch0_motor_on
-                name: Motor Depuradora On (W>2.0)
-                secondary_info: last-changed
-              - entity: timer.piscina_depuradora_ch0
-              - entity: sensor.piscina_depuradora_ch0_duracion_planificada_total
-              - entity: input_boolean.piscina_depuradora_ch0_programador_t1
-                name: Programador Tramo1
-              - entity: input_boolean.piscina_depuradora_ch0_programador_t2
-                name: Programador Tramo2
-              - entity: input_select.piscina_depuradora_ch0_programador_dias
-            show_header_toggle: false
-            state_color: true
-          - type: vertical-stack
-            cards:
-              - type: horizontal-stack
-                cards:
-                  - type: gauge
-                    entity: sensor.piscina_depuradora_ch0_duracion_planificada_t1
-                    name: TRAMO 1
-                    min: 0
-                    max: 360
-                    unit: Min
-                    needle: true
-                    severity:
-                      green: 180
-                      yellow: 240
-                      red: 300
-                  - type: custom:time-picker-card
-                    entity: input_datetime.piscina_depuradora_ch0_start_time_t1
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    hide:
-                      name: true
-                    link_values: true
-                    layout:
-                      embedded: true
-                  - type: custom:time-picker-card
-                    entity: input_datetime.piscina_depuradora_ch0_end_time_t1
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    hide:
-                      name: true
-                    layout:
-                      embedded: true
-                    link_values: true
-              - type: horizontal-stack
-                cards:
-                  - type: gauge
-                    entity: sensor.piscina_depuradora_ch0_duracion_planificada_t2
-                    name: TRAMO 2
-                    min: 0
-                    max: 360
-                    unit: Min
-                    needle: true
-                    severity:
-                      green: 180
-                      yellow: 240
-                      red: 300
-                  - type: custom:time-picker-card
-                    entity: input_datetime.piscina_depuradora_ch0_start_time_t2
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    hide:
-                      name: true
-                    link_values: true
-                    layout:
-                      embedded: true
-                  - type: custom:time-picker-card
-                    entity: input_datetime.piscina_depuradora_ch0_end_time_t2
-                    hour_mode: 24
-                    hour_step: 1
-                    minute_step: 1
-                    hide:
-                      name: true
-                    layout:
-                      embedded: true
-                    link_values: true
-        type: vertical-stack
-      - entities:
-          - input_number.piscina_depuradora_ch0_manual_minutos
-          - script.piscina_depuradora_ch0_timer_start
-          - script.piscina_depuradora_ch0_timer_pause
-          - script.piscina_depuradora_ch0_timer_resume
-          - script.piscina_depuradora_ch0_timer_cancel
-        show_header_toggle: false
-        title: Control Manual
-        state_color: true
-        type: entities
-    icon: mdi:swim
-    path: piscina_view
-    title: Piscina
-  - badges: []
-    cards:
       - cards:
           - color_thresholds:
               - color: purple
@@ -3277,6 +1941,1692 @@ views:
     icon: mdi:thermometer-lines
     path: temperatura
     title: Temperatura
+  - theme: Backend-selected
+    title: Calendar
+    path: calendar
+    icon: mdi:calendar
+    badges: []
+    cards:
+      - type: calendar
+        entities:
+          - calendar.universidad_universidad_aaf
+          - calendar.universidad_universidad_paf
+          - calendar.family_almuerzo
+          - calendar.family_cena
+          - calendar.family_eventos
+        initial_view: dayGridMonth
+        title: CALENDARIO FAMILY
+      - type: calendar
+        entities:
+          - calendar.universidad_universidad_aaf
+          - calendar.universidad_universidad_paf
+          - calendar.family_almuerzo
+          - calendar.family_cena
+          - calendar.family_eventos
+        initial_view: listWeek
+        title: CALENDARIO FAMILY
+  - title: Plan Riego
+    path: planriego_view
+    icon: mdi:head-snowflake-outline
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            image: /local/Riego_General_s0_1900x800.jpg
+            tap_action:
+              action: more-info
+            hold_action:
+              action: toggle
+            entity: input_boolean.riego_interruptor_global
+            name: Interruptor General Riego
+            aspect_ratio: '5'
+          - color: blue
+            entity: binary_sensor.riego_algun_sector_activo
+            name: ¿Regando Ahora?
+            icon: mdi:sprinkler-variant
+            type: tile
+            show_entity_picture: false
+          - cards:
+              - show_name: true
+                show_icon: true
+                entity: binary_sensor.riego_cesped_ch1_dia_ejecucion
+                hold_action:
+                  action: none
+                icon: mdi:sprinkler
+                name: Césped S1
+                tap_action:
+                  action: more-info
+                type: entity-button
+              - show_name: true
+                show_icon: true
+                entity: binary_sensor.riego_cesped_ch2_dia_ejecucion
+                hold_action:
+                  action: none
+                icon: mdi:sprinkler-variant
+                name: Césped S2
+                tap_action:
+                  action: more-info
+                type: entity-button
+              - show_name: true
+                show_icon: true
+                entity: binary_sensor.riego_cesped_ch3_dia_ejecucion
+                hold_action:
+                  action: none
+                name: Goteo S3
+                tap_action:
+                  action: more-info
+                type: entity-button
+                icon: mdi:sprinkler-fire
+              - show_name: true
+                show_icon: true
+                entity: switch.esphome_4ch_sw2_relay_3
+                icon: mdi:water-pump
+                name: Fuente Zen
+                show_state: false
+                tap_action:
+                  action: more-info
+                type: entity-button
+                hold_action:
+                  action: toggle
+            type: horizontal-stack
+          - cards:
+              - show_name: true
+                show_icon: true
+                entity: binary_sensor.riego_bonsais_ch1_dia_ejecucion
+                hold_action:
+                  action: none
+                icon: mdi:leaf
+                name: Bonsais Top
+                tap_action:
+                  action: more-info
+                type: entity-button
+              - entity: binary_sensor.riego_bonsais_ch2_dia_ejecucion
+                hold_action:
+                  action: none
+                icon: mdi:flower
+                name: Plantas Entrada
+                tap_action:
+                  action: more-info
+                type: entity-button
+              - show_name: true
+                show_icon: true
+                entity: binary_sensor.riego_tomates_ch0_dia_ejecucion
+                hold_action:
+                  action: none
+                name: Tomateras
+                tap_action:
+                  action: more-info
+                type: entity-button
+                icon: mdi:sprout
+              - show_name: true
+                show_icon: true
+                entity: binary_sensor.riego_bonsais_ch0_dia_ejecucion
+                icon: mdi:tree
+                name: Bonsais Prod
+                tap_action:
+                  action: more-info
+                type: entity-button
+            type: horizontal-stack
+          - cards:
+              - show_name: true
+                show_icon: true
+                entity: sensor.riego_cesped_ch1_duracion_planificada_total
+                hold_action:
+                  action: none
+                icon: mdi:sprinkler
+                name: Césped S1
+                tap_action:
+                  action: more-info
+                type: entity-button
+                show_state: true
+              - show_name: true
+                show_icon: true
+                entity: sensor.riego_cesped_ch2_duracion_planificada_total
+                hold_action:
+                  action: none
+                icon: mdi:sprinkler-variant
+                name: Césped S2
+                tap_action:
+                  action: more-info
+                type: entity-button
+                show_state: true
+              - show_name: true
+                show_icon: true
+                entity: sensor.riego_cesped_ch3_duracion_planificada_total
+                hold_action:
+                  action: none
+                icon: mdi:sprinkler-fire
+                name: Goteo S3
+                tap_action:
+                  action: more-info
+                type: entity-button
+                show_state: true
+              - show_name: true
+                show_icon: true
+                entity: sensor.riego_cesped_ch3_duracion_planificada_total
+                hold_action:
+                  action: none
+                name: Libre
+                tap_action:
+                  action: more-info
+                type: entity-button
+                show_state: false
+            type: horizontal-stack
+          - cards:
+              - show_name: true
+                show_icon: true
+                show_state: true
+                entity: sensor.riego_bonsais_ch0_duracion_planificada_total
+                hold_action:
+                  action: none
+                icon: mdi:leaf
+                name: Bonsais Top
+                tap_action:
+                  action: more-info
+                type: entity-button
+              - show_name: true
+                show_icon: true
+                show_state: true
+                entity: sensor.riego_bonsais_ch2_duracion_planificada_total
+                hold_action:
+                  action: none
+                icon: mdi:flower
+                name: Plantas Entrada
+                tap_action:
+                  action: more-info
+                type: entity-button
+              - show_name: true
+                show_icon: true
+                show_state: true
+                entity: sensor.riego_tomates_ch0_duracion_planificada_total
+                hold_action:
+                  action: none
+                name: Tomateras
+                tap_action:
+                  action: more-info
+                type: entity-button
+                icon: mdi:sprout
+              - show_name: true
+                show_icon: true
+                show_state: true
+                entity: sensor.riego_bonsais_ch1_duracion_planificada_total
+                icon: mdi:tree
+                name: Bonsais Prod
+                tap_action:
+                  action: more-info
+                type: entity-button
+            type: horizontal-stack
+      - type: vertical-stack
+        cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            image: /local/Riego_Bonsais_x1_900x362.jpg
+            tap_action:
+              action: more-info
+            hold_action:
+              action: toggle
+            entity: switch.esphome_pow_sw4
+            name: Cuadro Control Bomba Pozo
+            aspect_ratio: '5'
+          - color: yellow
+            type: tile
+            entity: binary_sensor.riego_bomba_pozo_motor_on
+            name: Motor Bomba Pozo Activa (>100W)
+            show_entity_picture: false
+          - color: red
+            type: tile
+            entity: binary_sensor.riego_bomba_pozo_warning_consumo
+            name: Warning Consumo Motor  (>1.900W)
+          - color: pink
+            type: tile
+            entity: binary_sensor.riego_bomba_pozo_warning_motor_off
+            name: Warning Riego Bomba Apagada
+          - type: horizontal-stack
+            cards:
+              - type: gauge
+                entity: sensor.esphome_pow_sw4_voltage
+                name: Voltage
+                unit: V
+                needle: false
+              - type: gauge
+                entity: sensor.esphome_pow_sw4_current
+                name: Amperios
+                unit: A
+                needle: true
+                severity:
+                  green: 0
+                  yellow: 8
+                  red: 10
+                min: 0
+                max: 12
+              - type: gauge
+                entity: sensor.esphome_pow_sw4_power
+                name: Watios
+                unit: W
+                severity:
+                  green: 1000
+                  yellow: 1500
+                  red: 1800
+                min: 0
+                max: 2000
+                needle: true
+          - cards:
+              - entities:
+                  - entity: sensor.esphome_pow_sw4_current
+                font_size: 50
+                line_color: blue
+                line_width: 6
+                name: Consumo
+                type: custom:mini-graph-card
+              - entities:
+                  - entity: sensor.esphome_pow_sw4_power
+                font_size: 50
+                line_color: green
+                line_width: 6
+                name: Potencia
+                type: custom:mini-graph-card
+            type: horizontal-stack
+      - type: vertical-stack
+        cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            image: /local/Riego_Bonsais_x2_1600x400.jpg
+            tap_action:
+              action: more-info
+            hold_action:
+              action: toggle
+            entity: automation.s18_control_interruptor_general_riego
+            name: 'IA Control Riego según Previsión AEMET '
+            aspect_ratio: '5'
+          - color: brown
+            type: tile
+            entity: automation.s18_control_interruptor_general_riego
+            name: S18 Regla Control Interruptor General Riego
+          - color: indigo
+            type: tile
+            entity: binary_sensor.riego_interruptor_global
+            icon: mdi:water-pump
+          - color: amber
+            type: tile
+            show_entity_picture: true
+            tap_action:
+              action: more-info
+            entity: binary_sensor.riego_automatico_hoy
+          - type: horizontal-stack
+            cards:
+              - color: blue
+                type: tile
+                name: Hoy
+                entity: sensor.aemet_tiempo_0d
+                show_entity_picture: true
+                tap_action:
+                  action: more-info
+              - color: cyan
+                type: tile
+                name: Mañana
+                show_entity_picture: true
+                tap_action:
+                  action: more-info
+                entity: sensor.aemet_tiempo_1d
+          - type: tile
+            entity: binary_sensor.aemet_prevision_lluvia_0d
+            name: AEMET Pronóstico Lluvia Día+0
+          - type: tile
+            entity: binary_sensor.aemet_prevision_lluvia_1d
+            name: AEMET Pronóstico Lluvia Día+1
+          - type: tile
+            entity: binary_sensor.aemet_prevision_lluvia_2d
+            name: AEMET Pronóstico Lluvia Día+2
+  - theme: Backend-selected
+    title: Riego Césped
+    path: riego_cesped_view
+    icon: mdi:sprinkler
+    badges: []
+    cards:
+      - cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            entity: binary_sensor.riego_cesped_ch1_dia_ejecucion
+            image: /local/Riego_Cesped_s1_1900x800.jpeg
+            name: 'SECTOR 1: Turbinas Cesped'
+            aspect_ratio: '5'
+          - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: toggle
+                name: Riego S1
+                entity: switch.esphome_4ch_sw3_relay_1
+                icon_color: teal
+              - type: custom:mushroom-entity-card
+                entity: timer.riego_cesped_ch1
+                fill_container: true
+                layout: vertical
+                name: Timer
+                icon: ''
+              - type: gauge
+                entity: sensor.riego_cesped_ch1_duracion_planificada_total
+                name: Tiempo Total
+                min: 0
+                max: 12
+                unit: Min
+                needle: true
+                severity:
+                  green: 1
+                  yellow: 6
+                  red: 10
+            type: horizontal-stack
+          - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: T1
+                entity: input_boolean.riego_cesped_ch1_programador_t1
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: T2
+                entity: input_boolean.riego_cesped_ch1_programador_t2
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: T3
+                entity: input_boolean.riego_cesped_ch1_programador_t3
+            type: horizontal-stack
+          - type: entities
+            entities:
+              - entity: input_select.riego_cesped_ch1_programador_dias
+            show_header_toggle: false
+            state_color: true
+          - type: vertical-stack
+            cards:
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_cesped_ch1_duracion_planificada_t1
+                    name: TRAMO 1
+                    min: 0
+                    max: 12
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 1
+                      yellow: 6
+                      red: 10
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch1_start_time_t1
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                    second_step: 5
+                    name: ''
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch1_end_time_t1
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                    layout:
+                      embedded: true
+                    link_values: true
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_cesped_ch1_duracion_planificada_t2
+                    name: TRAMO 2
+                    min: 0
+                    max: 12
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 1
+                      yellow: 6
+                      red: 10
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch1_start_time_t2
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch1_end_time_t2
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                    layout:
+                      embedded: true
+                    link_values: true
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_cesped_ch1_duracion_planificada_t3
+                    name: TRAMO 3
+                    min: 0
+                    max: 12
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 1
+                      yellow: 6
+                      red: 10
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch1_start_time_t3
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch1_end_time_t3
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                    layout:
+                      embedded: true
+                    link_values: true
+        type: vertical-stack
+      - cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            entity: binary_sensor.riego_cesped_ch2_dia_ejecucion
+            image: /local/Riego_Cesped_s2_1991x821.jpeg
+            name: SECTOR 2:Difusores Cesped
+            aspect_ratio: '5'
+          - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: toggle
+                name: Riego S2
+                entity: switch.esphome_4ch_sw3_relay_2
+                icon_color: teal
+              - type: custom:mushroom-entity-card
+                entity: timer.riego_cesped_ch2
+                fill_container: true
+                layout: vertical
+                name: Timer
+                icon: ''
+              - type: gauge
+                entity: sensor.riego_cesped_ch2_duracion_planificada_total
+                name: Tiempo Total
+                min: 0
+                max: 12
+                unit: Min
+                needle: true
+                severity:
+                  green: 1
+                  yellow: 6
+                  red: 10
+            type: horizontal-stack
+          - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: T1
+                entity: input_boolean.riego_cesped_ch2_programador_t1
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: T2
+                entity: input_boolean.riego_cesped_ch2_programador_t2
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: T3
+                entity: input_boolean.riego_cesped_ch2_programador_t3
+            type: horizontal-stack
+          - type: entities
+            entities:
+              - entity: input_select.riego_cesped_ch2_programador_dias
+            show_header_toggle: false
+            state_color: true
+          - type: vertical-stack
+            cards:
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_cesped_ch2_duracion_planificada_t1
+                    name: TRAMO 1
+                    min: 0
+                    max: 12
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 1
+                      yellow: 6
+                      red: 10
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch2_start_time_t1
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    name: ''
+                    hide:
+                      name: true
+                      icon: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch2_end_time_t1
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    name: ''
+                    hide:
+                      name: true
+                      icon: true
+                    layout:
+                      embedded: true
+                    link_values: true
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_cesped_ch2_duracion_planificada_t2
+                    name: TRAMO 2
+                    min: 0
+                    max: 12
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 1
+                      yellow: 6
+                      red: 10
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch2_start_time_t2
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    name: ''
+                    hide:
+                      name: true
+                      icon: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch2_end_time_t2
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    name: ''
+                    hide:
+                      name: true
+                      icon: true
+                    layout:
+                      embedded: true
+                    link_values: true
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_cesped_ch2_duracion_planificada_t3
+                    name: TRAMO 3
+                    min: 0
+                    max: 12
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 1
+                      yellow: 6
+                      red: 10
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch2_start_time_t3
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    name: ''
+                    hide:
+                      name: true
+                      icon: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch2_end_time_t3
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    name: ''
+                    hide:
+                      name: true
+                      icon: true
+                    layout:
+                      embedded: true
+                      icon: true
+                    link_values: true
+        type: vertical-stack
+      - cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            entity: binary_sensor.riego_cesped_ch3_dia_ejecucion
+            image: /local/Riego_Cesped_s3_1900x801.jpeg
+            name: 'SECTOR 3: Goteo Perímetro'
+            aspect_ratio: '5'
+          - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: toggle
+                name: Riego S3
+                entity: switch.esphome_4ch_sw3_relay_3
+                icon_color: teal
+              - type: custom:mushroom-entity-card
+                entity: timer.riego_cesped_ch3
+                fill_container: true
+                layout: vertical
+                name: Timer
+                icon: ''
+              - type: gauge
+                entity: sensor.riego_cesped_ch3_duracion_planificada_total
+                name: Tiempo Total
+                min: 0
+                max: 12
+                unit: Min
+                needle: true
+                severity:
+                  green: 1
+                  yellow: 6
+                  red: 10
+            type: horizontal-stack
+          - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: T1
+                entity: input_boolean.riego_cesped_ch3_programador_t1
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: T2
+                entity: input_boolean.riego_cesped_ch3_programador_t2
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: T3
+                entity: input_boolean.riego_cesped_ch3_programador_t3
+            type: horizontal-stack
+          - type: entities
+            entities:
+              - entity: input_select.riego_cesped_ch3_programador_dias
+            show_header_toggle: false
+            state_color: true
+          - type: vertical-stack
+            cards:
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_cesped_ch3_duracion_planificada_t1
+                    name: TRAMO 1
+                    min: 0
+                    max: 12
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 1
+                      yellow: 6
+                      red: 10
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch3_start_time_t1
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    name: ''
+                    hide:
+                      name: true
+                      icon: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch3_end_time_t1
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    name: ''
+                    hide:
+                      name: true
+                      icon: true
+                    layout:
+                      embedded: true
+                    link_values: true
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_cesped_ch3_duracion_planificada_t2
+                    name: TRAMO 2
+                    min: 0
+                    max: 12
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 1
+                      yellow: 6
+                      red: 10
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch3_start_time_t2
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    name: ''
+                    hide:
+                      name: true
+                      icon: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch3_end_time_t2
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    name: ''
+                    hide:
+                      name: true
+                      icon: true
+                    layout:
+                      embedded: true
+                    link_values: true
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_cesped_ch3_duracion_planificada_t3
+                    name: TRAMO 2
+                    min: 0
+                    max: 12
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 1
+                      yellow: 6
+                      red: 10
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch3_start_time_t3
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    name: ''
+                    hide:
+                      name: true
+                      icon: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch3_end_time_t3
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    name: ''
+                    hide:
+                      name: true
+                      icon: true
+                    layout:
+                      embedded: true
+                    link_values: true
+        type: vertical-stack
+  - theme: Backend-selected
+    icon: mdi:watering-can
+    path: riego_view
+    title: Riego Bonsais
+    badges: []
+    cards:
+      - cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            entity: binary_sensor.riego_bonsais_ch0_dia_ejecucion
+            image: /local/Riego_Bonsais_s1_1536x634.jpeg
+            name: 'SECTOR 1: Bonsais Producción'
+            aspect_ratio: '3'
+          - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: toggle
+                name: Producción
+                entity: switch.esphome_pow_sw1
+                icon_color: teal
+              - type: custom:mushroom-entity-card
+                entity: timer.riego_bonsais_ch0
+                fill_container: true
+                layout: vertical
+                name: Timer
+                icon: ''
+              - type: gauge
+                entity: sensor.riego_bonsais_ch0_duracion_planificada_total
+                name: Tiempo Total
+                min: 0
+                max: 12
+                unit: Min
+                needle: true
+                severity:
+                  green: 1
+                  yellow: 6
+                  red: 10
+            type: horizontal-stack
+          - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: T1
+                entity: input_boolean.riego_bonsais_ch0_programador_t1
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: T2
+                entity: input_boolean.riego_bonsais_ch0_programador_t2
+            type: horizontal-stack
+          - type: entities
+            entities:
+              - entity: input_select.riego_bonsais_ch0_programador_dias
+            show_header_toggle: false
+            state_color: true
+          - type: vertical-stack
+            cards:
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_bonsais_ch0_duracion_planificada_t1
+                    name: TRAMO 1
+                    min: 0
+                    max: 12
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 1
+                      yellow: 6
+                      red: 10
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_bonsais_ch0_start_time_t1
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                      seconds: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                      thin: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_bonsais_ch0_end_time_t1
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                    layout:
+                      embedded: true
+                    link_values: true
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_bonsais_ch0_duracion_planificada_t2
+                    name: TRAMO 2
+                    min: 0
+                    max: 12
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 1
+                      yellow: 6
+                      red: 10
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_bonsais_ch0_start_time_t2
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_bonsais_ch0_end_time_t2
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                    layout:
+                      embedded: true
+                    link_values: true
+        type: vertical-stack
+      - cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            entity: binary_sensor.riego_tomates_ch0_dia_ejecucion
+            image: /local/Riego_Bonsais_s2_1024x579.jpg
+            aspect_ratio: '3'
+            name: 'SECTOR 2: Huerto Tomates'
+          - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: toggle
+                name: Hueto Tomates
+                entity: switch.esphome_bas_sw2
+                icon_color: teal
+              - type: custom:mushroom-entity-card
+                entity: timer.riego_tomates_ch0
+                fill_container: true
+                layout: vertical
+                name: Timer
+                icon: ''
+              - type: gauge
+                entity: sensor.riego_tomates_ch0_duracion_planificada_total
+                name: Tiempo Total
+                min: 0
+                max: 12
+                unit: Min
+                needle: true
+                severity:
+                  green: 1
+                  yellow: 6
+                  red: 10
+            type: horizontal-stack
+          - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: T1
+                entity: input_boolean.riego_tomates_ch0_programador_t1
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: T2
+                entity: input_boolean.riego_tomates_ch0_programador_t2
+            type: horizontal-stack
+          - type: entities
+            entities:
+              - entity: input_select.riego_tomates_ch0_programador_dias
+            show_header_toggle: false
+            state_color: true
+          - type: vertical-stack
+            cards:
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_tomates_ch0_duracion_planificada_t1
+                    name: TRAMO 1
+                    min: 0
+                    max: 12
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 1
+                      yellow: 6
+                      red: 10
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_tomates_ch0_start_time_t1
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                      seconds: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                      thin: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_tomates_ch0_end_time_t1
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                      seconds: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                      thin: true
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_tomates_ch0_duracion_planificada_t2
+                    name: TRAMO 2
+                    min: 0
+                    max: 12
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 1
+                      yellow: 6
+                      red: 10
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_tomates_ch0_start_time_t2
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                      seconds: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                      thin: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_tomates_ch0_end_time_t2
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                      seconds: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                      thin: true
+        type: vertical-stack
+      - cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            entity: binary_sensor.riego_bonsais_ch2_dia_ejecucion
+            image: /local/Riego_Bonsais_s4_768x434.jpg
+            name: 'SECTOR 3: Plantas Aromáticas'
+            aspect_ratio: '3'
+          - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: toggle
+                name: Aromáticas
+                entity: switch.esphome_4ch_sw2_relay_2
+                icon_color: teal
+              - type: custom:mushroom-entity-card
+                entity: timer.riego_bonsais_ch2
+                fill_container: true
+                layout: vertical
+                name: Timer
+                icon: ''
+              - type: gauge
+                entity: sensor.riego_bonsais_ch2_duracion_planificada_total
+                name: Tiempo Total
+                min: 0
+                max: 12
+                unit: Min
+                needle: true
+                severity:
+                  green: 1
+                  yellow: 6
+                  red: 10
+            type: horizontal-stack
+          - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: T1
+                entity: input_boolean.riego_bonsais_ch2_programador_t1
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: T2
+                entity: input_boolean.riego_bonsais_ch2_programador_t2
+            type: horizontal-stack
+          - type: entities
+            entities:
+              - entity: input_select.riego_bonsais_ch2_programador_dias
+            show_header_toggle: false
+            state_color: true
+          - type: vertical-stack
+            cards:
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_bonsais_ch2_duracion_planificada_t1
+                    name: TRAMO 1
+                    min: 0
+                    max: 12
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 1
+                      yellow: 6
+                      red: 10
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_bonsais_ch2_start_time_t1
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                      seconds: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                      thin: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_bonsais_ch2_end_time_t1
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                      seconds: true
+                    layout:
+                      embedded: true
+                    link_values: true
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_bonsais_ch2_duracion_planificada_t2
+                    name: TRAMO 2
+                    min: 0
+                    max: 12
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 1
+                      yellow: 6
+                      red: 10
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_bonsais_ch2_start_time_t2
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                      seconds: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_bonsais_ch2_end_time_t2
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                      seconds: true
+                    layout:
+                      embedded: true
+                    link_values: true
+        type: vertical-stack
+      - cards:
+          - type: horizontal-stack
+            cards:
+              - show_state: true
+                show_name: true
+                camera_view: auto
+                type: picture-entity
+                entity: binary_sensor.riego_bonsais_ch1_dia_ejecucion
+                image: /local/Riego_Bonsais_s3_1900x884.jpeg
+                name: 'SECTOR 4: Bonsais Top'
+                aspect_ratio: '3'
+          - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: toggle
+                name: Bonsais Top
+                entity: switch.esphome_4ch_sw2_relay_1
+                icon_color: teal
+              - type: custom:mushroom-entity-card
+                entity: timer.riego_bonsais_ch1
+                fill_container: true
+                layout: vertical
+                name: Timer
+                icon: ''
+              - type: gauge
+                entity: sensor.riego_bonsais_ch1_duracion_planificada_total
+                name: Tiempo Total
+                min: 0
+                max: 12
+                unit: Min
+                needle: true
+                severity:
+                  green: 1
+                  yellow: 6
+                  red: 10
+            type: horizontal-stack
+          - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: T1
+                entity: input_boolean.riego_bonsais_ch0_programador_t1
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: T2
+                entity: input_boolean.riego_bonsais_ch0_programador_t2
+            type: horizontal-stack
+          - type: entities
+            entities:
+              - entity: input_select.riego_bonsais_ch1_programador_dias
+            show_header_toggle: false
+            state_color: true
+          - type: vertical-stack
+            cards:
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_bonsais_ch1_duracion_planificada_t1
+                    name: TRAMO 1
+                    min: 0
+                    max: 12
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 1
+                      yellow: 6
+                      red: 10
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_bonsais_ch1_start_time_t1
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                      seconds: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_bonsais_ch1_end_time_t1
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                      seconds: true
+                    layout:
+                      embedded: true
+                    link_values: true
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_bonsais_ch1_duracion_planificada_t2
+                    name: TRAMO 2
+                    min: 0
+                    max: 12
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 1
+                      yellow: 6
+                      red: 10
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_bonsais_ch1_start_time_t2
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                      seconds: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_bonsais_ch1_end_time_t2
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                      seconds: true
+                    layout:
+                      embedded: true
+                    link_values: true
+        type: vertical-stack
+  - theme: Backend-selected
+    icon: mdi:leaf
+    path: bonsais_view
+    title: Bonsais
+    badges: []
+    cards:
+      - cards:
+          - entity: plant.mp_01
+            type: plant-status
+            name: Ficus Tigerbark
+          - color_thresholds:
+              - color: magenta
+                value: 0
+              - color: red
+                value: 10
+              - color: yellow
+                value: 20
+              - color: green
+                value: 30
+              - color: teal
+                value: 40
+              - color: blue
+                value: 50
+              - color: violet
+                value: 90
+            entities:
+              - entity: sensor.humedad_plant_monitor_pm01
+            font_size: 50
+            line_width: 3
+            show:
+              icon: true
+              labels: true
+              state: true
+            name: Humedad
+            type: custom:mini-graph-card
+          - color_thresholds:
+              - color: purple
+                value: 46
+              - color: magenta
+                value: 44
+              - color: red
+                value: 42
+              - color: vermillion
+                value: 40
+              - color: orange
+                value: 38
+              - color: amber
+                value: 35
+              - color: yellow
+                value: 30
+              - color: chartreuse
+                value: 25
+              - color: green
+                value: 20
+              - color: teal
+                value: 15
+              - color: blue
+                value: 10
+              - color: violet
+                value: 5
+              - color: black
+                value: 0
+            entities:
+              - entity: sensor.temperatura_plant_monitor_pm01
+            font_size: 50
+            name: Temperatura
+            line_width: 3
+            points_per_hour: 4
+            show:
+              icon: true
+              labels: true
+              state: true
+            type: custom:mini-graph-card
+          - cards:
+              - entities:
+                  - entity: sensor.fertilidad_plant_monitor_pm01
+                font_size: 50
+                line_color: blue
+                line_width: 6
+                name: Fertilidad
+                type: custom:mini-graph-card
+              - entities:
+                  - entity: sensor.luminosidad_plant_monitor_pm01
+                font_size: 50
+                line_color: green
+                line_width: 6
+                name: Luminosidad
+                type: custom:mini-graph-card
+            type: horizontal-stack
+        type: vertical-stack
+      - cards:
+          - entity: plant.mp_02
+            name: Juniperus Proc. Nana
+            type: plant-status
+          - color_thresholds:
+              - color: magenta
+                value: 0
+              - color: red
+                value: 10
+              - color: yellow
+                value: 20
+              - color: green
+                value: 30
+              - color: teal
+                value: 40
+              - color: blue
+                value: 50
+              - color: violet
+                value: 90
+            entities:
+              - entity: sensor.humedad_plant_monitor_pm02
+            font_size: 50
+            line_width: 3
+            show:
+              icon: true
+              labels: true
+              state: true
+            name: Humedad
+            type: custom:mini-graph-card
+          - color_thresholds:
+              - color: purple
+                value: 46
+              - color: magenta
+                value: 44
+              - color: red
+                value: 42
+              - color: vermillion
+                value: 40
+              - color: orange
+                value: 38
+              - color: amber
+                value: 35
+              - color: yellow
+                value: 30
+              - color: chartreuse
+                value: 25
+              - color: green
+                value: 20
+              - color: teal
+                value: 15
+              - color: blue
+                value: 10
+              - color: violet
+                value: 5
+              - color: black
+                value: 0
+            entities:
+              - entity: sensor.temperatura_plant_monitor_pm02
+            font_size: 50
+            line_width: 3
+            points_per_hour: 4
+            name: Temperatura
+            show:
+              icon: true
+              labels: true
+              state: true
+            type: custom:mini-graph-card
+          - cards:
+              - entities:
+                  - entity: sensor.fertilidad_plant_monitor_pm02
+                font_size: 50
+                line_color: blue
+                line_width: 6
+                name: Fertilidad
+                type: custom:mini-graph-card
+              - entities:
+                  - entity: sensor.luminosidad_plant_monitor_pm02
+                font_size: 50
+                line_color: green
+                line_width: 6
+                name: Luminosidad
+                type: custom:mini-graph-card
+            type: horizontal-stack
+        type: vertical-stack
+      - cards:
+          - entity: plant.mp_03
+            name: Buganvilla
+            type: plant-status
+          - color_thresholds:
+              - color: magenta
+                value: 0
+              - color: red
+                value: 10
+              - color: yellow
+                value: 20
+              - color: green
+                value: 30
+              - color: teal
+                value: 40
+              - color: blue
+                value: 50
+              - color: violet
+                value: 90
+            entities:
+              - entity: sensor.humedad_plant_monitor_pm03
+            font_size: 50
+            line_width: 3
+            name: Humedad
+            show:
+              icon: true
+              labels: true
+              state: true
+            type: custom:mini-graph-card
+          - color_thresholds:
+              - color: purple
+                value: 46
+              - color: magenta
+                value: 44
+              - color: red
+                value: 42
+              - color: vermillion
+                value: 40
+              - color: orange
+                value: 38
+              - color: amber
+                value: 35
+              - color: yellow
+                value: 30
+              - color: chartreuse
+                value: 25
+              - color: green
+                value: 20
+              - color: teal
+                value: 15
+              - color: blue
+                value: 10
+              - color: violet
+                value: 5
+              - color: black
+                value: 0
+            entities:
+              - entity: sensor.temperatura_plant_monitor_pm03
+            font_size: 50
+            line_width: 3
+            points_per_hour: 4
+            name: Temperatura
+            show:
+              icon: true
+              labels: true
+              state: true
+            type: custom:mini-graph-card
+          - cards:
+              - entities:
+                  - entity: sensor.fertilidad_plant_monitor_pm03
+                font_size: 50
+                line_color: blue
+                line_width: 6
+                name: Fertilidad
+                type: custom:mini-graph-card
+              - entities:
+                  - entity: sensor.luminosidad_plant_monitor_pm03
+                font_size: 50
+                line_color: green
+                line_width: 6
+                name: Luminosidad
+                type: custom:mini-graph-card
+            type: horizontal-stack
+        type: vertical-stack
   - badges: []
     cards:
       - aspect_ratio: 75%
@@ -3600,6 +3950,188 @@ views:
     icon: mdi:weather-partly-cloudy
     path: tiempo_view
     title: El Tiempo
+  - badges: []
+    cards:
+      - cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            image: /local/Piscina_Fondo_s0_1555x800.jpg
+            tap_action:
+              action: more-info
+            hold_action:
+              action: toggle
+            entity: input_boolean.piscina_interruptor_global
+            name: Interruptor General Piscina
+            aspect_ratio: '4'
+          - type: entity
+            entity: binary_sensor.piscina_depuradora_ch0_status
+            name: Programa Depuradora Piscina
+            state_color: true
+          - type: entity
+            entity: binary_sensor.piscina_depuradora_ch0_motor_on
+            name: Motor Depuradora Encendido (>1.6W)
+            icon: mdi:flash-outline
+            state_color: true
+          - type: entity
+            entity: binary_sensor.piscina_depuradora_ch0_warning
+            state_color: true
+            name: Alerta Rango Potencia Electrica
+            icon: mdi:flash-alert
+          - type: horizontal-stack
+            cards:
+              - type: gauge
+                entity: sensor.esphome_pow_sw3_voltage
+                name: Voltage
+                unit: V
+                needle: false
+              - type: gauge
+                entity: sensor.esphome_pow_sw3_current
+                name: Amperios
+                unit: A
+                needle: true
+                severity:
+                  green: 0.05
+                  yellow: 0.3
+                  red: 0.5
+                min: 0
+                max: 1
+              - type: gauge
+                entity: sensor.esphome_pow_sw3_power
+                name: Watios
+                unit: W
+                severity:
+                  green: 2
+                  yellow: 4
+                  red: 5
+                min: 0
+                max: 10
+                needle: true
+          - cards:
+              - entities:
+                  - entity: sensor.esphome_pow_sw3_current
+                font_size: 50
+                line_color: blue
+                line_width: 6
+                name: Consumo
+                type: custom:mini-graph-card
+              - entities:
+                  - entity: sensor.esphome_pow_sw3_power
+                font_size: 50
+                line_color: green
+                line_width: 6
+                name: Potencia
+                type: custom:mini-graph-card
+            type: horizontal-stack
+        type: vertical-stack
+      - cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            entity: binary_sensor.piscina_depuradora_ch0_dia_ejecucion
+            image: /local/Piscina_Depuradora_s1_1900x800.jpg
+            name: 'PISCINA: Programa Automático Depuradora'
+            aspect_ratio: '4'
+          - type: entities
+            entities:
+              - entity: switch.esphome_pow_sw3
+                secondary_info: last-changed
+              - entity: binary_sensor.piscina_depuradora_ch0_motor_on
+                name: Motor Depuradora On (W>2.0)
+                secondary_info: last-changed
+              - entity: timer.piscina_depuradora_ch0
+              - entity: sensor.piscina_depuradora_ch0_duracion_planificada_total
+              - entity: input_boolean.piscina_depuradora_ch0_programador_t1
+                name: Programador Tramo1
+              - entity: input_boolean.piscina_depuradora_ch0_programador_t2
+                name: Programador Tramo2
+              - entity: input_select.piscina_depuradora_ch0_programador_dias
+            show_header_toggle: false
+            state_color: true
+          - type: vertical-stack
+            cards:
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.piscina_depuradora_ch0_duracion_planificada_t1
+                    name: TRAMO 1
+                    min: 0
+                    max: 360
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 180
+                      yellow: 240
+                      red: 300
+                  - type: custom:time-picker-card
+                    entity: input_datetime.piscina_depuradora_ch0_start_time_t1
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.piscina_depuradora_ch0_end_time_t1
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                    layout:
+                      embedded: true
+                    link_values: true
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.piscina_depuradora_ch0_duracion_planificada_t2
+                    name: TRAMO 2
+                    min: 0
+                    max: 360
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 180
+                      yellow: 240
+                      red: 300
+                  - type: custom:time-picker-card
+                    entity: input_datetime.piscina_depuradora_ch0_start_time_t2
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.piscina_depuradora_ch0_end_time_t2
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                    layout:
+                      embedded: true
+                    link_values: true
+        type: vertical-stack
+      - entities:
+          - input_number.piscina_depuradora_ch0_manual_minutos
+          - script.piscina_depuradora_ch0_timer_start
+          - script.piscina_depuradora_ch0_timer_pause
+          - script.piscina_depuradora_ch0_timer_resume
+          - script.piscina_depuradora_ch0_timer_cancel
+        show_header_toggle: false
+        title: Control Manual
+        state_color: true
+        type: entities
+    icon: mdi:swim
+    path: piscina_view
+    title: Piscina
   - theme: Backend-selected
     title: Media Player
     path: media-player
