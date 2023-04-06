@@ -204,17 +204,12 @@ camera:
   - platform: generic
     still_image_url: https://api.sat24.com/mostrecent/SP/visual5hdcomplete%20width=500%20height=304
     name: Weather Satelite
-  - platform: generic
-    still_image_url: !secret still_image_url_cam_estudio
-    name: IPcam Estudio
-    username: admin
-    password: !secret IPcam_estudio
-  - platform: generic
-    still_image_url: !secret still_image_url_cam_jardin
-    ##stream_source: !secret stream_source_url_cam_jardin
-    name: IPcam Jardín
-    username: admin
-    password: !secret IPcam_jardin
+  #- platform: generic
+  #  still_image_url: !secret still_image_url_cam_jardin
+  #  ##stream_source: !secret stream_source_url_cam_jardin
+  #  name: IPcam Jardín
+  #  username: admin
+  #  password: !secret IPcam_jardin
 
 #ffmpeg:
 
