@@ -1694,7 +1694,8 @@
       # offset: "+02:30:00"   # Horario Invierno GMT+2  => 18:30 + 3:30 = 22:00
       # offset: "+00:30:00"   # Horario Verano GMT+1  => 21:30 + 0:30 = 22:00
       event: sunset
-      offset: "+02:30:00"
+      # MODO VERANO => MOSQUITOS
+      offset: "+00:30:00"
     #- platform: time # Solo Invierno Calefacción
     #  at: '06:45:00'
     #- platform: sun  # solo para calefacción
@@ -1721,7 +1722,8 @@
       # offset: "+02:30:00"   # Horario Invierno GMT+1  => 18:30 + 3:30 = 22:00
       # offset: "+00:30:00"   # Horario Verano GMT+2  => 21:30 + 0:30 = 22:00
       event: sunset
-      offset: "+02:30:00"
+      # MODO VERANO => MOSQUITOS
+      offset: "+00:30:00"
   condition:
     condition: and
     conditions:
@@ -1761,13 +1763,13 @@
 - id: S12
   alias: 'S12 Switch Dormitorios Off'
   trigger:
-    - platform: time # Solo Invierno Calefacción
-      at: 
-        - "00:00:00"
-        - "01:00:00"
-        - "02:00:00"
-        - "03:00:00"
-        - "04:00:00"
+    #- platform: time # Solo Invierno Calefacción
+    #  at: 
+    #    - "00:00:00"
+    #    - "01:00:00"
+    #    - "02:00:00"
+    #    - "03:00:00"
+    #    - "04:00:00"
     - platform: sun
       event: sunrise
   condition:
@@ -1920,9 +1922,9 @@
 # PLAN DE RIEGOS ESTACION OTOÑO /VERANO
 #
 #     CANAL   SECTOR    HORA    TRAMO1    HORA2     TRAMO2
-#     A       1         8:00    5         22:00     5
-#     B       2         8:50    4         22:50     4
-#     C       3         10:00   4         23:30     4
+#     A       1         8:00    5         21:00     4
+#     B       2         10:50   4         23:00     4
+#     C       3         12:00   4         01:00     4
 #
 - id: S18b
   alias: 'S18b Control Bomba Riego'
@@ -1932,16 +1934,17 @@
       event: start
     - platform: time
       at:
-        - '07:45:00'
-        - '21:45:00'
-        - '12:30:00'
+        - '07:55:00'  # Enciende
+        - '12:30:00'  # Apaga
+        - '20:55:00'  # Enciente
+        - '01:30:00'  # Apaga
   action:
     # Apaga la bomba de riego por las noches y la enciende a primera hora en función del estado del interruptor global
     - choose:
-        # IF el interruptor general riego está encendido => a las 00:00 apaga la bomba de riego
+        # IF el interruptor general riego está encendido => a las 01:30 y a las 12:30, apaga la bomba de riego
         - conditions:
           - condition: template
-            value_template: "{{ now().hour == 12 }}"
+            value_template: "{{ now().hour == 12 or now().hour == 1 }}"
           sequence:
             - service: switch.turn_off
               target:
@@ -1949,7 +1952,7 @@
         # ELIF
         - conditions:
           - condition: template
-            value_template: "{{ (now().hour == 7 or now().hour == 21) and is_state('input_boolean.riego_interruptor_global','on')}}"
+            value_template: "{{ (now().hour == 7 or now().hour == 20) and is_state('input_boolean.riego_interruptor_global','on')}}"
           sequence:
             - service: switch.turn_on
               target:
@@ -2852,6 +2855,4 @@
       data:
         entity_id: alarm_control_panel.ha
         code: !secret alarm_control_code
-
-
 

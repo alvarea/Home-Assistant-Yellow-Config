@@ -721,7 +721,6 @@
       # - sensor.aemet_daily_forecast_temperature
 
       aemet_prevision_lluvia_0d:
-        # DARKSKY : rain, snow, sleet
         # AEMET : rainy, snow, sleet
         # AYER : 0d
         friendly_name: 'Pronóstico Lluvia 0d'

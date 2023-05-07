@@ -542,12 +542,12 @@ recorder:
 #      - weather
 #      - person
 
-weather:
-  - platform: darksky
-    api_key: !secret weather_apikey
-    mode: daily
-    latitude: !secret latitude_home
-    longitude: !secret longitude_home
+#weather:
+#  - platform: darksky
+#    api_key: !secret weather_apikey
+#    mode: daily
+#    latitude: !secret latitude_home
+#    longitude: !secret longitude_home
 
 
 #apcupsd:

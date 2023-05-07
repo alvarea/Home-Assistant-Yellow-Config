@@ -1368,16 +1368,16 @@ lavadora_switch_off:
         voz: >
           {% if states.sensor.aemet_condition.state | string == 'sunny' 
             %}
-            "Hola, el lavado ha terminado, el tiempo está soleado. Se puede tender fuera sin problemas."
+            "Lavado terminado. El tiempo está soleado, se puede tender."
           {% elif (states.sensor.aemet_condition.state | string == 'rainy' ) 
             %}
-            "Hola, el lavado ya ha terminado, pero tiene pinta de llover y recomiendo usar la secadora."
+            "Lavado terminado. Hay previsión de lluvia."
           {% elif (states.sensor.aemet_condition.state | string == 'partlycloudy'
                 or states.sensor.aemet_condition.state | string == 'cloudy')
             %}
-            "Hola, el lavado ya ha terminado, pero está nublado, revisa el tiempo antes de tender fuera."
+            "Lavado terminado. Está nublado,revisa el tiempo."
           {% else  %}
-            "Hola, el lavado ha terminado, pero antes de tender revisa la previsión del tiempo."
+            "Lavado terminado. Revisa la previsión del tiempo antes de tender."
           {% endif %}
 
 
