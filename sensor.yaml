@@ -1017,7 +1017,7 @@
           {% if states.input_datetime.lavadora_inicio_lavado.state is not none %} 
             {{ states.input_datetime.lavadora_inicio_lavado.state }}
           {% else %} 
-            {{ states.input_datetime.lavadora_inicio_lavado.attributes.timestamp | timestamp_custom("%H:%M")}}
+            {{ states.input_datetime.lavadora_inicio_lavado.attributes.timestamp | timestamp_custom("%H:%M:%S")}}
           {% endif %}
         icon_template: mdi:washing-machine-alert
 
@@ -1027,7 +1027,7 @@
           {% if states.input_datetime.lavadora_fin_lavado.state is not none %} 
             {{ states.input_datetime.lavadora_fin_lavado.state }}
           {% else %} 
-            {{ states.input_datetime.lavadora_fin_lavado.attributes.timestamp | timestamp_custom("%H:%M")}}
+            {{ states.input_datetime.lavadora_fin_lavado.attributes.timestamp | timestamp_custom("%H:%M:%S")}}
           {% endif %}
         icon_template: mdi:washing-machine-off
 
@@ -1035,9 +1035,9 @@
         friendly_name: 'Lavadora Duración Lavado)'
         icon_template: "{{ 'mdi:timer-sand' if states('sensor.lavadora_duracion_lavado') is not none }}"
         value_template: >-
-          {% if states.sensor.lavadora_fin_lavado.state is none %} 
+          {% if states.sensor.lavadora_fin_lavado.state is none or states.sensor.lavadora_fin_lavado.state == '00:00:00'%} 
             none
           {% else %} 
-            '{{ "{:}".format((states.input_datetime.lavadora_fin_lavado.attributes.timestamp -  states.input_datetime.lavadora_inicio_lavado.attributes.timestamp)/60)|int }}''
+            {{ "{:}".format((states.input_datetime.lavadora_fin_lavado.attributes.timestamp -  states.input_datetime.lavadora_inicio_lavado.attributes.timestamp)/60)|int }}
           {% endif %}
 

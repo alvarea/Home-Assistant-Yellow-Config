@@ -1,5 +1,8 @@
 #
-# ESPHOME SONOFF BASIC R2 - SW14 - NEW
+# ESPHOME SONOFF BASIC R2 - SW1 - NEW - AMPLIFICADOR YAMAHA HIFI
+#
+# 12.05.2023 : Fix error Network not found tras upgrade a ESPHOME 2023.04.  Elimino componentes innecesarios, dejando solo binary_sensor + switch
+#
 
 substitutions:
   device_name: esphome_bas_sw1
@@ -22,7 +25,7 @@ api:
 
 # Enable logging
 logger:
-  level: VERY_VERBOSE
+  level: VERBOSE
 
 ota:
 

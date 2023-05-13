@@ -8,7 +8,7 @@ esphome:
   board_flash_mode: dout
 
 wifi:
-  ssid: !secret wifi_ssid_wlan
+  ssid: !secret wifi_ssid_tc
   password: !secret wifi_pwd
   manual_ip:
     gateway: !secret wifi_gateway

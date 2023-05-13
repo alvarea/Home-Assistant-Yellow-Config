@@ -459,7 +459,7 @@
         value_template: >-
           {%  if is_state('binary_sensor.esphome_pow_sw2_switch','on')
               and states('sensor.esphome_pow_sw2_voltage')|int(0) > 200
-              and states('sensor.esphome_pow_sw2_power')|round(1) > 2.5
+              and states('sensor.esphome_pow_sw2_power')|round(1) > 0.5
           %}
             true
           {% else %}
@@ -469,8 +469,8 @@
       esphome_pow_sw2_lavadora_warning:
         value_template: >-
           {%  if is_state('binary_sensor.esphome_pow_sw2_switch','on')
-              and states('sensor.esphome_pow_sw2_power')|round(1) >= 0.1
-              and states('sensor.esphome_pow_sw2_power')|round(1) < 3.0
+              and states('sensor.esphome_pow_sw2_voltage')|round(1) >= 200
+              and states('sensor.esphome_pow_sw2_power')|round(1) < 0.5
           %}
             true
           {% else %}
@@ -1598,7 +1598,7 @@
 
       # MELCLOUD A/C Estudio
       # hvac_modes: off, heat, dry, cool, fan_only, heat_cool
-      melcloud_estudio_estate:
+      melcloud_estudio:
         value_template: >-
           {% if is_state('climate.aa_estudio','off') %}
             false
@@ -1606,6 +1606,18 @@
             true
           {% endif %}
         friendly_name: 'AC/Estudio'
+        icon_template: mdi:air-conditioner
+
+      # CLIMATIZACION ESTUDIO
+      # MELCLOUD A/C Estudio OR FAN.ESPHOME_S26_SW1
+      climatizacion_estudio:
+        value_template: >-
+          {% if is_state('binary_sensor.melcloud_estudio','on') or is_state('fan.esphome_s26_sw1','on') %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        friendly_name: 'Clima Estudio'
         icon_template: mdi:air-conditioner
 
       # Monitores Macbook Estudio

@@ -1355,9 +1355,6 @@ lavadora_switch_off:
   sequence:
     - delay: 00:00:02
 
-    - condition: template
-      value_template: '{{ as_timestamp(states.binary_sensor.esphome_pow_sw2_lavadora_warning.last_changed) - as_timestamp(states.binary_sensor.esphome_pow_sw2_lavadora_lavando.last_changed) < 300 }}'
-
     - service: switch.turn_off
       entity_id: switch.esphome_pow_sw2
     

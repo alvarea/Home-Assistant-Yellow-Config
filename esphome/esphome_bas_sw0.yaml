@@ -1,5 +1,8 @@
 #
 # ESPHOME SONOFF BASIC V.1.1 - SW0 - SIRENA ALARMA.-
+#
+# 12.05.2023 : Fix error Network not found tras upgrade a ESPHOME 2023.04.  Elimino componentes innecesarios, dejando solo binary_sensor + switch
+#
 
 substitutions:
   device_name: esphome_bas_sw0
@@ -22,18 +25,11 @@ api:
 
 # Enable logging
 logger:
-  level: VERY_VERBOSE
+
 
 ota:
 
 binary_sensor:
-  - platform: gpio
-    pin:
-      number: GPIO0
-      mode: INPUT_PULLUP
-      inverted: True
-    name: ${device_name}_boton
-
   - platform: status
     name: ${device_name}_status
 
@@ -41,15 +37,3 @@ switch:
   - platform: gpio
     name: ${device_name}
     pin: GPIO12
-
-output:
-  - platform: esp8266_pwm
-    id: ${device_name}_green_led
-    pin:
-      number: GPIO13
-      inverted: True
-
-light:
-  - platform: monochromatic
-    name: ${device_name}_led
-    output: ${device_name}_green_led

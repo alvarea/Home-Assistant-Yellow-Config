@@ -1,3 +1,18 @@
+
+
+{{ now().strftime("%H:%M") }}
+{{ now().strftime("%H:%M:%S") }}
+
+{{ as_timestamp(states.binary_sensor.esphome_pow_sw2_lavadora_lavando.last_changed) }}
+
+
+
+{{ as_timestamp(states.input_datetime.lavadora_inicio_lavado.state) }}
+
+
+{{ as_timestamp(states.binary_sensor.esphome_pow_sw2_lavadora_lavando.last_changed) }}
+
+
 #
 # GRUPOS LUCES - AREAS PARA ALEXA
 #

@@ -903,8 +903,8 @@
       conditions:
         # Si la fecha de última ejecucion de la escena es diferente a la del día (no se ha ejecutado ese día)
         - condition: template
-          value_template: "{{ states('scene.estudio_sunset') == 'unknown' or 
-            states('sensor.date') != (as_timestamp(states('scene.estudio_sunset')) | timestamp_custom('%Y-%m-%d', True)) }}"
+          value_template: "{{ states('scene.estudio_sunrise') == 'unknown' or 
+            states('sensor.date') != (as_timestamp(states('scene.estudio_sunrise')) | timestamp_custom('%Y-%m-%d', True)) }}"
         # Si AAC está en casa
         - condition: state
           entity_id: binary_sensor.family_home_aac
@@ -916,7 +916,7 @@
   action:
     - service: scene.turn_on
       target:
-        entity_id: scene.estudio_sunset
+        entity_id: scene.estudio_sunrise
     - service: media_player.media_pause
       target:
         entity_id: media_player.echo_alexa_estudio
@@ -1839,11 +1839,16 @@
       entity_id: binary_sensor.esphome_pow_sw2_lavadora_warning
       from: 'off'
       to: 'on'
+  condition:
+    condition: and
+    conditions:
+      - condition: template
+        value_template: "{{ as_timestamp(states.binary_sensor.esphome_pow_sw2_lavadora_warning.last_changed) - as_timestamp(states.binary_sensor.esphome_pow_sw2_lavadora_lavando.last_changed) < 300 }}"
   action:
     - service: input_datetime.set_datetime
       entity_id: input_datetime.lavadora_fin_lavado
       data:
-        time: '{{ now().strftime("%H:%M") }}'
+        time: '{{ now().strftime("%H:%M:%S") }}'
     # Llama al script de apagado de Sonoof POW si viene de un lavado
     - service: script.lavadora_switch_off
 
@@ -1859,6 +1864,10 @@
       entity_id: input_datetime.lavadora_inicio_lavado
       data:
         time: '{{ now().strftime("%H:%M") }}'
+    - service: input_datetime.set_datetime
+      entity_id: input_datetime.lavadora_fin_lavado
+      data:
+        time: '00:00'
 
 #
 # ESPHOME 4CH-R2 SW2 RIEGO BONSAIS
