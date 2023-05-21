@@ -397,6 +397,7 @@ cloud:
         - light.led_estudio_tv
         - light.luz_estudio_play_tv
         - light.luz_estudio_taller
+        - light.luz_estudio_neon
         #
         # SALON
         - light.luz_salon                   # Helper grupo luces de la habitación
@@ -441,10 +442,8 @@ cloud:
         - scene.estudio_setup_webcam
         - scene.estudio_setup_high
         - scene.estudio_setup_soft
-        - scene.estudio_noche
         - scene.estudio_sunrise
-        - scene.estudio_sunset
-        - scene.salon_sunset
+        - scene.estudio_sleep
         - scene.salon_noche
         - scene.salon_lectura
         - scene.salon_home_cinema
@@ -454,6 +453,9 @@ cloud:
         - scene.dormitorio_noche
         # PERSIANAS
         - cover.persiana_estudio
+        # VENTILADORES
+        - fan.esphome_s26_sw1
+        - fan.ventilador_dormitorio
     entity_config:
       script.homy_armado_parcial:
         name: armado parcial
@@ -485,11 +487,11 @@ cloud:
       cover.persiana_estudio:
         name: Persiana Estudio
         display_categories: SWITCH
+      fan.esphome_s26_sw1:
+        name: Ventilador Estudio
+        display_categories: FAN
       scene.estudio_sunrise:
         name: Estudio Amanecer
-        display_categories: SCENE_TRIGGER
-      scene.estudio_sunset:
-        name: Estudio Anochecer
         display_categories: SCENE_TRIGGER
 
 #

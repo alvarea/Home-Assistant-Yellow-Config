@@ -11,8 +11,22 @@ views:
               action: toggle
             name: Luz Estudio Setup
             entity: light.luz_estudio_setup
-            aspect_ratio: '2'
+            aspect_ratio: '4'
           - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.estudio_setup_soft
+                  data:
+                    transition: 5
+                name: Soft
+                icon: ''
+                icon_color: blue-grey
+                entity: scene.estudio_setup_soft
               - type: custom:mushroom-entity-card
                 entity: scene.estudio_setup_high
                 fill_container: true
@@ -27,77 +41,42 @@ views:
                 icon: ''
                 icon_color: blue-grey
               - type: custom:mushroom-entity-card
+                entity: scene.estudio_setup_webcam
                 fill_container: true
                 layout: vertical
                 tap_action:
                   action: call-service
                   service: scene.turn_on
                   target:
-                    entity_id: scene.estudio_setup_soft
+                    entity_id: scene.estudio_setup_webcam
                   data:
-                    transition: 3
-                name: Soft
-                icon: ''
-                icon_color: blue-grey
-                entity: scene.estudio_setup_soft
-              - type: custom:mushroom-entity-card
-                entity: scene.estudio_setup_call
-                fill_container: true
-                layout: vertical
-                tap_action:
-                  action: call-service
-                  service: scene.turn_on
-                  target:
-                    entity_id: scene.estudio_setup_call
-                  data:
-                    transition: 3
-                name: Webcam
+                    transition: 1
+                name: Conference
                 icon: mdi:webcam
                 icon_color: blue-grey
                 secondary_info: last-changed
               - type: custom:mushroom-entity-card
+                entity: light.estudio
                 fill_container: true
                 layout: vertical
                 tap_action:
                   action: call-service
-                  service: scene.turn_on
+                  service: light.turn_off
                   target:
-                    entity_id: scene.estudio_full
+                    area_id: c87f1d973bb247848d28bbe4be4c0a95
                   data:
-                    transition: 3
-                name: Full
+                    transition: 0
+                    flash: short
+                double_tap_action:
+                  action: call-service
+                  service: fan.turn_off
+                  target:
+                    area_id: c87f1d973bb247848d28bbe4be4c0a95
                 icon: ''
-                icon_color: blue-grey
-                entity: scene.estudio_full
-            type: horizontal-stack
-          - cards:
-              - type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: false
-                show_color_control: true
-                collapsible_controls: false
-                entity: light.luz_estudio_nate
-                name: Nate
-                tap_action:
-                  action: toggle
-              - type: custom:mushroom-entity-card
-                fill_container: true
-                name: Desk
-                entity: switch.esphome_bas_sw3
-                icon_color: pink
-                secondary_info: last-changed
-                tap_action:
-                  action: toggle
-              - type: custom:mushroom-entity-card
-                fill_container: true
-                name: Yamaha HiFi
-                entity: switch.esphome_s20_sw1
-                icon_color: blue
-                secondary_info: last-changed
-                tap_action:
-                  action: toggle
+                icon_color: grey
+                name: 'Off'
+                hold_action:
+                  action: more-info
             type: horizontal-stack
           - cards:
               - type: custom:mushroom-light-card
@@ -116,8 +95,8 @@ views:
                 show_color_temp_control: false
                 show_color_control: true
                 collapsible_controls: false
-                name: Led Desk
-                entity: light.luz_estudio_led_mesa
+                name: Webcam
+                entity: light.luz_estudio_webcam
               - type: custom:mushroom-light-card
                 fill_container: true
                 use_light_color: true
@@ -125,8 +104,8 @@ views:
                 show_color_temp_control: true
                 show_color_control: true
                 collapsible_controls: false
-                entity: light.luz_estudio_derecha
                 name: Dcha.
+                entity: light.luz_estudio_derecha
             type: horizontal-stack
           - cards:
               - type: custom:mushroom-light-card
@@ -143,10 +122,10 @@ views:
                 use_light_color: true
                 show_brightness_control: true
                 show_color_temp_control: false
-                show_color_control: false
+                show_color_control: true
                 collapsible_controls: false
-                entity: light.luz_estudio_play_c
-                name: Play C
+                name: Led Desk
+                entity: light.luz_estudio_led_mesa
               - type: custom:mushroom-light-card
                 fill_container: true
                 use_light_color: true
@@ -156,6 +135,46 @@ views:
                 collapsible_controls: false
                 entity: light.luz_estudio_play_d
                 name: Play D
+            type: horizontal-stack
+          - cards:
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: false
+                show_color_temp_control: false
+                show_color_control: false
+                collapsible_controls: false
+                entity: light.luz_estudio_neon
+                name: Neon Beer
+                tap_action:
+                  action: toggle
+                icon_color: amber
+                secondary_info: last-changed
+                layout: vertical
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: true
+                show_color_temp_control: false
+                show_color_control: true
+                collapsible_controls: false
+                entity: light.luz_estudio_nate
+                name: Nate
+                tap_action:
+                  action: toggle
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: false
+                show_color_temp_control: false
+                show_color_control: false
+                collapsible_controls: false
+                entity: light.luz_estudio_mesa
+                name: Mesa
+                tap_action:
+                  action: toggle
+                layout: vertical
+                secondary_info: last-changed
             type: horizontal-stack
         type: vertical-stack
       - cards:
@@ -168,7 +187,7 @@ views:
               action: toggle
             name: Luz Estudio Sala
             entity: light.luz_estudio_sala
-            aspect_ratio: '2'
+            aspect_ratio: '4'
           - cards:
               - type: custom:mushroom-entity-card
                 entity: scene.estudio_sunrise
@@ -179,73 +198,55 @@ views:
                   target:
                     entity_id: scene.estudio_sunrise
                   data:
-                    transition: 3
+                    transition: 5
                 icon: ''
-                icon_color: amber
+                icon_color: orange
                 name: Sunrise
                 layout: vertical
               - type: custom:mushroom-entity-card
-                entity: scene.estudio_sunset
+                entity: scene.estudio_azul
                 fill_container: true
                 layout: vertical
                 tap_action:
                   action: call-service
                   service: scene.turn_on
                   target:
-                    entity_id: scene.estudio_sunset
+                    entity_id: scene.estudio_azul
                   data:
-                    transition: 3
-                icon: ''
-                icon_color: deep-orange
-                name: Sunset
-              - type: custom:mushroom-entity-card
-                entity: scene.estudio_setup_night
-                fill_container: true
-                layout: vertical
-                tap_action:
-                  action: call-service
-                  service: scene.turn_on
-                  target:
-                    entity_id: scene.estudio_setup_night
-                  data:
-                    transition: 3
-                name: Noche
-                icon: ''
+                    transition: 5
+                name: Azul
+                icon: mdi:sunglasses
                 icon_color: light-blue
               - type: custom:mushroom-entity-card
                 fill_container: true
-                layout: vertical
-                icon: mdi:monitor-off
-                icon_color: black
-                entity: light.luz_estudio
                 tap_action:
                   action: call-service
-                  service: light.turn_off
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.estudio_home_cinema
                   data:
                     transition: 5
+                icon: ''
+                icon_color: cyan
+                layout: vertical
+                entity: scene.estudio_work_mode
+                name: Work
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
                   target:
-                    entity_id: light.luz_estudio
-                name: 'Off'
+                    entity_id: scene.estudio_full
+                  data:
+                    transition: 5
+                name: Full
+                icon: ''
+                icon_color: yellow
+                entity: scene.estudio_full
             type: horizontal-stack
           - cards:
-              - type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: true
-                show_color_control: true
-                collapsible_controls: false
-                entity: light.luz_estudio_techo
-                name: Techo
-              - type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: true
-                show_color_control: true
-                collapsible_controls: false
-                entity: light.luz_estudio_escalera
-                name: Escalera
               - type: custom:mushroom-light-card
                 fill_container: true
                 use_light_color: true
@@ -255,26 +256,28 @@ views:
                 collapsible_controls: false
                 entity: light.luz_estudio_alta
                 name: Alta
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: true
+                show_color_temp_control: false
+                show_color_control: false
+                collapsible_controls: false
+                entity: light.luz_estudio_play_tv
+                name: Play TV
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: true
+                show_color_temp_control: true
+                show_color_control: true
+                collapsible_controls: false
+                name: Techo
+                entity: light.luz_estudio_techo
+                tap_action:
+                  action: toggle
             type: horizontal-stack
           - cards:
-              - type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: false
-                show_color_control: false
-                collapsible_controls: false
-                entity: light.luz_estudio_lamparita
-                name: TV I
-              - type: custom:mushroom-light-card
-                fill_container: true
-                use_light_color: true
-                show_brightness_control: true
-                show_color_temp_control: false
-                show_color_control: false
-                collapsible_controls: false
-                entity: light.luz_estudio_tv
-                name: TV D
               - type: custom:mushroom-light-card
                 fill_container: true
                 use_light_color: true
@@ -284,8 +287,6 @@ views:
                 collapsible_controls: false
                 name: Media
                 entity: light.luz_estudio_media
-            type: horizontal-stack
-          - cards:
               - type: custom:mushroom-light-card
                 fill_container: true
                 use_light_color: true
@@ -293,7 +294,7 @@ views:
                 show_color_temp_control: false
                 show_color_control: false
                 collapsible_controls: false
-                name: LED TV
+                name: Led TV
                 entity: light.led_estudio_tv
               - type: custom:mushroom-light-card
                 fill_container: true
@@ -302,8 +303,10 @@ views:
                 show_color_temp_control: true
                 show_color_control: true
                 collapsible_controls: false
-                entity: light.luz_estudio_armario
-                name: Closet
+                entity: light.luz_estudio_lectura
+                name: Lectura
+            type: horizontal-stack
+          - cards:
               - type: custom:mushroom-light-card
                 fill_container: true
                 use_light_color: true
@@ -313,7 +316,124 @@ views:
                 collapsible_controls: false
                 name: Baja
                 entity: light.luz_estudio_baja
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: true
+                show_color_temp_control: false
+                show_color_control: false
+                collapsible_controls: false
+                entity: light.luz_estudio_tv_izq
+                name: Izq. TV
+                layout: vertical
+                secondary_info: last-changed
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: true
+                show_color_temp_control: true
+                show_color_control: true
+                collapsible_controls: false
+                entity: light.luz_estudio_taller
+                name: Taller
+                layout: vertical
+                secondary_info: last-changed
             type: horizontal-stack
+        type: vertical-stack
+      - cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            image: /local/Home_Room_Estudio_MediaPlayer_RGB.jpg
+            entity: media_player.echo_alexa_estudio
+            name: Alexa Media Player
+            tap_action:
+              action: more-info
+            aspect_ratio: '4'
+          - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                name: HiFi
+                entity: switch.esphome_bas_sw1
+                icon_color: blue
+                secondary_info: last-changed
+                tap_action:
+                  action: toggle
+                layout: vertical
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                name: Mac
+                layout: vertical
+                entity: binary_sensor.laptop_macbook_aac
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                name: Dell
+                layout: vertical
+                entity: binary_sensor.laptop_dell_aac
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                name: Regleta
+                entity: switch.esphome_bas_sw3
+                icon_color: pink
+                secondary_info: last-changed
+                hold_action:
+                  action: toggle
+                layout: vertical
+            type: horizontal-stack
+          - type: custom:mushroom-cover-card
+            name: Persiana
+            fill_container: true
+            show_position_control: true
+            show_buttons_control: true
+            entity: cover.persiana_estudio
+            show_tilt_position_control: false
+            layout: horizontal
+          - cards:
+              - type: custom:mushroom-light-card
+                fill_container: false
+                use_light_color: true
+                show_brightness_control: true
+                show_color_temp_control: true
+                show_color_control: true
+                collapsible_controls: false
+                entity: light.luz_estudio_armario
+                name: Armario
+                layout: vertical
+                secondary_info: none
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                name: Notificación
+                icon_color: pink
+                secondary_info: none
+                entity: switch.echo_alexa_estudio_do_not_disturb_switch
+                tap_action:
+                  action: toggle
+                layout: vertical
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                entity: sensor.echo_alexa_estudio_next_alarm
+                name: Alarma
+                layout: vertical
+                secondary_info: none
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.estudio_home_cinema
+                  data:
+                    transition: 5
+                icon: mdi:dolby
+                icon_color: purple
+                name: Dolby
+                layout: vertical
+                entity: scene.estudio_home_cinema
+                secondary_info: none
+            type: horizontal-stack
+          - entity: media_player.echo_alexa_estudio
+            type: media-control
         type: vertical-stack
       - type: vertical-stack
         cards:
@@ -322,39 +442,48 @@ views:
             camera_view: auto
             type: picture-entity
             image: /local/Estudio_AA_s0_1600x800.jpg
-            entity: binary_sensor.melcloud_estudio_estate
+            entity: binary_sensor.climatizacion_estudio
             name: A/A Estudio
             tap_action:
               action: more-info
-            hold_action:
-              action: call-service
-              service: climate.turn_off
-              service_data: {}
-              target:
-                device_id: e3baccf0bd493b061ec0fd82f41e5622
-            aspect_ratio: '2'
+            aspect_ratio: '4'
           - cards:
               - type: custom:mushroom-entity-card
                 fill_container: false
-                name: Mode
+                name: AA Mode
                 layout: vertical
                 entity: sensor.melcloud_estudio_state
-                hold_action:
+                tap_action:
                   action: call-service
-                  service: climate.turn_off
+                  service: climate.turn_on
                   service_data: {}
                   target:
                     device_id: e3baccf0bd493b061ec0fd82f41e5622
+                hold_action:
+                  action: more-info
               - type: custom:mushroom-entity-card
                 fill_container: false
-                name: Fan
+                name: AA Fan
                 layout: vertical
                 entity: sensor.melcloud_estudio_fan_mode
+                icon: mdi:fan
               - type: custom:mushroom-entity-card
                 entity: sensor.melcloud_estudio_swing_mode
                 fill_container: true
-                name: Swing
+                name: AA Swing
                 layout: vertical
+              - type: custom:mushroom-fan-card
+                fill_container: false
+                name: Ventilador
+                layout: vertical
+                entity: fan.esphome_s26_sw1
+                icon: ''
+                secondary_info: last-changed
+                tap_action:
+                  action: toggle
+                icon_animation: true
+                show_percentage_control: false
+                collapsible_controls: false
             type: horizontal-stack
           - type: custom:mushroom-climate-card
             entity: climate.aa_estudio
@@ -366,10 +495,42 @@ views:
               - cool
               - 'off'
               - fan_only
-            secondary_info: state
+            secondary_info: last-changed
             tap_action:
               action: more-info
-            layout: vertical
+            layout: horizontal
+            hold_action:
+              action: call-service
+              service: climate.turn_off
+              data: {}
+              target:
+                entity_id: climate.aa_estudio
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-entity-card
+                entity: binary_sensor.aqara_puerta_estudio_armario
+                name: Closet
+                fill_container: false
+                layout: vertical
+                secondary_info: none
+              - entity: binary_sensor.aqara_ventana_estudio_izquierda
+                type: custom:mushroom-entity-card
+                fill_container: false
+                layout: vertical
+                name: Izquierda
+                secondary_info: none
+              - type: custom:mushroom-entity-card
+                name: Derecha
+                fill_container: false
+                layout: vertical
+                entity: binary_sensor.aqara_ventana_estudio_derecha
+                secondary_info: none
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: vertical
+                entity: binary_sensor.aqara_puerta_estudio_desvan
+                name: Desván
+                secondary_info: none
           - color_thresholds:
               - color: purple
                 value: 46
@@ -408,72 +569,3 @@ views:
               labels: true
               state: true
             type: custom:mini-graph-card
-      - cards:
-          - entity: media_player.echo_alexa_estudio
-            type: media-control
-          - cards:
-              - type: custom:mushroom-entity-card
-                fill_container: true
-                name: Notificación
-                icon_color: pink
-                secondary_info: last-changed
-                entity: switch.echo_alexa_estudio_do_not_disturb_switch
-                tap_action:
-                  action: toggle
-                layout: vertical
-              - type: custom:mushroom-entity-card
-                fill_container: true
-                entity: sensor.echo_alexa_estudio_next_alarm
-                name: Alarma
-                layout: vertical
-              - type: custom:mushroom-entity-card
-                fill_container: true
-                name: HiFi
-                entity: switch.esphome_s26_sw1
-                icon_color: blue
-                secondary_info: last-changed
-                tap_action:
-                  action: toggle
-                layout: vertical
-              - type: custom:mushroom-entity-card
-                fill_container: true
-                name: Mac
-                layout: vertical
-                entity: binary_sensor.laptop_macbook_aac
-              - type: custom:mushroom-entity-card
-                fill_container: true
-                name: Dell
-                layout: vertical
-                entity: binary_sensor.laptop_dell_aac
-            type: horizontal-stack
-          - type: custom:mushroom-cover-card
-            name: Persiana
-            fill_container: true
-            show_position_control: true
-            show_buttons_control: true
-            entity: cover.persiana_estudio
-            show_tilt_position_control: false
-            layout: vertical
-          - type: horizontal-stack
-            cards:
-              - type: custom:mushroom-entity-card
-                entity: binary_sensor.aqara_puerta_estudio_armario
-                name: Armario
-                fill_container: false
-                layout: vertical
-              - entity: binary_sensor.aqara_ventana_estudio_izquierda
-                type: custom:mushroom-entity-card
-                fill_container: false
-                layout: vertical
-                name: Izquierda
-              - type: custom:mushroom-entity-card
-                name: Derecha
-                fill_container: false
-                layout: vertical
-                entity: binary_sensor.aqara_ventana_estudio_derecha
-              - type: custom:mushroom-entity-card
-                fill_container: false
-                layout: vertical
-                entity: binary_sensor.aqara_puerta_estudio_desvan
-                name: Desván
-        type: vertical-stack

@@ -101,6 +101,8 @@
       state: 'off'
     light.led_estudio_tv:
       state: 'off'
+    light.luz_estudio_neon:
+      state: 'off'
   icon: mdi:weather-sunset-up
 
 #
@@ -181,6 +183,8 @@
     light.led_estudio_tv:
       state: 'off'
     light.luz_estudio_webcam:
+      state: 'off'
+    light.luz_estudio_neon:
       state: 'off'
 
 #
@@ -265,6 +269,8 @@
       state: 'off'
     light.luz_estudio_webcam:
       state: 'off'
+    light.luz_estudio_neon:
+      state: 'off'
 
 #
 # ESCENA ESTUDIO SETUP HIGH - MODO FUERTE LECTURA LUZ AMANECER
@@ -324,6 +330,8 @@
     light.led_estudio_tv:
       state: 'off'
     light.luz_estudio_webcam:
+      state: 'off'
+    light.luz_estudio_neon:
       state: 'off'
 
 #
@@ -395,11 +403,12 @@
         - 255
         - 147
         - 0
-    light.luz_estudio_techo:
-      state: 'on'
-      brightness: 204
     light.led_estudio_tv:
       state: 'on'
+    light.luz_estudio_neon:
+      state: 'on'
+    light.luz_estudio_techo:
+      state: 'off'
     light.luz_estudio_lectura:
       state: 'off'
     light.luz_estudio_mesa:
@@ -479,6 +488,8 @@
     light.led_estudio_tv:
       state: 'on'
       brightness: 204
+    light.luz_estudio_neon:
+      state: 'on'
     light.luz_estudio_tv_izq:
       state: 'off'
     light.luz_estudio_lectura:
@@ -569,6 +580,8 @@
       brightness: 255
     light.luz_estudio_taller:
       state: 'on'
+    light.luz_estudio_neon:
+      state: 'on'
 
 - id: estudio_home_cinema
   name: Estudio Home Cinema
@@ -655,6 +668,8 @@
         - 76
         - 6
         - 255
+    light.luz_estudio_neon:
+      state: 'on'
     light.luz_estudio_izquierda:
       state: 'off'
     light.luz_estudio_derecha:

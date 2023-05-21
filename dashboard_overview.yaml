@@ -273,6 +273,8 @@ views:
                 secondary_info: last-changed
                 double_tap_action:
                   action: toggle
+                tap_action:
+                  action: toggle
               - type: custom:mushroom-entity-card
                 fill_container: true
                 layout: vertical
@@ -283,6 +285,8 @@ views:
                 secondary_info: last-changed
                 double_tap_action:
                   action: toggle
+                tap_action:
+                  action: toggle
               - type: custom:mushroom-entity-card
                 fill_container: true
                 layout: vertical
@@ -292,6 +296,8 @@ views:
                 icon: mdi:ceiling-light-multiple-outline
                 secondary_info: last-changed
                 double_tap_action:
+                  action: toggle
+                tap_action:
                   action: toggle
             type: horizontal-stack
           - cards:
@@ -304,6 +310,8 @@ views:
                 double_tap_action:
                   action: toggle
                 name: Luz Bonsais Entrada
+                tap_action:
+                  action: toggle
               - type: custom:mushroom-entity-card
                 fill_container: true
                 layout: vertical
@@ -311,6 +319,8 @@ views:
                 entity: light.luz_olivo_nubes
                 secondary_info: last-changed
                 double_tap_action:
+                  action: toggle
+                tap_action:
                   action: toggle
               - type: custom:mushroom-entity-card
                 fill_container: true
@@ -320,6 +330,8 @@ views:
                 secondary_info: last-changed
                 double_tap_action:
                   action: toggle
+                tap_action:
+                  action: toggle
             type: horizontal-stack
           - cards:
               - type: custom:mushroom-entity-card
@@ -327,7 +339,7 @@ views:
                 layout: vertical
                 icon_color: deep-purple
                 icon: mdi:air-conditioner
-                entity: binary_sensor.melcloud_estudio_estate
+                entity: binary_sensor.melcloud_estudio
                 name: A/C Estudio
                 tap_action:
                   action: navigate
@@ -369,26 +381,33 @@ views:
     title: Panel Control Alarma
     badges: []
     cards:
+      - features:
+          - type: alarm-modes
+            modes:
+              - armed_home
+              - armed_away
+              - disarmed
+        type: tile
+        entity: alarm_control_panel.ha
+        vertical: false
+      - features:
+          - type: alarm-modes
+            modes:
+              - armed_home
+              - armed_away
+              - armed_night
+              - armed_vacation
+              - armed_custom_bypass
+              - disarmed
+        type: tile
+        entity: alarm_control_panel.blink_casa
+        vertical: false
       - cards:
-          - entity: alarm_control_panel.ha
-            name: HOMY ALARM
-            type: alarm-panel
-            states:
-              - arm_home
-              - arm_away
           - type: entity
             entity: binary_sensor.esphome_bas_sw0
             name: Sirena Alarma
             state_color: true
-          - entity: alarm_control_panel.blink_casa
-            name: BLINK ALARM
-            type: alarm-panel
           - entities:
-              - entity: alarm_control_panel.ha
-                icon: mdi:shield-home
-                secondary_info: last-changed
-              - entity: alarm_control_panel.blink_casa
-                secondary_info: last-changed
               - entity: input_text.alarm_trigger
                 icon: mdi:security-network
                 name: Sensor
@@ -631,12 +650,12 @@ views:
         type: picture-glance
         entity: binary_sensor.blink_piscina_camera_armed
       - camera_view: live
-        camera_image: camera.blink_kitchen
+        camera_image: camera.blink_cocina
         entities:
-          - entity: binary_sensor.blink_kitchen_camera_armed
-          - entity: binary_sensor.blink_kitchen_motion_detected
-          - entity: sensor.blink_kitchen_wifi_signal
-          - entity: binary_sensor.blink_kitchen_battery
+          - entity: binary_sensor.blink_cocina_camera_armed
+          - entity: binary_sensor.blink_cocina_motion_detected
+          - entity: sensor.blink_cocina_wifi_signal
+          - entity: binary_sensor.blink_cocina_battery
           - entity: light.luz_cocina
         hold_action:
           action: call-service
@@ -645,7 +664,7 @@ views:
           action: more-info
         title: Cocina
         type: picture-glance
-        entity: camera.blink_kitchen
+        entity: camera.blink_cocina
       - camera_view: live
         camera_image: camera.blink_porche
         entities:
@@ -2305,10 +2324,15 @@ views:
                 fill_container: true
                 layout: vertical
                 tap_action:
-                  action: toggle
+                  action: more-info
                 name: Riego S1
                 entity: switch.esphome_4ch_sw3_relay_1
                 icon_color: teal
+                secondary_info: last-changed
+                hold_action:
+                  action: toggle
+                double_tap_action:
+                  action: toggle
               - type: custom:mushroom-entity-card
                 entity: timer.riego_cesped_ch1
                 fill_container: true
@@ -2479,10 +2503,13 @@ views:
                 fill_container: true
                 layout: vertical
                 tap_action:
-                  action: toggle
+                  action: more-info
                 name: Riego S2
                 entity: switch.esphome_4ch_sw3_relay_2
                 icon_color: teal
+                hold_action:
+                  action: toggle
+                secondary_info: last-changed
               - type: custom:mushroom-entity-card
                 entity: timer.riego_cesped_ch2
                 fill_container: true
@@ -2658,10 +2685,13 @@ views:
                 fill_container: true
                 layout: vertical
                 tap_action:
-                  action: toggle
+                  action: more-info
                 name: Riego S3
                 entity: switch.esphome_4ch_sw3_relay_3
                 icon_color: teal
+                secondary_info: last-changed
+                hold_action:
+                  action: toggle
               - type: custom:mushroom-entity-card
                 entity: timer.riego_cesped_ch3
                 fill_container: true
@@ -2842,10 +2872,13 @@ views:
                 fill_container: true
                 layout: vertical
                 tap_action:
-                  action: toggle
+                  action: more-info
                 name: Producción
                 entity: switch.esphome_pow_sw1
                 icon_color: teal
+                secondary_info: last-changed
+                hold_action:
+                  action: toggle
               - type: custom:mushroom-entity-card
                 entity: timer.riego_bonsais_ch0
                 fill_container: true
@@ -2870,14 +2903,14 @@ views:
                 layout: horizontal
                 tap_action:
                   action: toggle
-                name: T1
+                name: Bonsais Prod. T1
                 entity: input_boolean.riego_bonsais_ch0_programador_t1
               - type: custom:mushroom-entity-card
                 fill_container: false
                 layout: horizontal
                 tap_action:
                   action: toggle
-                name: T2
+                name: Bonsias Prod. T2
                 entity: input_boolean.riego_bonsais_ch0_programador_t2
             type: horizontal-stack
           - type: entities
@@ -2974,10 +3007,13 @@ views:
                 fill_container: true
                 layout: vertical
                 tap_action:
-                  action: toggle
-                name: Hueto Tomates
+                  action: more-info
+                name: Tomates
                 entity: switch.esphome_bas_sw2
                 icon_color: teal
+                hold_action:
+                  action: toggle
+                secondary_info: last-changed
               - type: custom:mushroom-entity-card
                 entity: timer.riego_tomates_ch0
                 fill_container: true
@@ -2988,13 +3024,13 @@ views:
                 entity: sensor.riego_tomates_ch0_duracion_planificada_total
                 name: Tiempo Total
                 min: 0
-                max: 12
+                max: 50
                 unit: Min
                 needle: true
                 severity:
-                  green: 1
-                  yellow: 6
-                  red: 10
+                  green: 20
+                  yellow: 30
+                  red: 40
             type: horizontal-stack
           - cards:
               - type: custom:mushroom-entity-card
@@ -3025,13 +3061,13 @@ views:
                     entity: sensor.riego_tomates_ch0_duracion_planificada_t1
                     name: TRAMO 1
                     min: 0
-                    max: 12
+                    max: 30
                     unit: Min
                     needle: true
                     severity:
-                      green: 1
-                      yellow: 6
-                      red: 10
+                      green: 5
+                      yellow: 15
+                      red: 20
                   - type: custom:time-picker-card
                     entity: input_datetime.riego_tomates_ch0_start_time_t1
                     hour_mode: 24
@@ -3064,13 +3100,13 @@ views:
                     entity: sensor.riego_tomates_ch0_duracion_planificada_t2
                     name: TRAMO 2
                     min: 0
-                    max: 12
+                    max: 30
                     unit: Min
                     needle: true
                     severity:
-                      green: 1
-                      yellow: 6
-                      red: 10
+                      green: 5
+                      yellow: 15
+                      red: 20
                   - type: custom:time-picker-card
                     entity: input_datetime.riego_tomates_ch0_start_time_t2
                     hour_mode: 24
@@ -3112,10 +3148,13 @@ views:
                 fill_container: true
                 layout: vertical
                 tap_action:
-                  action: toggle
+                  action: more-info
                 name: Aromáticas
                 entity: switch.esphome_4ch_sw2_relay_2
                 icon_color: teal
+                secondary_info: last-changed
+                hold_action:
+                  action: toggle
               - type: custom:mushroom-entity-card
                 entity: timer.riego_bonsais_ch2
                 fill_container: true
@@ -3249,10 +3288,15 @@ views:
                 fill_container: true
                 layout: vertical
                 tap_action:
-                  action: toggle
+                  action: more-info
                 name: Bonsais Top
                 entity: switch.esphome_4ch_sw2_relay_1
                 icon_color: teal
+                secondary_info: last-changed
+                hold_action:
+                  action: toggle
+                double_tap_action:
+                  action: toggle
               - type: custom:mushroom-entity-card
                 entity: timer.riego_bonsais_ch1
                 fill_container: true
@@ -3277,15 +3321,15 @@ views:
                 layout: horizontal
                 tap_action:
                   action: toggle
-                name: T1
-                entity: input_boolean.riego_bonsais_ch0_programador_t1
+                name: Bonsais Top T1
+                entity: input_boolean.riego_bonsais_ch1_programador_t1
               - type: custom:mushroom-entity-card
                 fill_container: false
                 layout: horizontal
                 tap_action:
                   action: toggle
-                name: T2
-                entity: input_boolean.riego_bonsais_ch0_programador_t2
+                name: Bonsais Top T2
+                entity: input_boolean.riego_bonsais_ch1_programador_t2
             type: horizontal-stack
           - type: entities
             entities:
@@ -3644,93 +3688,6 @@ views:
       - type: vertical-stack
         cards:
           - type: entity
-            entity: weather.dark_sky
-            name: DARK SKY
-            icon: mdi:weather-cloudy
-            state_color: true
-          - cards:
-              - entity: sensor.dark_sky_icon
-                hold_action:
-                  action: none
-                tap_action:
-                  action: more-info
-                type: entity-button
-                show_state: true
-                show_icon: false
-                name: Hoy
-                show_name: true
-              - entity: sensor.dark_sky_icon_1d
-                hold_action:
-                  action: none
-                tap_action:
-                  action: more-info
-                type: entity-button
-                name: Mañana
-                show_state: true
-                show_icon: false
-              - entity: sensor.dark_sky_icon_2d
-                hold_action:
-                  action: none
-                name: Día+2
-                tap_action:
-                  action: more-info
-                type: entity-button
-                icon: mdi:leaf
-                show_state: true
-                show_icon: false
-              - entity: sensor.dark_sky_icon_3d
-                hold_action:
-                  action: none
-                name: Día+3
-                tap_action:
-                  action: more-info
-                type: entity-button
-                show_state: true
-                show_icon: false
-            type: horizontal-stack
-          - cards:
-              - entity: sensor.dark_sky_humidity
-                hold_action:
-                  action: none
-                tap_action:
-                  action: more-info
-                type: entity-button
-                show_state: true
-                show_icon: false
-                name: Hoy
-                show_name: true
-              - entity: sensor.dark_sky_humidity_1d
-                hold_action:
-                  action: none
-                tap_action:
-                  action: more-info
-                type: entity-button
-                name: Mañana
-                show_state: true
-                show_icon: false
-              - entity: sensor.dark_sky_humidity_2d
-                hold_action:
-                  action: none
-                name: Día+2
-                tap_action:
-                  action: more-info
-                type: entity-button
-                icon: mdi:leaf
-                show_state: true
-                show_icon: false
-              - entity: sensor.dark_sky_humidity_3d
-                hold_action:
-                  action: none
-                name: Día+3
-                tap_action:
-                  action: more-info
-                type: entity-button
-                show_state: true
-                show_icon: false
-            type: horizontal-stack
-      - type: vertical-stack
-        cards:
-          - type: entity
             entity: sensor.aemet_condition
             name: AEMET Pronóstico Hoy
             icon: mdi:weather-cloudy
@@ -4037,9 +3994,6 @@ views:
           - type: entities
             entities:
               - entity: switch.esphome_pow_sw3
-                secondary_info: last-changed
-              - entity: binary_sensor.piscina_depuradora_ch0_motor_on
-                name: Motor Depuradora On (W>2.0)
                 secondary_info: last-changed
               - entity: timer.piscina_depuradora_ch0
               - entity: sensor.piscina_depuradora_ch0_duracion_planificada_total
@@ -4530,6 +4484,35 @@ views:
                 line_width: 6
                 name: Luz
                 type: custom:mini-graph-card
+            type: horizontal-stack
+          - cards:
+              - type: custom:mushroom-fan-card
+                fill_container: true
+                collapsible_controls: false
+                entity: fan.ventilador_dormitorio
+                icon_animation: true
+                show_percentage_control: true
+                show_oscillate_control: false
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                entity: button.ventilador_dormitorio_ciclo
+                hold_action:
+                  action: more-info
+                tap_action:
+                  action: call-service
+                  service: button.press
+                  target:
+                    entity_id: button.ventilador_dormitorio_ciclo
+                  data: {}
+                primary_info: name
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: true
+                show_color_temp_control: true
+                show_color_control: true
+                collapsible_controls: false
+                entity: light.ventilador_dormitorio_principal
             type: horizontal-stack
         type: vertical-stack
       - cards:
@@ -5043,7 +5026,7 @@ views:
             critical: 20
             charging: true
           - type: custom:battery-entity-row
-            entity: binary_sensor.door_window_sensor_158d000201e2e7
+            entity: sensor.aqara_puerta_salon_bateria
             attribute: battery_percent
             unit: '%'
             secondary_info: last-changed

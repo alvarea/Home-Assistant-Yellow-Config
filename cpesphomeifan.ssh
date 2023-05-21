@@ -1,0 +1,8 @@
+#
+# COPIA ARCHIVOS YAML A HOMY
+#
+# SOURCE: /Users/agustin/Dev/HOMY-Home-Assistant-Config/esphome
+# TARGET: /Volumes/config/esphome
+
+cp /Users/agustin/Dev/HOMY-Home-Assistant-Config/esphome/esphome_ifan*.yaml /Volumes/config/esphome
+
