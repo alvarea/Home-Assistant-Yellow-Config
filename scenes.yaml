@@ -723,7 +723,7 @@
     light.led_salon_tv:
       state: 'on'
       brightness: 204
-  icon: mdi:lamp
+  icon: mdi:lamps-outline
 
 - id: salon_lectura
   name: Salón Lectura
@@ -740,7 +740,7 @@
     light.led_salon_tv:
       state: 'on'
       brightness: 204
-  icon: mdi:mdi:lamps-outline
+  icon: mdi:lamps
 
 - id: salon_home_cinema
   name: Salón Home Cinema
@@ -756,7 +756,7 @@
     light.led_salon_tv:
       state: 'on'
       brightness: 204
-  icon: mdi:lamp
+  icon: mdi:dolby
 
 #
 # ESCENAs DORMITORIO PRINCIPAL

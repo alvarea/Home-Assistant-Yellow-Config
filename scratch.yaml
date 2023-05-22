@@ -1,3 +1,164 @@
+cloud:
+  alexa:
+    filter:
+      exclude_domains:
+        - alert
+        - automation
+        - binary_sensor
+        - button
+        - camera
+        - climate
+        - cover
+        - device_tracker
+        - fan
+        - group
+        - input_number
+        - input_datetime
+        - input_select
+        - input_text
+        - input_boolean
+        - light
+        - media_player
+        - number
+        - person
+        - range
+        - remote
+        - script
+        - sensor
+        - scene
+        - sun
+        - switch
+        - timer
+        - weather
+        - zone
+      include_entities:
+        #COCINA
+        - light.luz_cocina
+        #ENTRADA
+        - light.luz_hall                    # Helper grupo luces de la habitación entrada+pasillo
+        - light.luz_entrada                 # Voz Alexa: Luz Entrada
+        - light.luz_pasillo                 # Voz Alexa: Luz Pasillo
+        - light.luz_plancha_mecedora        # Voz Alexa: Luz Mecedora
+        # ESTUDIO
+        - light.luz_estudio                 # Alexa OK # Helper grupo luces del Estudio
+        - light.luz_estudio_setup           # Alexa OK # Helper grupo luces del Setup
+        - light.luz_estudio_sala            # Alexa OK # Helper grupo luces del Estudio Sala
+        - light.luz_estudio_alta            # Alexa OK
+        - light.luz_estudio_media           # Alexa OK
+        - light.luz_estudio_baja            # Alexa OK
+        - light.luz_estudio_izquierda       # Alexa OK
+        - light.luz_estudio_derecha         # Alexa OK
+        - light.luz_estudio_led_mesa        # Alexa OK
+        - light.luz_estudio_nate            # Alexa OK
+        - light.luz_estudio_mesa            # Alexa OK
+        - light.luz_estudio_lectura         # Alexa OK
+        - light.luz_estudio_play_i          # Alexa OK
+        - light.luz_estudio_play_d          # Alexa OK
+        - light.luz_estudio_techo           # Alexa OK
+        - light.luz_estudio_tv_izq          # Alexa OK
+        - light.led_estudio_tv              # Alexa OK
+        - light.luz_estudio_play_tv         # Alexa OK
+        - light.luz_estudio_taller          # Alexa OK
+        - light.luz_estudio_neon            # Alexa OK
+        #
+        # SALON
+        - light.luz_salon                   # Helper grupo luces de la habitación
+        - light.luz_salon_vitrina           # Voz Alexa: Luz Vitrina
+        - light.luz_salon_cilindro          # Voz Alexa: Luz Cilindro
+        - light.luz_salon_lectura           # Voz Alexa: Luz Lectura
+        - light.led_salon_tv                # Voz Alexa: Led Salon TV
+        - light.luz_arbol_navidad           # Voz Alexa: Arbol Navidad  TEMPORAL SONOFF S26
+        #
+        # DORMITORIOS 
+        - light.luz_dormitorio              # Helper grupo luces de la habitación
+        - light.luz_dormitorio_agu          # Helper grupo luces de la habitación
+        - light.luz_dormitorio_paloma       # Helper grupo luces de la habitación
+        - light.luz_dormitorio_agustin      # Voz Alexa: Luz Agustin
+        - light.luz_dormitorio_malen        # Voz Alexa: Luz Malen
+        - light.luz_plancha_mecedora        # Voz Alexa: Luz Mecedora
+        - light.luz_dormitorio_aaf_mesilla  # Voz Alexa: Luz Agu
+        - light.led_mesa_agu                # Voz Alexa: Led Mesa Agu
+        - light.luz_dormitorio_paf_mesa     # Voz Alexa: Luz Paloma
+        #
+        # JARDIN 
+        - light.luz_jardin                  # Helper grupo luces de la habitación
+        - light.luz_exterior                # Luces Exterior (MINI_SW1)
+        - light.luz_balizas_cesped          # Balizas Cesped  (switch.esphome_4ch_relay_1)
+        - light.luz_olivo_grande            # Foco Olivo Grande (switch.esphome_4ch_relay_2)
+        - light.luz_olivo_nubes             # Foco Olivo Nubes (switch.esphome_4ch_relay_3)
+        - light.luz_entrada_bonsais         # Foco Entrada Bonsai (switch.esphome_4ch_relay_4)
+        - light.luz_porche_jardin           # Porche Salón (MINI_SW2)
+        # ALARMA
+        - script.homy_armado_parcial
+        - script.homy_armado_total
+        - script.homy_desarmado_code
+        # MEDIA PLAYER
+        - media_player.firetv_cocina
+        - media_player.firetv_salon
+        - media_player.firetv_estudio
+        # ESCENAS
+        - scene.estudio_full              # alexa OK
+        - scene.estudio_home_cinema       # alexa OK
+        - scene.estudio_azul              # alexa OK
+        - scene.estudio_setup_webcam      # alexa OK  
+        - scene.estudio_setup_high        # alexa OK
+        - scene.estudio_setup_soft        # alexa OK
+        - scene.estudio_sunrise           # alexa OK
+        - scene.estudio_work_mode         # alexa OK
+        - scene.estudio_sleep
+        - scene.salon_noche               # alexa OK
+        - scene.salon_lectura             # alexa OK
+        - scene.salon_home_cinema         # alexa OK
+        - scene.salon_sunset              # alexa OK
+        - scene.dormitorio_full           # alexa OK
+        - scene.dormitorio_lectura        # alexa OK
+        - scene.dormitorio_relax          # alexa OK
+        - scene.dormitorio_noche          # alexa OK
+        # PERSIANAS
+        - cover.persiana_estudio          # alexa OK
+        # VENTILADORES
+        # - fan.ventilador_dormitorio
+        # INTERRUPTORES
+        - switch.esphome_s26_sw1          # alexa OK Freidora Aire
+    entity_config:
+      script.homy_armado_parcial:
+        name: armado parcial
+        display_categories: SWITCH
+      script.homy_armado_total:
+        name: armado total
+        display_categories: SWITCH
+      script.homy_desarmado_code:
+        name: !secret desarmado_code
+        display_categories: SWITCH
+      light.luz_salon:
+        name: Luz Salón
+        display_categories: LIGHT
+      light.luz_estudio_tv_izq:
+        name: Luz Estudio Izquierda
+        display_categories: LIGHT
+      light.luz_estudio_tv_dcha:
+        name: Luz Estudio Derecha
+        display_categories: LIGHT
+      media_player.firetv_salon:
+        name: Tele
+        display_categories: TV
+      media_player.firetv_cocina:
+        name: TV cocina
+        display_categories: TV
+      media_player.firetv_estudio:
+        name: TV estudio
+        display_categories: TV
+      cover.persiana_estudio:
+        name: Persiana Estudio
+        display_categories: SWITCH
+      switch.esphome_s26_sw1:
+        name: Freidora
+        display_categories: SWITCH
+      scene.estudio_sunrise:
+        name: Estudio Amanecer
+        display_categories: SCENE_TRIGGER
+
+#------------------
 
 
 {{ now().strftime("%H:%M") }}
