@@ -338,6 +338,7 @@ alert:
 # https://developer.amazon.com/es-ES/docs/alexa/device-apis/alexa-discovery.html#display-categories
 #
 # Desde HOMY 2023.05 la gestión y configuración se realiza desde UI.
+#
 cloud:
 
 #
