@@ -1695,6 +1695,17 @@
 # NMAP - COMPUTER LAPTOP DEVICES
 # =====================================================================
 #
+
+      setup_devices_status:
+        value_template: >-
+          {{ states('binary_sensor.laptop_macbook_aac') == 'on' 
+             or states('binary_sensor.laptop_dell_aac') == 'on' 
+             or states('switch.esphome_mini_sw7') == 'on' 
+            or states('media_player.echo_alexa_estudio') == 'playing' 
+          }}
+        friendly_name: 'Setup Devices Status'
+        icon_template: mdi:laptop
+
       laptop_aac:
         value_template: >-
           {% if is_state('binary_sensor.laptop_macbook_aac','on') 

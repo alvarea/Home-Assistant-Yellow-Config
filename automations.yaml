@@ -630,7 +630,6 @@
         - "04:00:00"
         - "05:00:00"
         - "06:00:00"
-        - "07:00:00"
   condition:
     condition: and
     conditions:
@@ -640,7 +639,7 @@
       - condition: time
         after: '00:30:00'
       - condition: time
-        before: '08:00:00'
+        before: '07:00:00'
       - condition: state
         entity_id: binary_sensor.family_any_home
         state: 'on'
@@ -1619,6 +1618,8 @@
       - condition: state
         entity_id: binary_sensor.piscina_depuradora_ch0_dia_ejecucion_t1  # Sensor del programador on/off
         state: 'on'
+      - condition: template
+        value_template: "{{ states('person.paloma') != 'home' }}"
   action:
     # Timer Programador Diario
     - service: timer.start
