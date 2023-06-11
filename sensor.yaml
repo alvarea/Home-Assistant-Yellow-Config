@@ -33,25 +33,18 @@
 #    host: alvareahomy.duckdns.org
 #    port: 2309
 #
-  - platform: command_line
-    name: Temperatura CPU
-    command: "cat /sys/class/thermal/thermal_zone0/temp"
-    # If errors occur, remove degree symbol below
-    unit_of_measurement: "°C"
-    value_template: '{{ value | multiply(0.001) | round(1) }}'
+
+  # No disponible en YAML dede 2023.06 con un warning.
+  #- platform: command_line
+  #  name: Temperatura CPU
+  #  command: "cat /sys/class/thermal/thermal_zone0/temp"
+  #  # If errors occur, remove degree symbol below
+  #  unit_of_measurement: "°C"
+  #  value_template: '{{ value | multiply(0.001) | round(1) }}'
 
   #- platform: command_line
   #  command: python3 -c "import requests; print(requests.get('https://pypi.python.org/pypi/homeassistant/json').json()['info']['version'])"
   #  name: Versión HA (web)
-
-  - platform: version
-    source: local
-    name: Versión Local
-
-  - platform: version
-    name: Versión Disponible
-    source: hassio
-
 
   - platform: systemmonitor
     resources:
@@ -68,6 +61,7 @@
         arg: /
       - type: disk_free
         arg: /
+      - type: processor_temperature
 
 #  - platform: darksky
 #    api_key: !secret weather_apikey

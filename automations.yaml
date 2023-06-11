@@ -366,8 +366,8 @@
       to: 'disarmed'
   action:
     # SONOFF_SW1_SIRENA INTERIOR ==> OFF
-    - service: switch.turn_off
-      entity_id: switch.esphome_bas_sw0
+    - service: siren.turn_off
+      entity_id: siren.sirena
 
     # DESARMADO PANEL ALARMA BLINK
     - service: alarm_control_panel.alarm_disarm
@@ -562,23 +562,6 @@
     # Llamada a script desactivado botón pánico.
     - service: script.alarma_boton_panico_off
 
-#
-# REGLA: BOTON APAGADO ESPHOME-SW1 ==> SIRENA OFF
-#
-- id: A11
-  alias: 'A12 Alarm Sirena Interior Off'
-  trigger:
-    platform: state
-    entity_id: binary_sensor.esphome_bas_sw0_boton
-    from: 'off'
-    to: 'on'
-  action:
-    # ESPHOME_SW1_SIRENA INTERIOR ==> OFF
-    - service: switch.turn_off
-      entity_id: switch.esphome_bas_sw0
-    - service: light.toggle
-      target:
-        entity_id: light.esphome_bas_sw0_led
 
 #-----------------------------------------------------------------------------#
 #                                                                             #
@@ -1365,8 +1348,12 @@
           {% else %} 30
           {% endif %}
       target:
-        entity_id: light.luz_pasillo
-        
+        entity_id: light.luz_estudio
+    - service: fan.turn_off
+      data: {}
+      target:
+        entity_id: fan.esphome_s26_sw2
+
 - id: L14
   alias: 'L14 Cube Flip90 Light Estudio Setup Soft'
   mode: restart

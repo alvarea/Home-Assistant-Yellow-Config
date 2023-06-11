@@ -309,29 +309,6 @@ alert:
     notifiers:
       - telegram_aac
 
-#light:
-#  - platform: group
-#    name: Luces Planta Baja
-#    entities:
-#      - light.cocina
-#      - light.dormitorio
-#      - light.entrada
-#      - light.pasillo
-#      - light.salon
-#  - platform: group
-#    name: Luces Planta Alta
-#    entities:
-#      - light.luces_estudio
-#  - platform: group
-#    name: Luces Estudio
-#    entities:
-#      - light.estudio
-#      - light.esphome_lb1_l01
-#  - platform: group
-#    name: Luces Interior
-#    entities:
-#      - light.luces_planta_baja
-#      - light.luces_planta_alta
 
 # Cloud -  Home Assistant Cloud - NABU CASA
 #
@@ -410,10 +387,11 @@ person:
 # The component currently only supports the HLS format.
 stream:
 
-blink:
-  username: !secret blink_usr
-  password: !secret blink_pwd
-  scan_interval: 600
+#blink:
+# Desde HOMY 2023.06 la gestión y configuración se realiza desde UI.
+#  username: !secret blink_usr
+#  password: !secret blink_pwd
+#  scan_interval: 600
   #binary_sensors:
   #  monitored_conditions:
   #    - motion_enabled

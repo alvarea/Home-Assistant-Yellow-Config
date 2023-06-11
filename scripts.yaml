@@ -66,9 +66,6 @@ sirena_xiaomi_play_alarm_disarmed:
     # IF Mute_Xiaomi = ON => True => CANCEL SCRIPT
     - condition: template
       value_template: "{% if is_state('input_boolean.alarm_mute_sonido_sirenas', 'off') %}true{% endif %}"
-    # SONOFF_SW1_SIRENA INTERIOR ==> OFF
-    #- service: switch.turn_off
-    #  entity_id: switch.esphome_bas_sw0
 
     # Aviso Xiaomi GW
     - service: xiaomi_aqara.stop_ringtone
@@ -108,8 +105,8 @@ sirena_v0_alarma_armed_away:
     #######################################
     #  SONOFF_SW1_SIRENA INTERIOR ==> ON  #
     #######################################
-    - service: switch.turn_on
-      entity_id: switch.esphome_bas_sw0
+    - service: siren.turn_on
+      entity_id: siren.sirena
 
 # SCRIPT PARA ENCENDER SOLO SIRENA XIAOMI TRAS DISPARO
 # DE ALARMA ARMED HOME O SENSOR DE HUMO
@@ -138,8 +135,8 @@ sirena_stop_alarma:
   alias: "Botón Stop Sirenas"
   sequence:
     # SONOFF_SW1_SIRENA INTERIOR ==> OFF
-    - service: switch.turn_off
-      entity_id: switch.esphome_bas_sw0
+    - service: siren.turn_off
+      entity_id: siren.sirena
     # Aviso Xiaomi GW
     - service: xiaomi_aqara.stop_ringtone
       data:
@@ -157,12 +154,12 @@ sirena_alarma_micro_aviso:
       value_template: "{% if is_state('input_boolean.alarm_mute_sonido_sirenas', 'off') %}true{% endif %}"
     #
     # CICLO 1:
-    - service: switch.turn_on
-      entity_id: switch.esphome_bas_sw0
+    - service: siren.turn_on
+      entity_id: siren.sirena
     - delay:
         milliseconds: 50
-    - service: switch.turn_off
-      entity_id: switch.esphome_bas_sw0
+    - service: siren.turn_off
+      entity_id: siren.sirena
 
 # SCRIPT PARA ENCENDER SIRENAS INTERIOR TRAS PULSAR EL DOBLE BOTON PANICO DESDE APP HOMY IOS
 #
@@ -174,7 +171,7 @@ sirena_alarma_micro_aviso:
 # Las sirenas se activan en este orden:
 # 1. Sirena interior Xiaomi con el tono configurado para Alarma
 # 2. Retraso de 5 segundos
-# 3. Sirena interior pasillo mediante switch.esphome_bas_sw0
+# 3. Sirena interior mediante siren.sirena (antes switch.esphome_bas_sw0)
 
 alarma_boton_panico:
   alias: 'Boton Panico ON'
@@ -265,8 +262,8 @@ sirena_alarma_triggered:
     #######################################
     #  SONOFF_SW1_SIRENA INTERIOR ==> ON  #
     #######################################
-    - service: switch.turn_on
-      entity_id: switch.esphome_bas_sw0
+    - service: siren.turn_on
+      entity_id: siren.sirena
 
 #-----------------------------------------------------------------------------#
 #                                                                             #
@@ -786,8 +783,8 @@ alexa_secuencia_alarma_disparada:
     #######################################
     # SONOFF_SW1_SIRENA INTERIOR ==> ON
     #######################################
-    - service: switch.turn_on
-      entity_id: switch.esphome_bas_sw0
+    - service: siren.turn_on
+      entity_id: siren.sirena
     #
     # Bucle sirena Alexa mientras la alarma esté disparada.
     - repeat:
@@ -808,8 +805,8 @@ alexa_secuencia_alarma_disparada:
     #######################################
     # SONOFF_SW1_SIRENA INTERIOR ==> OFF
     #######################################
-    - service: switch.turn_off
-      entity_id: switch.esphome_bas_sw0
+    - service: siren.turn_off
+      entity_id: siren.sirena
     - delay: 00:00:10
     - service: script.alexa_entrada_restaura_volumen
     - service: script.alexa_dormitorio_restaura_volumen
@@ -1414,9 +1411,11 @@ lavadora_switch_off:
 sonoff_initialize:
   alias: 'Parada Seguridad Interruptores SONOFF'
   sequence:
+    - service: siren.turn_off
+      entity_id: siren.sirena
     - service: switch.turn_off
       entity_id:
-        - switch.esphome_bas_sw0                  # SONOFF_BAS_SW0_SIRENA INTERIOR ==> OFF
+        - switch.esphome_bas_sw0                  # SONOFF_BAS_SW0
         - switch.esphome_4ch_sw2_relay_1          # SONOFF_4CH RIEGO BONSAIS
         - switch.esphome_4ch_sw2_relay_2
         - switch.esphome_4ch_sw2_relay_3

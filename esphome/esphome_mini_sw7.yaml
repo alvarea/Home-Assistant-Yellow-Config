@@ -15,10 +15,11 @@ esp32:
 wifi:
   ssid: !secret wifi_ssid_wlan
   password: !secret wifi_pwd
+  # use_address: 192.168.0.50 Tras el flash con este firmware, entrar en esphome y eliminar esta linea.
   manual_ip:
     gateway: !secret wifi_gateway
     subnet: 255.255.255.0
-    static_ip: 192.168.0.50
+    static_ip: 192.168.0.57
 
     
 #captive_portal:

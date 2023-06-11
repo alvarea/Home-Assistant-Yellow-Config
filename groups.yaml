@@ -6,14 +6,6 @@ alarma_status_grp:
     - script.homy_armado_parcial
     - script.homy_armado_total
 
-alarma_sirena_grp:
-  name: Botón Pánico / Sirena
-  entities:
-    - binary_sensor.esphome_bas_sw0_status
-    - binary_sensor.esphome_bas_sw0
-    - input_boolean.alarm_panic_button
-    - script.alarma_boton_panico
-    - script.alarma_sirenas_off
 
 # Como obtener el sensor del grupo
 # https://community.home-assistant.io/t/how-to-display-the-sensor-that-triggers-the-alarm/3385513
