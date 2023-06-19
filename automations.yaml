@@ -1295,11 +1295,11 @@
 # Available events are FLIP90, FLIP180, move, TAP_TWICE, SHAKE_AIR, swing, alert, FREE_FALL, ROTATE
 # The component stores the last action as the attribute last_action.
 #
-# shake_air:    ESTUDIO LIGHT OFF
-# free_fall:    ESTUDIO LIGHT ESCENA AZUL
-# flip_90:      ESTUDIO LIGHT ESCENA DESK
-# flip_180:     ESTUDIO LIGHT ESCENA DESK HIGH
-# tap_twice:    ESTUDIO 
+# shake_air:    ESTUDIO OFF
+# free_fall:    ESTUDIO ESCENA AZUL
+# flip_90:      ESTUDIO ESCENA DESK
+# flip_180:     ESTUDIO ESCENA DESK HIGH
+# tap_twice:    ESTUDIO ESCENA LAVA PALAUSTRE
 # ROTATE:       ESTUDIO 
 #
 - id: L12
@@ -1410,12 +1410,16 @@
       data_template:
         sonido: 'clock_01'
         repeticion: 1
-        voz: "Vale, activando escena setup webcam"
+        voz: "Vale, Activo Lavando Palaustre. Que descanses."
     - service: scene.turn_on
       target:
-        entity_id: scene.estudio_setup_webcam
+        entity_id: scene.estudio_lava_palaustre
       data:
         transition: 1
+    - service: media_player.media_pause
+      target:
+        entity_id: media_player.echo_alexa_estudio
+
 
 #-----------------------------------------------------------------------------#
 #                                                                             #

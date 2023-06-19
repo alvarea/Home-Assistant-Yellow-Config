@@ -101,6 +101,8 @@
       state: 'off'
     light.led_estudio_tv:
       state: 'off'
+    light.led_estudio_bar:
+      state: 'off'
     light.luz_estudio_neon:
       state: 'off'
     light.luz_estudio_neon_bar:
@@ -184,6 +186,8 @@
       state: 'off'
     light.led_estudio_tv:
       state: 'off' 
+    light.led_estudio_bar:
+      state: 'off'
     light.luz_estudio_webcam:
       state: 'off'
     light.luz_estudio_neon:
@@ -192,6 +196,73 @@
       state: 'off'
     light.luz_estudio_neon_bar:
       state: 'off'
+
+#
+# ESCENA ESTUDIO LAVA PALAUSTRE - Configuración del setup al finalizar la jornada laboral
+#
+- id: estudio_palaustre
+  name: Estudio Lava Palaustre
+  entities:
+    # Persiana
+    cover.persiana_estudio:
+      current_position: 50
+      assumed_state: true
+      friendly_name: Persiana Estudio
+      state: open
+    # Luces
+    light.luz_estudio:
+      state: 'off'
+    # Ventilador
+    fan.esphome_s26_sw2:
+      state: 'off'
+    # A/A Estudio
+    climate.aa_estudio:
+      hvac_modes:
+      - 'off'
+      - heat
+      - dry
+      - cool
+      - fan_only
+      - heat_cool
+      fan_modes:
+      - auto
+      - '1'
+      - '2'
+      - '3'
+      - '4'
+      swing_modes:
+      - auto
+      - 1_up
+      - '2'
+      - '3'
+      - '4'
+      - 5_down
+      - swing
+      temperature: 23
+      fan_mode: auto
+      swing_mode: 1_up
+      vane_horizontal: '3'
+      vane_horizontal_positions:
+      - auto
+      - 1_left
+      - '2'
+      - '3'
+      - '4'
+      - 5_right
+      - split
+      - swing
+      vane_vertical: 1_up
+      vane_vertical_positions:
+      - auto
+      - 1_up
+      - '2'
+      - '3'
+      - '4'
+      - 5_down
+      - swing
+      state: 'off'
+  icon: mdi:weather-sunset-up
+
 #
 # ESCENA ESTUDIO SETUP SLEEP - Configuración del setup estudio en modo apagado por la noche a partir de las 23.00
 #
@@ -234,6 +305,7 @@
     light.luz_estudio_led_mesa:
       state: 'on'
       brightness: 128
+      # Color Ocre
       rgb_color:
         - 255
         - 147
@@ -271,6 +343,8 @@
     light.luz_estudio_tv_izq:
       state: 'off'
     light.led_estudio_tv:
+      state: 'off'
+    light.led_estudio_bar:
       state: 'off'
     light.luz_estudio_webcam:
       state: 'off'
@@ -336,6 +410,8 @@
       state: 'off'
     light.led_estudio_tv:
       state: 'off'
+    light.led_estudio_bar:
+      state: 'off'
     light.luz_estudio_webcam:
       state: 'off'
     light.luz_estudio_neon:
@@ -350,40 +426,37 @@
   name: Estudio Azul
   icon: mdi:monitor-shimmer
   entities:
-    light.luz_estudio_izquierda:
-      state: 'on'
-      brightness: 204
-    light.luz_estudio_derecha:
-      state: 'on'
-      brightness: 204
     light.luz_estudio_nate:
       state: 'on'
-      brightness: 102
+      brightness: 76
     light.luz_estudio_led_mesa:
       state: 'on'
       brightness: 255
+      # Magenta: gb_color: 255,41,255
       rgb_color:
         - 255
-        - 147
-        - 0
+        - 41
+        - 255
     light.luz_estudio_play_i:
       state: 'on'
       brightness: 255
+      # Magenta: gb_color: 255,41,255
       rgb_color:
         - 255
-        - 147
-        - 0
+        - 41
+        - 255
     light.luz_estudio_play_d:
       state: 'on'
       brightness: 255
+      # Magenta: gb_color: 255,41,255
       rgb_color:
         - 255
-        - 147
-        - 0
+        - 41
+        - 255
     light.luz_estudio_alta:
       state: 'on'
       brightness: 255
-      # Azul: gb_color: 255,41,255
+      # Magenta: gb_color: 255,41,255
       rgb_color:
         - 255
         - 41
@@ -409,15 +482,152 @@
       brightness: 255
       # Azul: gb_color: 70, 6, 255
       rgb_color:
+        - 76
+        - 6
         - 255
-        - 147
-        - 0
+    # LEDs Estudio Gradient
+    select.led_estudio_tv_preset:
+      options:
+      - Gradient
+      icon: mdi:playlist-play
+      friendly_name: led-estudio-tv Preset
+      state: Gradient
+    select.led_estudio_bar_preset:
+      options:
+      - Gradient
+      icon: mdi:playlist-play
+      friendly_name: led-estudio-bar Preset
+      state: Gradient
     light.led_estudio_tv:
+      color_mode: rgb
+      brightness: 225
+      effect: Gradient
       state: 'on'
+    light.led_estudio_bar:
+      color_mode: rgb
+      brightness: 225
+      effect: Gradient
+      state: 'on'
+    # Luces Neon On
     light.luz_estudio_neon:
       state: 'on'
     light.luz_estudio_neon_bar:
       state: 'on'
+    # Luces Off
+    light.luz_estudio_izquierda:
+      state: 'off'
+    light.luz_estudio_derecha:
+      state: 'off'
+    light.luz_estudio_techo:
+      state: 'off'
+    light.luz_estudio_lectura:
+      state: 'off'
+    light.luz_estudio_mesa:
+     state: 'off'
+    light.luz_estudio_tv_izq:
+      state: 'off'
+    light.luz_estudio_webcam:
+      state: 'off'
+
+#
+# ESCENA ESTUDIO OCRE - TRAS ANOCHECER SETUP OCRE CALIDO
+#
+- id: estudio_ocre
+  name: Estudio Ocre
+  icon: mdi:monitor-shimmer
+  entities:
+    light.luz_estudio_nate:
+      state: 'on'
+      brightness: 102
+    light.luz_estudio_led_mesa:
+      state: 'on'
+      brightness: 255
+      # Color Ocre
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_play_i:
+      state: 'on'
+      brightness: 255
+      # Color Ocre
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_play_d:
+      state: 'on'
+      brightness: 255
+      # Color Ocre
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_alta:
+      state: 'on'
+      brightness: 204
+      # Color Ocre
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_media:
+      state: 'on'
+      brightness: 204
+      # Color Ocre
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_baja:
+      state: 'on'
+      brightness: 204
+      # Color Ocre
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    light.luz_estudio_play_tv:
+      state: 'on'
+      brightness: 255
+      # Color Ocre
+      rgb_color:
+        - 255
+        - 147
+        - 0
+    # LEDs Estudio Breathe Ocre
+    select.led_estudio_tv_preset:
+      options:
+      - Gradient
+      icon: mdi:playlist-play
+      friendly_name: led-estudio-tv Preset
+      state: Breathe
+    select.led_estudio_bar_preset:
+      options:
+      - Gradient
+      icon: mdi:playlist-play
+      friendly_name: led-estudio-bar Preset
+      state: Breathe
+    light.led_estudio_tv:
+      color_mode: rgb
+      brightness: 225
+      effect: Breathe
+      state: 'on'
+    light.led_estudio_bar:
+      color_mode: rgb
+      brightness: 225
+      effect: Gradient
+      state: 'on'
+    # Luces Neon On
+    light.luz_estudio_neon:
+      state: 'on'
+    light.luz_estudio_neon_bar:
+      state: 'on'
+    # Luces Off
+    light.luz_estudio_izquierda:
+      state: 'off'
+    light.luz_estudio_derecha:
+      state: 'off'
     light.luz_estudio_techo:
       state: 'off'
     light.luz_estudio_lectura:
@@ -489,18 +699,14 @@
       brightness: 204
       color_temp_kelvin: 6535
       color_temp: 153
-    light.luz_estudio_play_tv:
-      state: 'on'
-      brightness: 204
-      rgb_color: 
-        - 255
-        - 147
-        - 0
-    light.led_estudio_tv:
-      state: 'on'
-      brightness: 204
     light.luz_estudio_neon:
       state: 'on'
+    light.luz_estudio_play_tv:
+      state: 'off'
+    light.led_estudio_tv:
+      state: 'off'
+    light.led_estudio_bar:
+      state: 'off'
     light.luz_estudio_tv_izq:
       state: 'off'
     light.luz_estudio_lectura:
@@ -585,6 +791,17 @@
     light.led_estudio_tv:
       state: 'on'
       brightness: 255
+      rgb_color: 
+        - 255
+        - 147
+        - 0
+    light.led_estudio_bar:
+      state: 'on'
+      brightness: 255
+      rgb_color: 
+        - 255
+        - 147
+        - 0
     light.luz_estudio_lectura:
       state: 'on'
       brightness: 255
@@ -626,11 +843,52 @@
       app_id: com.amazon.firetv.youtube
       state: playing
     # Luces
+    select.led_estudio_tv_preset:
+      options:
+      - Gradient
+      icon: mdi:playlist-play
+      friendly_name: led-estudio-tv Preset
+      state: Gradient
+    select.led_estudio_bar_preset:
+      options:
+      - Gradient
+      icon: mdi:playlist-play
+      friendly_name: led-estudio-bar Preset
+      state: Gradient
     light.led_estudio_tv:
       color_mode: rgb
-      brightness: 153
+      brightness: 128
       effect: Gradient
       state: 'on'
+      supported_color_modes:
+      - rgb
+      hs_color:
+      - 300
+      - 100
+      rgb_color:
+      - 255
+      - 0
+      - 255
+      xy_color:
+      - 0.385
+      - 0.155
+    light.led_estudio_bar:
+      color_mode: rgb
+      brightness: 128
+      effect: Gradient
+      state: 'on'
+      supported_color_modes:
+      - rgb
+      hs_color:
+      - 300
+      - 100
+      rgb_color:
+      - 255
+      - 0
+      - 255
+      xy_color:
+      - 0.385
+      - 0.155
     light.luz_estudio_led_mesa:
       state: 'on'
       brightness: 76
@@ -737,9 +995,17 @@
     light.luz_salon_lectura:
       state: 'on'
       brightness: 153
+    select.led_salon_tv_preset:
+      options:
+      - Gradient
+      icon: mdi:playlist-play
+      friendly_name: led-estudio-tv Preset
+      state: Gradient
     light.led_salon_tv:
-      state: 'on'
+      color_mode: rgb
       brightness: 204
+      effect: Gradient
+      state: 'on'
   icon: mdi:lamps-outline
 
 - id: salon_lectura
@@ -770,9 +1036,18 @@
       brightness: 76
     light.luz_salon_lectura:
       state: 'off'
+    select.led_salon_tv_preset:
+      options:
+      - Gradient
+      icon: mdi:playlist-play
+      friendly_name: led-estudio-tv Preset
+      state: Gradient
     light.led_salon_tv:
+      color_mode: rgb
+      brightness: 76
+      effect: Gradient
       state: 'on'
-      brightness: 204
+
   icon: mdi:dolby
 
 #
@@ -821,3 +1096,4 @@
       state: 'on'
       brightness: 25
   icon: mdi:lightbulb-on-10
+
