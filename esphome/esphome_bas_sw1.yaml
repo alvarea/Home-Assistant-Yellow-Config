@@ -43,14 +43,3 @@ switch:
     name: ${device_name}
     pin: GPIO12
 
-output:
-  - platform: esp8266_pwm
-    id: ${device_name}_green_led
-    pin:
-      number: GPIO13
-      inverted: True
-
-light:
-  - platform: monochromatic
-    name: ${device_name}_led
-    output: ${device_name}_green_led

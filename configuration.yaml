@@ -91,11 +91,11 @@ http:
   # include_used_components: true
 
 # Discover some devices automatically
-discovery:
-  ignore:
-    #- igd
-    #- xiaomi_gw
-    #- esphome
+#
+# Deja de estar operativo bajo YAML
+# https://github.com/home-assistant/core/issues/97630
+#
+# discovery:
 
 logbook:
   exclude:
@@ -199,11 +199,14 @@ timer:
 #    hours_to_show: 168
 #    refresh: 1800
 
-# GENERIC IP CAMERA
-camera:
-  - platform: generic
-    still_image_url: https://api.sat24.com/mostrecent/SP/visual5hdcomplete%20width=500%20height=304
-    name: Weather Satelite
+# GENERIC IP CAMERA 
+# 
+# THIS YAML CONF STOP WORKING ON 2024.02.0
+#
+  #camera:
+  #- platform: generic
+  #  still_image_url: https://api.sat24.com/mostrecent/SP/visual5hdcomplete%20width=500%20height=304
+  #  name: Weather Satelite
   #- platform: generic
   #  still_image_url: !secret still_image_url_cam_jardin
   #  ##stream_source: !secret stream_source_url_cam_jardin
@@ -471,6 +474,7 @@ calendar:
       - name: Festivos
         calendar: "Festivos"
         search: "*"
+
 
 #
 # COVER TEMPLATE - PERSIANAS  => Paso a generar el cover directamente en ESPHOME - SONOFF DUAL R3

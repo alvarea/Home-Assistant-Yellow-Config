@@ -6,6 +6,9 @@
 # TEMPLATING JINJA2:  https://jinja.palletsprojects.com/en/master/templates   #
 #                                                                             #
 #-----------------------------------------------------------------------------#
+
+
+#-----------------------------------------------------------------------------#
 #                                                                             #
 # ARRANQUE/PARADA DEL SISTEMA                                                 #
 #                                                                             #
@@ -968,13 +971,19 @@
 
 - id: L02
   alias: 'L02 Luces Off Exterior Medianoche'
+  # APAGA LAS LUCES DEL JARDIN SI NO ES VERANO
   trigger:
     - platform: time
-      at: '23:59:00'
+      at: '00:00:00'
   condition:
-    - condition: state
-      entity_id: light.luz_jardin
-      state: 'on'
+    condition: and
+    conditions:
+      # No es verano
+      - condition: template
+        value_template: "{{ states('sensor.season') != 'summer' }}"
+      - condition: state
+        entity_id: light.luz_jardin
+        state: 'on'
   action:
     # Apagado Luces Exterior Casa + Luces Jardín
     - service: light.turn_off
@@ -1244,7 +1253,7 @@
     # Luces On
     - service: light.turn_on
       entity_id:
-        - light.luz_estudio_izquierda
+        - light.luz_estudio_techo
     #- service: scene.turn_on
     #  target:
     #    entity_id: scene.estudio_hall
@@ -1259,7 +1268,7 @@
     # Luces Off + Led
     - service: light.turn_off
       entity_id: 
-        - light.luz_estudio_izquierda
+        - light.luz_estudio_techo
 
 - id: L11
   alias: 'L11 Luces On Armario Estudio Sensor'
@@ -1420,34 +1429,9 @@
       target:
         entity_id: media_player.echo_alexa_estudio
 
-
 #-----------------------------------------------------------------------------#
 #                                                                             #
-# REGLAS PHILIPS SMART SWITCH / BUTTON                                        #
-#                                                                             #
-#-----------------------------------------------------------------------------#
-#
-#
-- id: L18
-  alias: Hue Smart Button Toggle Luz Pasillo
-  mode: single
-  description: ''
-  trigger:
-    - platform: event
-      event_type: zha_event
-      event_data:
-        device_ieee: 00:17:88:01:08:96:bf:40
-        endpoint_id: 1
-        command: "on"
-  condition: []
-  action:
-    - service: light.toggle
-      target:
-        entity_id: light.luz_dormitorio
-
-#-----------------------------------------------------------------------------#
-#                                                                             #
-# REGLAS DE CONTROL DE SMART SWITCH ESPHOME                                   #
+# REGLAS CONTROL BOTONES ESPHOME                                              #
 #                                                                             #
 #-----------------------------------------------------------------------------#
 
@@ -2856,4 +2840,184 @@
       data:
         entity_id: alarm_control_panel.ha
         code: !secret alarm_control_code
+
+#-----------------------------------------------------------------------------#
+#                                                                             #
+# REGLAS DE AUTOMATIZACION DISPOSITIVOS ZIGBEE A TRAVES DE EVENTOS ZHA        #
+#                                                                             #
+#-----------------------------------------------------------------------------#
+
+- id: ZHA_L1
+  alias: Philips Hue Smart Button - Luces Exterior
+  mode: queued
+  # Realiza un ciclo cada vez que se pulsa en el boton up/down
+  # scene.dormitorio_full, scene.dormitorio_lectura, scene.dormitorio_relax, scene.dormitorio_noche
+  trigger:
+    - device_id: 9b4a8d38607a9f81ccdffab704cd03e2
+      domain: zha
+      platform: device
+      # trigger.id = 0 => type = short_press
+      type: remote_button_short_press
+      subtype: turn_on
+    - device_id: 9b4a8d38607a9f81ccdffab704cd03e2
+      domain: zha
+      platform: device
+      # trigger.id = 1 => type = double_press
+      type: remote_button_double_press
+      subtype: turn_on
+    - device_id: 9b4a8d38607a9f81ccdffab704cd03e2
+      domain: zha
+      platform: device
+      # trigger.id = 2 => type = triple_press
+      type: remote_button_triple_press
+      subtype: turn_on
+  condition: []
+  action:
+    - choose:
+        # IF trigger.id = 0 = SHORT PRESS
+        - conditions:
+          - condition: trigger
+            id: 0
+          sequence:
+            # Enciende/Apaga Luz Exterior
+            - service: input_text.set_value
+              data:
+                value: "{{ trigger.id }}"
+              target:
+                entity_id: input_text.helper_hue_smart_button_entrada
+            - service: light.toggle
+              target:
+                entity_id: light.luz_exterior
+        # ELIF trigger.id = 1 = DOUBLE PRESS
+        - conditions:
+          - condition: trigger
+            id: 1
+          sequence:
+            # Apaga Luz Exterior
+            - service: input_text.set_value
+              data:
+                value: "{{ trigger.id }}"
+              target:
+                entity_id: input_text.helper_hue_smart_button_entrada
+            - service: light.toggle
+              target:
+                entity_id: light.luz_jardin
+
+- id: ZHA_L2
+  alias: Philips HUE Dimmer Switch - Luces Dormitorio
+  mode: queued
+  # Realiza un ciclo cada vez que se pulsa en el boton up/down
+  # scene.dormitorio_full, scene.dormitorio_lectura, scene.dormitorio_relax, scene.dormitorio_noche
+  #
+  # Device: Hue Dimmer Switch
+  # Event Type: remote_button_short_press, remote_button_double_press
+  # Event Subtype: turn_on, turn_off, dim_up, dim_down
+  #
+  trigger:
+    - device_id: bef6e070a0c12e5234501e01092f27e8
+      domain: zha
+      platform: device
+      type: remote_button_short_press
+      subtype: turn_on
+      # trigger.id = 0 => short_press - turn_on
+    - device_id: bef6e070a0c12e5234501e01092f27e8
+      domain: zha
+      platform: device
+      type: remote_button_double_press
+      subtype: turn_on
+      # trigger.id = 1 => double_press - turn_on
+    - device_id: bef6e070a0c12e5234501e01092f27e8
+      domain: zha
+      platform: device
+      type: remote_button_short_press
+      subtype: turn_off
+      # trigger.id = 2 => short_press - turn_off
+    - device_id: bef6e070a0c12e5234501e01092f27e8
+      domain: zha
+      platform: device
+      type: remote_button_double_press
+      subtype: turn_off
+      # trigger.id = 3 => double_press - turn_off
+    - device_id: bef6e070a0c12e5234501e01092f27e8
+      domain: zha
+      platform: device
+      type: remote_button_short_press
+      subtype: dim_up
+      # trigger.id = 4 => short_press - dim_up
+    - device_id: bef6e070a0c12e5234501e01092f27e8
+      domain: zha
+      platform: device
+      type: remote_button_short_press
+      subtype: dim_down
+      # trigger.id = 5 => short_press - dim_down
+  condition: []
+  action:
+    # value: "{{ trigger.to_state.attributes.friendly_name }}"
+    - choose:
+        # IF trigger.id = 0 => SHORT_press - TURN_ON
+        - conditions:
+          - condition: trigger
+            id: 0
+          sequence:
+            - service: scene.turn_on
+              target:
+                entity_id: scene.dormitorio_lectura
+        # ELIF trigger.id = 1 => DOUBLE_press - TURN_ON
+        - conditions:
+          - condition: trigger
+            id: 1
+          sequence:
+            # Enciende Luz Agustin y Apaga Luz Malen
+            - service: light.turn_on
+              target:
+                entity_id: light.luz_dormitorio_agustin
+            - service: light.turn_off
+              target:
+                entity_id: light.luz_dormitorio_malen
+        # ELIF trigger.id = 2 => SHORT_press - TURN_OFF
+        - conditions:
+          - condition: trigger
+            id: 2
+          sequence:
+            - service: light.turn_off
+              target:
+                entity_id: light.luz_dormitorio
+        # ELIF trigger.id = 3 => DOUBLE_press - TURN_OFF
+        - conditions:
+          - condition: trigger
+            id: 3
+          sequence:
+            # Enciende Luz Malen y Apaga Luz Agustín
+            - service: light.turn_on
+              target:
+                entity_id: light.luz_dormitorio_malen
+            - service: light.turn_off
+              target:
+                entity_id: light.luz_dormitorio_agustin
+        # ELIF trigger.id = 4 => short_press - dim_up
+        - conditions:
+          - condition: trigger
+            id: 4
+          sequence:
+            - service: input_select.select_next
+              data:
+                cycle: true
+              target:
+                entity_id: input_select.scene_dormitorio_helper
+            - service: scene.turn_on
+              target:
+                entity_id: "{{ states('input_select.scene_dormitorio_helper')}}"
+        # ELIF trigger.id = 5 => short_press - dim_down
+        - conditions:
+          - condition: trigger
+            id: 5
+          sequence:
+            - service: input_select.select_previous
+              data:
+                cycle: true
+              target:
+                entity_id: input_select.scene_dormitorio_helper
+            - service: scene.turn_on
+              target:
+                entity_id: "{{ states('input_select.scene_dormitorio_helper')}}"
 

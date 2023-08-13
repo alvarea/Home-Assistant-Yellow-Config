@@ -1,12 +1,7 @@
 #
 # ESPHOME SONOFF POW R2 SW3 - PISCINA
 #
-# FTDDI CABLE 1 ROJO-MARRON
-#   GND => MARRON
-#   R   => ROJO
-#   TX  => NARANJA
-#   VCC => AMARILLO - 3.3V
-#
+
 substitutions:
   device_name: esphome_pow_sw3
 
@@ -28,35 +23,6 @@ api:
 
 ota:
 
-binary_sensor:
-  - platform: gpio
-    pin:
-      number: GPIO0
-      mode: INPUT_PULLUP
-      inverted: True
-    name: ${device_name}_boton
-  - platform: status
-    name: ${device_name}_status
-
-switch:
-  - platform: gpio
-    name: ${device_name}
-    pin: GPIO12
-
-output:
-  # Register the green LED as a dimmable output ....
-  - platform: esp8266_pwm
-    id: ${device_name}_green_led
-    pin:
-      number: GPIO13
-      inverted: True
-
-light:
-  # ... and then make a light out of it.
-  - platform: monochromatic
-    name: ${device_name}_led
-    output: ${device_name}_green_led
-
 # Example configuration entry
 # Disable logging over USB
 logger:
@@ -75,3 +41,42 @@ sensor:
       name: ${device_name}_voltage
     power:
       name: ${device_name}_power
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: True
+    name: ${device_name} boton
+    on_press:
+      - switch.toggle: fakebutton
+
+switch:
+  - platform: template
+    name: ${device_name}
+    optimistic: true
+    id: fakebutton
+    turn_on_action:
+      - switch.turn_on: relay
+      - light.turn_on: led
+    turn_off_action:
+      - switch.turn_off: relay
+      - light.turn_off: led
+  - platform: gpio
+    id: relay
+    pin: GPIO12
+
+output:
+  - platform: esp8266_pwm
+    id: pow_blue_led
+    pin:
+      number: GPIO15
+      inverted: True
+
+light:
+  - platform: monochromatic
+    name: ${device_name} led
+    output: pow_blue_led
+    id: led
+

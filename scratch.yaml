@@ -161,19 +161,6 @@ cloud:
 #------------------
 
 
-{{ now().strftime("%H:%M") }}
-{{ now().strftime("%H:%M:%S") }}
-
-{{ as_timestamp(states.binary_sensor.esphome_pow_sw2_lavadora_lavando.last_changed) }}
-
-
-
-{{ as_timestamp(states.input_datetime.lavadora_inicio_lavado.state) }}
-
-
-{{ as_timestamp(states.binary_sensor.esphome_pow_sw2_lavadora_lavando.last_changed) }}
-
-
 #
 # GRUPOS LUCES - AREAS PARA ALEXA
 #
@@ -245,55 +232,54 @@ show_header_toggle: false
 state_color: true
 
 
-cards:
-  - type: custom:mushroom-entity-card
-    fill_container: true
-    layout: vertical
-    tap_action:
-      action: toggle
-    name: Producción
-    entity: switch.esphome_pow_sw1
-    icon_color: teal
-  - type: custom:mushroom-entity-card
-    entity: timer.riego_bonsais_ch0
-    fill_container: true
-    layout: vertical
-    name: Timer
-    icon: ''
-  - type: custom:mushroom-entity-card
-    fill_container: true
-    layout: vertical
-    name: Duración
-    icon: ''
-    entity: sensor.riego_bonsais_ch0_duracion_planificada_total
-type: horizontal-stack
 
-cards:
-  - type: custom:mushroom-entity-card
-    fill_container: false
-    layout: horizontal
-    tap_action:
-      action: toggle
-    name: T1
-    entity: input_boolean.riego_bonsais_ch0_programador_t1
-  - type: custom:mushroom-entity-card
-    fill_container: false
-    layout: horizontal
-    tap_action:
-      action: toggle
-    name: T2
-    entity: input_boolean.riego_bonsais_ch0_programador_t2
-type: horizontal-stack
+- id: BP02
+  alias: Controller - Philips 8718699693985 Hue Smart Button
+  mode: restart
+  use_blueprint:
+    path: EPMatt/philips_8718699693985.yaml
+    input:
+      integration: ZHA
+      controller_device: 9b4a8d38607a9f81ccdffab704cd03e2
+      helper_last_controller_event: input_text.helper_hue_smart_button_entrada
+      button_double_press: true
+      helper_double_press_delay: 750
+      helper_debounce_delay: 100
+      action_button_short:
+        # LUZ EXTERIOR FAROLES
+        - service: light.turn_on
+          data: {}
+          target:
+            entity_id: light.luz_exterior
+        - delay: "00:00:03"
+      action_button_long:
+        # LUZ EXTERIOR FAROLES
+        - service: light.turn_off
+          data: {}
+          target:
+            entity_id: light.luz_exterior
+        - delay: "00:00:03"
+      action_button_double:
+        - service: alarm_control_panel.alarm_arm_away
+          data:
+            entity_id: alarm_control_panel.ha
+            code: !secret alarm_control_code
 
 
-type: gauge
-entity: sensor.riego_bonsais_ch0_duracion_planificada_total
-name: Tiempo Total
-min: 0
-max: 12
-unit: Min
-needle: true
-severity:
-  green: 1
-  yellow: 6
-  red: 10
+- id: BP01
+  alias: Controller lights using Philips Hue Dimmer Switch (RWL021)
+  use_blueprint:
+    path: Rantaki/zha_blueprint_philips_hue_dimmer_swith_rwl021_fast_setup.yaml
+    input:
+      zha_device: bef6e070a0c12e5234501e01092f27e8
+      zha_entity_light:
+        - light.luz_dormitorio_agustin
+        - light.luz_dormitorio_malen
+
+
+
+
+
+
+
+

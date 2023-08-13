@@ -1,0 +1,87 @@
+#
+# ESPHOME SONOFF MINI R4 EXTREME - SW8
+#
+substitutions:
+  device_name: esphome_mini_sw8
+
+esphome:
+  name: ${device_name}
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+wifi:
+  ssid: !secret wifi_ssid_tc
+  password: !secret wifi_pwd
+  # use_address: 192.168.0.50 Tras el flash con este firmware, entrar en esphome y eliminar esta linea.
+  manual_ip:
+    gateway: !secret wifi_gateway
+    subnet: 255.255.255.0
+    static_ip: 192.168.0.58
+
+    
+#captive_portal:
+
+#esp32_ble_tracker:
+#  scan_parameters:
+#    interval: 300ms
+#    window: 100ms
+#    active: true
+
+#bluetooth_proxy:
+#  active: true
+
+logger:
+
+ota:
+
+api:
+  
+switch:
+  - platform: gpio
+    name: ${device_name}
+    pin:
+      number: GPIO26
+      inverted: false
+    id: relay
+    on_turn_on:
+      - light.turn_on: relay_led
+    on_turn_off:
+      - light.turn_off: relay_led
+  - platform: restart
+    name: ${device_name}_restart
+
+output:
+  - platform: gpio
+    pin: GPIO19
+    inverted: True
+    id: relay1_led_gpio
+
+light:
+  - platform: binary
+    name: "Relay LED"
+    id: relay_led
+    internal: true    
+    output: relay1_led_gpio
+
+binary_sensor:
+  - platform: gpio
+    internal: true
+    pin:
+      number: GPIO27
+      mode: INPUT_PULLUP
+      inverted: false
+    name: ${device_name}_switch
+    on_state:
+      - switch.toggle: relay
+  - platform: gpio
+    internal: true
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: false
+    name: ${device_name}_button
+    on_press:
+      - switch.toggle: relay

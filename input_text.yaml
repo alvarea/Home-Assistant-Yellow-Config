@@ -31,7 +31,3 @@
     name: Previsión Lluvia Ayer
     initial: ''
     icon: mdi:weather
-
-  helper_hue_boton_dormitorio:
-    name: Helper Last Action Hue Boton Dormitorio
-    initial: ''
