@@ -414,29 +414,21 @@
     # MUY IMPORTANTE: EN EL ARM AWAY SE CHEQUEA GRUPO SENSORES HOME + AWAY
     - platform: state
       entity_id:
-        #- group.alarma_sensores_perimetro_grp                   # Grupo Sensores PERIMETRO
-        #- group.alarma_sensores_presencia_interior_grp          # Grupo Sensores Presencia INTERIOR
-        #- group.alarma_sensores_presencia_exterior_grp          # Grupo Sensores Presencia EXTERIOR
         - binary_sensor.alarma_sensores_perimetro                # Grupo Sensores PERIMETRO
         - binary_sensor.alarma_sensores_presencia_interior       # Grupo Sensores Presencia INTERIOR
         - binary_sensor.alarma_sensores_presencia_exterior       # Grupo Sensores Presencia EXTERIOR
-
       to: 'on'
-    # Los sensores vibración solo saltan por trigger = event
-    - platform: event
-      event_type: xiaomi_aqara.movement
-      event_data:
-        entity_id:
-          - binary_sensor.vibration_158d0002b15e3b # Rack Comunicaciones
-          - binary_sensor.vibration_158d0002a4eacc # Puerta atras salon
-        action_type: vibrate
-    - platform: event
-      event_type: xiaomi_aqara.movement
-      event_data:
-        entity_id:
-          - binary_sensor.vibration_158d0002b15e3b # Rack Comunicaciones
-          - binary_sensor.vibration_158d0002a4eacc # Puerta atras salon
-        action_type: tilt
+    # Los sensores vibración solo saltan por trigger = platform device
+    - platform: device
+      type: vibration
+      device_id: f23111988853a7beeb8c26078f390729 # Puerta Principal Entrada
+      entity_id: 3c418e73805f1a07820c181eb7bbe936
+      domain: binary_sensor
+    - platform: device
+      type: vibration
+      device_id: b8cd622289394361f35ed30b303598f9 # Puerta Salón
+      entity_id: 0a5a7d3964574dd4792fa6f0925a5e3e
+      domain: binary_sensor
   condition:
     condition: and
     conditions:
@@ -465,17 +457,17 @@
       # Grupo Sensores PERIMETRO
       entity_id: binary_sensor.alarma_sensores_perimetro
       to: 'on'
-    # Los sensores vibración solo saltan por trigger = event
-    - platform: event
-      event_type: xiaomi_aqara.movement
-      event_data:
-        entity_id: binary_sensor.vibration_158d0002a4eacc # Puerta atras salon
-        action_type: vibrate
-    - platform: event
-      event_type: xiaomi_aqara.movement
-      event_data:
-        entity_id: binary_sensor.vibration_158d0002a4eacc # Puerta atras salon
-        action_type: tilt
+    # Los sensores vibración solo saltan por trigger = platform device
+    - platform: device
+      type: vibration
+      device_id: f23111988853a7beeb8c26078f390729 # Puerta Principal Entrada
+      entity_id: 3c418e73805f1a07820c181eb7bbe936
+      domain: binary_sensor
+    - platform: device
+      type: vibration
+      device_id: b8cd622289394361f35ed30b303598f9 # Puerta Salón
+      entity_id: 0a5a7d3964574dd4792fa6f0925a5e3e
+      domain: binary_sensor
   condition:
     - condition: state
       entity_id: alarm_control_panel.ha
@@ -2853,23 +2845,29 @@
   # Realiza un ciclo cada vez que se pulsa en el boton up/down
   # scene.dormitorio_full, scene.dormitorio_lectura, scene.dormitorio_relax, scene.dormitorio_noche
   trigger:
+    # trigger.id = 0 => type = short_press
+    # trigger.id = 1 => type = double_press
+    # trigger.id = 2 => type = triple_press
+    # trigger.id = 3 => type = quadruple_press
     - device_id: 9b4a8d38607a9f81ccdffab704cd03e2
       domain: zha
       platform: device
-      # trigger.id = 0 => type = short_press
       type: remote_button_short_press
       subtype: turn_on
     - device_id: 9b4a8d38607a9f81ccdffab704cd03e2
       domain: zha
       platform: device
-      # trigger.id = 1 => type = double_press
       type: remote_button_double_press
       subtype: turn_on
     - device_id: 9b4a8d38607a9f81ccdffab704cd03e2
       domain: zha
       platform: device
-      # trigger.id = 2 => type = triple_press
       type: remote_button_triple_press
+      subtype: turn_on
+    - device_id: 9b4a8d38607a9f81ccdffab704cd03e2
+      domain: zha
+      platform: device
+      type: remote_button_quadruple_press
       subtype: turn_on
   condition: []
   action:
@@ -2888,12 +2886,22 @@
             - service: light.toggle
               target:
                 entity_id: light.luz_exterior
+            - service: script.alexa_entrada_secuencia
+              data_template:
+                sonido: 'clock_01'
+                repeticion: 1
+                voz: >
+                  {% if states.light.luz_exterior.state == 'on' %}
+                    Luces exteriores de la casa encendidas 
+                  {% else %}
+                    Luces xteriores de la casa apagadas
+                  {%endif%}
         # ELIF trigger.id = 1 = DOUBLE PRESS
         - conditions:
           - condition: trigger
             id: 1
           sequence:
-            # Apaga Luz Exterior
+            # Apaga Luces Jardin Exterior
             - service: input_text.set_value
               data:
                 value: "{{ trigger.id }}"
@@ -2902,6 +2910,37 @@
             - service: light.toggle
               target:
                 entity_id: light.luz_jardin
+            - service: script.alexa_entrada_secuencia
+              data_template:
+                sonido: 'clock_01'
+                repeticion: 1
+                voz: >
+                  {% if states.light.luz_jardin.state == 'on' %}
+                    Todas las luces exteriores del jardín están encendidas 
+                  {% else %}
+                    Todas las luces exteriores del jardín están apagadas
+                  {%endif%}
+        # ELIF trigger.id = 2 = TRIPLE PRESS
+        - conditions:
+          - condition: trigger
+            id: 2
+          sequence:
+            # Check Sensores Magneticos Perimetro
+            - service: input_text.set_value
+              data:
+                value: "{{ trigger.id }}"
+              target:
+                entity_id: input_text.helper_hue_smart_button_entrada
+            - service: script.check_sensores_magneticos_perimetro
+        # ELIF trigger.id = 3 = QUADRUPLE PRESS
+        - conditions:
+          - condition: trigger
+            id: 3
+          sequence:
+            - service: alarm_control_panel.alarm_arm_away
+              data:
+                entity_id: alarm_control_panel.ha
+                code: !secret alarm_control_code
 
 - id: ZHA_L2
   alias: Philips HUE Dimmer Switch - Luces Dormitorio
@@ -2914,42 +2953,42 @@
   # Event Subtype: turn_on, turn_off, dim_up, dim_down
   #
   trigger:
+    # trigger.id = 0 => short_press - turn_on
+    # trigger.id = 1 => double_press - turn_on
+    # trigger.id = 2 => short_press - turn_off
+    # trigger.id = 3 => double_press - turn_off
+    # trigger.id = 4 => short_press - dim_up
+    # trigger.id = 5 => short_press - dim_down
     - device_id: bef6e070a0c12e5234501e01092f27e8
       domain: zha
       platform: device
       type: remote_button_short_press
       subtype: turn_on
-      # trigger.id = 0 => short_press - turn_on
     - device_id: bef6e070a0c12e5234501e01092f27e8
       domain: zha
       platform: device
       type: remote_button_double_press
       subtype: turn_on
-      # trigger.id = 1 => double_press - turn_on
     - device_id: bef6e070a0c12e5234501e01092f27e8
       domain: zha
       platform: device
       type: remote_button_short_press
       subtype: turn_off
-      # trigger.id = 2 => short_press - turn_off
     - device_id: bef6e070a0c12e5234501e01092f27e8
       domain: zha
       platform: device
       type: remote_button_double_press
       subtype: turn_off
-      # trigger.id = 3 => double_press - turn_off
     - device_id: bef6e070a0c12e5234501e01092f27e8
       domain: zha
       platform: device
       type: remote_button_short_press
       subtype: dim_up
-      # trigger.id = 4 => short_press - dim_up
     - device_id: bef6e070a0c12e5234501e01092f27e8
       domain: zha
       platform: device
       type: remote_button_short_press
       subtype: dim_down
-      # trigger.id = 5 => short_press - dim_down
   condition: []
   action:
     # value: "{{ trigger.to_state.attributes.friendly_name }}"
@@ -3021,3 +3060,45 @@
               target:
                 entity_id: "{{ states('input_select.scene_dormitorio_helper')}}"
 
+
+
+- id: ZHA_L3
+  alias: Aqara Vibracion Puerta Principal Entrada
+  mode: queued
+  # Event Type: vibration
+  # Event Subtype: 
+  #
+  trigger:
+    # trigger.id = 0 => Binary_Sensor => Vibración ON
+    # trigger.id = 1 => ZHA => Tilted = Inclinacion
+    - platform: device
+      type: vibration
+      device_id: f23111988853a7beeb8c26078f390729
+      entity_id: 3c418e73805f1a07820c181eb7bbe936
+      domain: binary_sensor
+    - device_id: f23111988853a7beeb8c26078f390729
+      domain: zha
+      platform: device
+      type: device_tilted
+      subtype: device_tilted
+  condition: []
+  action:
+    # value: "{{ trigger.to_state.attributes.friendly_name }}"
+    - choose:
+        # IF trigger.id = 0 => SHORT_press - TURN_ON
+        - conditions:
+          - condition: trigger
+            id: 0
+          sequence:
+            - service: light.toggle
+              target:
+                entity_id: light.luz_estudio_derecha
+    - choose:
+        # IF trigger.id = 0 => SHORT_press - TURN_ON
+        - conditions:
+          - condition: trigger
+            id: 1
+          sequence:
+            - service: light.toggle
+              target:
+                entity_id: light.luz_estudio_izquierda

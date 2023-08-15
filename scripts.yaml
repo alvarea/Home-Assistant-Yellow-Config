@@ -970,18 +970,6 @@ notifica_alarma:
       message: >
         {{ states('input_text.mensaje_msg') }}
 
-  # Notificación Telegram
-  #- service: notify.telegram_alarm
-  #  data:
-  #    titulo: '*ALARMA*'
-  #    mensaje: Cámaras Seguridad
-  #    data:
-  #      photo:
-  #        - url: http://192.168.0.13/snapshot/image0.jpg
-  #          caption: Cámara Cocina
-  #        - url: http://192.168.0.12:8080/snapshot.cgi
-  #          caption: Cámara Estudio
-
 notifica_evento:
   alias: 'Notifica Evento'
   sequence:
@@ -1534,7 +1522,6 @@ blink_trigger_cam_cocina:
 #                                                                             #
 #-----------------------------------------------------------------------------#
 
-
 estudio_persiana_down_full:
   alias: 'Estudio Persiana Cerrada'
   sequence:
@@ -1607,3 +1594,42 @@ firetv_estudio_movistar_a3:
         entity_id: media_player.firetv_estudio
       data:
         command: "CENTER"
+
+#-----------------------------------------------------------------------------#
+#                                                                             #
+# CONTROL SENSORES ALARMA ANTES DE ACTIVADO                                   #
+#                                                                             #
+#-----------------------------------------------------------------------------#
+
+check_sensores_magneticos_perimetro:
+  alias: 'Check Sensores Magneticos Perimetro'
+  sequence:
+    - service: input_text.set_value
+      data_template:
+        entity_id: input_text.alarma_check_sensores_magneticos
+        value: >
+          {% if states.binary_sensor.alarma_sensores_perimetro.state == 'off' %} 
+            Todas las puertas y ventanas están cerradas. Alarma lista para activar
+          {% elif states.binary_sensor.aqara_puerta_entrada_principal.state == 'on' %}
+            Atención, alarma no lista para armar. Revise el sensor {{ state_attr('binary_sensor.aqara_puerta_entrada_principal', 'friendly_name') }}
+          {% elif states.binary_sensor.aqara_puerta_salon.state == 'on' %}
+            Atención, alarma no lista para armar. Revise el sensor {{ state_attr('binary_sensor.aqara_puerta_salon', 'friendly_name') }}
+          {% elif states.binary_sensor.aqara_ventana_estudio_izquierda.state == 'on' %}
+            Atención, alarma no lista para armar. Revise el sensor {{ state_attr('binary_sensor.aqara_ventana_estudio_izquierda', 'friendly_name') }}
+          {% elif states.binary_sensor.aqara_ventana_estudio_derecha.state == 'on' %}
+            Atención, alarma no lista para armar. Revise el sensor {{ state_attr('binary_sensor.aqara_ventana_estudio_derecha', 'friendly_name') }}
+          {% elif states.binary_sensor.aqara_ventana_dormitorio_principal.state == 'on' %}
+            Atención, alarma no lista para armar. Revise el sensor {{ state_attr('binary_sensor.aqara_ventana_dormitorio_principal', 'friendly_name') }}
+          {% elif states.binary_sensor.aqara_ventana_dormitorio_plancha.state == 'on' %}
+            Atención, alarma no lista para armar. Revise el sensor {{ state_attr('binary_sensor.aqara_ventana_dormitorio_plancha', 'friendly_name') }}
+          {% elif states.binary_sensor.aqara_ventana_dormitorio_agu.state == 'on' %}
+            Atención, alarma no lista para armar. Revise el sensor {{ state_attr('binary_sensor.aqara_ventana_dormitorio_agu', 'friendly_name') }}
+          {% elif states.binary_sensor.aqara_ventana_dormitorio_paloma.state == 'on' %}
+            Atención, alarma no lista para armar. Revise el sensor {{ state_attr('binary_sensor.aqara_ventana_dormitorio_paloma', 'friendly_name') }}
+          {%endif%}
+    - service: script.alexa_entrada_secuencia
+      data_template:
+        sonido: 'clock_01'
+        repeticion: 1
+        voz: "{{ states.input_text.alarma_check_sensores_magneticos.state }}" 
+

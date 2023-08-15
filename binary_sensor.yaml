@@ -217,6 +217,21 @@
       #
       # CONTROL SENSORES PRESENCIA ALARMA AWAY
       #
+      alarma_check_status:
+        value_template: >-
+          {%  if is_state('binary_sensor.alarma_sensores_perimetro','off')
+              and is_state('binary_sensor.aqara_humo_cocina','off')
+              and is_state('binary_sensor.water_leak_sensor_158d00045a3376','off')
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        icon_template: >-
+          {% if is_state('binary_sensor.alarma_check_status','on') %} mdi:alarm-light
+          {% else %} mdi:alarm-light-off
+          {% endif %}
+
       # Genera un binary_sensor nuevo a partir del sensor movimiento original en ZHA y un selector input_boolean  
       # lo que permite desactivar en la pestaña configuración el sensor que esté dando problemas.
       #
