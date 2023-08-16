@@ -217,9 +217,9 @@
       #
       # CONTROL SENSORES PRESENCIA ALARMA AWAY
       #
-      alarma_check_status:
+      alarma_check_listo_para_armar:
         value_template: >-
-          {%  if is_state('binary_sensor.alarma_sensores_perimetro','off')
+          {%  if is_state('binary_sensor.alarma_sensores_perimetro_principal','off')
               and is_state('binary_sensor.aqara_humo_cocina','off')
               and is_state('binary_sensor.water_leak_sensor_158d00045a3376','off')
           %}
@@ -228,7 +228,7 @@
             false
           {% endif %}
         icon_template: >-
-          {% if is_state('binary_sensor.alarma_check_status','on') %} mdi:alarm-light
+          {% if is_state('binary_sensor.alarma_check_listo_para_armar','on') %} mdi:alarm-light
           {% else %} mdi:alarm-light-off
           {% endif %}
 

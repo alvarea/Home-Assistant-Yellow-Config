@@ -179,14 +179,17 @@ alarma_boton_panico:
     # When a condition does not return true, the script will finish
     - condition: template
       value_template: "{% if is_state('input_boolean.alarm_panic_button', 'on') %}true{% endif %}"
-    # Llamada Scripts SIRENAS ALARMA
-    - service: script.sirena_alarma
+    # Llamada ACTIVA SIRENAS ALARMA
+    - service: siren.turn_on
+      entity_id: siren.sirena
     # Notifica Telegram
-    - service: script.notifica_evento
+    - service: script.notifica_alarma
       data:
-        titulo: '*ALARMA HOMY*'
-        mensaje: >
-          >>> URGENTE: BOTON PANICO ACTIVADO
+        variables:
+          titulo: '*ATENCION ALARMA*'
+          mensaje: >
+            >>> URGENTE: BOTON PANICO ACTIVADO
+
 
 alarma_boton_panico_off:
   alias: 'Boton Panico OFF'
@@ -1609,7 +1612,7 @@ check_sensores_magneticos_perimetro:
         entity_id: input_text.alarma_check_sensores_magneticos
         value: >
           {% if states.binary_sensor.alarma_sensores_perimetro.state == 'off' %} 
-            Todas las puertas y ventanas están cerradas. Alarma lista para activar
+            Puertas y ventanas cerradas. Alarma lista para armado total.
           {% elif states.binary_sensor.aqara_puerta_entrada_principal.state == 'on' %}
             Atención, alarma no lista para armar. Revise el sensor {{ state_attr('binary_sensor.aqara_puerta_entrada_principal', 'friendly_name') }}
           {% elif states.binary_sensor.aqara_puerta_salon.state == 'on' %}
@@ -1632,4 +1635,16 @@ check_sensores_magneticos_perimetro:
         sonido: 'clock_01'
         repeticion: 1
         voz: "{{ states.input_text.alarma_check_sensores_magneticos.state }}" 
+    - service: light.turn_on
+      entity_id: light.tagreader_led
+      data_template:
+        brightness: 128
+        color_name: >
+          {% if states.binary_sensor.alarma_check_listo_para_armar.state == 'on' %}
+            green
+          {% else %}
+            red
+          {%endif%}
+
+
 
