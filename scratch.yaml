@@ -298,87 +298,9 @@ state_color: true
           target:
             entity_id: automation.s16c_sonoff_pow_lavadora_warning
 
-    - device_id: 328313c81613944986dbe5ef589bf2b6
-      domain: zha
-      platform: device
-      type: remote_button_long_press
-      subtype: dim_up
-      id: long_dim_up
-    - device_id: 328313c81613944986dbe5ef589bf2b6
-      domain: zha
-      platform: device
-      type: remote_button_long_release
-      subtype: dim_up
-      id: long_release_dim_up
-    - device_id: 328313c81613944986dbe5ef589bf2b6
-      domain: zha
-      platform: device
-      type: remote_button_long_press
-      subtype: dim_down
-      id: dim_down
-    - device_id: 328313c81613944986dbe5ef589bf2b6
-      domain: zha
-      platform: device
-      type: remote_button_long_release
-      subtype: dim_down
-      id: long_release_dim_down
 
-        # ELIF long_press_dim_up
-        - conditions:
-          - condition: trigger
-            id: long_dim_up
-          sequence:
-            - service: cover.open_cover
-              target:
-                entity_id = cover.persiana_estudio
-            - service: input_text.set_value
-              data:
-                value: "open cover.persiana_estudio"
-              target:
-                entity_id: input_text.helper_ikea_dimmer_switch_estudio
-            - delay: "00:00:02"
-            - service: cover.stop_cover
-              target:
-                entity_id = cover.persiana_estudio
 
-        # ELIF long_press_dim_down
-        - conditions:
-          - condition: trigger
-            id: long_press_dim_down
-          sequence:
-            - service: cover.close_cover
-              target:
-                entity_id = cover.persiana_estudio
-            - service: input_text.set_value
-              data:
-                value: "close cover.persiana_estudio"
-              target:
-                entity_id: input_text.helper_ikea_dimmer_switch_estudio
-        # ELIF long_release_dim_up
-        - conditions:
-          - condition: trigger
-            id: long_release_dim_up
-          sequence:
-            - service: cover.stop_cover
-              target:
-                entity_id = cover.persiana_estudio
-            - service: input_text.set_value
-              data:
-                value: "stop cover.persiana_estudio"
-              target:
-                entity_id: input_text.helper_ikea_dimmer_switch_estudio
-        # ELIF long_release_dim_down
-        - conditions:
-          - condition: trigger
-            id: long_release_dim_down
-          sequence:
-            - service: cover.stop_cover
-              target:
-                entity_id = cover.persiana_estudio
-            - service: input_text.set_value
-              data:
-                value: "stop cover.persiana_estudio"
-              target:
-                entity_id: input_text.helper_ikea_dimmer_switch_estudio
+
+
 
 

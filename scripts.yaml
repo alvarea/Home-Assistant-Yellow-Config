@@ -1617,10 +1617,6 @@ check_sensores_magneticos_perimetro:
             Atención, alarma no lista para armar. Revise el sensor {{ state_attr('binary_sensor.aqara_puerta_entrada_principal', 'friendly_name') }}
           {% elif states.binary_sensor.aqara_puerta_salon.state == 'on' %}
             Atención, alarma no lista para armar. Revise el sensor {{ state_attr('binary_sensor.aqara_puerta_salon', 'friendly_name') }}
-          {% elif states.binary_sensor.aqara_ventana_estudio_izquierda.state == 'on' %}
-            Atención, alarma no lista para armar. Revise el sensor {{ state_attr('binary_sensor.aqara_ventana_estudio_izquierda', 'friendly_name') }}
-          {% elif states.binary_sensor.aqara_ventana_estudio_derecha.state == 'on' %}
-            Atención, alarma no lista para armar. Revise el sensor {{ state_attr('binary_sensor.aqara_ventana_estudio_derecha', 'friendly_name') }}
           {% elif states.binary_sensor.aqara_ventana_dormitorio_principal.state == 'on' %}
             Atención, alarma no lista para armar. Revise el sensor {{ state_attr('binary_sensor.aqara_ventana_dormitorio_principal', 'friendly_name') }}
           {% elif states.binary_sensor.aqara_ventana_dormitorio_plancha.state == 'on' %}
