@@ -536,7 +536,8 @@
       data:
         entity_id: alarm_control_panel.ha
         code: !secret alarm_control_code
-    #
+    # Check sensores perimetro
+    - service: script.check_sensores_magneticos_perimetro
     # Aviso sonoro con Xiaomi GW
     - service: script.sirena_stop_alarma
     # Notifica Evento
@@ -2760,6 +2761,8 @@
           entity_id: alarm_control_panel.ha
           state: 'disarmed'
         sequence:
+          # Check sensores perimetro
+          - service: script.check_sensores_magneticos_perimetro
           # Armardo Away
           - service: alarm_control_panel.alarm_arm_away
             data:
@@ -2767,6 +2770,8 @@
               code: !secret alarm_control_code
       #ELSE alarma armado home/away => Desarmado
       default:
+        # Check sensores perimetro
+        - service: script.check_sensores_magneticos_perimetro
         # Desarmado
         - service: alarm_control_panel.alarm_disarm
           data:
@@ -2837,6 +2842,9 @@
       event_data:
         actionName: 'alarma_off'
   action:
+    # Check sensores perimetro
+    - service: script.check_sensores_magneticos_perimetro
+
     # Desarmado de Alarmas
     - service: alarm_control_panel.alarm_disarm
       data:
@@ -3575,6 +3583,8 @@
           - condition: trigger
             id: double_press
           sequence:
+            # Check sensores perimetro
+            - service: script.check_sensores_magneticos_perimetro
             # Desarmado de Alarmas
             - service: alarm_control_panel.alarm_disarm
               data:
@@ -3596,3 +3606,71 @@
                 value: "shortcut_button script stop sirenas"
               target:
                 entity_id: input_text.helper_ikea_dimmer_switch_estudio
+
+- id: ZHA_L8
+  alias: IKEA Tradfri Switch - Dormitorio AAF
+  mode: restart
+  #
+  # Event Type: remote_button_short_press, remote_button_double_press
+  # Event Subtype: turn_on, turn_off, dim_up, dim_down
+  #
+  trigger:
+    - device_id: 20684e813ecec36f420f36d00c206fbe
+      domain: zha
+      platform: device
+      type: remote_button_short_press
+      subtype: turn_on
+      id: on_short_press # Trigger ID
+    - device_id: 20684e813ecec36f420f36d00c206fbe
+      domain: zha
+      platform: device
+      type: remote_button_short_press
+      subtype: turn_off
+      id: off_short_press
+    - device_id: 20684e813ecec36f420f36d00c206fbe
+      domain: zha
+      platform: device
+      type: remote_button_long_press
+      subtype: dim_up
+      id: dim_up
+    - device_id: 20684e813ecec36f420f36d00c206fbe
+      domain: zha
+      platform: device
+      type: remote_button_long_press
+      subtype: dim_down
+      id: dim_down
+  condition: []
+  action:
+    - choose:
+        # IF on_short_press
+        - conditions:
+          - condition: trigger
+            id: on_short_press
+          sequence:
+            - service: light.toggle
+              target:
+                entity_id: light.led_mesa_agu
+        # ELIF off_short_press 
+        - conditions:
+          - condition: trigger
+            id: off_short_press
+          sequence:
+            - service: light.toggle
+              target:
+                entity_id: light.luz_dormitorio_mesilla_agu
+        # ELIF dim_up
+        - conditions:
+          - condition: trigger
+            id: dim_up
+          sequence:
+            - service: fan.turn_on
+              target:
+                entity_id: fan.aire_acondicionado_agu
+        # ELIF dim_down
+        - conditions:
+          - condition: trigger
+            id: dim_down
+          sequence:
+            - service: fan.turn_off
+              target:
+                entity_id: fan.aire_acondicionado_agu
