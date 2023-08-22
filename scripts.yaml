@@ -1543,16 +1543,6 @@ estudio_persiana_up_full:
     target:
       entity_id: cover.persiana_estudio
 
-estudio_persiana_down_3s:
-  alias: 'Estudio Persiana Down 3s'
-  sequence:
-    - service: switch.turn_off
-      entity_id: switch.esphome_dual_sw1_relay_1
-    - service: switch.turn_on
-      entity_id: switch.esphome_dual_sw1_relay_2
-    - delay: 00:00:03
-    - service: switch.turn_off
-      entity_id: switch.esphome_dual_sw1_relay_2
 
 
 #-----------------------------------------------------------------------------#
@@ -1560,6 +1550,30 @@ estudio_persiana_down_3s:
 # CONTROL SECUENCIAS ESCENAS                                                  #
 #                                                                             #
 #-----------------------------------------------------------------------------#
+
+# set_escena_estudio:
+#   alias: 'Set Escena Estudio'
+#   icon: 'mdi:pallete'
+#   fields:
+#     escena:
+#       name: Escena
+#       description: "Nombre de la escena a activar"
+#   mode: restart
+#   sequence:
+#     - service: scene.turn_on
+#       target:
+#         entity_id: "{{ escena }}"
+#       data:
+#         transition: 5
+#     - service: input_text.set_value
+#       data:
+#         value: >
+#           {% if {{ escena }} == scene.estudio_soft %} escena estudio SOFT
+#           {% elif {{ escena }} == scene.estudio_high %} escena estudio HIGH
+#           {% elif {{ escena }} == scene.estudio_azul %} escena estudio AZUL
+#           {% elif {{ escena }} == scene.estudio_ocre %} escena estudio OCRE
+#       target:
+#         entity_id: input_text.helper_ikea_dimmer_switch_estudio
 
 escena_estudio_home_cinema:
   alias: 'Estudio Escena Home Cinema'
@@ -1641,6 +1655,7 @@ check_sensores_magneticos_perimetro:
           {% else %}
             red
           {%endif%}
+
 
 
 

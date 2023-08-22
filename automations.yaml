@@ -194,7 +194,6 @@
   alias: 'X1 Alarma Agua Arqueta'
   trigger:
     - platform: state
-  trigger:
       entity_id: binary_sensor.water_leak_sensor_158d00045a3376
       from: 'off'
       to: 'on'
@@ -3530,58 +3529,59 @@
         # Para el uso de las persianas no supone un problema ya que solo necesito un evento Long-Release para parar el motor.
 
 - id: ZHA_L7
-  alias: IKEA Shortcut Button - Estudio
+  alias: IKEA Tradfri Switch - Estudio
   mode: queued
-  # Short_press ==> Ventilador toogle
-  # Double_press ==> Alarma Desarmado
-  # Long_Press ==> 
-  # Long_Release ==> Turn Off Sirenas
+  # Short_press ON  ==> Toggle Ventilador toogle
+  # Short_press OFF ==> Alarma Desarmado
+  # Long_Press ON   ==> AA Estudio on 
+  # Long_Press OFF  ==> AA Estudio off
   #
   trigger:
-    - device_id: 2d8be0dc60e20c31cc24a1f9ddc65e0a
+    - device_id: 7bfd253f74df460b6e04fd16678d5dfc
       domain: zha
       platform: device
       type: remote_button_short_press
       subtype: turn_on
-      id: short_press
-    - device_id: 2d8be0dc60e20c31cc24a1f9ddc65e0a
+      id: on_short_press # ==> Toggle Ventilador toogle
+    - device_id: 7bfd253f74df460b6e04fd16678d5dfc
       domain: zha
       platform: device
-      type: remote_button_double_press
-      subtype: turn_on
-      id: double_press
-    - device_id: 2d8be0dc60e20c31cc24a1f9ddc65e0a
+      type: remote_button_short_press
+      subtype: turn_off
+      id: off_short_press
+    - device_id: 7bfd253f74df460b6e04fd16678d5dfc
       domain: zha
       platform: device
       type: remote_button_long_press
       subtype: dim_up
-      id: long_press
-    - device_id: 2d8be0dc60e20c31cc24a1f9ddc65e0a
+      id: dim_up
+    - device_id: 7bfd253f74df460b6e04fd16678d5dfc
       domain: zha
       platform: device
-      type: remote_button_long_release
-      subtype: dim_up
-      id: long_release
+      type: remote_button_long_press
+      subtype: dim_down
+      id: dim_down
   condition: []
   action:
     - choose:
-        # IF trigger.id = on_short_press
+        # IF trigger.id = on_short_press ==> Toggle Ventilador toogle
         - conditions:
           - condition: trigger
-            id: short_press
+            id: on_short_press
           sequence:
             - service: fan.toggle
               target:
                 entity_id: fan.esphome_s26_sw2
+            - delay: "00:00:02"
             - service: input_text.set_value
               data:
                 value: "shortcut_button fan.estudio {{ states('fan.esphome_s26_sw2')}}"
               target:
                 entity_id: input_text.helper_ikea_dimmer_switch_estudio
-        # ELIF double_press
+        # ELIF off_short_press ==> Alarm Disarm
         - conditions:
           - condition: trigger
-            id: double_press
+            id: off_short_press
           sequence:
             # Check sensores perimetro
             - service: script.check_sensores_magneticos_perimetro
@@ -3592,18 +3592,35 @@
                 code: !secret alarm_control_code
             - service: input_text.set_value
               data:
-                value: "shortcut_button alarma {{ states('alarm_control_panel.ha')}}"
+                value: "ALARMA HOMY {{ states('alarm_control_panel.ha')}}"
               target:
                 entity_id: input_text.helper_ikea_dimmer_switch_estudio
-        # ELIF long_release
+        # ELIF dim_up
         - conditions:
           - condition: trigger
-            id: long_release
+            id: dim_up
           sequence:
-            - service: script.sirena_stop_alarma
+            - service: climate.turn_on
+              data: {}
+              target:
+                entity_id: climate.aa_estudio
             - service: input_text.set_value
               data:
-                value: "shortcut_button script stop sirenas"
+                value: "A/A Estudio ON"
+              target:
+                entity_id: input_text.helper_ikea_dimmer_switch_estudio
+        # ELIF dim_down
+        - conditions:
+          - condition: trigger
+            id: dim_down
+          sequence:
+            - service: climate.turn_off
+              data: {}
+              target:
+                entity_id: climate.aa_estudio
+            - service: input_text.set_value
+              data:
+                value: "A/A Estudio OFF"
               target:
                 entity_id: input_text.helper_ikea_dimmer_switch_estudio
 
