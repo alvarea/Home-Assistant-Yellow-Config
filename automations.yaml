@@ -383,10 +383,6 @@
     #  data_template:
     #    value: " "
 
-    #
-    # Aviso sonoro con Xiaomi GW
-    #- service: script.sirena_xiaomi_play_alarm_disarmed
-
     # Apaga Luz Piloto Alarma
     - service: light.turn_off
       entity_id: 
@@ -1313,139 +1309,6 @@
             - light.luz_estudio_armario
             - light.esphome_s26_sw1_led
 
-#-----------------------------------------------------------------------------#
-#                                                                             #
-# REGLAS MAGIC CUBE                                                           #
-#                                                                             #
-#-----------------------------------------------------------------------------#
-#
-# Available events are FLIP90, FLIP180, move, TAP_TWICE, SHAKE_AIR, swing, alert, FREE_FALL, ROTATE
-# The component stores the last action as the attribute last_action.
-#
-# shake_air:    ESTUDIO OFF
-# free_fall:    ESTUDIO ESCENA AZUL
-# flip_90:      ESTUDIO ESCENA DESK
-# flip_180:     ESTUDIO ESCENA DESK HIGH
-# tap_twice:    ESTUDIO ESCENA LAVA PALAUSTRE
-# ROTATE:       ESTUDIO 
-#
-- id: L12
-  alias: 'L12 Cube FreeFall Light Estudio Noche'
-  mode: restart
-  trigger:
-    platform: event
-    event_type: xiaomi_aqara.cube_action
-    event_data:
-      entity_id: binary_sensor.cube_158d00024a4a62
-      action_type: free_fall
-  action:
-    - service: script.alexa_estudio_secuencia
-      data_template:
-        sonido: 'clock_01'
-        repeticion: 1
-        voz: "Vale, activando escena Estudio Noche"
-    - service: scene.turn_on
-      target:
-        entity_id: scene.estudio_noche
-      data:
-        transition: 3
-
-- id: L13
-  alias: 'L13 Cube Shake Light Estudio off'
-  mode: restart
-  trigger:
-    platform: event
-    event_type: xiaomi_aqara.cube_action
-    event_data:
-      entity_id: binary_sensor.cube_158d00024a4a62
-      action_type: shake_air
-  action:
-    # Aviso apagando luces estudio izquierda solo
-    #
-    - service: light.turn_off
-      entity_id: light.luz_estudio_izquierda
-    # Apaga luces estudio con retardo variable en función de la hora
-    #
-    - service: light.turn_off
-      entity_id: light.luz_estudio
-      data:
-        transition: >
-          {% if now().hour >= 0 and now().hour <= 7 %} 30
-          {% elif now().hour >= 8 and now().hour <= 18 %} 1
-          {% else %} 30
-          {% endif %}
-      target:
-        entity_id: light.luz_estudio
-    - service: fan.turn_off
-      data: {}
-      target:
-        entity_id: fan.esphome_s26_sw2
-
-- id: L14
-  alias: 'L14 Cube Flip90 Light Estudio Setup Soft'
-  mode: restart
-  trigger:
-    platform: event
-    event_type: xiaomi_aqara.cube_action
-    event_data:
-      entity_id: binary_sensor.cube_158d00024a4a62
-      action_type: flip90
-  action:
-    - service: script.alexa_estudio_secuencia
-      data_template:
-        sonido: 'clock_01'
-        repeticion: 1
-        voz: "Vale, activando escena setup soft"
-    - service: scene.turn_on
-      target:
-        entity_id: scene.estudio_setup_soft
-      data:
-        transition: 5
-
-- id: L15
-  alias: 'L15 Cube Flip180 Light Estudio Desk High'
-  mode: restart
-  trigger:
-    platform: event
-    event_type: xiaomi_aqara.cube_action
-    event_data:
-      entity_id: binary_sensor.cube_158d00024a4a62
-      action_type: flip180
-  action:
-    - service: script.alexa_estudio_secuencia
-      data_template:
-        sonido: 'clock_01'
-        repeticion: 1
-        voz: "Vale, activando escena setup high"
-    - service: scene.turn_on
-      target:
-        entity_id: scene.estudio_setup_high
-      data:
-        transition: 5
-
-- id: L16
-  alias: 'L16 Cube TapTwice'
-  mode: restart
-  trigger:
-    platform: event
-    event_type: xiaomi_aqara.cube_action
-    event_data:
-      entity_id: binary_sensor.cube_158d00024a4a62
-      action_type: tap_twice
-  action:
-    - service: script.alexa_estudio_secuencia
-      data_template:
-        sonido: 'clock_01'
-        repeticion: 1
-        voz: "Vale, Activo Lavando Palaustre. Que descanses."
-    - service: scene.turn_on
-      target:
-        entity_id: scene.estudio_lava_palaustre
-      data:
-        transition: 1
-    - service: media_player.media_pause
-      target:
-        entity_id: media_player.echo_alexa_estudio
 
 #-----------------------------------------------------------------------------#
 #                                                                             #
@@ -3425,12 +3288,22 @@
           - condition: trigger
             id: on_short_press
           sequence:
+            # Selecciona la escena Setup_High (la segunda)
+            - service: input_select.select_first
+              data: {}
+              target:
+                entity_id: input_select.helper_scene_estudio
+            - service: input_select.select_next
+              data:
+                cycle: true
+              target:
+                entity_id: input_select.helper_scene_estudio
             - service: scene.turn_on
               target:
-                entity_id: scene.estudio_setup_high
+                entity_id: "{{ states('input_select.helper_scene_estudio')}}"
             - service: input_text.set_value
               data:
-                value: "turn_on scene.estudio_setup_high"
+                value: "{{ states('input_select.helper_scene_estudio') | lower }} ON"
               target:
                 entity_id: input_text.helper_ikea_dimmer_switch_estudio
         # ELIF off_short_press
@@ -3443,7 +3316,7 @@
                 entity_id: light.luz_estudio
             - service: input_text.set_value
               data:
-                value: "turn_off light.luz_estudio"
+                value: "Luz Estudio OFF"
               target:
                 entity_id: input_text.helper_ikea_dimmer_switch_estudio
         # ELIF left
@@ -3461,7 +3334,7 @@
                 entity_id: "{{ states('input_select.helper_scene_estudio')}}"
             - service: input_text.set_value
               data:
-                value: "turn_on {{ states('input_select.helper_scene_estudio')}}"
+                value: "{{ states('input_select.helper_scene_estudio') | lower }} ON"
               target:
                 entity_id: input_text.helper_ikea_dimmer_switch_estudio
         # ELIF right
@@ -3479,7 +3352,7 @@
                 entity_id: "{{ states('input_select.helper_scene_estudio')}}"
             - service: input_text.set_value
               data:
-                value: "turn_on {{ states('input_select.helper_scene_estudio')}}"
+                value: "{{ states('input_select.helper_scene_estudio') | lower }} ON"
               target:
                 entity_id: input_text.helper_ikea_dimmer_switch_estudio
         # ELIF lpress_dim_up
@@ -3492,7 +3365,7 @@
                 entity_id: cover.persiana_estudio
             - service: input_text.set_value
               data:
-                value: "open cover.persiana_estudio"
+                value: "Cover Estudio OPEN"
               target:
                 entity_id: input_text.helper_ikea_dimmer_switch_estudio
         # ELIF lpress_dim_down
@@ -3505,7 +3378,7 @@
                 entity_id: cover.persiana_estudio
             - service: input_text.set_value
               data:
-                value: "close cover.persiana_estudio"
+                value: "Cover Estudio CLOSE"
               target:
                 entity_id: input_text.helper_ikea_dimmer_switch_estudio
         # ELIF lrelease_dim_up
@@ -3518,7 +3391,7 @@
                 entity_id: cover.persiana_estudio
             - service: input_text.set_value
               data:
-                value: "Stop cover.persiana_estudio"
+                value: "Cover Estudio STOP"
               target:
                 entity_id: input_text.helper_ikea_dimmer_switch_estudio
 
@@ -3571,30 +3444,41 @@
           sequence:
             - service: fan.toggle
               target:
-                entity_id: fan.esphome_s26_sw2
+                entity_id: fan.estudio
             - delay: "00:00:02"
             - service: input_text.set_value
               data:
-                value: "shortcut_button fan.estudio {{ states('fan.esphome_s26_sw2')}}"
+                value: "Ventilador Estudio {{ states('fan.estudio') | upper }}"
               target:
                 entity_id: input_text.helper_ikea_dimmer_switch_estudio
-        # ELIF off_short_press ==> Alarm Disarm
+        # ELIF off_short_press ==> OFF ESUDIO 
         - conditions:
           - condition: trigger
             id: off_short_press
           sequence:
-            # Check sensores perimetro
-            - service: script.check_sensores_magneticos_perimetro
-            # Desarmado de Alarmas
-            - service: alarm_control_panel.alarm_disarm
+            # Aviso apagando luces estudio izquierda solo
+            - service: light.turn_off
+              entity_id: light.luz_estudio_izquierda
+            # Apaga luces estudio con retardo variable en función de la hora
+            - service: light.turn_off
+              entity_id: light.luz_estudio
               data:
-                entity_id: alarm_control_panel.ha
-                code: !secret alarm_control_code
-            - service: input_text.set_value
-              data:
-                value: "ALARMA HOMY {{ states('alarm_control_panel.ha')}}"
+                transition: >
+                  {% if now().hour >= 0 and now().hour <= 7 %} 30
+                  {% elif now().hour >= 8 and now().hour <= 18 %} 1
+                  {% else %} 30
+                  {% endif %}
               target:
-                entity_id: input_text.helper_ikea_dimmer_switch_estudio
+                entity_id: light.luz_estudio
+            # Para Ventilador Estudio
+            - service: fan.turn_off
+              data: {}
+              target:
+                entity_id: fan.estudio
+            # Para Alexa Estudio 
+            - service: media_player.media_pause
+              target:
+                entity_id: media_player.echo_alexa_estudio
         # ELIF dim_up
         - conditions:
           - condition: trigger
@@ -3606,7 +3490,7 @@
                 entity_id: climate.aa_estudio
             - service: input_text.set_value
               data:
-                value: "A/A Estudio ON"
+                value: "A/A Estudio {{ states('climate.aa_estudio')| upper }}"
               target:
                 entity_id: input_text.helper_ikea_dimmer_switch_estudio
         # ELIF dim_down
@@ -3620,7 +3504,7 @@
                 entity_id: climate.aa_estudio
             - service: input_text.set_value
               data:
-                value: "A/A Estudio OFF"
+                value: "A/A Estudio {{ states('climate.aa_estudio')| upper }}"
               target:
                 entity_id: input_text.helper_ikea_dimmer_switch_estudio
 
@@ -3691,3 +3575,75 @@
             - service: fan.turn_off
               target:
                 entity_id: fan.aire_acondicionado_agu
+
+- id: ZHA_L9
+  alias: AQARA Cube Estudio
+  mode: queued
+  # type: device_shaken, subtype: turn_on   => ALARM DISARM
+  # type: device_rotated,subtype: left      =>
+  # type: device_rotated,subtype: right     => 
+  # type: device_knocked,subtype: face_any  => Escena Estudio Lava Palaustre
+  trigger:
+    - device_id: d37e91591c751fdbc46064847d200cbc
+      domain: zha
+      platform: device
+      type: device_shaken
+      subtype: turn_on
+      id: shaken
+    - device_id: d37e91591c751fdbc46064847d200cbc
+      domain: zha
+      platform: device
+      type: device_knocked
+      subtype: face_any
+      id: knocked
+  condition: []
+  action:
+    - choose:
+        # IF trigger.id = shaken => Alarm DISARM
+        - conditions:
+          - condition: trigger
+            id: shaken
+          sequence:
+            # Desarmado de Alarmas
+            - service: alarm_control_panel.alarm_disarm
+              data:
+                entity_id: alarm_control_panel.ha
+                code: !secret alarm_control_code
+            - service: input_text.set_value
+              data:
+                value: "ALARMA HOMY {{ states('alarm_control_panel.ha')| upper }}"
+              target:
+                entity_id: input_text.helper_ikea_dimmer_switch_estudio
+        # ELIF knocked => Escena Lava Palaustre.
+        - conditions:
+          - condition: trigger
+            id: knocked
+          sequence:
+            # Aviso apagando luces estudio izquierda solo
+            - service: light.turn_off
+              entity_id: light.luz_estudio_izquierda
+            - service: script.alexa_estudio_secuencia
+              data_template:
+                sonido: 'clock_01'
+                repeticion: 1
+                voz: "OK"
+            - service: scene.turn_on
+              target:
+                entity_id: scene.estudio_lava_palaustre
+              data:
+                transition: 1
+            - service: media_player.media_pause
+              target:
+                entity_id: media_player.echo_alexa_estudio
+            - service: input_text.set_value
+              data:
+                value: "scene.estudio_lava_palaustre ON"
+              target:
+                entity_id: input_text.helper_ikea_dimmer_switch_estudio
+            - service: script.alexa_estudio_secuencia
+              data_template:
+                sonido: 'clock_01'
+                repeticion: 1
+                voz: "Vale, Activo Lavando Palaustre. Que descanses."
+
+

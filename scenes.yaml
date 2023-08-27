@@ -213,7 +213,7 @@
     light.luz_estudio:
       state: 'off'
     # Ventilador
-    fan.esphome_s26_sw2:
+    fan.estudio:
       state: 'off'
     # A/A Estudio
     climate.aa_estudio:
