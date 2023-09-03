@@ -215,8 +215,38 @@
         icon_template: mdi:alarm-light
 
       #
-      # CONTROL SENSORES PRESENCIA ALARMA AWAY
+      # CONTROL SENSORES PRESENCIA ALARMA 
       #
+      alarma_estado_general:
+        value_template: >-
+          {%  if is_state('alarm_control_panel.ha','disarmed')
+              and is_state('alarm_control_panel.blink_casa','disarmed')
+          %}
+            false
+          {% else %}
+            true
+          {% endif %}
+        icon_template: >-
+          {% if is_state('binary_sensor.alarma_estado_armado','on') %} mdi:alarm-light
+          {% else %} mdi:alarm-light-off
+          {% endif %}
+
+      alarma_estado_sensores:
+        value_template: >-
+          {%  if is_state('binary_sensor.alarma_sensores_perimetro_principal','off')
+              and is_state('binary_sensor.alarma_sensores_perimetro_secundario','off')
+              and is_state('binary_sensor.alarma_sensores_presencia_interior','off')
+              and is_state('binary_sensor.alarma_sensores_presencia_exterior','off')
+          %}
+            true
+          {% else %}
+            flase
+          {% endif %}
+        icon_template: >-
+          {% if is_state('binary_sensor.alarma_estado_sensores','on') %} mdi:motion-sensor
+          {% else %} mdi:motion-sensor-off
+          {% endif %}
+
       alarma_check_listo_para_armar:
         value_template: >-
           {%  if is_state('binary_sensor.alarma_sensores_perimetro_principal','off')
@@ -1627,7 +1657,7 @@
       # MELCLOUD A/C Estudio OR FAN.ESPHOME_S26_SW1
       climatizacion_estudio:
         value_template: >-
-          {% if is_state('binary_sensor.melcloud_estudio','on') or is_state('fan.esphome_s26_sw1','on') %}
+          {% if is_state('binary_sensor.melcloud_estudio','on') or is_state('fan.estudio','on') %}
             true
           {% else %}
             false
@@ -1712,11 +1742,14 @@
 #
 
       setup_devices_status:
+        # esphome_4ch_sw4_relay_2 = HIFI YAMAHA
+        # esphome_4ch_sw4_relay_3 = XBOX
         value_template: >-
           {{ states('binary_sensor.laptop_macbook_aac') == 'on' 
              or states('binary_sensor.laptop_dell_aac') == 'on' 
-             or states('switch.esphome_mini_sw7') == 'on' 
-            or states('media_player.echo_alexa_estudio') == 'playing' 
+             or states('switch.esphome_4ch_sw4_relay_2') == 'on' 
+             or states('switch.esphome_4ch_sw4_relay_3') == 'on' 
+             or states('media_player.echo_alexa_estudio') == 'playing' 
           }}
         friendly_name: 'Setup Devices Status'
         icon_template: mdi:laptop

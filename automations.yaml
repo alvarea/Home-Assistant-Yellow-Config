@@ -3405,7 +3405,7 @@
   alias: IKEA Tradfri Switch - Estudio
   mode: queued
   # Short_press ON  ==> Toggle Ventilador toogle
-  # Short_press OFF ==> Alarma Desarmado
+  # Short_press OFF ==> Toggle Luz Estudio Setup Soft / Off
   # Long_Press ON   ==> AA Estudio on 
   # Long_Press OFF  ==> AA Estudio off
   #
@@ -3646,4 +3646,75 @@
                 repeticion: 1
                 voz: "Vale, Activo Lavando Palaustre. Que descanses."
 
+- id: ZHA_L10
+  alias: IKEA Tradfri Switch - Dormitorio PAF
+  mode: restart
+  #
+  # Event Type: remote_button_short_press, remote_button_double_press
+  # Event Subtype: turn_on, turn_off, dim_up, dim_down
+  #
+  trigger:
+    - device_id: 79551b9db03e27203c7483398811e579
+      domain: zha
+      platform: device
+      type: remote_button_short_press
+      subtype: turn_on
+      id: on_short_press # Trigger ID
+    - device_id: 79551b9db03e27203c7483398811e579
+      domain: zha
+      platform: device
+      type: remote_button_short_press
+      subtype: turn_off
+      id: off_short_press
+    - device_id: 79551b9db03e27203c7483398811e579
+      domain: zha
+      platform: device
+      type: remote_button_long_press
+      subtype: dim_up
+      id: dim_up
+    - device_id: 79551b9db03e27203c7483398811e579
+      domain: zha
+      platform: device
+      type: remote_button_long_press
+      subtype: dim_down
+      id: dim_down
+  condition: []
+  action:
+    - choose:
+        # IF on_short_press
+        - conditions:
+          - condition: trigger
+            id: on_short_press
+          sequence:
+            - service: light.toggle
+              target:
+                entity_id: light.luz_dormitorio_paf_mesa
+        # ELIF off_short_press 
+        - conditions:
+          - condition: trigger
+            id: off_short_press
+          sequence:
+            - service: light.toggle
+              target:
+                entity_id: light.luz_dormitorio_mesilla_paloma
+        # ELIF dim_up
+        - conditions:
+          - condition: trigger
+            id: dim_up
+          sequence:
+            - service: light.turn_on
+              data:
+                brightness_step_pct: 25
+              target:
+                entity_id: light.luz_dormitorio_mesilla_paloma
+        # ELIF dim_down
+        - conditions:
+          - condition: trigger
+            id: dim_down
+          sequence:
+            - service: light.turn_on
+              data:
+                brightness_step_pct: -25
+              target:
+                entity_id: light.luz_dormitorio_mesilla_paloma
 

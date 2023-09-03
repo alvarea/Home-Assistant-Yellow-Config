@@ -78,7 +78,7 @@
 # Control alarma y notificaciones
 #
   alarm_panic_button:
-    name: Alarma Botón Pánico
+    name: Control Previo Botón Pánico
     initial: off
     icon: mdi:security-home
     # AAC. Interruptores control alarma y notificaciones

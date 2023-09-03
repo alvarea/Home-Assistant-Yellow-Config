@@ -301,6 +301,18 @@ state_color: true
 
 
 
+show_state: true
+show_name: true
+camera_view: auto
+type: picture-entity
+image: /local/Home_Alarm_Security_I3.jpg
+tap_action:
+  action: more-info
+hold_action:
+  action: toggle
+name: Sistemas Alarma Seguridad
+aspect_ratio: '5'
+entity: binary_sensor.alarma_estado_armado
 
 
 
