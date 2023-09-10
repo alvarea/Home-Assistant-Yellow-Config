@@ -281,8 +281,6 @@
         color_name: orange
         transition: 3
         brightness: 128
-
-
     # INICIALIZA EL SENSOR DEL TRIGGER
     - service: input_text.set_value
       entity_id: input_text.alarm_trigger
@@ -984,13 +982,13 @@
       - condition: template
         value_template: "{{ states('sensor.season') != 'summer' }}"
       - condition: state
-        entity_id: light.luz_jardin
+        entity_id: light.luces_jardin
         state: 'on'
   action:
     # Apagado Luces Exterior Casa + Luces Jardín
     - service: light.turn_off
       entity_id: 
-        - light.luz_jardin
+        - light.luces_jardin
         - light.luz_exterior
 
     # Notifica a Familia
@@ -1085,13 +1083,13 @@
     condition: or
     conditions:
       - condition: state
-        entity_id: light.luz_planta_alta # Luces Planta Alta
+        entity_id: light.luces_planta_alta # Luces Planta Alta
         state: 'on'
       - condition: state
-        entity_id: light.luz_planta_baja # Luces Planta Baja
+        entity_id: light.luces_planta_baja # Luces Planta Baja
         state: 'on'
       - condition: state
-        entity_id: light.luz_jardin # Luces exterior
+        entity_id: light.luces_jardin # Luces exterior
         state: 'on'
   action:
     # Apagado Luces Toda la Casa
@@ -1158,7 +1156,7 @@
         after: sunset
         after_offset: "+00:15:00"
       - condition: state
-        entity_id: light.luz_dormitorio
+        entity_id: light.luces_dormitorio_mfc
         state: 'off'
       #- condition: sun
       #  # before_offset: "+02:00:00"  ==> Horario Invierno GMT+1, en el amanecer -2h
@@ -1171,11 +1169,11 @@
     #    entity_id: scene.dormitorio_relax
     - service: light.turn_on
       entity_id: 
-        - light.luz_dormitorio
+        - light.luces_dormitorio_mfc
         - light.esphome_s20_sw1_led
     - service: input_text.set_value
       data:
-        value: "sensor turn_on light.luz_dormitorio"
+        value: "sensor turn_on light.luces_dormitorio"
       target:
         entity_id: input_text.helper_hue_dimmer_switch_dormitorio
     # Espera de 5'
@@ -1183,11 +1181,11 @@
     # Luces Off + Led
     - service: light.turn_off
       entity_id: 
-        - light.luz_dormitorio
+        - light.luces_dormitorio
         - light.esphome_s20_sw1_led
     - service: input_text.set_value
       data:
-        value: "sensor turn_off light.luz_dormitorio"
+        value: "sensor turn_off light.luces_dormitorio"
       target:
         entity_id: input_text.helper_hue_dimmer_switch_dormitorio
 
@@ -2608,13 +2606,13 @@
   alias: 'NFC AAC Tag1 Alarma '
   trigger:
     - platform: tag
-      tag_id: 04-50-B6-01-25-3B-03 # AAC Green Tag
+      tag_id: 04-50-B6-01-25-3B-03 # AAC Blue Tag
     - platform: tag
       tag_id: 04-50-4F-01-B5-1D-03 # MFC Red Tag
     - platform: tag
-      tag_id: 04-50-9A-01-7D-1D-03 # AAF Yellow Tag
+      tag_id: 04-50-9A-01-7D-1D-03 # AAF Black Tag
     - platform: tag
-      tag_id: 04-50-B3-01-0D-3B-03 # PAF Red Tag
+      tag_id: 04-50-B3-01-0D-3B-03 # PAF Yellow Tag
   action:
     - choose:
       # IF Alarma Homy = Desarmada => Armado Away
@@ -2652,7 +2650,7 @@
     - service: script.alarma_boton_panico
 
 - id: T03
-  alias: 'NFC Home Blue Tag - Armado Away'
+  alias: 'NFC Home Big Blue Tag - Armado Away'
   trigger:
     - platform: tag
       tag_id: 2C-CA-F0-22
@@ -2661,6 +2659,24 @@
       data:
         entity_id: alarm_control_panel.ha
         code: !secret alarm_control_code
+
+- id: T04
+  alias: 'NFC Green Tag TEST'
+  mode: single
+  trigger:
+    - platform: tag
+      tag_id: 6e6b6c52-631e-42ea-b576-59d024e4a698 # Green Tag
+  action:
+    - service: fan.toggle
+      target:
+        entity_id: fan.estudio
+    - delay: "00:00:02"
+    - service: input_text.set_value
+      data:
+        value: "Ventilador Estudio {{ states('fan.estudio') | upper }}"
+      target:
+        entity_id: input_text.helper_ikea_dimmer_switch_estudio
+
 
 #-----------------------------------------------------------------------------#
 #                                                                             #
@@ -2872,7 +2888,7 @@
   action:
     # value: "{{ trigger.to_state.attributes.friendly_name }}"
     - choose:
-        # IF trigger.id = on_short_press
+        # IF trigger.id = on_short_press => Escena Dormitorio Lectura
         - conditions:
           - condition: trigger
             id: on_short_press
@@ -2907,12 +2923,13 @@
           - condition: trigger
             id: off_short_press
           sequence:
+            # Apaga Luz Agustin y Apaga Luz Malen
             - service: light.turn_off
               target:
-                entity_id: light.luz_dormitorio
+                entity_id: light.luces_dormitorio_mfc
             - service: input_text.set_value
               data:
-                value: "turn_off light.luz_dormitorio"
+                value: "turn_off light.luces_dormitorio"
               target:
                 entity_id: input_text.helper_hue_dimmer_switch_dormitorio
         # ELIF off_double_press
@@ -3082,10 +3099,10 @@
           sequence:
             - service: light.turn_off
               target:
-                entity_id: light.luz_salon
+                entity_id: light.luces_salon
             - service: input_text.set_value
               data:
-                value: "turn_off light.luz_salon"
+                value: "turn_off light.luces_salon"
               target:
                 entity_id: input_text.helper_ikea_dimmer_switch_salon
         # ELIF left
@@ -3183,11 +3200,11 @@
           sequence:
             - service: light.toggle
               target:
-                entity_id: light.luz_jardin
+                entity_id: light.luces_jardin
             - delay: "00:00:01"
             - service: input_text.set_value
               data:
-                value: "light.luz_jardin {{ states('light.luz_jardin')}}"
+                value: "light.luces_jardin {{ states('light.luces_jardin')}}"
               target:
                 entity_id: input_text.helper_ikea_tradfri_switch_salon
         # ELIF dim_up => TOGGLE Luces Exterior
@@ -3201,7 +3218,7 @@
             - delay: "00:00:01"
             - service: input_text.set_value
               data:
-                value: "light.luz_jardin {{ states('light.luz_exterior')}}"
+                value: "light.luces_jardin {{ states('light.luz_exterior')}}"
               target:
                 entity_id: input_text.helper_ikea_tradfri_switch_salon
         # ELIF dim_down => TOGGLE Luces Piscina
@@ -3558,7 +3575,7 @@
           sequence:
             - service: light.toggle
               target:
-                entity_id: light.luz_dormitorio_mesilla_agu
+                entity_id: light.luz_mesilla_aaf
         # ELIF dim_up
         - conditions:
           - condition: trigger
@@ -3688,7 +3705,7 @@
           sequence:
             - service: light.toggle
               target:
-                entity_id: light.luz_dormitorio_paf_mesa
+                entity_id: light.luz_mesa_paf
         # ELIF off_short_press 
         - conditions:
           - condition: trigger
@@ -3696,7 +3713,7 @@
           sequence:
             - service: light.toggle
               target:
-                entity_id: light.luz_dormitorio_mesilla_paloma
+                entity_id: light.luz_mesilla_paf
         # ELIF dim_up
         - conditions:
           - condition: trigger
@@ -3706,7 +3723,7 @@
               data:
                 brightness_step_pct: 25
               target:
-                entity_id: light.luz_dormitorio_mesilla_paloma
+                entity_id: light.luz_mesilla_paf
         # ELIF dim_down
         - conditions:
           - condition: trigger
@@ -3716,7 +3733,7 @@
               data:
                 brightness_step_pct: -25
               target:
-                entity_id: light.luz_dormitorio_mesilla_paloma
+                entity_id: light.luz_mesilla_paf
 
 
 

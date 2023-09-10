@@ -69,7 +69,7 @@ alarma_sensores_luz_grp:
 luces_device_sun_light_trigger_grp:
   name: Luces Device Sun Trigger
   entities:
-    - light.luz_salon_vitrina
+    - light.luz_vitrina
 
 person_device_sun_light_trigger_grp:
   name: Personas Device Sun Trigger

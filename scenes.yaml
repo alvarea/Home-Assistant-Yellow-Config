@@ -1025,12 +1025,12 @@
 - id: salon_sunset
   name: Salón Sunset
   entities:
-    light.luz_salon_vitrina:
+    light.luz_vitrina:
       state: 'on'
       brightness: 102
-    light.luz_salon_cilindro:
+    light.luz_cilindro:
       state: 'off'
-    light.luz_salon_lectura:
+    light.luz_lectura:
       state: 'off'
     light.led_salon_tv:
       state: 'off'
@@ -1042,13 +1042,13 @@
 - id: salon_noche
   name: Salón Noche
   entities:
-    light.luz_salon_cilindro:
+    light.luz_cilindro:
       state: 'on'
       brightness: 153
-    light.luz_salon_vitrina:
+    light.luz_vitrina:
       state: 'on'
       brightness: 153
-    light.luz_salon_lectura:
+    light.luz_lectura:
       state: 'on'
       brightness: 153
     light.led_salon_tv:
@@ -1198,13 +1198,13 @@
 - id: salon_lectura
   name: Salón Lectura
   entities:
-    light.luz_salon_cilindro:
+    light.luz_cilindro:
       state: 'on'
       brightness: 153
-    light.luz_salon_vitrina:
+    light.luz_vitrina:
       state: 'on'
       brightness: 230
-    light.luz_salon_lectura:
+    light.luz_lectura:
       state: 'on'
       brightness: 153
     light.led_salon_tv:
@@ -1215,11 +1215,11 @@
 - id: salon_home_cinema
   name: Salón Home Cinema
   entities:
-    light.luz_salon_lectura:
+    light.luz_lectura:
       state: 'off'
-    light.luz_salon_cilindro:
+    light.luz_cilindro:
       state: 'off'
-    light.luz_salon_vitrina:
+    light.luz_vitrina:
       state: 'on'
       brightness: 76
     select.led_salon_tv_preset:

@@ -231,22 +231,6 @@
           {% else %} mdi:alarm-light-off
           {% endif %}
 
-      alarma_estado_sensores:
-        value_template: >-
-          {%  if is_state('binary_sensor.alarma_sensores_perimetro_principal','off')
-              and is_state('binary_sensor.alarma_sensores_perimetro_secundario','off')
-              and is_state('binary_sensor.alarma_sensores_presencia_interior','off')
-              and is_state('binary_sensor.alarma_sensores_presencia_exterior','off')
-          %}
-            true
-          {% else %}
-            flase
-          {% endif %}
-        icon_template: >-
-          {% if is_state('binary_sensor.alarma_estado_sensores','on') %} mdi:motion-sensor
-          {% else %} mdi:motion-sensor-off
-          {% endif %}
-
       alarma_check_listo_para_armar:
         value_template: >-
           {%  if is_state('binary_sensor.alarma_sensores_perimetro_principal','off')
