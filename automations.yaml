@@ -974,30 +974,29 @@
   # APAGA LAS LUCES DEL JARDIN SI NO ES VERANO
   trigger:
     - platform: time
-      at: '00:00:00'
+      at: '23:30:00'
+      id: trigger_2330
+    - platform: time
+      at: '00:30:00'
+      id: trigger_0030
   condition:
-    condition: and
+    condition: or
     conditions:
-      # No es verano
       - condition: template
-        value_template: "{{ states('sensor.season') != 'summer' }}"
-      - condition: state
-        entity_id: light.luces_jardin
-        state: 'on'
+        value_template: "{{ now().hour == 23 and states('sensor.season') != 'summer' and states('light.luces_exterior') == 'on' }}"
+      - condition: template
+        value_template: "{{ now().hour == 00 and states('sensor.season') == 'summer' and states('light.luces_exterior') == 'on' }}"
   action:
     # Apagado Luces Exterior Casa + Luces Jardín
     - service: light.turn_off
-      entity_id: 
-        - light.luces_jardin
-        - light.luz_exterior
-
+      entity_id: light.luces_exterior
     # Notifica a Familia
     - service: script.notifica_evento
       data:
-        voz: 'Es casi medianoche. Apago luces del jardín'
+        voz: 'Es  medianoche. Apagando luces Exterior y Jardín'
         titulo: '*ALUMBRADO*'
         mensaje: >
-          >>> EVENTO: Casi Medianoche
+          >>> EVENTO: Es Medianoche
 
           >>> LUCES: Apagado Alumbrado Exterior + Jardín
 
@@ -1094,7 +1093,7 @@
   action:
     # Apagado Luces Toda la Casa
     - service: light.turn_off
-      entity_id: light.luz_toda_la_casa
+      entity_id: light.luces_toda_la_casa
 
 - id: L07
   alias: 'L07 Luces On Entrada Según Sensor'
@@ -3596,10 +3595,15 @@
 - id: ZHA_L9
   alias: AQARA Cube Estudio
   mode: queued
+  # DEVICE_FLIPED ==> Realiza un ciclo cada vez que se pulsa en el boton left-right
+  # entity_id: scene.estudio_setup_soft, scene.estudio_setup_high, scene.estudio_azul, scene.estudio_ocre
+  #
   # type: device_shaken, subtype: turn_on   => ALARM DISARM
-  # type: device_rotated,subtype: left      =>
-  # type: device_rotated,subtype: right     => 
+  # type: device_rotated,subtype: left      => Escena Estudio Setup Soft
+  # type: device_rotated,subtype: right     => Escena Estudio Setup High
   # type: device_knocked,subtype: face_any  => Escena Estudio Lava Palaustre
+  # type: device_flipped,subtype: face_any  => Ciclo Derecha Loop Escenas
+  # type: device_slid,subtype: face_any     => 
   trigger:
     - device_id: d37e91591c751fdbc46064847d200cbc
       domain: zha
@@ -3613,6 +3617,24 @@
       type: device_knocked
       subtype: face_any
       id: knocked
+    - device_id: d37e91591c751fdbc46064847d200cbc
+      domain: zha
+      platform: device
+      type: device_rotated
+      subtype: left
+      id: rotated_left
+    - device_id: d37e91591c751fdbc46064847d200cbc
+      domain: zha
+      platform: device
+      type: device_rotated
+      subtype: right
+      id: rotated_right
+    - device_id: d37e91591c751fdbc46064847d200cbc
+      domain: zha
+      platform: device
+      type: device_flipped
+      subtype: face_any
+      id: flipped
   condition: []
   action:
     - choose:
@@ -3629,6 +3651,54 @@
             - service: input_text.set_value
               data:
                 value: "ALARMA HOMY {{ states('alarm_control_panel.ha')| upper }}"
+              target:
+                entity_id: input_text.helper_ikea_dimmer_switch_estudio
+        # ELIF trigger.id = rotated_left => Escena Estudio Setup SOFT
+        - conditions:
+          - condition: trigger
+            id: rotated_left
+          sequence:
+            - service: scene.turn_on
+              target:
+                entity_id: scene.estudio_setup_soft
+              data:
+                transition: 5
+            - service: input_text.set_value
+              data:
+                value: "scene.estudio_setup_soft ON"
+              target:
+                entity_id: input_text.helper_ikea_dimmer_switch_estudio
+        # ELIF trigger.id = rotated_left => Escena Estudio Setup HIGH
+        - conditions:
+          - condition: trigger
+            id: rotated_right
+          sequence:
+            - service: scene.turn_on
+              target:
+                entity_id: scene.estudio_setup_high
+              data:
+                transition: 5
+            - service: input_text.set_value
+              data:
+                value: "scene.estudio_setup_high ON"
+              target:
+                entity_id: input_text.helper_ikea_dimmer_switch_estudio
+        # ELIF trigger.id = flipped
+        - conditions:
+          - condition: trigger
+            id: flipped
+          sequence:
+            - service: input_select.select_next
+              data:
+                cycle: true
+              target:
+                entity_id: input_select.helper_scene_estudio
+            - service: scene.turn_on
+              target:
+                entity_id: "{{ states('input_select.helper_scene_estudio')}}"
+            - service: input_text.set_value
+              data:
+                value: "{{ states('input_select.helper_scene_estudio') | lower }} ON"
               target:
                 entity_id: input_text.helper_ikea_dimmer_switch_estudio
         # ELIF knocked => Escena Lava Palaustre.
@@ -3734,13 +3804,3 @@
                 brightness_step_pct: -25
               target:
                 entity_id: light.luz_mesilla_paf
-
-
-
-  
-
- 
-    
-    
-    
-    

@@ -74,15 +74,31 @@ binary_sensor:
             call.perform();
           }
 
+output:
+  - platform: gpio
+    pin: GPIO27
+    id: relay1
+  - platform: gpio
+    pin: GPIO14
+    id: relay2
+
 switch:
-- platform: gpio
-  pin: GPIO27
-  interlock: &interlock [open_cover, close_cover]
-  id: open_cover
-- platform: gpio
-  pin: GPIO14
-  interlock: *interlock
-  id: close_cover
+  - platform: gpio
+    pin: GPIO27
+    interlock: &interlock [open_cover, close_cover]
+    id: open_cover
+  - platform: gpio
+    pin: GPIO14
+    interlock: *interlock
+    id: close_cover
+  - platform: output
+    name: "esphome dual sw1 - relay up"
+    output: relay1
+    id: sw1
+  - platform: output
+    name: "esphome dual sw1 - relay down"
+    output: relay2
+    id: sw2
 
 cover:
 - platform: time_based
