@@ -90,143 +90,79 @@ setup_telegram_grp:
   entities:
     - input_select.home_notify
 
-setup_luces_jardin_grp:
-  name: Luces Jardín Setup
-  entities:
-    - binary_sensor.esphome_4ch_status
-    - input_boolean.jardin_programador_xia_ext
-    - input_boolean.jardin_programador_bas_sw2
-    - input_boolean.jardin_programador_bas_sw4
-    - input_boolean.jardin_programador_4ch_ch1
-    - input_boolean.jardin_programador_4ch_ch2
-    - input_boolean.jardin_programador_4ch_ch3
-    - input_boolean.jardin_programador_4ch_ch4
 
-setup_reglas_luces_grp:
-  name: Reglas Luces
+helper_family_home_tracking_group:
+  name: Helper Family Home Tracking
   entities:
-    - automation.l01_luces_on_exterior_sunset
-    - automation.l02_luces_off_exterior_sunset_4h
-    - automation.l03_luces_off_exterior_all_family_home
-    - automation.l04_luces_on_salon_puesta_sol_30m
-    - automation.l05_luces_on_exterior_segun_sensor
-    - automation.l06_luces_off_before_sunrise
-    - automation.l07_luces_on_entrada_segun_sensor
+    - input_boolean.family_home_aac
+    - input_boolean.family_home_mfc
+    - input_boolean.family_home_aaf
+    - input_boolean.family_home_paf
 
-setup_sirenas_grp:
-  name: Sirenas
+helper_programadores_jardin_group:
+  name: Helper Programador Luces Jardin
   entities:
-    - input_boolean.alarm_mute_sonido_sirenas
-    - input_select.xiaomi_sound_alarm_armed
-    - input_number.xiaomi_volume_alarm_armed
-    - input_select.xiaomi_sound_alarm_disarmed
-    - input_number.xiaomi_volume_alarm_disarmed
-    - input_select.xiaomi_sound_alarm
-    - input_number.xiaomi_volume_alarm
-    - input_boolean.alarm_test_sirenas
-    #- switch.esphome_bas_sw0
+    - input_boolean.programador_luz_faroles_exterior
+    - input_boolean.programador_luz_porche_jardin
+    - input_boolean.programador_luz_balizas_cesped
+    - input_boolean.programador_luz_olivo_grande
+    - input_boolean.programador_luz_olivo_nubes
+    - input_boolean.programador_luz_entrada_bonsais
 
-all_automations_grp:
-  name: Grupo automatizaciones
+helper_automations_estudio_group:
+  name: Helper Automatizaciones Estudio
   entities:
-    - automation.a0_alarma_disarmed_to_pending
-    - automation.a10_alarm_boton_panico_off
-    - automation.a12_alarm_sirena_interior_off
-    - automation.a1_alarma_armed_to_pending
-    - automation.a2_alarma_armado_away_ok
-    - automation.a3_alarma_armado_home_ok
-    - automation.a4_alarma_disarmed
-    - automation.a5_alarm_trigger_armed_away
-    - automation.a6_alarm_trigger_armed_home
-    - automation.a7_alarm_triggered
-    - automation.a8_alarm_triggered
-    - automation.a9_alarm_home_auto_disarm
-    - automation.blink_camera_update
-    - automation.f01_family_away_armado_total
-    - automation.f02_armado_parcial_midnight
-    - automation.f03_family_home_armado_home
-    - automation.f04_family_home_telegram
-    - automation.f05_family_home_how_many_sleep
-    - automation.f06_family_mfc_check_sleep
-    - automation.f07_family_aaf_check_sleep
-    - automation.f08_family_paf_check_sleep
-    - automation.f09_family_aac_check_sleep
-    - automation.f09_family_any_change_actualiza_contador
-    - automation.ha_daily_automations
-    - automation.hass_clock_notify
-    - automation.hass_daily_full_backup
-    - automation.hass_notify_snapshot_failure
-    - automation.hass_startup_scripts
-    - automation.ios_action_alarma_away
-    - automation.ios_action_alarma_off
-    - automation.ios_action_luces_salon
-    - automation.ios_action_luz_estudio
-    - automation.l01_luces_on_exterior_sunset
-    - automation.l02_luces_off_exterior_sunset
-    - automation.l04_luces_on_salon_sunset
-    - automation.l05_luces_on_exterior_segun_sensor
-    - automation.l06_luces_off_before_sunrise
-    - automation.l07_luces_on_entrada_segun_sensor
-    - automation.l08_luces_on_dormitorio_segun_sensor
-    - automation.l09_luces_on_dormitorio_warning
     - automation.l10_luces_on_estudio_segun_sensor
     - automation.l11_luces_estudio_off
-    - automation.l12_cube_tap_twice_light_toggle
-    - automation.l13_cube_flip90_light_estudio_on
-    - automation.l13_cube_flip90_light_on
-    - automation.l14_cube_rotate_light_desk_toggle
-    - automation.l14_cube_shake_light_off
-    - automation.l14_cube_shake_light_off_2
-    - automation.l15_cube_move_light_desk_toggle
-    - automation.m1_toogle_luz_rack_macbook_webcam
-    - automation.nfc_home_blue_tag_alarma_away
-    - automation.p01_ping_router_fibra
-    - automation.p02_ping_ap_wifi_tplink
-    - automation.p03_sony_ps4_on
-    - automation.p04_sony_ps4_off
-    - automation.s01_sonoff_4ch_boton1_on
-    - automation.s02_sonoff_4ch_boton2_on
-    - automation.s03_sonoff_4ch_boton3_on
-    - automation.s04_sonoff_4ch_status
-    - automation.s05_sonoff_pow_status
-    - automation.s06_timer_piscina_start
-    - automation.s07_timer_piscina_end
-    - automation.s08_set_hora_final_planificado
-    - automation.s09_sonoff_s20_sw1_toggle
-    - automation.s09b_sonoff_s20_sw3_toggle
-    - automation.s10_switch_dormitorio_mfc_on
-    - automation.s10b_switch_dormitorio_paf_on
-    - automation.s10c_switch_dormitorio_aaf_on
-    - automation.s11_switch_dormitorio_paf_on
-    - automation.s12_switch_dormitorios_off
-    - automation.s13_sonoff_sw2_porche_piscina
-    - automation.s14_sonoff_sw4_porche_piscina
-    - automation.s15_ups_apc700_status
-    - automation.s16_sonoff_pow_lavadora_boton_switch_on
-    - automation.s17_sonoff_pow_lavadora_led
-    - automation.s17c_sonoff_pow_lavadora_warning_off
-    - automation.s19_timer_riego_bonsais_ch1_start
-    - automation.s19_timer_riego_bonsais_ch1_timer2_start
-    - automation.s20_timer_riego_bonsais_ch1_end
-    - automation.s21_timer_riego_bonsais_ch2_start
-    - automation.s22_timer_riego_bonsais_ch2_end
-    - automation.s23_timer_fuente_ch3_start
-    - automation.s24_timer_fuente_ch3_end
-    - automation.s25_timer_fuente_frog_sw2_start
-    - automation.s26_timer_fuente_frog_sw2_start
-    - automation.s27_timer_fuente_frog_sw2_end
-    - automation.s28_control_jardin_before_sunrise
-    - automation.t01_family_away_armado_total
-    - automation.t02_armado_parcial_midnight
-    - automation.t03_family_home_armado_home
-    - automation.t04_family_home_telegram
-    - automation.t05_family_home_how_many_sleep
-    - automation.t06_family_mfc_check_sleep
-    - automation.t07_family_aaf_check_sleep
-    - automation.t08_family_paf_check_sleep
-    - automation.t09_family_aac_check_sleep
-    - automation.tag_nfc_blue_house_tag_is_scanned
-    - automation.update_device_meta_tracker
-    - automation.x0_test_on
-    - automation.x1_alarma_agua_arqueta
+    - automation.e01_escena_estudio_sunrise_al_amanecer
+    - automation.e02_escena_estudio_sunset
+    - automation.e03_escena_estudio_sleep
+    - automation.p01_test_conectividad_ping_router
+    - automation.p02_test_conectividad_ping_wifi_tplink
+    - automation.p03_test_conectividad_ping_sonoff_4ch_status
+    - automation.zha_estudio_aqara_cube
+    - automation.zha_estudio_ikea_tradfri
+    - automation.zha_estudioikea_styrbar_dimmer
+
+helper_automations_cocina_group:
+  name: Helper Automatizaciones Cocina
+  entities:
     - automation.x1_alarma_humo_cocina
+    - automation.s16_sonoff_pow_lavadora_boton_switch_on
+    - automation.s17b_sonoff_pow_lavadora_led
+    - automation.s16c_sonoff_pow_lavadora_warning
+    - automation.s16d_lavadora_hora_inicio
+    - automation.zha_cocina_ikea_rodret_dimmer
+
+helper_automations_entrada_group:
+  name: Helper Automatizaciones Entrada
+  entities:
+    - automation.l07_luces_on_entrada_segun_sensor
+
+
+helper_automations_salon_group:
+  name: Helper Automatizaciones Salon
+  entities:
+    - automation.l04_luces_on_salon_sunset
+    - automation.zha_salon_ikea_styrbar_dimmer
+
+helper_automations_jardin_group:
+  name: Helper Automatizaciones Jardin
+  entities:
+    - automation.blink_camera_update
+    - automation.l01_luces_on_exterior_sunset
+    - automation.l02_luces_off_exterior_sunset
+    - automation.l05_luces_on_exterior_segun_sensor
+    - automation.s18_control_interruptor_general_riego
+    - automation.s18b_control_bomba_riego
+    - automation.zha_exterior_philips_hue_smart_button
+    - automation.zha_porcha_jardin_ikea_styrbar_dimmer
+
+helper_automations_all_group:
+  name: Helper Automatizaciones Home
+  entities:
+    - group.helper_automations_estudio_group
+    - group.helper_automations_cocina_group
+    - group.helper_automations_entrada_group
+    - group.helper_automations_salon_group
+    - group.helper_automations_jardin_group

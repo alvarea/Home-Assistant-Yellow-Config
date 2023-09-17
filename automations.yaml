@@ -577,7 +577,7 @@
 #                                                                             #
 #-----------------------------------------------------------------------------#
 
-- id: F01
+- id: f01_family_away_armado_total
   alias: 'F01 Family Away Armado Total'
   trigger:
     # Ya no hay nadie en casa
@@ -594,8 +594,8 @@
     - service: script.home_switch_off
 
 
-- id: F02
-  alias: 'F03 Family Home Armado Home'
+- id: f02_family_home_armado_home
+  alias: 'F02 Family Home Armado Home'
   trigger:
     - platform: template
       value_template: >-
@@ -2751,7 +2751,7 @@
 #-----------------------------------------------------------------------------#
 
 - id: ZHA_L1
-  alias: Philips Hue Smart Button - Luces Exterior
+  alias: ZHA Exterior Philips Hue Smart Button
   mode: queued
   # Realiza un ciclo cada vez que se pulsa en el boton up/down
   # scene.dormitorio_full, scene.dormitorio_lectura, scene.dormitorio_relax, scene.dormitorio_noche
@@ -2837,7 +2837,7 @@
         #  sequence:
 
 - id: ZHA_L2
-  alias: Philips HUE Dimmer Switch - Luces Dormitorio
+  alias: ZHA Dormitorio MFC Philips HUE Dimmer
   mode: queued
   # Realiza un ciclo cada vez que se pulsa en el boton up/down
   # scene.dormitorio_full, scene.dormitorio_lectura, scene.dormitorio_relax, scene.dormitorio_noche
@@ -2986,7 +2986,7 @@
                 entity_id: input_text.helper_hue_dimmer_switch_dormitorio
 
 - id: ZHA_L3
-  alias: IKEA Rodret Dimmer Switch - Lavadora
+  alias: ZHA Cocina IKEA Rodret Dimmer
   mode: queued
   trigger:
     # trigger.id = 0 => on_press - turn_on
@@ -3029,7 +3029,7 @@
                 entity_id: automation.s16c_sonoff_pow_lavadora_warning
 
 - id: ZHA_L4
-  alias: IKEA Styrbar Dimmer Remote Control - Luces Salón
+  alias: ZHA Salon IKEA Styrbar Dimmer
   mode: queued
   # Realiza un ciclo cada vez que se pulsa en el boton left-right
   # scene.dormitorio_full, scene.dormitorio_lectura, scene.dormitorio_relax, scene.dormitorio_noche
@@ -3142,7 +3142,7 @@
                 entity_id: input_text.helper_ikea_dimmer_switch_salon
 
 - id: ZHA_L5
-  alias: IKEA Tradfri Switch - Luces Porche Jardín
+  alias: ZHA Porche Jardin IKEA Tradfri
   mode: restart
   # Realiza un ciclo cada vez que se pulsa en el boton left-right
   # scene.dormitorio_full, scene.dormitorio_lectura, scene.dormitorio_relax, scene.dormitorio_noche
@@ -3236,7 +3236,7 @@
                 entity_id: input_text.helper_ikea_tradfri_switch_salon
 
 - id: ZHA_L6
-  alias: IKEA Styrbar Dimmer Remote Control - Luces Estudio
+  alias: ZHA Estudio IKEA Styrbar Dimmer
   mode: queued
   # Realiza un ciclo cada vez que se pulsa en el boton left-right
   # entity_id: scene.estudio_setup_soft, scene.estudio_setup_high, scene.estudio_azul, scene.estudio_ocre
@@ -3418,7 +3418,7 @@
         # Para el uso de las persianas no supone un problema ya que solo necesito un evento Long-Release para parar el motor.
 
 - id: ZHA_L7
-  alias: IKEA Tradfri Switch - Estudio
+  alias: ZHA Estudio IKEA Tradfri
   mode: queued
   # Short_press ON  ==> Toggle Ventilador toogle
   # Short_press OFF ==> Toggle Luz Estudio Setup Soft / Off
@@ -3525,7 +3525,7 @@
                 entity_id: input_text.helper_ikea_dimmer_switch_estudio
 
 - id: ZHA_L8
-  alias: IKEA Tradfri Switch - Dormitorio AAF
+  alias: ZHA IKEA Dormitorio AAF IKEA Tradfri
   mode: restart
   #
   # Event Type: remote_button_short_press, remote_button_double_press
@@ -3593,7 +3593,7 @@
                 entity_id: fan.aire_acondicionado_agu
 
 - id: ZHA_L9
-  alias: AQARA Cube Estudio
+  alias: ZHA Estudio Aqara Cube
   mode: queued
   # DEVICE_FLIPED ==> Realiza un ciclo cada vez que se pulsa en el boton left-right
   # entity_id: scene.estudio_setup_soft, scene.estudio_setup_high, scene.estudio_azul, scene.estudio_ocre
@@ -3734,7 +3734,7 @@
                 voz: "Vale, Activo Lavando Palaustre. Que descanses."
 
 - id: ZHA_L10
-  alias: IKEA Tradfri Switch - Dormitorio PAF
+  alias: ZHA Dormitorio PAF IKEA Tradfri
   mode: restart
   #
   # Event Type: remote_button_short_press, remote_button_double_press
