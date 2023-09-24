@@ -500,85 +500,8 @@
     # ALEXA SIRENAS ALARMA DISPARADA
     - service: script.alexa_secuencia_alarma_disparada
 
-# REGLA: TRIGGER DESARMADO AUTOMATICO AL AMANECER
-#
-- id: A9
-  alias: 'A9 Alarm Home Auto Disarm'
-  trigger:
-    - platform: sun
-      event: sunrise
-      offset: "-00:15:00"
-  condition:
-    condition: and
-    conditions:
-      - condition: state
-        entity_id: alarm_control_panel.ha
-        state: armed_home
-      # Hay alguien en casa
-      - condition: state
-        entity_id: binary_sensor.family_any_home
-        state: 'on'
-  action:
-    # ALMACENA EL SENSOR DEL TRIGGER
-    - service: input_text.set_value
-      entity_id: input_text.alarm_trigger
-      data_template:
-        value: "A9 Armed_Home Auto Disarm Sunrise"
-    # Desarmado de Alarmas
-    - service: alarm_control_panel.alarm_disarm
-      data:
-        entity_id: alarm_control_panel.ha
-        code: !secret alarm_control_code
-    # Check sensores perimetro
-    - service: script.check_sensores_magneticos_perimetro
-    # Aviso sonoro con Xiaomi GW
-    - service: script.sirena_stop_alarma
-    # Notifica Evento
-    - service: script.notifica_evento
-      data:
-        titulo: '*ALARMA HOMY*'
-        mensaje: >
-          >>> ESTADO: Desarmado automático al amanecer.
-
-#
-# REGLA: APAGADO BOTON PANICO
-#
-- id: A10
-  alias: 'A10 Alarm Boton Panico Off'
-  trigger:
-    platform: state
-    entity_id: input_boolean.alarm_panic_button
-    from: 'on'
-    to: 'off'
-  action:
-    # Llamada a script desactivado botón pánico.
-    - service: script.alarma_boton_panico_off
-
-- id: A11
-  alias: 'A11 Check Status Sensores Perimetro Led Tag Reader'
-  trigger:
-    platform: state
-    entity_id: binary_sensor.alarma_check_listo_para_armar
-  action:
-    - service: light.turn_on
-      entity_id: light.tagreader_led
-      data_template:
-        brightness: 128
-        color_name: >
-          {% if states.binary_sensor.alarma_check_listo_para_armar.state == 'on' %}
-            green
-          {% else %}
-            red
-          {%endif%}
-
-#-----------------------------------------------------------------------------#
-#                                                                             #
-# FAMILY TRACKING AT HOME: Control Home/Away                                  #
-#                                                                             #
-#-----------------------------------------------------------------------------#
-
-- id: f01_family_away_armado_total
-  alias: 'F01 Family Away Armado Total'
+- id: A8_alarm_armed_away_family_away
+  alias: 'A8 Alarm Armed Away Family Away'
   trigger:
     # Ya no hay nadie en casa
     platform: state
@@ -594,9 +517,14 @@
     - service: script.home_switch_off
 
 
-- id: f02_family_home_armado_home
-  alias: 'F02 Family Home Armado Home'
+- id: A9_alarm_armed_home_family_home
+  alias: 'A9 Alarm Armed Home Family Home'
   trigger:
+    # Trigger basado en scheduler helper que tendrá una programacion habitual de 23:30 a 07:00-08:30 segun verano/invierno
+    - platform: state
+      entity_id: schedule.helper_alarma_armado_home
+      to: 'on'
+    # Trigger basado en la hora para que de 1 a 6 reintente el autoarmado cada 15'
     - platform: template
       value_template: >-
         {{  now().hour >= 1
@@ -609,10 +537,6 @@
       - condition: state
         entity_id: alarm_control_panel.ha
         state: disarmed
-      - condition: time
-        after: '00:45:00'
-      - condition: time
-        before: '07:00:00'
       - condition: state
         entity_id: binary_sensor.family_any_home
         state: 'on'
@@ -632,7 +556,6 @@
         - delay: '00:00:05'
         - service: alarm_control_panel.alarm_arm_home
           entity_id: alarm_control_panel.ha
-    # ELIF trigger.id = 1 => SHORT_press - TURN_OFF
     default:
       - service: script.alexa_secuencia
         data_template:
@@ -640,6 +563,85 @@
           repeticion: 1
           voz: Atención. Alarma no lista para armado parcial. Revise puertas y ventanas.
           
+
+# REGLA: TRIGGER DESARMADO AUTOMATICO AL AMANECER
+#
+- id: A10_alarm_home_auto_disam
+  alias: 'A10 Alarm Home Auto Disarm'
+  trigger:
+    - platform: state
+      entity_id: schedule.helper_alarma_armado_home
+      to: 'off'
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: alarm_control_panel.ha
+        state: armed_home
+      # Hay alguien en casa
+      - condition: state
+        entity_id: binary_sensor.family_any_home
+        state: 'on'
+  action:
+    # ALMACENA EL SENSOR DEL TRIGGER
+    - service: input_text.set_value
+      entity_id: input_text.alarm_trigger
+      data_template:
+        value: "A10 Alarm Home Auto Disarm"
+    # Desarmado de Alarmas
+    - service: alarm_control_panel.alarm_disarm
+      data:
+        entity_id: alarm_control_panel.ha
+        code: !secret alarm_control_code
+    # Check sensores perimetro
+    - service: script.check_sensores_magneticos_perimetro
+    # Aviso sonoro con Xiaomi GW
+    - service: script.sirena_stop_alarma
+    # Notifica Evento
+    - service: script.notifica_evento
+      data:
+        titulo: '*ALARMA HOMY*'
+        mensaje: >
+          >>> ESTADO: Desarmado automático al amanecer.
+
+- id: A11_check_status_sensores_perimetros
+  alias: 'A11 Check Status Sensores Perimetro'
+  trigger:
+    platform: state
+    entity_id: binary_sensor.alarma_check_listo_para_armar
+  action:
+    - service: light.turn_on
+      entity_id: light.tagreader_led
+      data_template:
+        brightness: 128
+        color_name: >
+          {% if states.binary_sensor.alarma_check_listo_para_armar.state == 'on' %}
+            green
+          {% else %}
+            red
+          {%endif%}
+
+#
+# REGLA: APAGADO BOTON PANICO
+#
+- id: A12_alarm_boton_panico_off
+  alias: 'A12 Alarm Boton Panico Off'
+  trigger:
+    platform: state
+    entity_id: input_boolean.alarm_panic_button
+    from: 'on'
+    to: 'off'
+  action:
+    # Llamada a script desactivado botón pánico.
+    - service: script.alarma_boton_panico_off
+
+
+#-----------------------------------------------------------------------------#
+#                                                                             #
+# FAMILY TRACKING AT HOME: Control Home/Away                                  #
+#                                                                             #
+#-----------------------------------------------------------------------------#
+
 - id: F04
   alias: 'F04 Family Home'
   trigger:
@@ -979,13 +981,20 @@
     - platform: time
       at: '00:30:00'
       id: trigger_0030
+    - platform: time # TESTING
+      at: '12:08:00'
   condition:
     condition: or
     conditions:
+     # Temporada Verano Activada => 00:30 APAGA
       - condition: template
-        value_template: "{{ now().hour == 23 and states('sensor.season') != 'summer' and states('light.luces_exterior') == 'on' }}"
-      - condition: template
-        value_template: "{{ now().hour == 00 and states('sensor.season') == 'summer' and states('light.luces_exterior') == 'on' }}"
+        value_template: "{{ now().hour == 00 and states('input_boolean.helper_temporada_verano') == 'on' and states('light.luces_exterior') == 'on' }}"
+      # Temporada Verano Desactivada => 23:30 APAGA
+      - condition: template 
+        value_template: "{{ now().hour == 23 and states('input_boolean.helper_temporada_verano') == 'off' and states('light.luces_exterior') == 'on' }}"
+      # Temporada Verano Desactivada => TESTING
+      - condition: template 
+        value_template: "{{ now().hour == 12 and states('input_boolean.helper_temporada_verano') == 'off' and states('light.luces_exterior') == 'on' }}"
   action:
     # Apagado Luces Exterior Casa + Luces Jardín
     - service: light.turn_off
@@ -2585,8 +2594,8 @@
 #-----------------------------------------------------------------------------#
 
 # Comprueba si el Tag Reader tiene apagado el led verde y sonido cuando lee un tag, para activarlo siempre.
-- id: T00
-  alias: 'Tagreader Check Led'
+- id: t00_tagreader_turn_on_led
+  alias: 'Tagreader Turn On Led'
   trigger:
     - platform: state
       entity_id: switch.tagreader_9a0be4_buzzer_enabled
@@ -2601,8 +2610,8 @@
           - switch.tagreader_9a0be4_buzzer_enabled
           - switch.tagreader_9a0be4_led_enabled
 
-- id: T01
-  alias: 'NFC AAC Tag1 Alarma '
+- id: t01_nfc_tags_alarm_toogle
+  alias: 'NFC Tags Alarm Toogle'
   trigger:
     - platform: tag
       tag_id: 04-50-B6-01-25-3B-03 # AAC Blue Tag
@@ -2637,8 +2646,8 @@
             entity_id: alarm_control_panel.ha
             code: !secret alarm_control_code
 
-- id: T02
-  alias: 'NFC Tag Credit Card Botón Pánico'
+- id: t02_nfc_tags_credit_card_boton_panico
+  alias: 'NFC Tags Credit Card Botón Pánico'
   trigger:
     - platform: tag
       tag_id: 79-D5-0A-8F # Tag Credit Card
@@ -2648,8 +2657,8 @@
       entity_id: input_boolean.alarm_panic_button
     - service: script.alarma_boton_panico
 
-- id: T03
-  alias: 'NFC Home Big Blue Tag - Armado Away'
+- id: t03_nfc_tags_bigblue_alarm_armed_away'
+  alias: 'NFC Tags Big Blue  - Armado Away'
   trigger:
     - platform: tag
       tag_id: 2C-CA-F0-22
@@ -2658,23 +2667,6 @@
       data:
         entity_id: alarm_control_panel.ha
         code: !secret alarm_control_code
-
-- id: T04
-  alias: 'NFC Green Tag TEST'
-  mode: single
-  trigger:
-    - platform: tag
-      tag_id: 6e6b6c52-631e-42ea-b576-59d024e4a698 # Green Tag
-  action:
-    - service: fan.toggle
-      target:
-        entity_id: fan.estudio
-    - delay: "00:00:02"
-    - service: input_text.set_value
-      data:
-        value: "Ventilador Estudio {{ states('fan.estudio') | upper }}"
-      target:
-        entity_id: input_text.helper_ikea_dimmer_switch_estudio
 
 
 #-----------------------------------------------------------------------------#
