@@ -1514,8 +1514,8 @@
     - service: switch.turn_on
       entity_id: switch.esphome_pow_sw3
 
-- id: S06c
-  alias: 'S06c Timer Piscina Depuradora CH0 End'
+- id: S07
+  alias: 'S07 Timer Piscina Depuradora CH0 End'
   trigger:
     - platform: event
       event_type: timer.finished
@@ -1549,6 +1549,29 @@
   action:
     - service: switch.toggle
       entity_id: switch.esphome_s20_sw3
+
+- id: S09c
+  alias: 'S09c Sonoff S26 SW1 Toggle'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.esphome_s26_sw1_boton
+      from: 'off'
+      to: 'on'
+  action:
+    # Freidora Toggle
+    - service: switch.toggle
+      entity_id: switch.esphome_s26_sw1
+
+- id: S09d
+  alias: 'S09d Sonoff S26 SW2 Toggle'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.esphome_s26_sw2_boton
+      from: 'off'
+      to: 'on'
+  action:
+    - service: switch.toggle
+      entity_id: switch.esphome_s26_sw2
 
 - id: S10
   alias: 'S10 Switch Dormitorio MFC On'
@@ -1755,8 +1778,8 @@
 # Control del Interruptor General de Riego en base a Previsión Tiempo
 # SENSOR:  input_boolean.riego_interruptor_global
 #
-- id: S18
-  alias: 'S18 Control Interruptor General Riego'
+- id: S17
+  alias: 'S17 Control Interruptor General Riego'
   mode: restart
   trigger:
     - platform: time
@@ -1791,74 +1814,55 @@
 #
 # SENSOR:  input_boolean.riego_interruptor_global
 #
-# PLAN DE RIEGOS ESTACION OTOÑO /VERANO
-#
-#     CANAL   SECTOR    HORA    TRAMO1    HORA2     TRAMO2
-#     A       1         8:00    5         21:00     4
-#     B       2         10:50   4         23:00     4
-#     C       3         12:00   4         01:00     4
-#
-- id: S18b
-  alias: 'S18b Control Bomba Riego'
+- id: S18
+  alias: 'S18 Control Bomba Riego Encendido'
   mode: restart
   trigger:
-    - platform: homeassistant
-      event: start
-    - platform: time
-      at:
-        - '07:55:00'  # Enciende
-        - '12:30:00'  # Apaga
-        - '20:55:00'  # Enciente
-        - '01:30:00'  # Apaga
+    - platform: state
+      entity_id: 
+        - switch.esphome_4ch_sw3_relay_1
+        - switch.esphome_4ch_sw3_relay_2
+        - switch.esphome_4ch_sw3_relay_3
   action:
     # Apaga la bomba de riego por las noches y la enciende a primera hora en función del estado del interruptor global
     - choose:
-        # IF el interruptor general riego está encendido => a las 01:30 y a las 12:30, apaga la bomba de riego
+        # IF se enciende algún de los sectores de riego que tire de bomba, se enciende el cuadro de control: POW_SW4
         - conditions:
           - condition: template
-            value_template: "{{ now().hour == 12 or now().hour == 1 }}"
-          sequence:
-            - service: switch.turn_off
-              target:
-                entity_id: switch.esphome_pow_sw4
-        # ELIF
-        - conditions:
-          - condition: template
-            value_template: "{{ (now().hour == 7 or now().hour == 20) and is_state('input_boolean.riego_interruptor_global','on')}}"
+            value_template: "{{ trigger.to_state.state == 'on' and is_state('switch.esphome_pow_sw4','off') }}"
           sequence:
             - service: switch.turn_on
               target:
                 entity_id: switch.esphome_pow_sw4
+        # ELIF, en caso contrario, se apaga deja pasar 5' para que llene la hidroesfera y luego apaga
+        - conditions:
+          - condition: template
+            value_template: "{{ trigger.to_state.state == 'off'}}"
+          sequence:
+            - delay: "00:05:00"
+            - service: switch.turn_off
+              target:
+                entity_id: switch.esphome_pow_sw4
 
-# Regla Original Control Bomba Riego basado en el interruptor global
-#
-#- id: S18b
-#  alias: 'S18b Control Bomba Riego'
-#  mode: restart
-#  trigger:
-#    - platform: state
-#      entity_id: input_boolean.riego_interruptor_global
-#  action:
-#    # Apaga/Enciende el controlador de la bomba de riego en función del interruptor
-#    - choose:
-#        # IF el interruptor general riego se enciende => enciende controlador bomba
-#        - conditions:
-#          - condition: template
-#            value_template: "{{ is_state('input_boolean.riego_interruptor_global','on') and is_state('binary_sensor.riego_control_bomba_status','off') }}"
-#          sequence:
-#            - service: switch.turn_on
-#             target:
-#                entity_id: switch.esphome_pow_sw4
-#        # ELIF el interruptor general riego se apaga y el controlador bomba riego encendido => Apaga controlador bomba
-#        - conditions:
-#          - condition: template
-#            value_template: "{{ is_state('input_boolean.riego_interruptor_global','off') and is_state('binary_sensor.riego_control_bomba_status','on') }}"
-#          sequence:
-#            - service: switch.turn_off
-#              target:
-#                entity_id: switch.esphome_pow_sw4
-#
-#
+- id: S18b
+  alias: 'S18b Control Bomba Riego Apagado'
+  mode: restart
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.esphome_pow_sw4_current
+      below: 1
+  action:
+    # Apaga la bomba de riego por las noches y la enciende a primera hora en función del estado del interruptor global
+    - choose:
+        # IF se enciende algún de los sectores de riego que tire de bomba, se enciende el cuadro de control: POW_SW4
+        - conditions:
+          - condition: template
+            value_template: "{{ is_state('switch.esphome_pow_sw4','on') and is_state('switch.riego_bomba_pozo','off') }}"
+          sequence:
+            - service: switch.turn_off
+              target:
+                entity_id: switch.esphome_pow_sw4
+
 - id: S19
   alias: 'S19 Set Luvia Ayer'
   mode: restart
@@ -3472,9 +3476,9 @@
               entity_id: light.luz_estudio
               data:
                 transition: >
-                  {% if now().hour >= 0 and now().hour <= 7 %} 30
+                  {% if now().hour >= 0 and now().hour <= 7 %} 60
                   {% elif now().hour >= 8 and now().hour <= 18 %} 1
-                  {% else %} 30
+                  {% else %} 60
                   {% endif %}
               target:
                 entity_id: light.luz_estudio
@@ -3645,16 +3649,14 @@
                 value: "ALARMA HOMY {{ states('alarm_control_panel.ha')| upper }}"
               target:
                 entity_id: input_text.helper_ikea_dimmer_switch_estudio
-        # ELIF trigger.id = rotated_left => Escena Estudio Setup SOFT
+        # ELIF trigger.id = rotated_right => Escena Estudio Setup SOFT
         - conditions:
           - condition: trigger
-            id: rotated_left
+            id: rotated_right
           sequence:
             - service: scene.turn_on
               target:
                 entity_id: scene.estudio_setup_soft
-              data:
-                transition: 5
             - service: input_text.set_value
               data:
                 value: "scene.estudio_setup_soft ON"
@@ -3663,13 +3665,11 @@
         # ELIF trigger.id = rotated_left => Escena Estudio Setup HIGH
         - conditions:
           - condition: trigger
-            id: rotated_right
+            id: rotated_left
           sequence:
             - service: scene.turn_on
               target:
                 entity_id: scene.estudio_setup_high
-              data:
-                transition: 5
             - service: input_text.set_value
               data:
                 value: "scene.estudio_setup_high ON"

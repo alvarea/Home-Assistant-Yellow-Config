@@ -529,7 +529,7 @@
           {% else %}
             false
           {% endif %}
-        friendly_name: 'Control Depuradora Piscina'
+        friendly_name: 'Motor Depuradora Piscina'
         icon_template: mdi:pool
 
       esphome_pow_sw3_blue_led:
