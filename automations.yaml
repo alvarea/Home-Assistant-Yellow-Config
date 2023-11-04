@@ -280,7 +280,7 @@
       data:
         color_name: orange
         transition: 3
-        brightness: 128
+        brightness: 96
     # INICIALIZA EL SENSOR DEL TRIGGER
     - service: input_text.set_value
       entity_id: input_text.alarm_trigger
@@ -328,7 +328,7 @@
       data:
         color_name: blue
         transition: 3
-        brightness: 128
+        brightness: 96
 
     # ALMACENA EL SENSOR DEL TRIGGER
     - service: input_text.set_value
@@ -409,6 +409,7 @@
     # MUY IMPORTANTE: EN EL ARM AWAY SE CHEQUEA GRUPO SENSORES HOME + AWAY
     - platform: state
       entity_id:
+        - binary_sensor.aqara_puerta_entrada_principal           # Puerta de entrada
         - binary_sensor.alarma_sensores_perimetro_principal      # Grupo Sensores PERIMETRO PRINCIPAL
         - binary_sensor.alarma_sensores_perimetro_secundario     # Grupo Sensores PERIMETRO SECUNDARIO
         - binary_sensor.alarma_sensores_presencia_interior       # Grupo Sensores Presencia INTERIOR
@@ -450,8 +451,10 @@
   alias: 'A6 Alarm Trigger Armed Home'
   trigger:
     - platform: state
-      # Grupo Sensores PERIMETRO
-      entity_id: binary_sensor.alarma_sensores_perimetro_principal
+      # Grupo Sensores PERIMETRO PRINCIPAL
+      entity_id: 
+        - binary_sensor.aqara_puerta_entrada_principal           # Puerta de entrada
+        - binary_sensor.alarma_sensores_perimetro_principal      # Grupo Sensores PERIMETRO PRINCIPAL
       to: 'on'
     # Los sensores vibración solo saltan por trigger = platform device
     - platform: device
@@ -613,7 +616,7 @@
     - service: light.turn_on
       entity_id: light.tagreader_led
       data_template:
-        brightness: 128
+        brightness: 96
         color_name: >
           {% if states.binary_sensor.alarma_check_listo_para_armar.state == 'on' %}
             green
@@ -641,22 +644,6 @@
 # FAMILY TRACKING AT HOME: Control Home/Away                                  #
 #                                                                             #
 #-----------------------------------------------------------------------------#
-
-- id: F04
-  alias: 'F04 Family Home'
-  trigger:
-    # Hay alguien en casa
-    - platform: state
-      entity_id: binary_sensor.family_any_home
-      from: 'off'
-      to: 'on'
-  action:
-    # Script encendido Luz piloto si es de noche
-    - service: script.notifica_evento
-      data_template:
-        titulo: '*FAMILY HOME: SI*'
-        mensaje: >
-          >>> EVENTO: Primero en Entrar {{ states('sensor.family_last_tracking') }}
 
 - id: F05
   alias: 'F05 Family Home How Many Sleep'
@@ -957,64 +944,61 @@
       # offset: "-00:30:00"   # Horario Verano GMT+2
     - platform: sun
       event: sunset
-      offset: "+00:10:00"
+      offset: "+00:30:00"
   action:
     # Encendido Luces Exterior y Jardín
     - service: script.luces_exterior_on
-    # Notifica a Familia
-    - service: script.notifica_evento
-      data:
-        voz: 'Se ha puesto el sol. Enciendo luces del jardín'
-        titulo: '*ALUMBRADO*'
-        mensaje: >
-          >>> EVENTO: Puesta de Sol hace 10'
-
-          >>> LUCES: Alumbrado Exterior On
+    # Anuncio Alexa
+    - service: script.alexa_secuencia
+      data_template:
+        sonido: 'clock_01'
+        repeticion: 1
+        voz: >
+          {% if states('input_boolean.helper_temporada_verano') == 'on' %}
+            "Buenas noches, son las {{ now().hour }} y {{ now().minute }} y el sol se pone en breve. Enciendo luces Exterior"
+          {% elif states('input_boolean.helper_temporada_verano') == 'off' %}
+            "Buenas noches, son las {{ now().hour }} y {{ now().minute }} y el sol ya se ha puesto. Enciendo luces Exterior"
+          {% endif %}
 
 - id: L02
   alias: 'L02 Luces Off Exterior Medianoche'
   # APAGA LAS LUCES DEL JARDIN SI NO ES VERANO
   trigger:
-    - platform: time
-      at: '23:30:00'
-      id: trigger_2330
-    - platform: time
-      at: '00:30:00'
-      id: trigger_0030
-    - platform: time # TESTING
-      at: '12:08:00'
-  condition:
-    condition: or
-    conditions:
-     # Temporada Verano Activada => 00:30 APAGA
-      - condition: template
-        value_template: "{{ now().hour == 00 and states('input_boolean.helper_temporada_verano') == 'on' and states('light.luces_exterior') == 'on' }}"
-      # Temporada Verano Desactivada => 23:30 APAGA
-      - condition: template 
-        value_template: "{{ now().hour == 23 and states('input_boolean.helper_temporada_verano') == 'off' and states('light.luces_exterior') == 'on' }}"
-      # Temporada Verano Desactivada => TESTING
-      - condition: template 
-        value_template: "{{ now().hour == 12 and states('input_boolean.helper_temporada_verano') == 'off' and states('light.luces_exterior') == 'on' }}"
+    - platform: template
+      value_template: "{{ states('input_boolean.helper_temporada_verano') == 'on' and states('light.luces_exterior') == 'on' and 
+                          (states.input_datetime.helper_hora_apagado_jardin_verano.attributes.timestamp | int | timestamp_custom('%H:%M', False)) 
+                           == states('sensor.time')  
+                      }}"
+      id: trigger_verano
+    - platform: template
+      value_template: "{{ states('input_boolean.helper_temporada_verano') == 'off' and states('light.luces_exterior') == 'on' and 
+                          (states.input_datetime.helper_hora_apagado_jardin_invierno.attributes.timestamp | int | timestamp_custom('%H:%M', False)) 
+                           == states('sensor.time')  
+                      }}"
+      id: trigger_invierno
+  condition: []
   action:
     # Apagado Luces Exterior Casa + Luces Jardín
     - service: light.turn_off
       entity_id: light.luces_exterior
-    # Notifica a Familia
-    - service: script.notifica_evento
-      data:
-        voz: 'Es  medianoche. Apagando luces Exterior y Jardín'
-        titulo: '*ALUMBRADO*'
-        mensaje: >
-          >>> EVENTO: Es Medianoche
-
-          >>> LUCES: Apagado Alumbrado Exterior + Jardín
+    # Anuncio Alexa
+    - service: script.alexa_secuencia
+      data_template:
+        sonido: 'clock_01'
+        repeticion: 1
+        voz: >
+          {% if states('input_boolean.helper_temporada_verano') == 'on' %}
+            "Buenas noches, son las {{ now().hour }} y {{ now().minute }}. Es temporada verano, apago luces Exterior y Jardín"
+          {% elif states('input_boolean.helper_temporada_verano') == 'off' %}
+            "Buenas noches, son las {{ now().hour }} y {{ now().minute }}. Estamos en {{ states('sensor.season') }}, apago luces Exterior y Jardín"
+          {% endif %}
 
 - id: L04
   alias: 'L04 Luces On Salon Sunset'
   trigger:
     - platform: sun
       # offset: "-00:35:00"   # Horario Invierno GMT+1
-      # offset: "-00:25:00"   # Horario Verano GMT+2
+      # offset: "-00:15:00"   # Horario Verano GMT+2
       event: sunset
       offset: "-00:35:00"
   condition:
@@ -1032,15 +1016,7 @@
       target:
         entity_id: scene.salon_sunset
       data:
-        transition: 30
-    # Notifica a Familia
-    - service: script.notifica_evento
-      data:
-        titulo: '*ALUMBRADO*'
-        mensaje: >
-          >>> EVENTO: Puesta de Sol en breve
-
-          >>> LUCES: Alumbrado Luz Salón On
+        transition: 300
 #
 # La regla de alumbrado exterior según sensor se simplifica para que se encienda por la noche, siempre que esté oscuro.
 # La idea es que por programacion horaria y puesta de sol la regla de encendido en la puesta de sol encienda y mantenga
@@ -1149,6 +1125,7 @@
       entity_id:
         - light.luz_entrada
         - light.luz_gateway_aqara
+        - light.tagreader_led
 
 - id: L08
   alias: 'L08 Luces On Dormitorio Según Sensor'
@@ -1782,10 +1759,8 @@
   alias: 'S17 Control Interruptor General Riego'
   mode: restart
   trigger:
-    - platform: time
-      at:
-        - '07:00:00'
-        - '21:00:00'
+    - platform: time_pattern
+      hours: "/1"
   action:
     - choose:
         # IF Riego On AND HOY No Se Riega (Llueve) => Apaga Riego
