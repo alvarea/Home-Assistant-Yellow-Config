@@ -721,38 +721,6 @@
                          {% else %} "+00:30:00"
                          {% endif %}'
 
-      #sun_season:
-      #  friendly_name: 'Offset Puesta Sol Estación'
-      # value_template: "{{ sensor.season }}"
-      #   icon_template: >
-      #    '{% if is_state("sensor.season", "autumn") %}
-      #      mdi:leaf
-      #    {% elif is_state("sensor.season", "winter") %}
-      #      mdi:snowflake
-      #    {% elif is_state("sensor.season", "spring") %}
-      #      mdi:flower
-      #    {% elif is_state("sensor.season", "summer") %}
-      #      mdi:sunglasses
-      #    {% else %}
-      #      mdi:cloud
-      #    {% endif %}'
-
-      temp_interior:
-        friendly_name: 'Temperatura Interior Media'
-        icon_template: mdi:thermometer-lines
-        unit_of_measurement: 'ºC'
-        value_template: >
-          {{
-          ((
-           states('sensor.ly1_desk_setup_temperatura')|float(0) + 
-           states('sensor.temperature_158d00022b65ff')|float(0) + 
-           states('sensor.aqara_temperatura_cocina')|float(0) +
-           states('sensor.temperature_158d00022c6a47')|float(0) +
-           states('sensor.temperature_158d0002e97092')|float(0) +
-           states('sensor.temperature_158d00025efda4')|float(0) 
-          ) / 7)|round(1)
-          }}
-          
       # hvac_modes: off, heat, dry, cool, fan_only, heat_cool
       melcloud_estudio_state:
         friendly_name: 'AC/Estudio'

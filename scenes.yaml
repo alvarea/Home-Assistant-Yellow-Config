@@ -681,29 +681,25 @@
       state: 'off'
 
 #
-# ESCENA ESTUDIO WEBCAM
+# ESCENA ESTUDIO WEBCAM MODE ON
 #
-- id: estudio_setup_webcam
-  name: Estudio Setup Webcam
+- id: estudio_setup_webcam_on
+  name: Estudio Setup Webcam On
   icon: mdi:webcam
   entities:
+    # Persiana
+    #
+    #cover.persiana_estudio:
+    #  current_position: 30
+    #  assumed_state: true
+    #  friendly_name: Persiana Estudio
+    #  supported_features: 15
+    #  state: open
     switch.echo_alexa_estudio_do_not_disturb_switch:
       state: 'on'
-    light.luz_estudio_mesa:
-     state: 'off'
-    light.luz_estudio_izquierda:
-      brightness: 255
-      state: 'on'
-      color_temp_kelvin: 4000
-      color_temp: 250
-    light.luz_estudio_derecha:
-      brightness: 255
-      state: 'on'
-      color_temp_kelvin: 4000
-      color_temp: 250
     light.luz_estudio_nate:
       state: 'on'
-      brightness: 255
+      brightness: 169 # 70%
       color_temp_kelvin: 4000
       color_temp: 250
     light.luz_estudio_led_mesa:
@@ -729,7 +725,7 @@
         - 0
     light.luz_estudio_webcam:
       state: 'on'
-      brightness: 255
+      brightness: 169 # 70%
       color_temp_kelvin: 4000
       color_temp: 250
     light.luz_estudio_alta:
@@ -742,13 +738,16 @@
       brightness: 204
       color_temp_kelvin: 6535
       color_temp: 153
+    light.luz_estudio_mesa:
+     state: 'off'
+    light.luz_estudio_izquierda:
+      state: 'off'
+    light.luz_estudio_derecha:
+      state: 'off'
     light.luz_estudio_baja:
-      state: 'on'
-      brightness: 204
-      color_temp_kelvin: 6535
-      color_temp: 153
+      state: 'off'
     light.luz_estudio_neon:
-      state: 'on'
+      state: 'off'
     light.luz_estudio_play_tv:
       state: 'off'
     light.led_estudio_tv:

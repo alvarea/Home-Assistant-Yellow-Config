@@ -186,10 +186,6 @@ timer:
     name: Timer CH4
     icon: mdi:timer
 
-#counter:
-#  nespresso_start:
-#    initial: 0
-#    step: 1
 
 #history_graph:
 #  piscina_duracion:
@@ -250,11 +246,6 @@ timer:
 #    - mac: !secret xiaomi_mac
 #      key: !secret xiaomi_gateway
 
-# PING DEVICE TRACKER
-#device_tracker:
-#  - platform: ping
-#    hosts:
-#      nmap_dell_6c_55_bf_win_aac: 192.168.0.70
 
 # NOTIFICACIONES
 notify:
