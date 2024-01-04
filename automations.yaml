@@ -1,5 +1,5 @@
-#-----------------------------------------------------------------------------#
 #                                                                             #
+#-----------------------------------------------------------------------------#
 # HOMY - HOME ASSISTANT - ALVAREA 2020                                        #
 #                                                                             #
 #-----------------------------------------------------------------------------#
@@ -249,24 +249,41 @@
       from: 'armed_away'
       to: 'pending'
   action:
-    #- service: script.alarma_to_pending
-    #  data_template:
-    #    fromstate: '{{trigger.from_state.state}}'
-    #    tostate: '{{trigger.to_state.state}}'
-    #    ringtone_msg: 10004
-
-    # Script Notifica Evento Alarma Disparada
-    - service: script.notifica_evento
-      data_template:
-        titulo: '*ALARMA HOMY*'
-        mensaje: >
-          >>> ESTADO: ATENCION AVISO PREVIO SALTO ALARMA
-
-    # Script Envío Sonido Alexa Alexa
-    - service: script.alexa_secuencia_alarma_desarmado
-      data_template:
-        voz: "¡ATENCION!, Alarma Disparada. Tiene un minuto para desarmar. ¡ATENCION!, Desarme ahora, por favor."
-        sonido: "{{ states('input_select.alarma_sonido_desarmado') }}"
+    # Encendido Led Tag Reader ROJO
+    - service: light.turn_on
+      entity_id: light.luz_gateway_aqara
+      data:
+        color_name: red
+        brightness: 255
+    # Encendido Led Gateway ROJO
+    - service: light.turn_on
+      entity_id: light.tagreader_led
+      data:
+        color_name: red
+        brightness: 255
+    - choose:
+        # IF entity_id: alarm_control_panel.ha == state: 'triggered'
+        - conditions:
+          - condition: template
+            value_template: "{{ states('input_text.alarm_trigger') == 'Puerta Entrada Principal' }}"
+          sequence:         
+            # Script Envío Sonido Alexa Alexa
+            - service: script.alexa_secuencia_alarma_desarmado
+            # RETRASO de 10 segundos para que, si es falsa alarma al abrir puerta de entrada, de tiempo a desarmar con el tag NFC
+            - delay: 00:00:10
+            # Tras los 5 segundos de espera, comprueba si la alarma sigue en estado Triggered o alguien la ha desarmado.
+            # Si sigue en estado Triggered, se inicia la secuencia de alarma disparada.
+    - choose:
+        # IF entity_id: alarm_control_panel.ha == state: 'triggered'
+        - conditions:
+          - condition: template
+            value_template: "{{ states('alarm_control_panel.ha') == 'pending' }}"
+          sequence:         
+            # Script Envío Sonido Alexa Alexa
+            - service: script.alexa_secuencia_alarma_desarmado
+              data_template:
+                voz: "¡ATENCION!, Aviso previo a salto alarma. Tiene un minuto para desarmar. ¡ATENCION!, Desarme ahora, por favor."
+                sonido: "{{ states('input_select.alarma_sonido_desarmado') }}"
 
 # REGLA: ARMADO AWAY COMPLETADO
 #
@@ -378,12 +395,6 @@
     - service: alarm_control_panel.alarm_disarm
       entity_id: alarm_control_panel.blink_casa
 
-    # Resetea el sensor del TRIGGER
-    #- service: input_text.set_value
-    #  entity_id: input_text.alarm_trigger
-    #  data_template:
-    #    value: " "
-
     # Apaga Luz Piloto Alarma
     - service: light.turn_off
       entity_id: 
@@ -486,7 +497,6 @@
     - service: alarm_control_panel.alarm_trigger
       entity_id: alarm_control_panel.ha
 
-
 # REGLA: ALARMA ARMED_AWAY TRIGGERED ==> SIRENA + NOTIFICACION COMPLETA
 #
 - id: A7
@@ -496,15 +506,21 @@
       entity_id: alarm_control_panel.ha
       to: 'triggered'
   action:
-    # Script Notificación Alarma
-    - service: script.notifica_alarma
-      data_template:
-        titulo: '*ALARMA HOMY*'
-        mensaje: >
-          >>> ESTADO: ATENCION ALARMA DISPARADA
+    - choose:
+        # IF entity_id: alarm_control_panel.ha == state: 'triggered'
+        - conditions:
+          - condition: template
+            value_template: "{{ states('alarm_control_panel.ha') == 'triggered' }}"
+          sequence:         
+            # Script Notificación Alarma
+            - service: script.notifica_alarma
+              data_template:
+                titulo: '*ALARMA HOMY*'
+                mensaje: >
+                  >>> ESTADO: ATENCION ALARMA DISPARADA
 
-    # ALEXA SIRENAS ALARMA DISPARADA
-    - service: script.alexa_secuencia_alarma_disparada
+            # ALEXA SIRENAS ALARMA DISPARADA
+            - service: script.alexa_secuencia_alarma_disparada
 
 - id: A8_alarm_armed_away_family_away
   alias: 'A8 Alarm Armed Away Family Away'
@@ -1552,11 +1568,10 @@
   alias: 'S10 Switch Dormitorio MFC On'
   trigger:
     - platform: sun
-      # offset: "+02:30:00"   # Horario Invierno GMT+2  => 18:30 + 3:30 = 22:00
-      # offset: "+00:30:00"   # Horario Verano GMT+1  => 21:30 + 0:30 = 22:00
+      # offset: "+03:00:00"   # Horario Invierno GMT+2  => 18:30 + 3:00 = 21:30 => Calefacción
+      # offset: "+00:30:00"   # Horario Verano GMT+1  => 21:30 + 0:30 = 22:00 => Mosquitoes
       event: sunset
-      # MODO VERANO => MOSQUITOS
-      offset: "+00:30:00"
+      offset: "+03:00:00"
     #- platform: time # Solo Invierno Calefacción
     #  at: '06:45:00'
     #- platform: sun  # solo para calefacción
@@ -1569,9 +1584,8 @@
       - condition: state
         entity_id: input_boolean.calefac_programador_mfc
         state: 'on'
-      - condition: state
-        entity_id: input_boolean.family_sleep_home_mfc
-        state: 'on'
+      - condition: template
+        value_template: "{{ is_state('input_boolean.family_sleep_home_mfc','on') or is_state('input_boolean.family_sleep_home_aac','on') }}"
   action:
     - service: switch.turn_on
       entity_id: switch.esphome_s20_sw1
@@ -1624,13 +1638,14 @@
 - id: S12
   alias: 'S12 Switch Dormitorios Off'
   trigger:
-    #- platform: time # Solo Invierno Calefacción
-    #  at: 
-    #    - "00:00:00"
-    #    - "01:00:00"
-    #    - "02:00:00"
-    #    - "03:00:00"
-    #    - "04:00:00"
+    - platform: time # Solo Invierno Calefacción
+      at: 
+        - "00:30:00"
+        - "01:00:00"
+        - "02:00:00"
+        - "03:00:00"
+        - "04:00:00"
+        - "05:00:00"
     - platform: sun
       event: sunrise
   condition:
@@ -2609,14 +2624,12 @@
           # Check sensores perimetro
           - service: script.check_sensores_magneticos_perimetro
           # Armardo Away
-          - service: alarm_control_panel.alarm_arm_away
-            data:
-              entity_id: alarm_control_panel.ha
-              code: !secret alarm_control_code
+          #- service: alarm_control_panel.alarm_arm_away
+          #  data:
+          #    entity_id: alarm_control_panel.ha
+          #    code: !secret alarm_control_code
       #ELSE alarma armado home/away => Desarmado
       default:
-        # Check sensores perimetro
-        - service: script.check_sensores_magneticos_perimetro
         # Desarmado
         - service: alarm_control_panel.alarm_disarm
           data:

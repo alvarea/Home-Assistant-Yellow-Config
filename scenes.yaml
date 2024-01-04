@@ -1050,6 +1050,9 @@
     light.luz_lectura:
       state: 'on'
       brightness: 153
+    light.luz_salon_sofa:
+      state: 'on'
+      brightness: 204
     light.led_salon_tv:
       effect_list:
       - Android
@@ -1209,6 +1212,9 @@
     light.led_salon_tv:
       state: 'on'
       brightness: 204
+    light.luz_salon_sofa:
+      state: 'on'
+      brightness: 204
   icon: mdi:lamps
 
 - id: salon_home_cinema
@@ -1217,6 +1223,8 @@
     light.luz_lectura:
       state: 'off'
     light.luz_cilindro:
+      state: 'off'
+    light.luz_salon_sofa:
       state: 'off'
     light.luz_vitrina:
       state: 'on'
