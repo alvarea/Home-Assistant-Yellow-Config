@@ -965,16 +965,15 @@
   action:
     # Encendido Luces Exterior y Jardín
     - service: script.luces_exterior_on
-    # Anuncio Alexa
-    - service: script.alexa_anuncio
-      data_template:
-        alexa: 'entrada'
-        voz: >
-          {% if states('input_boolean.helper_temporada_verano') == 'on' %}
-            "Buenas noches, son las {{ now().hour }} y {{ now().minute }} y el sol se pone en breve. Enciendo luces Exterior"
-          {% elif states('input_boolean.helper_temporada_verano') == 'off' %}
-            "Buenas noches, son las {{ now().hour }} y {{ now().minute }} y el sol ya se ha puesto. Enciendo luces Exterior"
-          {% endif %}
+    # Notifica a Familia
+    - service: script.notifica_evento
+      data:
+        voz: 'Se ha puesto el sol. Enciendo luces del jardín'
+        titulo: '*ALUMBRADO*'
+        mensaje: >
+          >>> EVENTO: Puesta de Sol hace 10'
+
+          >>> LUCES: Alumbrado Exterior On
 
 - id: L02
   alias: 'L02 Luces Off Exterior Medianoche'
@@ -997,16 +996,15 @@
     # Apagado Luces Exterior Casa + Luces Jardín
     - service: light.turn_off
       entity_id: light.luces_exterior
-    # Anuncio Alexa
-    - service: script.alexa_anuncio
-      data_template:
-        alexa: 'entrada'
-        voz: >
-          {% if states('input_boolean.helper_temporada_verano') == 'on' %}
-            "Buenas noches, son las {{ now().hour }} y {{ now().minute }}. Es temporada verano, apago luces Exterior"
-          {% elif states('input_boolean.helper_temporada_verano') == 'off' %}
-            "Buenas noches, son las {{ now().hour }} y {{ now().minute }}. Apago luces Exterior"
-          {% endif %}
+    # Notifica a Familia
+    - service: script.notifica_evento
+      data:
+        voz: 'Es  medianoche. Apagando luces Exterior y Jardín'
+        titulo: '*ALUMBRADO*'
+        mensaje: >
+          >>> EVENTO: Es Medianoche
+
+          >>> LUCES: Apagado Alumbrado Exterior + Jardín
 
 - id: L04
   alias: 'L04 Luces On Salon Sunset'
