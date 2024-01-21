@@ -127,6 +127,9 @@
         after: sunrise
         before: sunset
         before_offset: "04:00:00"
+      - condition: state
+        entity_id: input_boolean.helper_blink_camera_trigger
+        state: 'on'
   action:
     # Actualizacion imagen cámaras última hora.
     - service: script.blink_trigger_cam_hall
@@ -142,6 +145,8 @@
     - service: script.blink_trigger_cam_estudio
     - delay: '00:00:10'
     - service: script.blink_trigger_cam_cocina
+    - delay: '00:00:10'
+    - service: script.blink_trigger_cam_salon
 
 #-----------------------------------------------------------------------------#
 #                                                                             #
@@ -1021,6 +1026,9 @@
       - condition: state
         entity_id: binary_sensor.family_any_home
         state: 'on'
+      - condition: state
+        entity_id: light.luces_salon
+        state: 'off'
       - condition: numeric_state
         entity_id: sensor.aqara_movimiento_salon_luminosidad
         below: 50
@@ -1152,7 +1160,7 @@
     conditions:
       - condition: sun
         after: sunset
-        after_offset: "+00:15:00"
+        after_offset: "+00:30:00"
       - condition: template
         value_template: "{{ (now().hour >= 17 and now().hour <= 22) }}"
       - condition: state
@@ -1304,6 +1312,44 @@
             - light.luz_estudio_armario
             - light.esphome_s26_sw1_led
 
+- id: L12
+  alias: 'L12 Luces On Cocina Según Sensor'
+  mode: restart
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.ikea_sensor_movimiento_cocina
+      to: 'on'
+  condition:
+    condition: and
+    conditions:
+      - condition: sun
+        after: sunset
+        after_offset: "+00:30:00"
+      - condition: template
+        value_template: "{{ (now().hour > 0 and now().hour <=7) or (now().hour > 18) }}"
+      - condition: state
+        entity_id: light.luz_cocina
+        state: 'off'
+  action:
+    - service: light.turn_on
+      data:
+        brightness_pct: >
+          {% if now().hour >= 0 and now().hour <= 7 %} 50
+          {% elif now().hour >= 8 and now().hour <= 17 %} 90
+          {% else %} 90
+          {% endif %}
+      target:
+        entity_id: light.luz_cocina
+    # Espera de 10'
+    - delay:
+        minutes: >
+          {% if now().hour >= 1 and now().hour <= 6 %} 3
+          {% else %} 10
+          {% endif %}
+    # Luces Off + Led
+    - service: light.turn_off
+      entity_id: 
+        - light.luz_cocina
 
 #-----------------------------------------------------------------------------#
 #                                                                             #

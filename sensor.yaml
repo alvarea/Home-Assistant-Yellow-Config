@@ -46,22 +46,22 @@
   #  command: python3 -c "import requests; print(requests.get('https://pypi.python.org/pypi/homeassistant/json').json()['info']['version'])"
   #  name: Versión HA (web)
 
-  - platform: systemmonitor
-    resources:
-      - type: load_15m
-      - type: processor_use
-      - type: memory_use_percent
-      - type: memory_use
-      - type: memory_free
-      - type: swap_use_percent
-      - type: last_boot
-      - type: disk_use_percent
-        arg: /
-      - type: disk_use
-        arg: /
-      - type: disk_free
-        arg: /
-      - type: processor_temperature
+  #- platform: systemmonitor
+  #  resources:
+  #    - type: load_15m
+  #    - type: processor_use
+  #    - type: memory_use_percent
+  #    - type: memory_use
+  #    - type: memory_free
+  #    - type: swap_use_percent
+  #    - type: last_boot
+  #    - type: disk_use_percent
+  #      arg: /
+  #    - type: disk_use
+  #      arg: /
+  #    - type: disk_free
+  #      arg: /
+  #    - type: processor_temperature
 
 #  - platform: darksky
 #    api_key: !secret weather_apikey
@@ -1002,4 +1002,3 @@
           {% else %} 
             {{ "{:}".format((states.input_datetime.lavadora_fin_lavado.attributes.timestamp -  states.input_datetime.lavadora_inicio_lavado.attributes.timestamp)/60)|int }}
           {% endif %}
-

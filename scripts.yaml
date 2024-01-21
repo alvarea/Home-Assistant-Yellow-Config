@@ -1437,92 +1437,109 @@ blink_trigger_cam_hall:
   alias: 'Blink Trigger Camera Hall'
   sequence:
     - service: blink.trigger_camera
-      data:
+      target:
         entity_id: camera.blink_hall
     - delay: 00:00:05
-    - service: blink.blink_update
+    #- service: blink.blink_update
     - service: camera.snapshot
-      data:
+      target:
         entity_id: camera.blink_hall
+      data:
         filename: /share/blink_hall.jpg
 
 blink_trigger_cam_puerta_principal:
   alias: 'Blink Trigger Camera Puerta'
   sequence:
     - service: blink.trigger_camera
-      data:
+      target:
         entity_id: camera.blink_puerta_principal
     - delay: 00:00:05
-    - service: blink.blink_update
     - service: camera.snapshot
-      data:
+      target:
         entity_id: camera.blink_puerta_principal
+      data:
         filename: /share/blink_puerta.jpg
 
 blink_trigger_cam_puerta_garaje:
   alias: 'Blink Trigger Camera Garaje'
   sequence:
     - service: blink.trigger_camera
-      data:
+      target:
         entity_id: camera.blink_puerta_garaje
     - delay: 00:00:05
-    - service: blink.blink_update
     - service: camera.snapshot
-      data:
+      target:
         entity_id: camera.blink_puerta_garaje
+      data:
         filename: /share/blink_garaje.jpg
 
 blink_trigger_cam_piscina:
   alias: 'Blink Trigger Camera Piscina'
   sequence:
     - service: blink.trigger_camera
-      data:
+      target:
         entity_id: camera.blink_piscina
     - delay: 00:00:05
-    - service: blink.blink_update
     - service: camera.snapshot
-      data:
+      target:
         entity_id: camera.blink_piscina
+      data:
         filename: /share/blink_piscina.jpg
 
 blink_trigger_cam_porche:
   alias: 'Blink Trigger Camera Porche'
   sequence:
     - service: blink.trigger_camera
-      data:
+      target:
         entity_id: camera.blink_porche
     - delay: 00:00:05
-    - service: blink.blink_update
     - service: camera.snapshot
-      data:
+      target:
         entity_id: camera.blink_porche
+      data:
         filename: /share/blink_porche.jpg
 
 blink_trigger_cam_estudio:
   alias: 'Blink Trigger Camera Estudio'
   sequence:
     - service: blink.trigger_camera
-      data:
+      target:
         entity_id: camera.blink_estudio
     - delay: 00:00:05
-    - service: blink.blink_update
     - service: camera.snapshot
-      data:
+      target:
         entity_id: camera.blink_estudio
+      data:
         filename: /share/blink_estudio.jpg
 
 blink_trigger_cam_cocina:
   alias: 'Blink Trigger Camera Cocina'
   sequence:
     - service: blink.trigger_camera
-      data:
+      target:
+        #device_id: c545650d1214ef801176d6f91c43b14e
         entity_id: camera.blink_cocina
+    - delay: 00:00:05
+    - service: camera.snapshot
+      target:
+        #device_id: c545650d1214ef801176d6f91c43b14e
+        entity_id: camera.blink_cocina
+      data:
+        filename: /share/blink_cocina.jpg
+
+blink_trigger_cam_salon:
+  alias: 'Blink Trigger Camera Salon'
+  sequence:
+    - service: blink.trigger_camera
+      target:
+        entity_id: camera.blink_salon
     - delay: 00:00:05
     - service: blink.blink_update
     - service: camera.snapshot
+      target:
+        entity_id: camera.blink_salon
       data:
-        entity_id: camera.blink_cocina
-        filename: /share/blink_cocina.jpg
+        filename: /share/blink_salon.jpg
 
 #-----------------------------------------------------------------------------#
 #                                                                             #

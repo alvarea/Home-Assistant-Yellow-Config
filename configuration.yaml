@@ -15,7 +15,7 @@ homeassistant:
   customize: !include customize.yaml
   allowlist_external_dirs:
     - '/share'
-  legacy_templates: true
+  # legacy_templates: true
   # Media content
   media_dirs:
     media: "/media"
