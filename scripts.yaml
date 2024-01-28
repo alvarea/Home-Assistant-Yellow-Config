@@ -1194,16 +1194,16 @@ riego_bonsais_ch1_timer_cancel:
   sequence:
     - service: timer.cancel
       entity_id: timer.riego_bonsais_ch1
-    - service: switch.turn_off
-      entity_id: switch.esphome_4ch_sw2_relay_1
+    - service: valve.close_valve
+      entity_id: valve.esphome_4ch_sw2_relay_1
 
 riego_bonsais_ch2_timer_cancel:
   alias: Timer Riego Bonsais CH2 Cancel
   sequence:
     - service: timer.cancel
       entity_id: timer.riego_bonsais_ch2
-    - service: switch.turn_off
-      entity_id: switch.esphome_4ch_sw2_relay_2
+    - service: valve.close_valve
+      entity_id: valve.esphome_4ch_sw2_relay_2
 
 riego_bonsais_ch3_timer_cancel:
   alias: Timer Riego Bonsais CH3 Cancel
@@ -1226,8 +1226,8 @@ riego_bonsais_ch0_timer_cancel:
   sequence:
     - service: timer.cancel
       entity_id: timer.riego_bonsais_ch0
-    - service: switch.turn_off
-      entity_id: switch.esphome_pow_sw1
+    - service: valve.close_valve
+      entity_id: valve.esphome_pow_sw1
 
 riego_tomates_ch0_timer_cancel:
   alias: Timer Tomatera Cancel
@@ -1283,14 +1283,16 @@ jardin_riego_off:
     # Apagado Riego Jardin y Fuentes
     - service: switch.turn_off
       entity_id:
-        - switch.esphome_4ch_sw2_relay_1
-        - switch.esphome_4ch_sw2_relay_2
         - switch.esphome_4ch_sw2_relay_3
         - switch.esphome_4ch_sw2_relay_3
         - switch.esphome_4ch_sw3_relay_1
         - switch.esphome_4ch_sw3_relay_2
         - switch.esphome_4ch_sw3_relay_3
         - switch.esphome_4ch_sw3_relay_4
+    - service: valve.close_valve
+      entity_id:
+        - valve.esphome_4ch_sw2_relay_1
+        - valve.esphome_4ch_sw2_relay_2
 
 #Apagado SW Sonoff Piscina Depuradora
 piscina_depuradora_off:
@@ -1412,8 +1414,6 @@ sonoff_initialize:
     - service: switch.turn_off
       entity_id:
         - switch.esphome_bas_sw0                  # SONOFF_BAS_SW0
-        - switch.esphome_4ch_sw2_relay_1          # SONOFF_4CH RIEGO BONSAIS
-        - switch.esphome_4ch_sw2_relay_2
         - switch.esphome_4ch_sw2_relay_3
         - switch.esphome_4ch_sw2_relay_4
         - switch.esphome_4ch_sw3_relay_1          # SONOFF_4CH RIEGO CESPED
@@ -1421,8 +1421,12 @@ sonoff_initialize:
         - switch.esphome_4ch_sw3_relay_3
         - switch.esphome_4ch_sw3_relay_4
         - switch.esphome_bas_sw2                  # SONOFF_BAS_SW2 HUERTO TOMATERAS
-        - switch.esphome_pow_sw1                  # SONOFF_POW_SW1 BONSAIS PRODUCCION
         - switch.esphome_pow_sw3                  # SONOFF_POW_SW3 DEPURADORA PISCINA
+    - service: valve.close_valve
+      entity_id:
+        - valve.esphome_4ch_sw2_relay_1           # SONOFF_4CH RIEGO BONSAIS
+        - valve.esphome_4ch_sw2_relay_2           # SONOFF_4CH RIEGO PLANTAS AROMATICAS
+        - valve.esphome_pow_sw1                   # SONOFF_POW_SW1 BONSAIS PRODUCCION
     - service: switch.turn_on
       entity_id:
         - switch.tagreader_9a0be4_buzzer_enabled  # Activa el zumbido al pasar un tag

@@ -907,7 +907,7 @@
       #
       riego_bonsais_ch1_status:
         value_template: >-
-          {% if is_state('switch.esphome_4ch_sw2_relay_1','on') %}
+          {% if is_state('valve.esphome_4ch_sw2_relay_1','on') %}
             true
           {% else %}
             false
@@ -971,7 +971,7 @@
       #
       riego_bonsais_ch2_status:
         value_template: >-
-          {% if is_state('switch.esphome_4ch_sw2_relay_2','on') %}
+          {% if is_state('valve.esphome_4ch_sw2_relay_2','on') %}
             true
           {% else %}
             false
@@ -1103,7 +1103,7 @@
       #
       riego_bonsais_ch0_status:
         value_template: >-
-          {% if is_state('switch.esphome_pow_sw1','on') %}
+          {% if is_state('valve.esphome_pow_sw1','on') %}
             true
           {% else %}
             false

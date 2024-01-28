@@ -3150,7 +3150,7 @@ views:
                 tap_action:
                   action: more-info
                 name: Aromáticas
-                entity: switch.esphome_4ch_sw2_relay_2
+                entity: valve.esphome_4ch_sw2_relay_2
                 icon_color: teal
                 secondary_info: last-changed
                 hold_action:
@@ -3290,7 +3290,7 @@ views:
                 tap_action:
                   action: more-info
                 name: Bonsais Top
-                entity: switch.esphome_4ch_sw2_relay_1
+                entity: valve.esphome_4ch_sw2_relay_1
                 icon_color: teal
                 secondary_info: last-changed
                 hold_action:

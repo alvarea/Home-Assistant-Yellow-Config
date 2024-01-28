@@ -1326,7 +1326,7 @@
         after: sunset
         after_offset: "+00:30:00"
       - condition: template
-        value_template: "{{ (now().hour > 0 and now().hour <=7) or (now().hour > 18) }}"
+        value_template: "{{ (now().hour >= 18 and now().hour <= 23) or (now().hour >= 0 and now().hour <=7) }}"
       - condition: state
         entity_id: light.luz_cocina
         state: 'off'
@@ -1335,7 +1335,7 @@
       data:
         brightness_pct: >
           {% if now().hour >= 0 and now().hour <= 7 %} 50
-          {% elif now().hour >= 8 and now().hour <= 17 %} 90
+          {% elif now().hour >= 18 and now().hour <= 23 %} 90
           {% else %} 90
           {% endif %}
       target:
@@ -1343,7 +1343,7 @@
     # Espera de 10'
     - delay:
         minutes: >
-          {% if now().hour >= 1 and now().hour <= 6 %} 3
+          {% if now().hour >= 1 and now().hour <= 7 %} 2
           {% else %} 10
           {% endif %}
     # Luces Off + Led
@@ -1415,8 +1415,8 @@
       from: 'off'
       to: 'on'
   action:
-    - service: switch.toggle
-      entity_id: switch.esphome_4ch_sw2_relay_1
+    - service: valve.toggle
+      entity_id: valve.esphome_4ch_sw2_relay_1
 
 - id: S02_4CH_SW2
   alias: 'S02 Sonoff 4CH SW2 Boton2 On'
@@ -1426,8 +1426,8 @@
       from: 'off'
       to: 'on'
   action:
-    - service: switch.toggle
-      entity_id: switch.esphome_4ch_sw2_relay_2
+    - service: valve.toggle
+      entity_id: valve.esphome_4ch_sw2_relay_2
 
 - id: S03_4CH_SW2
   alias: 'S03 Sonoff 4CH SW2 Boton3 On'
@@ -1941,8 +1941,8 @@
       data_template:
         entity_id: timer.riego_bonsais_ch1
         duration: '{{ states.sensor.riego_bonsais_ch1_duracion_planificada_t1.state|int * 60}}'
-    - service: switch.turn_on
-      entity_id: switch.esphome_4ch_sw2_relay_1
+    - service: valve.open_valve
+      entity_id: valve.esphome_4ch_sw2_relay_1
 
 - id: S19d
   alias: 'S19d Timer Riego CH1 Bonsais Top Tramo2'
@@ -1964,8 +1964,8 @@
       data_template:
         entity_id: timer.riego_bonsais_ch1
         duration: '{{ states.sensor.riego_bonsais_ch1_duracion_planificada_t2.state|int * 60}}'
-    - service: switch.turn_on
-      entity_id: switch.esphome_4ch_sw2_relay_1
+    - service: valve.open_valve
+      entity_id: valve.esphome_4ch_sw2_relay_1
 
 - id: S19e
   alias: 'S19e Timer Riego CH1 End'
@@ -2000,8 +2000,8 @@
       data_template:
         entity_id: timer.riego_bonsais_ch2
         duration: '{{ states.sensor.riego_bonsais_ch2_duracion_planificada_t1.state|int * 60}}'
-    - service: switch.turn_on
-      entity_id: switch.esphome_4ch_sw2_relay_2
+    - service: valve.open_valve
+      entity_id: valve.esphome_4ch_sw2_relay_2
 
 - id: S20b
   alias: 'S20b Timer Riego CH2 Plantas Aromaticas Tramo2'
@@ -2023,8 +2023,8 @@
       data_template:
         entity_id: timer.riego_bonsais_ch2
         duration: '{{ states.sensor.riego_bonsais_ch2_duracion_planificada_t2.state|int * 60}}'
-    - service: switch.turn_on
-      entity_id: switch.esphome_4ch_sw2_relay_2
+    - service: valve.open_valve
+      entity_id: valve.esphome_4ch_sw2_relay_2
 
 - id: S20c
   alias: 'S20c Timer Riego CH2 Plantas Aromaticas Tramo1'
@@ -2095,8 +2095,8 @@
       data_template:
         entity_id: timer.riego_bonsais_ch0
         duration: '{{ states.sensor.riego_bonsais_ch0_duracion_planificada_t1.state|int * 60 }}'
-    - service: switch.turn_on
-      entity_id: switch.esphome_pow_sw1
+    - service: valve.open_valve
+      entity_id: valve.esphome_pow_sw1
 
 - id: S26
   alias: 'S26 Timer Riego Bonsais Produccion Tramo2'
@@ -2118,8 +2118,8 @@
       data_template:
         entity_id: timer.riego_bonsais_ch0
         duration: '{{ states.sensor.riego_bonsais_ch0_duracion_planificada_t2.state|int * 60 }}'
-    - service: switch.turn_on
-      entity_id: switch.esphome_pow_sw1
+    - service: valve.open_valve
+      entity_id: valve.esphome_pow_sw1
 
 - id: S27
   alias: 'S27 Timer Riego Bonsais Produccion End'
@@ -2477,8 +2477,8 @@
   trigger:
     - platform: state
       entity_id:
-        - switch.esphome_4ch_sw2_relay_1
-        - switch.esphome_4ch_sw2_relay_2
+        - valve.esphome_4ch_sw2_relay_1
+        - valve.esphome_4ch_sw2_relay_2
         - switch.esphome_4ch_sw2_relay_3
         - switch.esphome_4ch_sw2_relay_4
         - switch.esphome_4ch_sw3_relay_1
@@ -2486,7 +2486,7 @@
         - switch.esphome_4ch_sw3_relay_3
         - switch.esphome_4ch_sw3_relay_4
       to: 'on'
-      for: '00:12:01'
+      for: '00:12:00'
   action:
     - service: script.jardin_riego_off
     # Notifica a Familia
@@ -2494,7 +2494,7 @@
       data:
         titulo: '*JARDIN: SOBRERIEGO DETECTADO*'
         mensaje: >
-          >>> EVENTO: Control Riego/Fuentes encendidas > 10'
+          >>> EVENTO: Control Riego encendidas > 10'
           >>> JARDIN: Apagado total del riego
 
 #- id: S42

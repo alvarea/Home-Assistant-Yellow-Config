@@ -219,7 +219,7 @@ type: entities
 entities:
   - entity: binary_sensor.riego_bonsais_ch1_status
     secondary_info: last-changed
-  - entity: switch.esphome_4ch_sw2_relay_1
+  - entity: valve.esphome_4ch_sw2_relay_1
     secondary_info: none
   - entity: timer.riego_bonsais_ch1
   - entity: sensor.riego_bonsais_ch1_duracion_planificada_total
