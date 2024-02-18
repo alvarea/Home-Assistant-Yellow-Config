@@ -1437,113 +1437,122 @@ sonoff_initialize:
 # SISTEMA DE CAMARAS BLINK                                                    #
 #                                                                             #
 #-----------------------------------------------------------------------------#
-blink_trigger_cam_hall:
-  alias: 'Blink Trigger Camera Hall'
+
+
+trigger_blink_all_cameras:
+  alias: 'Trigger Blink All Canera'
+  sequence:
+    - service: script.trigger_blink_hall
+    - delay: '00:00:05'
+    - service: script.trigger_blink_puerta_principal
+    - delay: '00:00:05'
+    - service: script.trigger_blink_puerta_exterior
+    - delay: '00:00:05'
+    - service: script.trigger_blink_piscina
+    - delay: '00:00:05'
+    - service: script.trigger_blink_porche
+    - delay: '00:00:05'
+    - service: script.trigger_blink_estudio
+    - delay: '00:00:05'
+    - service: script.trigger_blink_salon
+    - delay: '00:00:05'
+    - service: script.trigger_blink_cocina
+
+trigger_blink_hall:
+  alias: 'Trigger Blink Cámara Hall'
   sequence:
     - service: blink.trigger_camera
       target:
         entity_id: camera.blink_hall
-    - delay: 00:00:05
-    #- service: blink.blink_update
     - service: camera.snapshot
       target:
         entity_id: camera.blink_hall
       data:
-        filename: /share/blink_hall.jpg
+        filename: /config/www/blink_hall.jpg
 
-blink_trigger_cam_puerta_principal:
-  alias: 'Blink Trigger Camera Puerta'
+trigger_blink_puerta_principal:
+  alias: 'Trigger Blink Cámara Puerta'
   sequence:
     - service: blink.trigger_camera
       target:
         entity_id: camera.blink_puerta_principal
-    - delay: 00:00:05
     - service: camera.snapshot
       target:
         entity_id: camera.blink_puerta_principal
       data:
-        filename: /share/blink_puerta.jpg
+        filename: /config/www/blink_puerta.jpg
 
-blink_trigger_cam_puerta_garaje:
-  alias: 'Blink Trigger Camera Garaje'
+trigger_blink_puerta_exterior:
+  alias: 'Trigger Blink Cámara Exterior'
   sequence:
     - service: blink.trigger_camera
       target:
-        entity_id: camera.blink_puerta_garaje
-    - delay: 00:00:05
+        entity_id: camera.blink_puerta_exterior
     - service: camera.snapshot
       target:
-        entity_id: camera.blink_puerta_garaje
+        entity_id: camera.blink_puerta_exterior
       data:
-        filename: /share/blink_garaje.jpg
+        filename: /config/www/blink_puerta_exterior.jpg
 
-blink_trigger_cam_piscina:
-  alias: 'Blink Trigger Camera Piscina'
+trigger_blink_piscina:
+  alias: 'Trigger Blink Cámara Piscina'
   sequence:
     - service: blink.trigger_camera
       target:
         entity_id: camera.blink_piscina
-    - delay: 00:00:05
     - service: camera.snapshot
       target:
         entity_id: camera.blink_piscina
       data:
-        filename: /share/blink_piscina.jpg
+        filename: /config/www/blink_piscina.jpg
 
-blink_trigger_cam_porche:
-  alias: 'Blink Trigger Camera Porche'
+trigger_blink_porche:
+  alias: 'Trigger Blink Cámara Porche'
   sequence:
     - service: blink.trigger_camera
       target:
         entity_id: camera.blink_porche
-    - delay: 00:00:05
     - service: camera.snapshot
       target:
         entity_id: camera.blink_porche
       data:
-        filename: /share/blink_porche.jpg
+        filename: /config/www/blink_porche.jpg
 
-blink_trigger_cam_estudio:
-  alias: 'Blink Trigger Camera Estudio'
+trigger_blink_estudio:
+  alias: 'Trigger Blink Cámara Estudio'
   sequence:
     - service: blink.trigger_camera
       target:
         entity_id: camera.blink_estudio
-    - delay: 00:00:05
     - service: camera.snapshot
       target:
         entity_id: camera.blink_estudio
       data:
-        filename: /share/blink_estudio.jpg
+        filename: /config/www/blink_estudio.jpg
 
-blink_trigger_cam_cocina:
-  alias: 'Blink Trigger Camera Cocina'
-  sequence:
-    - service: blink.trigger_camera
-      target:
-        #device_id: c545650d1214ef801176d6f91c43b14e
-        entity_id: camera.blink_cocina
-    - delay: 00:00:05
-    - service: camera.snapshot
-      target:
-        #device_id: c545650d1214ef801176d6f91c43b14e
-        entity_id: camera.blink_cocina
-      data:
-        filename: /share/blink_cocina.jpg
-
-blink_trigger_cam_salon:
-  alias: 'Blink Trigger Camera Salon'
+trigger_blink_salon:
+  alias: 'Trigger Blink Cámara Salon'
   sequence:
     - service: blink.trigger_camera
       target:
         entity_id: camera.blink_salon
-    - delay: 00:00:05
-    - service: blink.blink_update
     - service: camera.snapshot
       target:
         entity_id: camera.blink_salon
       data:
-        filename: /share/blink_salon.jpg
+        filename: /config/www/blink_salon.jpg
+
+trigger_blink_cocina:
+  alias: 'Trigger Blink Cámara Cocina'
+  sequence:
+    - service: blink.trigger_camera
+      target:
+        entity_id: camera.blink_cocina
+    - service: camera.snapshot
+      target:
+        entity_id: camera.blink_cocina
+      data:
+        filename: /config/www/blink_cocina.jpg
 
 #-----------------------------------------------------------------------------#
 #                                                                             #
@@ -1610,7 +1619,7 @@ escena_estudio_home_cinema:
       data:
         media_content_type: video/mp4
         #media_content_id: "https://youtu.be/fLWacgcUMKw"
-        media_content_id: /local/dolby-atmos-demo.mp4
+        media_content_id: /config/www/dolby-atmos-demo.mp4
 
 
 firetv_estudio_movistar_a3:

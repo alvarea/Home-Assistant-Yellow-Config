@@ -123,31 +123,27 @@
   condition:
     condition: and
     conditions:
-      - condition: sun
-        after: sunrise
-        before: sunset
-        before_offset: "04:00:00"
+      - condition: template
+        value_template: "{{ (now().hour >= 6 and now().hour <=23) or (now().hour >= 0 and now().hour <= 1) }}"
       - condition: state
         entity_id: input_boolean.helper_blink_camera_trigger
         state: 'on'
   action:
-    # Actualizacion imagen cámaras última hora.
-    - service: script.blink_trigger_cam_hall
-    - delay: '00:00:10'
-    - service: script.blink_trigger_cam_puerta_principal
-    - delay: '00:00:10'
-    - service: script.blink_trigger_cam_puerta_garaje
-    - delay: '00:00:10'
-    - service: script.blink_trigger_cam_piscina
-    - delay: '00:00:10'
-    - service: script.blink_trigger_cam_porche
-    - delay: '00:00:10'
-    - service: script.blink_trigger_cam_estudio
-    - delay: '00:00:10'
-    - service: script.blink_trigger_cam_cocina
-    - delay: '00:00:10'
-    - service: script.blink_trigger_cam_salon
-
+    - service: script.trigger_blink_hall
+    - delay: '00:00:05'
+    - service: script.trigger_blink_puerta_principal
+    - delay: '00:00:05'
+    - service: script.trigger_blink_puerta_exterior
+    - delay: '00:00:05'
+    - service: script.trigger_blink_piscina
+    - delay: '00:00:05'
+    - service: script.trigger_blink_porche
+    - delay: '00:00:05'
+    - service: script.trigger_blink_estudio
+    - delay: '00:00:05'
+    - service: script.trigger_blink_salon
+    - delay: '00:00:05'
+    - service: script.trigger_blink_cocina
 #-----------------------------------------------------------------------------#
 #                                                                             #
 # ALARMA: Armado y Control de la Alarma                                       #

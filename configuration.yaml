@@ -381,18 +381,6 @@ person:
 # The component currently only supports the HLS format.
 stream:
 
-#blink:
-# Desde HOMY 2023.06 la gestión y configuración se realiza desde UI.
-#  username: !secret blink_usr
-#  password: !secret blink_pwd
-#  scan_interval: 600
-  #binary_sensors:
-  #  monitored_conditions:
-  #    - motion_enabled
-  #    - motion_detected
-  #sensors:
-  #  monitored_conditions:
-  #    - battery
 
 #
 # Sensores Xiaomi Flower Care - Componente Plant - Integracion ESPHOME - ESP32S Hub BLE ESP32S
@@ -466,6 +454,11 @@ calendar:
         calendar: "Festivos"
         search: "*"
 
+device_tracker:
+  - platform: aruba
+    host: 192.168.0.3
+    username: !secret aruba_usr
+    password: !secret aruba_pwd
 
 #
 # COVER TEMPLATE - PERSIANAS  => Paso a generar el cover directamente en ESPHOME - SONOFF DUAL R3
