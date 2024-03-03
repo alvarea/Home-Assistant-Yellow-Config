@@ -1,5 +1,5 @@
 #
-# ESPHOME - ESP32S HUB2 - BLUETOOTH BLE ESTUDIO
+# ESPHOME - ESP32S HUB2 - BLUETOOTH BLE ESTUDIO => OBSOLETO => ESP32 REUTILIZADO LEDS
 #
 
 substitutions:
@@ -11,7 +11,7 @@ esphome:
   board: nodemcu-32s
 
 wifi:
-  ssid: !secret wifi_ssid_tc
+  ssid: !secret wifi_ssid_wlan
   password: !secret wifi_pwd
   manual_ip:
     static_ip: 192.168.0.47

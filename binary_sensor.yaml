@@ -235,7 +235,6 @@
         value_template: >-
           {%  if is_state('binary_sensor.alarma_sensores_perimetro_principal','off')
               and is_state('binary_sensor.aqara_humo_cocina','off')
-              and is_state('binary_sensor.water_leak_sensor_158d00045a3376','off')
           %}
             true
           {% else %}

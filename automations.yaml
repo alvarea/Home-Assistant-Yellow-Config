@@ -198,7 +198,7 @@
   alias: 'X1 Alarma Agua Arqueta'
   trigger:
     - platform: state
-      entity_id: binary_sensor.water_leak_sensor_158d00045a3376
+      entity_id: binary_sensor.aqara_sensor_agua_arqueta
       from: 'off'
       to: 'on'
   action:

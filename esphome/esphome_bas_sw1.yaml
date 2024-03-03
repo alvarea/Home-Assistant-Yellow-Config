@@ -1,5 +1,5 @@
 #
-# ESPHOME SONOFF BASIC R2 - SW1 - LUZ NEON BAR
+# ESPHOME SONOFF BASIC R2 - SW1 - LUZ NEON BAR  => DISPONIBLE
 # 12.05.2023 : Fix error Network not found tras upgrade a ESPHOME 2023.04.  Elimino componentes innecesarios, dejando solo binary_sensor + switch
 #
 
@@ -13,7 +13,7 @@ esphome:
   board_flash_mode: dout
 
 wifi:
-  ssid: !secret wifi_ssid_tc
+  ssid: !secret wifi_ssid_wlan
   password: !secret wifi_pwd
   manual_ip:
     gateway: !secret wifi_gateway
