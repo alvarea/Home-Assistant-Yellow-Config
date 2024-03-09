@@ -20,128 +20,6 @@ home_switch_off:
     - service: switch.turn_off
       entity_id: group.switch_calefaccion_grp
 
-alarma_to_pending:
-  alias: "Alarma Disarmed to Pending"
-  sequence:
-    - condition: template
-      value_template: '{{fromstate != tostate}}'
-
-    # Aviso sonoro con Xiaomi GW
-    - service: xiaomi_aqara.stop_ringtone
-      data:
-        gw_mac: !secret xiaomi_mac
-    - service: xiaomi_aqara.play_ringtone
-      data_template:
-        gw_mac: !secret xiaomi_mac
-        ringtone_id: '{{ringtone_msg}}'
-        ringtone_vol: >
-          {{ states('input_number.xiaomi_volume_alarm_armed') | int }}
-
-# SCRIPT PARA NOTIFICACION MENSAJES SONORO SISTEMA ARMADO
-#
-# {{ states.input_select.xiaomi_sound_alarm_armed.state.split('-')[0] }}
-# {{ states('input_number.xiaomi_volume_alarm_armed') | int }}
-#
-sirena_xiaomi_play_alarm_armed:
-  alias: "Alarma Sonido Armado"
-  sequence:
-    # IF Mute_Xiaomi = ON => True => CANCEL SCRIPT
-    - condition: template
-      value_template: "{% if is_state('input_boolean.alarm_mute_sonido_sirenas', 'off') %}true{% endif %}"
-    # Aviso Xiaomi GW
-    - service: xiaomi_aqara.stop_ringtone
-      data:
-        gw_mac: !secret xiaomi_mac
-    - service: xiaomi_aqara.play_ringtone
-      data_template:
-        gw_mac: !secret xiaomi_mac
-        ringtone_id: >-
-            {{ states.input_select.xiaomi_sound_alarm_armed.state.split('-')[0] }}
-        ringtone_vol: >-
-            {{ states('input_number.xiaomi_volume_alarm_armed') | int }}
-
-sirena_xiaomi_play_alarm_disarmed:
-  alias: "Alarma Sonido Desarmado"
-  sequence:
-    # IF Mute_Xiaomi = ON => True => CANCEL SCRIPT
-    - condition: template
-      value_template: "{% if is_state('input_boolean.alarm_mute_sonido_sirenas', 'off') %}true{% endif %}"
-
-    # Aviso Xiaomi GW
-    - service: xiaomi_aqara.stop_ringtone
-      data:
-        gw_mac: !secret xiaomi_mac
-    - service: xiaomi_aqara.play_ringtone
-      data_template:
-        gw_mac: !secret xiaomi_mac
-        ringtone_id: >-
-            {{ states.input_select.xiaomi_sound_alarm_disarmed.state.split('-')[0] }}
-        ringtone_vol: >-
-            {{ states('input_number.xiaomi_volume_alarm_disarmed') | int }}
-
-# SCRIPT PARA ENCENDER SIRENAS INTERIOR TRAS DISPARO DE ALARMA
-#
-# {{ states.input_select.xiaomi_sound_alarm.state.split('-')[0] }}
-# {{ states('input_number.xiaomi_volume_alarm') | int }}
-#
-sirena_v0_alarma_armed_away:
-  alias: "Sirena Alarma Armed Away"
-  sequence:
-    # IF Mute_Xiaomi = ON => True => CANCEL SCRIPT
-    - condition: template
-      value_template: "{% if is_state('input_boolean.alarm_mute_sonido_sirenas', 'off') %}true{% endif %}"
-    - service: xiaomi_aqara.stop_ringtone
-      data:
-        gw_mac: !secret xiaomi_mac
-    - service: xiaomi_aqara.play_ringtone
-      data_template:
-        gw_mac: !secret xiaomi_mac
-        ringtone_id: >-
-            {{ states.input_select.xiaomi_sound_alarm.state.split('-')[0] }}
-        ringtone_vol: >-
-            {{ states('input_number.xiaomi_volume_alarm') | int}}
-    # Retraso 5"
-    - delay: '00:00:05'
-    #######################################
-    #  SONOFF_SW1_SIRENA INTERIOR ==> ON  #
-    #######################################
-    - service: siren.turn_on
-      entity_id: siren.sirena
-
-# SCRIPT PARA ENCENDER SOLO SIRENA XIAOMI TRAS DISPARO
-# DE ALARMA ARMED HOME O SENSOR DE HUMO
-#
-sirena_v0_alarma_armed_home:
-  alias: "Sirena Alarma Armed Home"
-  sequence:
-    # IF Mute_Xiaomi = ON => True => CANCEL SCRIPT
-    - condition: template
-      value_template: "{% if is_state('input_boolean.alarm_mute_sonido_sirenas', 'off') %}true{% endif %}"
-    - service: xiaomi_aqara.stop_ringtone
-      data:
-        gw_mac: !secret xiaomi_mac
-    - service: xiaomi_aqara.play_ringtone
-      data_template:
-        gw_mac: !secret xiaomi_mac
-        ringtone_id: >-
-            {{ states.input_select.xiaomi_sound_alarm.state.split('-')[0] }}
-        ringtone_vol: >-
-            {{ states('input_number.xiaomi_volume_alarm') | int}}
-
-
-# SCRIPT PARA NOTIFICACION MENSAJES SONORO SISTEMA ARMADO
-#
-sirena_stop_alarma:
-  alias: "Botón Stop Sirenas"
-  sequence:
-    # SONOFF_SW1_SIRENA INTERIOR ==> OFF
-    - service: siren.turn_off
-      entity_id: siren.sirena
-    # Aviso Xiaomi GW
-    - service: xiaomi_aqara.stop_ringtone
-      data:
-        gw_mac: !secret xiaomi_mac
-
 
 # SCRIPT PARA UN MICRO AVISO DE SIRENA INTERIOR
 #
@@ -169,9 +47,8 @@ sirena_alarma_micro_aviso:
 # 3. Pulsar el botón del script de apagado para cancelar sirenas: script.boton_panico
 #
 # Las sirenas se activan en este orden:
-# 1. Sirena interior Xiaomi con el tono configurado para Alarma
-# 2. Retraso de 5 segundos
-# 3. Sirena interior mediante siren.sirena (antes switch.esphome_bas_sw0)
+# 1. Retraso de 3 segundos
+# 2. Sirena interior mediante siren.sirena (antes switch.esphome_bas_sw0)
 
 alarma_boton_panico:
   alias: 'Boton Panico ON'
@@ -194,8 +71,6 @@ alarma_boton_panico:
 alarma_boton_panico_off:
   alias: 'Boton Panico OFF'
   sequence:
-    # Llamada Scripts STOP SIRENAS ALARMA
-    - service: script.sirena_stop_alarma
     # Notifica Telegram
     - service: script.notifica_evento
       data:
@@ -237,36 +112,6 @@ homy_desarmado_code:
         code: !secret alarm_control_code
     # La notificación se hace mediente la activación de la regla:
     # alias: 'A4_alarma_activa_desarmada'
-
-#-----------------------------------------------------------------------------#
-#                                                                             #
-# SCRIPTS PARA ENCENDER SIRENAS INTERIOR TRAS DISPARO DE ALARMA               #
-#                                                                             #
-#-----------------------------------------------------------------------------#
-
-sirena_alarma_triggered:
-  alias: "Sirena Alarma Triggered"
-  mode: restart
-  sequence:
-    # IF Mute Sirenas = ON => True => CANCEL SCRIPT
-    - condition: template
-      value_template: "{% if is_state('input_boolean.alarm_mute_sonido_sirenas', 'off') %}true{% endif %}"
-
-    #- service: xiaomi_aqara.play_ringtone
-    #  data_template:
-    #    gw_mac: !secret xiaomi_mac
-    #    ringtone_id: >-
-    #        {{ states.input_select.xiaomi_sound_alarm.state.split('-')[0] }}
-    #    ringtone_vol: >-
-    #        {{ states('input_number.xiaomi_volume_alarm') | int}}
-
-    # Retraso 5"
-    - delay: '00:00:05'
-    #######################################
-    #  SONOFF_SW1_SIRENA INTERIOR ==> ON  #
-    #######################################
-    - service: siren.turn_on
-      entity_id: siren.sirena
 
 #-----------------------------------------------------------------------------#
 #                                                                             #

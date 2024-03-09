@@ -302,7 +302,7 @@
       alarma_sensor_movimiento_dormitorio_principal:
         value_template: >-
           {%  if is_state('input_boolean.alarma_sensor_presencia_dormitorio_principal','on')
-              and is_state('binary_sensor.motion_sensor_158d0002ea1d0f','on')
+              and is_state('binary_sensor.aqara_movimiento_principal','on')
           %}
             true
           {% else %}

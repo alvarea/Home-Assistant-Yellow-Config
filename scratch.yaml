@@ -265,57 +265,192 @@ state_color: true
             entity_id: alarm_control_panel.ha
             code: !secret alarm_control_code
 
+# SCRIPT PARA NOTIFICACION MENSAJES SONORO SISTEMA ARMADO
+#
+# {{ states.input_select.xiaomi_sound_alarm_armed.state.split('-')[0] }}
+# {{ states('input_number.xiaomi_volume_alarm_armed') | int }}
+#
 
-- id: BP01
-  alias: Controller lights using Philips Hue Dimmer Switch (RWL021)
-  use_blueprint:
-    path: Rantaki/zha_blueprint_philips_hue_dimmer_swith_rwl021_fast_setup.yaml
-    input:
-      zha_device: bef6e070a0c12e5234501e01092f27e8
-      zha_entity_light:
-        - light.luz_dormitorio_agustin
-        - light.luz_dormitorio_malen
+# SCRIPT PARA ENCENDER SIRENAS INTERIOR TRAS DISPARO DE ALARMA
+#
+# {{ states.input_select.xiaomi_sound_alarm.state.split('-')[0] }}
+# {{ states('input_number.xiaomi_volume_alarm') | int }}
+#
+sirena_v0_alarma_armed_away:
+  alias: "Sirena Alarma Armed Away"
+  sequence:
+    # IF Mute_Xiaomi = ON => True => CANCEL SCRIPT
+    - condition: template
+      value_template: "{% if is_state('input_boolean.alarm_mute_sonido_sirenas', 'off') %}true{% endif %}"
+    # Retraso 3"
+    - delay: '00:00:03'
+    #######################################
+    #  SONOFF_SW1_SIRENA INTERIOR ==> ON  #
+    #######################################
+    - service: siren.turn_on
+      entity_id: siren.sirena
 
-
-
-
-
-- id: ZHA_L4
-  alias: IKEA Rodret Dimmer Switch - Lavadora
-  mode: queued
-  use_blueprint:
-    path: damru/ikea-rodret-dimmer-remote-e2201-zha-control-anything.yaml
-    input:
-      remote: 0a43ad4d68f6c171709761fb9a09e579
-      on_press_action:
-        - service: switch.toggle
-          data: {}
-          target:
-            entity_id: switch.esphome_pow_sw2
-      off_press_action:
-        - service: automation.toggle
-          data: {}
-          target:
-            entity_id: automation.s16c_sonoff_pow_lavadora_warning
-
-
-
-
-show_state: true
-show_name: true
-camera_view: auto
-type: picture-entity
-image: /local/Home_Alarm_Security_I3.jpg
-tap_action:
-  action: more-info
-hold_action:
-  action: toggle
-name: Sistemas Alarma Seguridad
-aspect_ratio: '5'
-entity: binary_sensor.alarma_estado_armado
+# SCRIPT PARA ENCENDER SOLO SIRENA XIAOMI TRAS DISPARO
+# DE ALARMA ARMED HOME O SENSOR DE HUMO
+#
+sirena_v0_alarma_armed_home:
+  alias: "Sirena Alarma Armed Home"
+  sequence:
+    # IF Mute_Xiaomi = ON => True => CANCEL SCRIPT
+    - condition: template
+      value_template: "{% if is_state('input_boolean.alarm_mute_sonido_sirenas', 'off') %}true{% endif %}"
+    - service: xiaomi_aqara.stop_ringtone
+      data:
+        gw_mac: !secret xiaomi_mac
+    - service: xiaomi_aqara.play_ringtone
+      data_template:
+        gw_mac: !secret xiaomi_mac
+        ringtone_id: >-
+            {{ states.input_select.xiaomi_sound_alarm.state.split('-')[0] }}
+        ringtone_vol: >-
+            {{ states('input_number.xiaomi_volume_alarm') | int}}
 
 
+# SCRIPT PARA NOTIFICACION MENSAJES SONORO SISTEMA ARMADO
+#
+sirena_stop_alarma:
+  alias: "Botón Stop Sirenas"
+  sequence:
+    # SONOFF_SW1_SIRENA INTERIOR ==> OFF
+    - service: siren.turn_off
+      entity_id: siren.sirena
+    # Aviso Xiaomi GW
+    - service: xiaomi_aqara.stop_ringtone
+      data:
+        gw_mac: !secret xiaomi_mac
+
+#-----------------------------------------------------------------------------#
+#                                                                             #
+# SCRIPTS PARA ENCENDER SIRENAS INTERIOR TRAS DISPARO DE ALARMA               #
+#                                                                             #
+#-----------------------------------------------------------------------------#
+
+sirena_alarma_triggered:
+  alias: "Sirena Alarma Triggered"
+  mode: restart
+  sequence:
+    # IF Mute Sirenas = ON => True => CANCEL SCRIPT
+    - condition: template
+      value_template: "{% if is_state('input_boolean.alarm_mute_sonido_sirenas', 'off') %}true{% endif %}"
+
+    #- service: xiaomi_aqara.play_ringtone
+    #  data_template:
+    #    gw_mac: !secret xiaomi_mac
+    #    ringtone_id: >-
+    #        {{ states.input_select.xiaomi_sound_alarm.state.split('-')[0] }}
+    #    ringtone_vol: >-
+    #        {{ states('input_number.xiaomi_volume_alarm') | int}}
+
+    # Retraso 5"
+    - delay: '00:00:05'
+    #######################################
+    #  SONOFF_SW1_SIRENA INTERIOR ==> ON  #
+    #######################################
+    - service: siren.turn_on
+      entity_id: siren.sirena
 
 
 
+# INPUT SELECT FILE - XIAOMI GATEWAY
+# ALARM WARNING BEFORE ARMED : PENDING TIME
+#
+  xiaomi_sound_alarm_armed:
+    name: "Sonido Alarma Armado"
+    options:
+      - "0 - Police car 1"
+      - "1 - Police car 2"
+      - "2 - Accident"
+      - "3 - Countdown"
+      - "4 - Ghost"
+      - "5 - Sniper rifle"
+      - "6 - Battle"
+      - "7 - Air raid"
+      - "8 - Bark"
+      - "10 - Doorbell"
+      - "11 - Knock at a door"
+      - "12 - Amuse"
+      - "13 - Alarm clock"
+      - "10004 - ArmadoDesarme"
+      - "10005 - ArmadoSalgaAhora"
+    icon: mdi:music-note
+    initial: '11 - Knock at a door'
 
+# ALARM WARNING DISARMING
+#
+  xiaomi_sound_alarm_disarmed:
+    name: "Sonido Alarma Desarmado"
+    options:
+      - "0 - Police car 1"
+      - "1 - Police car 2"
+      - "2 - Accident"
+      - "3 - Countdown"
+      - "4 - Ghost"
+      - "5 - Sniper rifle"
+      - "6 - Battle"
+      - "7 - Air raid"
+      - "8 - Bark"
+      - "10 - Doorbell"
+      - "11 - Knock at a door"
+      - "12 - Amuse"
+      - "13 - Alarm clock"
+      - "10004 - ArmadoDesarme"
+      - "10005 - ArmadoSalgaAhora"
+    icon: mdi:music-note
+    initial: '11 - Knock at a door'
+
+# ALARM TRIGGER SOUND
+#
+  xiaomi_sound_alarm:
+    name: "Sonido Alarma"
+    options:
+      - "0 - Police car 1"
+      - "1 - Police car 2"
+      - "2 - Accident"
+      - "3 - Countdown"
+      - "4 - Ghost"
+      - "5 - Sniper rifle"
+      - "6 - Battle"
+      - "7 - Air raid"
+      - "8 - Bark"
+      - "10 - Doorbell"
+      - "11 - Knock at a door"
+      - "12 - Amuse"
+      - "13 - Alarm clock"
+    icon: mdi:music-note
+    initial: '2 - Accident'
+
+
+#
+# Input number to control Xiaomi gateway Volume Alarm Triggered
+  xiaomi_volume_alarm:
+    name: Volumen
+    min: 0
+    max: 100
+    step: 2
+    initial: 90
+    icon: mdi:volume-high
+#
+# Input number to control Xiaomi gateway Volume Alarm Armed
+  xiaomi_volume_alarm_armed:
+    name: Volumen
+    mode: slider
+    initial: 2
+    min: 0
+    max: 100
+    step: 2
+    icon: mdi:volume-high
+#
+# Input number to control Xiaomi gateway Volume Alarm Disarm
+  xiaomi_volume_alarm_disarmed:
+    name: Volumen
+    mode: slider
+    initial: 2
+    min: 0
+    max: 100
+    step: 2
+    icon: mdi:volume-high

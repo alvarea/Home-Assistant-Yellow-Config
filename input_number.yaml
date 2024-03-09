@@ -8,35 +8,6 @@
     max: 4
     step: 1
     icon: mdi:home-account
-#
-# Input number to control Xiaomi gateway Volume Alarm Triggered
-  xiaomi_volume_alarm:
-    name: Volumen
-    min: 0
-    max: 100
-    step: 2
-    initial: 90
-    icon: mdi:volume-high
-#
-# Input number to control Xiaomi gateway Volume Alarm Armed
-  xiaomi_volume_alarm_armed:
-    name: Volumen
-    mode: slider
-    initial: 2
-    min: 0
-    max: 100
-    step: 2
-    icon: mdi:volume-high
-#
-# Input number to control Xiaomi gateway Volume Alarm Disarm
-  xiaomi_volume_alarm_disarmed:
-    name: Volumen
-    mode: slider
-    initial: 2
-    min: 0
-    max: 100
-    step: 2
-    icon: mdi:volume-high
 
 #
 # ALEXA ENTRADA

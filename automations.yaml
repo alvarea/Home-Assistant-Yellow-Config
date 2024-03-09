@@ -69,22 +69,6 @@
     - service: script.alexa_entrada_set_volumen
     - service: script.alexa_estudio_set_volumen
     - service: script.alexa_dormitorio_set_volumen
-    #
-    # Establece Volumen Xiaomi Hub => DEPRECATED
-    - service: input_number.set_value
-      data_template:
-        entity_id: input_number.xiaomi_volume_alarm_armed
-        value: >-
-          {% if (now().hour == 11) %} {{ 10|float}}
-          {% elif (now().hour == 21) %} {{ 2|float}}
-          {% endif %}
-    - service: input_number.set_value
-      data_template:
-        entity_id: input_number.xiaomi_volume_alarm_disarmed
-        value: >-
-          {% if (now().hour == 11) %} {{ 10|float}}
-          {% elif (now().hour == 21) %} {{ 2|float}}
-          {% endif %}
 
 - id: hass_clock_notify
   alias: 'HASS Clock Notify'
@@ -307,8 +291,6 @@
       entity_id: input_text.alarm_trigger
       data_template:
         value: " "
-    # Aviso sonoro con Xiaomi GW
-    #- service: script.sirena_xiaomi_play_alarm_armed
 
     # Script Envío Sonido Alexa Alexa
     - service: script.alexa_secuencia
@@ -356,8 +338,6 @@
       entity_id: input_text.alarm_trigger
       data_template:
         value: " "
-    # Aviso sonoro con Xiaomi GW
-    #- service: script.sirena_xiaomi_play_alarm_armed
 
     # Script Envío Sonido Alexa Alexa
     - service: script.alexa_secuencia
@@ -616,8 +596,6 @@
         code: !secret alarm_control_code
     # Check sensores perimetro
     - service: script.check_sensores_magneticos_perimetro
-    # Aviso sonoro con Xiaomi GW
-    - service: script.sirena_stop_alarma
     # Notifica Evento
     - service: script.notifica_evento
       data:
@@ -1149,7 +1127,7 @@
   mode: restart
   trigger:
     - platform: state
-      entity_id: binary_sensor.motion_sensor_158d0002ea1d0f
+      entity_id: binary_sensor.aqara_movimiento_principal
       to: 'on'
   condition:
     condition: and
