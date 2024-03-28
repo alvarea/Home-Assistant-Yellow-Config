@@ -69,13 +69,16 @@ status_led:
   pin:
     number: GPIO13
     inverted: true
+    allow_other_uses: true
 
 output:
   - platform: esp8266_pwm
     id: blue_led
-    pin: GPIO13
+    pin: 
+      number: GPIO13
+      allow_other_uses: true
     inverted: True
-
+    
 light:
   # the 4 lines below define the Blue LED light on Sonoff Mini, to expose in HomeAssistant remove line "internal: true"
   - platform: monochromatic

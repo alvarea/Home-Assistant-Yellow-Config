@@ -9,6 +9,7 @@
 #
 substitutions:
   device_name: esphome_pow_sw2
+  update_interval: 30s
 
 esphome:
   name: ${device_name}
@@ -68,10 +69,15 @@ uart:
 
 sensor:
   - platform: cse7766
-    update_interval: 30s
     current:
       name: ${device_name}_current
+      filters:
+        - throttle_average: ${update_interval}
     voltage:
       name: ${device_name}_voltage
+      filters:
+        - throttle_average: ${update_interval}
     power:
       name: ${device_name}_power
+      filters:
+        - throttle_average: ${update_interval}

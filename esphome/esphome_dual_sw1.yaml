@@ -76,19 +76,27 @@ binary_sensor:
 
 output:
   - platform: gpio
-    pin: GPIO27
+    pin: 
+      number: GPIO27
+      allow_other_uses: true
     id: relay1
   - platform: gpio
-    pin: GPIO14
+    pin: 
+      number: GPIO14
+      allow_other_uses: true
     id: relay2
 
 switch:
   - platform: gpio
-    pin: GPIO27
+    pin: 
+      number: GPIO27
+      allow_other_uses: true
     interlock: &interlock [open_cover, close_cover]
     id: open_cover
   - platform: gpio
-    pin: GPIO14
+    pin: 
+      number: GPIO14
+      allow_other_uses: true
     interlock: *interlock
     id: close_cover
   - platform: output
