@@ -519,6 +519,37 @@
     # Script  Apagado Total
     - service: script.home_switch_off
 
+# REGLA: SCHEDULER ACTIVADO/DESACTIVADO REGLA A8 AUTOARMADO TOTAL - JUEVES LIMPIEZA CASA 07 A 15 OFF
+#
+- id: A8x_alarm_armed_away_scheduler
+  alias: 'A8X Alarm Armed Away Scheduler'
+  trigger:
+    # Trigger basado en scheduler helper que tendrá una programacion 24x7 menos los jueves de 7 a 15.
+    - platform: state
+      entity_id: schedule.helper_alarma_auto_armado_a8
+      to: 'on'
+      id: trigger_on
+    - platform: state
+      entity_id: schedule.helper_alarma_auto_armado_a8
+      to: 'off'
+      id: trigger_off
+  condition: []
+  action:
+    - choose:
+        - conditions:
+          - condition: trigger
+            id: trigger_on
+          sequence:
+            - service: automation.turn_on
+              target:
+                entity_id: automation.a8_alarm_armed_away_family_away
+        - conditions:
+          - condition: trigger
+            id: trigger_off
+          sequence:
+            - service: automation.turn_off
+              target:
+                entity_id: automation.a8_alarm_armed_away_family_away
 
 - id: A9_alarm_armed_home_family_home
   alias: 'A9 Alarm Armed Home Family Home'
@@ -564,7 +595,7 @@
         data_template:
           alexa: 'entrada'
           voz: Atención. Alarma no lista para armado parcial. Revise puertas y ventanas.
-          
+
 # REGLA: TRIGGER DESARMADO AUTOMATICO AL AMANECER
 #
 - id: A10_alarm_home_auto_disam
@@ -1025,7 +1056,9 @@
   mode: restart
   trigger:
     - platform: state
-      entity_id: binary_sensor.aqara_movimiento_entrada_exterior
+      entity_id: 
+        - binary_sensor.aqara_movimiento_entrada_exterior
+        - binary_sensor.ikea_sensor_movimiento_entrada_exterior
       to: 'on'
   condition:
     condition: and
@@ -1733,11 +1766,12 @@
       entity_id: binary_sensor.esphome_pow_sw2_lavadora_warning
       from: 'off'
       to: 'on'
+      for: '00:00:15'
   condition:
-    condition: and
-    conditions:
-      - condition: template
-        value_template: "{{ as_timestamp(states.binary_sensor.esphome_pow_sw2_lavadora_warning.last_changed) - as_timestamp(states.binary_sensor.esphome_pow_sw2_lavadora_lavando.last_changed) < 300 }}"
+    - condition: template
+      value_template: '{{ (as_timestamp(states.binary_sensor.esphome_pow_sw2_lavadora_warning.last_changed) | timestamp_custom("%H:%M:%S"))
+                          > (states.input_datetime.lavadora_inicio_lavado.attributes.timestamp | timestamp_custom("%H:%M:%S"))
+                      }}'
   action:
     - service: input_datetime.set_datetime
       entity_id: input_datetime.lavadora_fin_lavado
@@ -2129,7 +2163,7 @@
         entity_id: timer.riego_tomates_ch0
         duration: '{{ states.sensor.riego_tomates_ch0_duracion_planificada_t1.state|int * 60 }}'
     - service: switch.turn_on
-      entity_id: switch.esphome_bas_sw2
+      entity_id: switch.esphome_bas_sw4
       
 - id: S29
   alias: 'S29 Timer Riego Huerto Tramo2'
@@ -2152,7 +2186,7 @@
         entity_id: timer.riego_tomates_ch0
         duration: '{{ states.sensor.riego_tomates_ch0_duracion_planificada_t2.state|int * 60 }}'
     - service: switch.turn_on
-      entity_id: switch.esphome_bas_sw2
+      entity_id: switch.esphome_bas_sw4
 
 - id: S30
   alias: 'S30 Timer Riego Huerto End'
@@ -2750,6 +2784,7 @@
 #                                                                             #
 #-----------------------------------------------------------------------------#
 
+#  alias: ZHA Exterior Philips Hue Smart Button
 - id: ZHA_L1
   alias: ZHA Exterior Philips Hue Smart Button
   mode: queued
@@ -2836,6 +2871,7 @@
         #    id: quadruple_press
         #  sequence:
 
+#  alias: ZHA Dormitorio MFC Philips HUE Dimmer
 - id: ZHA_L2
   alias: ZHA Dormitorio MFC Philips HUE Dimmer
   mode: queued
@@ -2985,6 +3021,7 @@
               target:
                 entity_id: input_text.helper_hue_dimmer_switch_dormitorio
 
+#  alias: ZHA Cocina IKEA Rodret Dimmer
 - id: ZHA_L3
   alias: ZHA Cocina IKEA Rodret Dimmer
   mode: queued
@@ -3028,6 +3065,7 @@
               target:
                 entity_id: automation.s16c_sonoff_pow_lavadora_warning
 
+#  alias: ZHA Salon IKEA Styrbar Dimmer
 - id: ZHA_L4
   alias: ZHA Salon IKEA Styrbar Dimmer
   mode: queued
@@ -3141,6 +3179,7 @@
               target:
                 entity_id: input_text.helper_ikea_dimmer_switch_salon
 
+#  alias: ZHA Porche Jardin IKEA Tradfri
 - id: ZHA_L5
   alias: ZHA Porche Jardin IKEA Tradfri
   mode: restart
@@ -3235,6 +3274,7 @@
               target:
                 entity_id: input_text.helper_ikea_tradfri_switch_salon
 
+#  alias: ZHA Estudio IKEA Styrbar Dimmer
 - id: ZHA_L6
   alias: ZHA Estudio IKEA Styrbar Dimmer
   mode: queued
@@ -3417,12 +3457,13 @@
         # genera por error el evento <Long Realease - Dim UP>, en lugar de Dim Down. 
         # Para el uso de las persianas no supone un problema ya que solo necesito un evento Long-Release para parar el motor.
 
+#  alias: ZHA Estudio IKEA Tradfri
 - id: ZHA_L7
   alias: ZHA Estudio IKEA Tradfri
   mode: queued
   # Short_press ON  ==> Toggle Ventilador toogle
   # Short_press OFF ==> Toggle Luz Estudio Setup Soft / Off
-  # Long_Press ON   ==> AA Estudio on 
+  # Long_Press ON   ==> Toggle Regleta Enchufes Setup
   # Long_Press OFF  ==> AA Estudio off
   #
   trigger:
@@ -3443,13 +3484,13 @@
       platform: device
       type: remote_button_long_press
       subtype: dim_up
-      id: dim_up
+      id: dim_up # long_press_on
     - device_id: 7bfd253f74df460b6e04fd16678d5dfc
       domain: zha
       platform: device
       type: remote_button_long_press
       subtype: dim_down
-      id: dim_down
+      id: dim_down # long_press_off
   condition: []
   action:
     - choose:
@@ -3467,7 +3508,7 @@
                 value: "Ventilador Estudio {{ states('fan.estudio') | upper }}"
               target:
                 entity_id: input_text.helper_ikea_dimmer_switch_estudio
-        # ELIF off_short_press ==> OFF ESUDIO 
+        # ELIF off_short_press ==> FULL OFF ESTUDIO 
         - conditions:
           - condition: trigger
             id: off_short_press
@@ -3480,9 +3521,9 @@
               entity_id: light.luz_estudio
               data:
                 transition: >
-                  {% if now().hour >= 0 and now().hour <= 7 %} 60
-                  {% elif now().hour >= 8 and now().hour <= 18 %} 1
-                  {% else %} 60
+                  {% if now().hour >= 0 and now().hour <= 7 %} 30
+                  {% elif now().hour >= 8 and now().hour <= 19 %} 1
+                  {% else %} 30
                   {% endif %}
               target:
                 entity_id: light.luz_estudio
@@ -3491,14 +3532,33 @@
               data: {}
               target:
                 entity_id: fan.estudio
+            # Para AA Estudio
+            - service: climate.turn_off
+              data: {}
+              target:
+                entity_id: climate.aa_estudio
+            - service: input_text.set_value
+              data:
+                value: "A/A Estudio {{ states('climate.aa_estudio')| upper }}"
+              target:
+                entity_id: input_text.helper_ikea_dimmer_switch_estudio
             # Para Alexa Estudio 
             - service: media_player.media_pause
               target:
                 entity_id: media_player.echo_alexa_estudio
-        # ELIF dim_up
+        # ELIF dim_up =# long_press_on
         - conditions:
           - condition: trigger
             id: dim_up
+          sequence:
+            - service: switch.toggle
+              data: {}
+              target:
+                entity_id: switch.esphome_bas_sw3
+        # ELIF dim_down = long_press_off => Regleta enchufes
+        - conditions:
+          - condition: trigger
+            id: dim_down
           sequence:
             - service: climate.turn_on
               data: {}
@@ -3509,21 +3569,8 @@
                 value: "A/A Estudio {{ states('climate.aa_estudio')| upper }}"
               target:
                 entity_id: input_text.helper_ikea_dimmer_switch_estudio
-        # ELIF dim_down
-        - conditions:
-          - condition: trigger
-            id: dim_down
-          sequence:
-            - service: climate.turn_off
-              data: {}
-              target:
-                entity_id: climate.aa_estudio
-            - service: input_text.set_value
-              data:
-                value: "A/A Estudio {{ states('climate.aa_estudio')| upper }}"
-              target:
-                entity_id: input_text.helper_ikea_dimmer_switch_estudio
 
+#  alias: ZHA IKEA Dormitorio AAF IKEA Tradfri
 - id: ZHA_L8
   alias: ZHA IKEA Dormitorio AAF IKEA Tradfri
   mode: restart
@@ -3592,6 +3639,7 @@
               target:
                 entity_id: fan.aire_acondicionado_agu
 
+#  alias: ZHA Estudio Aqara Cube
 - id: ZHA_L9
   alias: ZHA Estudio Aqara Cube
   mode: queued
@@ -3729,6 +3777,7 @@
                 repeticion: 1
                 voz: "Vale, Activo Lavando Palaustre. Que descanses."
 
+#  alias: ZHA Dormitorio PAF IKEA Tradfri
 - id: ZHA_L10
   alias: ZHA Dormitorio PAF IKEA Tradfri
   mode: restart
@@ -3800,3 +3849,120 @@
                 brightness_step_pct: -25
               target:
                 entity_id: light.luz_mesilla_paf
+
+#  alias: ZHA Dormitorio AAC IKEA Somrig
+- id: ZHA_L11
+  alias: ZHA Dormitorio AAC IKEA Somrig
+  mode: restart
+  #
+  # Event Type: remote_button_short_press, remote_button_double_press, remote_button_long_press
+  # Event Subtype: button_1,button_2
+  #
+  trigger:
+    - device_id: 3669ebbfa7c0575345aa83a9121ba51b
+      domain: zha
+      platform: device
+      type: remote_button_short_press
+      subtype: button_1
+      id: b1_short_press # Trigger ID
+    - device_id: 3669ebbfa7c0575345aa83a9121ba51b
+      domain: zha
+      platform: device
+      type: remote_button_double_press
+      subtype: button_1
+      id: b1_double_press
+    - device_id: 3669ebbfa7c0575345aa83a9121ba51b
+      domain: zha
+      platform: device
+      type: remote_button_short_press
+      subtype: button_2
+      id: b2_short_press 
+    - device_id: 3669ebbfa7c0575345aa83a9121ba51b
+      domain: zha
+      platform: device
+      type: remote_button_double_press
+      subtype: button_2
+      id: b2_double_press
+    - device_id: 3669ebbfa7c0575345aa83a9121ba51b
+      domain: zha
+      platform: device
+      type: remote_button_long_press
+      subtype: button_1
+      id: b1_long_press
+    - device_id: 3669ebbfa7c0575345aa83a9121ba51b
+      domain: zha
+      platform: device
+      type: remote_button_long_press
+      subtype: button_2
+      id: b2_long_press
+  condition: []
+  action:
+    - choose:
+        # IF b1_short_press
+        - conditions:
+          - condition: trigger
+            id: b1_short_press
+          sequence:
+            - service: light.toggle
+              target:
+                entity_id: light.luz_dormitorio_agustin
+        # ELIF b1_double_press
+        - conditions:
+          - condition: trigger
+            id: b1_double_press
+          sequence:
+            - service: light.toggle
+              target:
+                entity_id: light.luz_dormitorio_malen
+        # ELIF b2_short_press
+        - conditions:
+          - condition: trigger
+            id: b2_short_press
+          sequence:
+            - service: switch.toggle
+              target:
+                entity_id: switch.hue_sw1_cargador
+        # ELIF b2_double_press
+        - conditions:
+          - condition: trigger
+            id: b2_double_press
+          sequence:
+            - service: switch.turn_off
+              target:
+                entity_id: switch.hue_sw1_cargador
+        # ELIF b1_long_press
+        - conditions:
+          - condition: trigger
+            id: b1_long_press
+          sequence:
+            - service: input_select.select_next
+              data:
+                cycle: true
+              target:
+                entity_id: input_select.helper_scene_dormitorio
+            - service: scene.turn_on
+              target:
+                entity_id: "{{ states('input_select.helper_scene_dormitorio')}}"
+            - service: input_text.set_value
+              data:
+                value: "turn_on {{ states('input_select.helper_scene_dormitorio')}}"
+              target:
+                entity_id: input_text.helper_hue_dimmer_switch_dormitorio
+        # ELIF b2_long_press
+        - conditions:
+          - condition: trigger
+            id: b2_long_press
+          sequence:
+            - service: input_select.select_previous
+              data:
+                cycle: true
+              target:
+                entity_id: input_select.helper_scene_dormitorio
+            - service: scene.turn_on
+              target:
+                entity_id: "{{ states('input_select.helper_scene_dormitorio')}}"
+            - service: input_text.set_value
+              data:
+                value: "turn_on {{ states('input_select.helper_scene_dormitorio')}}"
+              target:
+                entity_id: input_text.helper_hue_dimmer_switch_dormitorio

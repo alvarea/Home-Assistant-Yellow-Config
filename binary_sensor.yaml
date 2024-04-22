@@ -486,8 +486,8 @@
       esphome_pow_sw2_lavadora_lavando:
         value_template: >-
           {%  if is_state('binary_sensor.esphome_pow_sw2_switch','on')
-              and states('sensor.esphome_pow_sw2_voltage')|int(0) > 200
-              and states('sensor.esphome_pow_sw2_current')|round(1) > 0.5
+              and states('sensor.esphome_pow_sw2_voltage')|int(0) >= 200
+              and states('sensor.esphome_pow_sw2_current')|round(1) >= 0.2
           %}
             true
           {% else %}
@@ -498,13 +498,15 @@
         value_template: >-
           {%  if is_state('binary_sensor.esphome_pow_sw2_switch','on')
               and states('sensor.esphome_pow_sw2_voltage')|round(1) >= 200
-              and states('sensor.esphome_pow_sw2_current')|round(1) < 0.5
+              and states('sensor.esphome_pow_sw2_current')|round(1) < 0.2
           %}
             true
           {% else %}
             false
           {% endif %}
+      # and (as_timestamp(now()) - as_timestamp(states.binary_sensor.esphome_pow_sw2_lavadora_lavando.last_changed)) > 300
 
+      
       #
       # SONOFF POW_SW3. PISCINA. Sensores control consumo potencia
       #
@@ -732,7 +734,7 @@
       #  value_template: states('sensor.dark_sky_icon')
 
       # TARJETA VERTICAL PRONOSTICO
-      # - entity: sensor.aemet_condition = weather.aemet_daily
+      # - entity: sensor.aemet_condition = weather.aemet
 
       # - entity: sensor.aemet_rain
       # - entity: sensor.aemet_rain_probability
@@ -1166,7 +1168,7 @@
       #
       riego_tomates_ch0_status:
         value_template: >-
-          {% if is_state('switch.esphome_bas_sw2','on') %}
+          {% if is_state('switch.esphome_bas_sw4','on') %}
             true
           {% else %}
             false

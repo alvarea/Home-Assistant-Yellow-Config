@@ -1080,7 +1080,7 @@ riego_tomates_ch0_timer_cancel:
     - service: timer.cancel
       entity_id: timer.riego_tomates_ch0
     - service: switch.turn_off
-      entity_id: switch.esphome_bas_sw2
+      entity_id: switch.esphome_bas_sw4
 
 riego_cesped_ch1_timer_cancel:
   alias: Timer Riego Cesped CH1 Cancel
@@ -1265,7 +1265,7 @@ sonoff_initialize:
         - switch.esphome_4ch_sw3_relay_2
         - switch.esphome_4ch_sw3_relay_3
         - switch.esphome_4ch_sw3_relay_4
-        - switch.esphome_bas_sw2                  # SONOFF_BAS_SW2 HUERTO TOMATERAS
+        - switch.esphome_bas_sw4                  # SONOFF_BAS_SW2 HUERTO TOMATERAS
         - switch.esphome_pow_sw3                  # SONOFF_POW_SW3 DEPURADORA PISCINA
     - service: valve.close_valve
       entity_id:

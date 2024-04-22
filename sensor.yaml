@@ -758,6 +758,8 @@
       #
       # AEMET PREVISION METEREOLOGICA
       #
+      # https://www.aemet.es/es/eltiempo/prediccion/municipios/espartinas-id41040#detallada
+
       # aemet_prevision_tiempo_dia0:
       #  # rain, snow, sleet
       #  friendly_name: 'Previsión Tiempo Hoy'
@@ -765,7 +767,7 @@
       #  value_template: states('sensor.dark_sky_icon')
 
       # TARJETA VERTICAL PRONOSTICO
-      # - entity: sensor.aemet_condition = weather.aemet_daily
+      # - entity: sensor.aemet_condition = weather.aemet
 
       # - entity: sensor.aemet_rain
       # - entity: sensor.aemet_rain_probability
@@ -787,188 +789,128 @@
       # {{ as_timestamp(strptime(states('sensor.aemet_datetime_0d'),'%Y-%m-%d %H:%M:%S')) | timestamp_custom("%A,%d-%m") }}
       #
 
-      # Sensores personalizados en español
+      # Sensores personalizados en español VERSION ORIGINAL
+      #aemet_tiempo_0d:
+      #  friendly_name: "Tiempo Hoy"
+      #  value_template: >-
+      #    {% if state_attr('weather.aemet','forecast').0.condition == 'rainy' %} Lluvia
+      #    {% elif state_attr('weather.aemet','forecast').0.condition == 'weather-partly-rainy' %} Lluvia Parcial
+      #    {% elif state_attr('weather.aemet','forecast').0.condition == 'lightning' %} Tormenta
+      #    {% elif state_attr('weather.aemet','forecast').0.condition == 'cloudy' %} Nublado
+      #    {% elif state_attr('weather.aemet','forecast').0.condition == 'partlycloudy' %} Nublado Parcial
+      #    {% elif state_attr('weather.aemet','forecast').0.condition == 'nightpartlycloudy' %} Nublado
+      #    {% elif state_attr('weather.aemet','forecast').0.condition == 'sunny' %} Soleado
+      #    {% else %} Desconocido
+      #    {% endif %}
+      #  icon_template: >-
+      #    {% if state_attr('weather.aemet','forecast').0.condition == 'rainy' %} mdi:weather-rainy
+      #    {% elif state_attr('weather.aemet','forecast').0.condition == 'weather-partly-rainy' %} mdi:weather-partly-rainy
+      #    {% elif state_attr('weather.aemet','forecast').0.condition == 'lightning' %} mdi:weather-lightning
+      #    {% elif state_attr('weather.aemet','forecast').0.condition == 'cloudy' %} mdi:weather-cloudy
+      #    {% elif state_attr('weather.aemet','forecast').0.condition == 'partlycloudy' %} mdi:weather-partly-cloudy
+      #    {% elif state_attr('weather.aemet','forecast').0.condition == 'nightpartlycloudy' %} mdi:weather-night-partly-cloudy
+      #    {% elif state_attr('weather.aemet','forecast').0.condition == 'sunny' %} mdi:weather-sunny
+      #    {% else %} Desconocido
+      #    {% endif %}
+
       aemet_tiempo_0d:
         friendly_name: "Tiempo Hoy"
         value_template: >-
-          {% if state_attr('weather.aemet_daily','forecast').0.condition == 'rainy' %} Lluvia
-          {% elif state_attr('weather.aemet_daily','forecast').0.condition == 'weather-partly-rainy' %} Lluvia Parcial
-          {% elif state_attr('weather.aemet_daily','forecast').0.condition == 'lightning' %} Tormenta
-          {% elif state_attr('weather.aemet_daily','forecast').0.condition == 'cloudy' %} Nublado
-          {% elif state_attr('weather.aemet_daily','forecast').0.condition == 'partlycloudy' %} Nublado Parcial
-          {% elif state_attr('weather.aemet_daily','forecast').0.condition == 'nightpartlycloudy' %} Nublado
-          {% elif state_attr('weather.aemet_daily','forecast').0.condition == 'sunny' %} Soleado
+          {% if states('sensor.aemet_condition') == 'rainy' %} Lluvia
+          {% elif states('sensor.aemet_condition') == 'weather-partly-rainy' %} Lluvia Parcial
+          {% elif states('sensor.aemet_condition') == 'lightning' %} Tormenta
+          {% elif states('sensor.aemet_condition') == 'cloudy' %} Nublado
+          {% elif states('sensor.aemet_condition') == 'partlycloudy' %} Nublado Parcial
+          {% elif states('sensor.aemet_condition') == 'nightpartlycloudy' %} Nublado
+          {% elif states('sensor.aemet_condition') == 'sunny' %} Soleado
           {% else %} Desconocido
           {% endif %}
         icon_template: >-
-          {% if state_attr('weather.aemet_daily','forecast').0.condition == 'rainy' %} mdi:weather-rainy
-          {% elif state_attr('weather.aemet_daily','forecast').0.condition == 'weather-partly-rainy' %} mdi:weather-partly-rainy
-          {% elif state_attr('weather.aemet_daily','forecast').0.condition == 'lightning' %} mdi:weather-lightning
-          {% elif state_attr('weather.aemet_daily','forecast').0.condition == 'cloudy' %} mdi:weather-cloudy
-          {% elif state_attr('weather.aemet_daily','forecast').0.condition == 'partlycloudy' %} mdi:weather-partly-cloudy
-          {% elif state_attr('weather.aemet_daily','forecast').0.condition == 'nightpartlycloudy' %} mdi:weather-night-partly-cloudy
-          {% elif state_attr('weather.aemet_daily','forecast').0.condition == 'sunny' %} mdi:weather-sunny
+          {% if states('sensor.aemet_condition') == 'rainy' %} mdi:weather-rainy
+          {% elif states('sensor.aemet_condition') == 'weather-partly-rainy' %} mdi:weather-partly-rainy
+          {% elif states('sensor.aemet_condition') == 'lightning' %} mdi:weather-lightning
+          {% elif states('sensor.aemet_condition') == 'cloudy' %} mdi:weather-cloudy
+          {% elif states('sensor.aemet_condition') == 'partlycloudy' %} mdi:weather-partly-cloudy
+          {% elif states('sensor.aemet_condition') == 'nightpartlycloudy' %} mdi:weather-night-partly-cloudy
+          {% elif states('sensor.aemet_condition') == 'sunny' %} mdi:weather-sunny
           {% else %} Desconocido
           {% endif %}
 
       aemet_tiempo_1d:
         friendly_name: "Tiempo Mañana"
         value_template: >-
-          {% if state_attr('weather.aemet_daily','forecast').1.condition == 'rainy' %} Lluvia
-          {% elif state_attr('weather.aemet_daily','forecast').1.condition == 'weather-partly-rainy' %} Lluvia Parcial
-          {% elif state_attr('weather.aemet_daily','forecast').1.condition == 'lightning' %} Tormenta
-          {% elif state_attr('weather.aemet_daily','forecast').1.condition == 'cloudy' %} Nublado
-          {% elif state_attr('weather.aemet_daily','forecast').1.condition == 'partlycloudy' %} Nublado Parcial
-          {% elif state_attr('weather.aemet_daily','forecast').1.condition == 'nightpartlycloudy' %} Nublado
-          {% elif state_attr('weather.aemet_daily','forecast').1.condition == 'sunny' %} Soleado
+          {% if states('sensor.aemet_daily_forecast_condition') == 'rainy' %} Lluvia
+          {% elif states('sensor.aemet_daily_forecast_condition') == 'weather-partly-rainy' %} Lluvia Parcial
+          {% elif states('sensor.aemet_daily_forecast_condition') == 'lightning' %} Tormenta
+          {% elif states('sensor.aemet_daily_forecast_condition') == 'cloudy' %} Nublado
+          {% elif states('sensor.aemet_daily_forecast_condition') == 'partlycloudy' %} Nublado Parcial
+          {% elif states('sensor.aemet_daily_forecast_condition') == 'nightpartlycloudy' %} Nublado
+          {% elif states('sensor.aemet_daily_forecast_condition') == 'sunny' %} Soleado
           {% else %} Desconocido
           {% endif %}
         icon_template: >-
-          {% if state_attr('weather.aemet_daily','forecast').1.condition == 'rainy' %} mdi:weather-rainy
-          {% elif state_attr('weather.aemet_daily','forecast').1.condition == 'weather-partly-rainy' %} mdi:weather-partly-rainy
-          {% elif state_attr('weather.aemet_daily','forecast').1.condition == 'lightning' %} mdi:weather-lightning
-          {% elif state_attr('weather.aemet_daily','forecast').1.condition == 'cloudy' %} mdi:weather-cloudy
-          {% elif state_attr('weather.aemet_daily','forecast').1.condition == 'partlycloudy' %} mdi:weather-partly-cloudy
-          {% elif state_attr('weather.aemet_daily','forecast').1.condition == 'nightpartlycloudy' %} mdi:weather-night-partly-cloudy
-          {% elif state_attr('weather.aemet_daily','forecast').1.condition == 'sunny' %} mdi:weather-sunny
+          {% if states('sensor.aemet_daily_forecast_condition') == 'rainy' %} mdi:weather-rainy
+          {% elif states('sensor.aemet_daily_forecast_condition') == 'weather-partly-rainy' %} mdi:weather-partly-rainy
+          {% elif states('sensor.aemet_daily_forecast_condition') == 'lightning' %} mdi:weather-lightning
+          {% elif states('sensor.aemet_daily_forecast_condition') == 'cloudy' %} mdi:weather-cloudy
+          {% elif states('sensor.aemet_daily_forecast_condition') == 'partlycloudy' %} mdi:weather-partly-cloudy
+          {% elif states('sensor.aemet_daily_forecast_condition') == 'nightpartlycloudy' %} mdi:weather-night-partly-cloudy
+          {% elif states('sensor.aemet_daily_forecast_condition') == 'sunny' %} mdi:weather-sunny
           {% else %} Desconocido
           {% endif %}
-
-      aemet_tiempo_2d:
-        friendly_name: "Tiempo Pasado Mañana"
-        value_template: >-
-          {% if state_attr('weather.aemet_daily','forecast').2.condition == 'rainy' %} Lluvia
-          {% elif state_attr('weather.aemet_daily','forecast').2.condition == 'weather-partly-rainy' %} Lluvia Parcial
-          {% elif state_attr('weather.aemet_daily','forecast').2.condition == 'lightning' %} Tormenta
-          {% elif state_attr('weather.aemet_daily','forecast').2.condition == 'cloudy' %} Nublado
-          {% elif state_attr('weather.aemet_daily','forecast').2.condition == 'partlycloudy' %} Nublado Parcial
-          {% elif state_attr('weather.aemet_daily','forecast').2.condition == 'nightpartlycloudy' %} Nublado
-          {% elif state_attr('weather.aemet_daily','forecast').2.condition == 'sunny' %} Soleado
-          {% else %} Desconocido
-          {% endif %}
-        icon_template: >-
-          {% if state_attr('weather.aemet_daily','forecast').2.condition == 'rainy' %} mdi:weather-rainy
-          {% elif state_attr('weather.aemet_daily','forecast').2.condition == 'weather-partly-rainy' %} mdi:weather-partly-rainy
-          {% elif state_attr('weather.aemet_daily','forecast').2.condition == 'lightning' %} mdi:weather-lightning
-          {% elif state_attr('weather.aemet_daily','forecast').2.condition == 'cloudy' %} mdi:weather-cloudy
-          {% elif state_attr('weather.aemet_daily','forecast').2.condition == 'partlycloudy' %} mdi:weather-partly-cloudy
-          {% elif state_attr('weather.aemet_daily','forecast').2.condition == 'nightpartlycloudy' %} mdi:weather-night-partly-cloudy
-          {% elif state_attr('weather.aemet_daily','forecast').2.condition == 'sunny' %} mdi:weather-sunny
-          {% else %} Desconocido
-          {% endif %}
-
-      aemet_datetime_0d:
-        friendly_name: "Datetime Hoy"
-        value_template: "{{ state_attr('weather.aemet_daily','forecast').0.datetime }}"
-
-      aemet_fecha_0d:
-        friendly_name: "Fecha Hoy"
-        #value_template: "{{ as_timestamp(strptime(state_attr('weather.aemet_daily','forecast').0.datetime,'%Y-%m-%d %H:%M:%S'),0) | timestamp_custom('%A,%d-%m') }}"
-        value_template: "{{ as_timestamp(state_attr('weather.aemet_daily','forecast').0.datetime) | timestamp_custom('%A,%d-%m') }}"
-
-      aemet_lluvia_0d:
-        friendly_name:  "%Probabilidad Lluvia Hoy"
-        value_template: "{{ state_attr('weather.aemet_daily','forecast').0.precipitation_probability }}"
-
-      aemet_max_temperatura_0d:
-        friendly_name: "Temperatura Max Hoy"
-        value_template: "{{ state_attr('weather.aemet_daily','forecast').0.temperature }}"
 
       aemet_min_temperatura_0d:
         friendly_name: "Temperatura Min Hoy"
-        value_template: "{{ state_attr('weather.aemet_daily','forecast').0.templow }}"
+        value_template: "{{ states('sensor.aemet_daily_forecast_temperature_low') }}"
+
+      aemet_max_temperatura_0d:
+        friendly_name: "Temperatura Max Hoy"
+        value_template: "{{ states('sensor.aemet_daily_forecast_temperature') }}"
+
+      # PENDIENTE ACTUALIZAR 
+      aemet_datetime_0d:
+        friendly_name: "Datetime Hoy"
+        value_template: "{{ state_attr('weather.aemet','forecast').0.datetime }}"
+
+      aemet_fecha_0d:
+        friendly_name: "Fecha Hoy"
+        #value_template: "{{ as_timestamp(strptime(state_attr('weather.aemet','forecast').0.datetime,'%Y-%m-%d %H:%M:%S'),0) | timestamp_custom('%A,%d-%m') }}"
+        value_template: "{{ as_timestamp(state_attr('weather.aemet','forecast').0.datetime) | timestamp_custom('%A,%d-%m') }}"
+
+      aemet_lluvia_0d:
+        friendly_name:  "%Probabilidad Lluvia Hoy"
+        value_template: "{{ state_attr('weather.aemet','forecast').0.precipitation_probability }}"
+
 
       aemet_min_viento_0d:
         friendly_name: "Viento Hoy"
-        value_template: "{{ state_attr('weather.aemet_daily','forecast').0.wind_speed }}"
-
+        value_template: "{{ state_attr('weather.aemet','forecast').0.wind_speed }}"
+      
+      # MAÑANA 
       aemet_datetime_1d:
         friendly_name: "Datetime Mañana"
-        value_template: "{{ state_attr('weather.aemet_daily','forecast').1.datetime }}"
+        value_template: "{{ state_attr('weather.aemet','forecast').1.datetime }}"
 
       aemet_fecha_1d:
         friendly_name: "Fecha Mañana"
-        #value_template: "{{ as_timestamp(strptime(state_attr('weather.aemet_daily','forecast').1.datetime,'%Y-%m-%d %H:%M:%S'),0) | timestamp_custom('%A,%d-%m') }}"
-        value_template: "{{ as_timestamp(state_attr('weather.aemet_daily','forecast').1.datetime) | timestamp_custom('%A,%d-%m') }}"
+        #value_template: "{{ as_timestamp(strptime(state_attr('weather.aemet','forecast').1.datetime,'%Y-%m-%d %H:%M:%S'),0) | timestamp_custom('%A,%d-%m') }}"
+        value_template: "{{ as_timestamp(state_attr('weather.aemet','forecast').1.datetime) | timestamp_custom('%A,%d-%m') }}"
 
       aemet_lluvia_1d:
         friendly_name:  "%Probabilidad Lluvia Mañana"
-        value_template: "{{ state_attr('weather.aemet_daily','forecast').1.precipitation_probability }}"
+        value_template: "{{ state_attr('weather.aemet','forecast').1.precipitation_probability }}"
 
       aemet_max_temperatura_1d:
         friendly_name: "Temperatura Max Mañana "
-        value_template: "{{ state_attr('weather.aemet_daily','forecast').1.temperature }}"
+        value_template: "{{ state_attr('weather.aemet','forecast').1.temperature }}"
 
       aemet_min_temperatura_1d:
         friendly_name: "Temperatura Min Mañana "
-        value_template: "{{ state_attr('weather.aemet_daily','forecast').1.templow }}"
+        value_template: "{{ state_attr('weather.aemet','forecast').1.templow }}"
 
       aemet_min_viento_1d:
         friendly_name: "Viento Mañana"
-        value_template: "{{ state_attr('weather.aemet_daily','forecast').1.wind_speed }}"
-
-      # PASADO MAÑANA
-      aemet_datetime_2d:
-        friendly_name: "Datetime Pasado Mañana"
-        value_template: "{{ state_attr('weather.aemet_daily','forecast').2.datetime }}"
-
-      aemet_fecha_2d:
-        friendly_name: "Fecha Pasado Mañana"
-        #value_template: "{{ as_timestamp(strptime(state_attr('weather.aemet_daily','forecast').2.datetime,'%Y-%m-%d %H:%M:%S'),0) | timestamp_custom('%A,%d-%m') }}"
-        value_template: "{{ as_timestamp(state_attr('weather.aemet_daily','forecast').2.datetime) | timestamp_custom('%A,%d-%m') }}"
-
-      aemet_lluvia_2d:
-        friendly_name:  "%Probabilidad Lluvia Pasado Mañana"
-        value_template: "{{ state_attr('weather.aemet_daily','forecast').2.precipitation_probability }}"
-
-      aemet_max_temperatura_2d:
-        friendly_name: "Temperatura Max Pasado Mañana "
-        value_template: "{{ state_attr('weather.aemet_daily','forecast').2.temperature }}"
-
-      aemet_min_temperatura_2d:
-        friendly_name: "Temperatura Min Pasado Mañana "
-        value_template: "{{ state_attr('weather.aemet_daily','forecast').2.templow }}"
-
-      aemet_min_viento_2d:
-        friendly_name: "Viento Pasado Mañana "
-        value_template: "{{ state_attr('weather.aemet_daily','forecast').2.wind_speed }}"
-
-      # HOY + 3 dias
-      aemet_datetime_3d:
-        friendly_name: "Datetime Pasado Mañana"
-        value_template: "{{ state_attr('weather.aemet_daily','forecast').3.datetime }}"
-
-      aemet_fecha_3d:
-        friendly_name: "Fecha Pasado Mañana"
-        #value_template: "{{ as_timestamp(strptime(state_attr('weather.aemet_daily','forecast').3.datetime,'%Y-%m-%d %H:%M:%S'),0) | timestamp_custom('%A,%d-%m') }}"
-        value_template: "{{ as_timestamp(state_attr('weather.aemet_daily','forecast').3.datetime) | timestamp_custom('%A,%d-%m') }}"
-
-      aemet_lluvia_3d:
-        friendly_name:  "%Probabilidad Lluvia Pasado Mañana"
-        value_template: "{{ state_attr('weather.aemet_daily','forecast').3.precipitation_probability }}"
-
-      aemet_max_temperatura_3d:
-        friendly_name: "Temperatura Max Pasado Mañana "
-        value_template: "{{ state_attr('weather.aemet_daily','forecast').3.temperature }}"
-
-      aemet_min_temperatura_3d:
-        friendly_name: "Temperatura Min Pasado Mañana "
-        value_template: "{{ state_attr('weather.aemet_daily','forecast').3.templow }}"
-
-      aemet_min_viento_3d:
-        friendly_name: "Viento Pasado Mañana "
-        value_template: "{{ state_attr('weather.aemet_daily','forecast').3.wind_speed }}"
-
-      estudio_persiana_mode:
-        friendly_name: Persiana Estudio Modo 
-        value_template: >-
-          {% if is_state('input_boolean.estudio_persiana_mode_up','on') %} Subir
-          {% else %} Bajar
-          {% endif %}
-        icon_template: >-
-          {% if is_state('input_boolean.estudio_persiana_mode_up','on') %} window-shutter-alert
-          {% else %} window-shutter
-          {% endif %}
+        value_template: "{{ state_attr('weather.aemet','forecast').1.wind_speed }}"
 
       #
       # CONTROL LAVADORA

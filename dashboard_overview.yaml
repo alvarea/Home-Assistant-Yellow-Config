@@ -146,7 +146,7 @@ views:
           - show_current: true
             show_forecast: true
             type: weather-forecast
-            entity: weather.aemet_daily
+            entity: weather.aemet
             name: Tiempo
           - cards:
               - color_thresholds:

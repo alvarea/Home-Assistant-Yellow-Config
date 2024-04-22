@@ -650,7 +650,7 @@
     light.led_estudio_bar:
       color_mode: rgb
       brightness: 225
-      effect: Gradient
+      effect: Breathe
       state: 'on'
     # Luces Neon On
     light.luz_estudio_neon:
