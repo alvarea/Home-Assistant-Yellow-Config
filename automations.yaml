@@ -968,10 +968,10 @@
   trigger:
       # offset: "+00:30:00"   # Horario Invierno GMT+1
       # offset: "+00:10:00"   # Horario Invierno GMT+1 - Febrero
-      # offset: "-00:30:00"   # Horario Verano GMT+2
+      # offset: "-00:15:00"   # Horario Verano GMT+2
     - platform: sun
       event: sunset
-      offset: "+00:30:00"
+      offset: "-00:15:00"
   action:
     # Encendido Luces Exterior y Jardín
     - service: script.luces_exterior_on
@@ -988,6 +988,8 @@
 - id: L02
   alias: 'L02 Luces Off Exterior Medianoche'
   # APAGA LAS LUCES DEL JARDIN SI NO ES VERANO
+  mode: single
+  max_exceeded: silent
   trigger:
     - platform: template
       value_template: "{{ states('input_boolean.helper_temporada_verano') == 'on' and states('light.luces_exterior') == 'on' and 
@@ -1015,7 +1017,8 @@
           >>> EVENTO: Es Medianoche
 
           >>> LUCES: Apagado Alumbrado Exterior + Jardín
-
+    - delay: 60
+    
 - id: L04
   alias: 'L04 Luces On Salon Sunset'
   trigger:
@@ -1622,7 +1625,7 @@
       # offset: "+03:00:00"   # Horario Invierno GMT+2  => 18:30 + 3:00 = 21:30 => Calefacción
       # offset: "+00:30:00"   # Horario Verano GMT+1  => 21:30 + 0:30 = 22:00 => Mosquitoes
       event: sunset
-      offset: "+03:00:00"
+      offset: "+00:30:00"
     #- platform: time # Solo Invierno Calefacción
     #  at: '06:45:00'
     #- platform: sun  # solo para calefacción
@@ -1689,14 +1692,14 @@
 - id: S12
   alias: 'S12 Switch Dormitorios Off'
   trigger:
-    - platform: time # Solo Invierno Calefacción
-      at: 
-        - "00:30:00"
-        - "01:00:00"
-        - "02:00:00"
-        - "03:00:00"
-        - "04:00:00"
-        - "05:00:00"
+    #- platform: time # Solo Invierno Calefacción
+    #  at: 
+    #    - "00:30:00"
+    #    - "01:00:00"
+    #    - "02:00:00"
+    #    - "03:00:00"
+    #    - "04:00:00"
+    #    - "05:00:00"
     - platform: sun
       event: sunrise
   condition:

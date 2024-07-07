@@ -1804,74 +1804,13 @@
         friendly_name: 'Portátil Zenbook AAF'
         icon_template: mdi:laptop
 
-  - platform: ping
-    host: 8.8.8.8
-    name: "ping 00 Internet Google"
-    count: 5
-    scan_interval: 300
-
-  - platform: ping
-    host: 192.168.0.1
-    count: 5
-    name: 'ping 01 Router Movistar'
-    scan_interval: 300
-
-    #ping_02_nas_time_capsule:
-  - platform: ping
-    host: 192.168.0.2
-    count: 2
-    name: 'ping 02 NAS Time Capsule'
-
-    #ping_05_router_wifi_tplink:
-  - platform: ping
-    host: 192.168.0.5
-    count: 2
-    name: 'ping 05 Router Wifi TPlink'
-
-    #ping_06_router_wifi_linksys:
-  - platform: ping
-    host: 192.168.0.6
-    count: 2
-    name: 'ping 06 Router WIFI Linksys'
-
-    #ping_07_switch_salon:
-  - platform: ping
-    host: 192.168.0.7
-    count: 2
-    name: 'ping 07 Switch Salon'
-
-    #ping_07_switch_pasillo:
-  - platform: ping
-    host: 192.168.0.8
-    count: 2
-    name: 'ping 08 Switch Pasillo'
-
-    #ping_09_switch_estudio:
-  - platform: ping
-    host: 192.168.0.9
-    count: 2
-    name: 'ping 09 Switch Estudio'
-
-    #ping_dell_macbook_aac LAN
-  - platform: ping
-    host: 192.168.0.60
-    count: 2
-    name: 'ping macbook aac lan'
-
-    #ping_dell_macbook_aac WIFI
-  - platform: ping
-    host: 192.168.0.61
-    count: 2
-    name: 'ping macbook aac wifi'
-
-    #ping_dell_windows_cgi_aac
-  - platform: ping
-    host: 192.168.0.70
-    count: 2
-    name: 'ping Dell Windows CGI AAC'
-    
-    #ping_asus_windows_aaf
-  - platform: ping
-    host: 192.168.0.72
-    count: 2
-    name: 'ping Asus Windows AAF'
+  # 
+  # YAML CONFIGURATION DEPRECATED
+  # 
+  # Version 2024.07 , a partir de esta versión, la configuracion de los sensores PING se hace desde la UI
+  #
+  #- platform: ping
+  #  host: 8.8.8.8
+  #  name: "ping 00 Internet Google"
+  #  count: 5
+  #  scan_interval: 300
