@@ -968,10 +968,10 @@
   trigger:
       # offset: "+00:30:00"   # Horario Invierno GMT+1
       # offset: "+00:10:00"   # Horario Invierno GMT+1 - Febrero
-      # offset: "-00:15:00"   # Horario Verano GMT+2
+      # offset: "+00:15:00"   # Horario Verano GMT+2
     - platform: sun
       event: sunset
-      offset: "-00:15:00"
+      offset: "+00:15:00"
   action:
     # Encendido Luces Exterior y Jardín
     - service: script.luces_exterior_on
@@ -981,7 +981,7 @@
         voz: 'Se ha puesto el sol. Enciendo luces del jardín'
         titulo: '*ALUMBRADO*'
         mensaje: >
-          >>> EVENTO: Puesta de Sol hace 10'
+          >>> EVENTO: Puesta de Sol hace 15'
 
           >>> LUCES: Alumbrado Exterior On
 
