@@ -204,6 +204,67 @@
           mensaje: >
             >>> URGENTE: SENSOR AGUA ARQUETA BAÑO
 #
+# ALARMA AUTOMATICA SENSOR SENSOR PUERTA CANCELA ABIERTA
+#
+- id: X3_alarma_cancela_abierta
+  alias: 'X3 Alarma Cancela Abierta'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.ikea_sensor_puerta_cancela
+      from: 'off'
+      to: 'on'
+      for: '00:10:00'
+  action:
+    # Micro Aviso Sirena Interior
+    - service: script.sirena_alarma_micro_aviso
+
+    # Script Envío Sonido Alexa Alexa
+    - service: script.alexa_secuencia
+      data_template:
+        sonido: "{{ states('input_select.alarma_sonido_disparado') }}"
+        repeticion: 1
+        voz: 'ATENCION. La cancela exterior lleva abierta más de 10 minutos'
+
+    # Script Notificación Alarma
+    - service: script.notifica_alarma
+      data:
+        variables:
+          titulo: '*ATENCION ALARMA PUERTA CANCELA*'
+          mensaje: >
+            >>> URGENTE: PUERTA CANCELA ABIERTA 
+
+#
+# ALARMA AUTOMATICA SENSOR SENSOR PUERTA FRIGORIFICO ABIERTA
+#
+- id: X3_alarma_frigorifico_abierta
+  alias: 'X3 Alarma Frigorifico Abierta'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.ikea_sensor_puerta_frigorico
+      from: 'off'
+      to: 'on'
+      for: '00:02:00'
+  action:
+    # Micro Aviso Sirena Interior
+    - service: script.sirena_alarma_micro_aviso
+
+    # Script Envío Sonido Alexa Alexa
+    - service: script.alexa_secuencia
+      data_template:
+        sonido: "{{ states('input_select.alarma_sonido_disparado') }}"
+        repeticion: 1
+        voz: 'ATENCION. La puerta del frigorífico lleva abierta más de 2 minutos'
+
+    # Script Notificación Alarma
+    - service: script.notifica_alarma
+      data:
+        variables:
+          titulo: '*ATENCION ALARMA PUERTA FRIGORIFICO*'
+          mensaje: >
+            >>> URGENTE: PUERTA FRIGORIFICO ABIERTA 
+
+
+#
 # REGLA: ALARMA DISARMED A <ARMING>
 #
 - id: A0
@@ -2488,16 +2549,16 @@
   trigger:
     - platform: state
       entity_id:
-        - valve.esphome_4ch_sw2_relay_1
-        - valve.esphome_4ch_sw2_relay_2
-        - switch.esphome_4ch_sw2_relay_3
-        - switch.esphome_4ch_sw2_relay_4
-        - switch.esphome_4ch_sw3_relay_1
-        - switch.esphome_4ch_sw3_relay_2
-        - switch.esphome_4ch_sw3_relay_3
-        - switch.esphome_4ch_sw3_relay_4
+        - switch.esphome_bas_sw4          # Riego Tomates
+        - valve.esphome_pow_sw1           # Riego Bonsais Producción
+        - valve.esphome_4ch_sw2_relay_1   # Riego Bonsais Top
+        - valve.esphome_4ch_sw2_relay_2   # Riego Plantas Aromáticas
+        - switch.esphome_4ch_sw3_relay_1  # Riego turbinas
+        - switch.esphome_4ch_sw3_relay_2  # Riego difusores
+        - switch.esphome_4ch_sw3_relay_3  # Riego goteo
+        - switch.esphome_4ch_sw3_relay_4  # Libre
       to: 'on'
-      for: '00:12:00'
+      for: '00:10:00'
   action:
     - service: script.jardin_riego_off
     # Notifica a Familia

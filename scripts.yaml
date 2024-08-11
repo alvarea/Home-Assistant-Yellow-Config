@@ -401,7 +401,7 @@ alexa_secuencia:
               entity_id: input_select.alarma_media_player
               state: 'media_player.echo_alexa_dormitorio'
           sequence:
-            - service: script.alexa_dormitorio_set_volumen_alarma
+            #- service: script.alexa_dormitorio_set_volumen_alarma
             - service: script.alexa_anuncio
               data_template:
                 alexa: 'dormitorio'
@@ -415,7 +415,7 @@ alexa_secuencia:
             - service: script.alexa_dormitorio_restaura_volumen
       default:
         # SALIDA ALEXA ENTRADA
-        - service: script.alexa_entrada_set_volumen_alarma
+        #- service: script.alexa_entrada_set_volumen_alarma
         - service: script.alexa_anuncio
           data_template:
             alexa: 'entrada'
@@ -440,7 +440,7 @@ alexa_entrada_secuencia:
   alias: 'Alexa Entrada Secuencia'
   mode: restart
   sequence:
-    - service: script.alexa_entrada_set_volumen_alarma
+    #- service: script.alexa_entrada_set_volumen_alarma
     - service: script.alexa_anuncio
       data_template:
         alexa: 'entrada'
@@ -457,7 +457,7 @@ alexa_dormitorio_secuencia:
   alias: 'Alexa Dormitorio Secuencia'
   mode: restart
   sequence:
-    - service: script.alexa_dormitorio_set_volumen_alarma
+    #- service: script.alexa_dormitorio_set_volumen_alarma
     - service: script.alexa_anuncio
       data_template:
         alexa: 'dormitorio'
@@ -473,7 +473,7 @@ alexa_estudio_secuencia:
   alias: 'Alexa Estudio Secuencia'
   mode: restart
   sequence:
-    - service: script.alexa_estudio_set_volumen
+    #- service: script.alexa_estudio_set_volumen
     - service: script.alexa_anuncio
       data_template:
         alexa: 'estudio'
@@ -504,7 +504,7 @@ alexa_secuencia_alarma_armado:
               entity_id: input_select.alarma_media_player
               state: 'media_player.echo_alexa_dormitorio'
           sequence:
-            - service: script.alexa_dormitorio_set_volumen_alarma
+            #- service: script.alexa_dormitorio_set_volumen_alarma
             - service: script.alexa_anuncio
               data_template:
                 alexa: 'dormitorio'
@@ -525,7 +525,7 @@ alexa_secuencia_alarma_armado:
             - delay: 00:00:10
             - service: script.alexa_dormitorio_restaura_volumen
       default:
-        - service: script.alexa_entrada_set_volumen_alarma
+        #- service: script.alexa_entrada_set_volumen_alarma
         - service: script.alexa_anuncio
           data_template:
             alexa: 'entrada'
@@ -564,7 +564,7 @@ alexa_secuencia_alarma_desarmado:
               entity_id: input_select.alarma_media_player
               state: 'media_player.echo_alexa_dormitorio'
           sequence:
-            - service: script.alexa_dormitorio_set_volumen_alarma
+            #- service: script.alexa_dormitorio_set_volumen_alarma
             - service: script.alexa_anuncio
               data_template:
                 alexa: 'dormitorio'
@@ -585,7 +585,7 @@ alexa_secuencia_alarma_desarmado:
             - delay: 00:00:10
             - service: script.alexa_dormitorio_restaura_volumen
       default:
-        - service: script.alexa_entrada_set_volumen_alarma
+        #- service: script.alexa_entrada_set_volumen_alarma
         - service: script.alexa_anuncio
           data_template:
             alexa: 'entrada'
@@ -617,7 +617,7 @@ alexa_secuencia_alarma_disparada:
   alias: 'Alexa Secuencia Alarma Disparada'
   mode: restart
   sequence:
-    - service: script.alexa_entrada_set_volumen_alarma
+    #- service: script.alexa_entrada_set_volumen_alarma
     - service: script.alexa_dormitorio_set_volumen_alarma
     - service: media_player.play_media
       data_template:
