@@ -240,7 +240,7 @@
   alias: 'X3 Alarma Frigorifico Abierta'
   trigger:
     - platform: state
-      entity_id: binary_sensor.ikea_sensor_puerta_frigorico
+      entity_id: binary_sensor.ikea_sensor_puerta_frigorifico
       from: 'off'
       to: 'on'
       for: '00:02:00'
@@ -3596,16 +3596,6 @@
               data: {}
               target:
                 entity_id: fan.estudio
-            # Para AA Estudio
-            - service: climate.turn_off
-              data: {}
-              target:
-                entity_id: climate.aa_estudio
-            - service: input_text.set_value
-              data:
-                value: "A/A Estudio {{ states('climate.aa_estudio')| upper }}"
-              target:
-                entity_id: input_text.helper_ikea_dimmer_switch_estudio
             # Para Alexa Estudio 
             - service: media_player.media_pause
               target:

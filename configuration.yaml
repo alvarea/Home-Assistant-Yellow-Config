@@ -78,8 +78,9 @@ http:
   use_x_forwarded_for: true
   trusted_proxies:
     - 127.0.0.1
+    - 192.168.0.10
   ip_ban_enabled: true
-  login_attempts_threshold: 500
+  login_attempts_threshold: 100
 
 # Checks for available updates
 # Note: This component will send some information about your system to
