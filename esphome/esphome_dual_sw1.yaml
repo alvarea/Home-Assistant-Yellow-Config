@@ -161,7 +161,17 @@ sensor:
       name: "LY1 Desk_Setup Humedad"
     battery_level:
       name: "LY1 Desk_Setup Batería Nivel"
-    #battery_voltage:
-    #  name: "LY1 Desk_Setup Batería (V)"
+    battery_voltage:
+      name: "LY1 Desk_Setup Batería"
     # signal_strength:
     #  name: "LY1 Desk_Setup Señal"
+
+  # LY02 Estudio Sala
+  - platform: atc_mithermometer
+    mac_address: "A4:C1:38:6B:AA:C8"
+    temperature:
+      name: "LY2 Estudio Sala Temperatura"
+    humidity:
+      name: "LY2 Estudio Sala Humedad"
+    battery_level:
+      name: "LY2 Estudio Sala Batería"

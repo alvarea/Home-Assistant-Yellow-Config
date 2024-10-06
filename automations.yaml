@@ -146,7 +146,6 @@
   action:
     # Micro Aviso Sirena Interior
     - service: script.sirena_alarma_micro_aviso
-
 #
 # ALARMA AUTOMATICA SENSOR HUMO COCINA
 #
@@ -176,7 +175,7 @@
           mensaje: >
             >>> URGENTE: SENSOR HUMO COCINA
 #
-# ALARMA AUTOMATICA SENSOR SENSOR AGUA ARQUETA
+# ALARMA AUTOMATICA SENSOR AGUA ARQUETA
 #
 - id: X2_alarma_agua_arqueta
   alias: 'X1 Alarma Agua Arqueta'
@@ -204,7 +203,7 @@
           mensaje: >
             >>> URGENTE: SENSOR AGUA ARQUETA BAÑO
 #
-# ALARMA AUTOMATICA SENSOR SENSOR PUERTA CANCELA ABIERTA
+# ALARMA AUTOMATICA SENSOR PUERTA CANCELA ABIERTA
 #
 - id: X3_alarma_cancela_abierta
   alias: 'X3 Alarma Cancela Abierta'
@@ -232,12 +231,11 @@
           titulo: '*ATENCION ALARMA PUERTA CANCELA*'
           mensaje: >
             >>> URGENTE: PUERTA CANCELA ABIERTA 
-
 #
-# ALARMA AUTOMATICA SENSOR SENSOR PUERTA FRIGORIFICO ABIERTA
+# ALARMA AUTOMATICA SENSOR PUERTA FRIGORIFICO ABIERTA
 #
-- id: X3_alarma_frigorifico_abierta
-  alias: 'X3 Alarma Frigorifico Abierta'
+- id: X4_alarma_frigorifico_abierta
+  alias: 'X4 Alarma Frigorifico Abierta'
   trigger:
     - platform: state
       entity_id: binary_sensor.ikea_sensor_puerta_frigorifico
@@ -262,7 +260,33 @@
           titulo: '*ATENCION ALARMA PUERTA FRIGORIFICO*'
           mensaje: >
             >>> URGENTE: PUERTA FRIGORIFICO ABIERTA 
+#
+# ALARMA AUTOMATICA SENSOR HUMEDAD FREGADERO.
+#
+- id: X5_alarma_fregadero_humedad
+  alias: 'X4 Alarma Fregadero Humedad'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.ikea_badring_humedad_fregadero
+      to: 'moist'
+  action:
+    # Micro Aviso Sirena Interior
+    - service: script.sirena_alarma_micro_aviso
 
+    # Script Envío Sonido Alexa Alexa
+    - service: script.alexa_secuencia
+      data_template:
+        sonido: "{{ states('input_select.alarma_sonido_disparado') }}"
+        repeticion: 1
+        voz: 'ATENCION. Sensor Humedad Fregadero Activado'
+
+    # Script Notificación Alarma
+    - service: script.notifica_alarma
+      data:
+        variables:
+          titulo: '*ATENCION ALARMA AGUA FREGADERO*'
+          mensaje: >
+            >>> URGENTE: SENSOR HUMEDAD FREGADERO
 
 #
 # REGLA: ALARMA DISARMED A <ARMING>
@@ -3624,7 +3648,7 @@
               target:
                 entity_id: input_text.helper_ikea_dimmer_switch_estudio
 
-#  alias: ZHA IKEA Dormitorio AAF IKEA Tradfri
+#  alias: ZHA  Dormitorio AAF IKEA Tradfri
 - id: ZHA_L8
   alias: ZHA IKEA Dormitorio AAF IKEA Tradfri
   mode: restart
@@ -4020,3 +4044,82 @@
                 value: "turn_on {{ states('input_select.helper_scene_dormitorio')}}"
               target:
                 entity_id: input_text.helper_hue_dimmer_switch_dormitorio
+
+#  alias: ZHA Dormitorio MFC IKEA Tradfri
+- id: ZHA_L12
+  alias: ZHA Dormitorio MFC IKEA Tradfri
+  mode: queued
+  # Short_press ON 
+  # Short_press OFF
+  # Long_Press ON 
+  # Long_Press OFF
+  #
+  trigger:
+    - device_id: dd68b0741084f8f1a5db454612648197
+      domain: zha
+      platform: device
+      type: remote_button_short_press
+      subtype: turn_on
+      id: on_short_press # ==> Dos lamparas on
+    - device_id: dd68b0741084f8f1a5db454612648197
+      domain: zha
+      platform: device
+      type: remote_button_short_press
+      subtype: turn_off
+      id: off_short_press # ==> Dos lamparas off
+    - device_id: dd68b0741084f8f1a5db454612648197
+      domain: zha
+      platform: device
+      type: remote_button_long_press
+      subtype: dim_up
+      id: dim_up # Lampara AAC toggle
+    - device_id: dd68b0741084f8f1a5db454612648197
+      domain: zha
+      platform: device
+      type: remote_button_long_press
+      subtype: dim_down
+      id: dim_down # Lampara MFC toggle
+  condition: []
+  action:
+    - choose:
+        # IF trigger.id = on_short_press ==> Dos lamparas on
+        - conditions:
+          - condition: trigger
+            id: on_short_press
+          sequence:
+            - service: light.turn_on
+              target:
+                entity_id: light.luces_dormitorio_mfc
+        # ELIF off_short_press Dos lamparas OFF
+        - conditions:
+          - condition: trigger
+            id: off_short_press
+          sequence:
+            # Apaga luces estudio con retardo variable en función de la hora
+            - service: light.turn_off
+              data:
+                transition: >
+                  {% if now().hour >= 0 and now().hour <= 7 %} 5
+                  {% elif now().hour >= 8 and now().hour <= 19 %} 0
+                  {% else %} 30
+                  {% endif %}
+              target:
+                entity_id: light.luces_dormitorio_mfc
+        # ELIF dim_up => Lampara AAC toggle
+        - conditions:
+          - condition: trigger
+            id: dim_up
+          sequence:
+            - service: light.toggle
+              data: {}
+              target:
+                entity_id: light.luz_dormitorio_agustin
+        # ELIF dim_up => Lampara AAC toggle
+        - conditions:
+          - condition: trigger
+            id: dim_down
+          sequence:
+            - service: light.toggle
+              data: {}
+              target:
+                entity_id: light.luz_dormitorio_malen

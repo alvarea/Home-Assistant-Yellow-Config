@@ -137,30 +137,30 @@
       color_temp: 250
     light.luz_estudio_nate:
       state: 'on'
-      brightness: 102
+      brightness: 204
       color_temp_kelvin: 4000
       color_temp: 250
     light.luz_estudio_led_mesa:
       state: 'on'
       brightness: 255
       rgb_color: 
-        - 255
-        - 147
-        - 0
+        - 254
+        - 254
+        - 254
     light.luz_estudio_play_i:
       state: 'on'
       brightness: 255
       rgb_color: 
-        - 255
-        - 147
-        - 0
+        - 254
+        - 254
+        - 254
     light.luz_estudio_play_d:
       state: 'on'
       brightness: 255
       rgb_color: 
-        - 255
-        - 147
-        - 0
+        - 254
+        - 254
+        - 254
     light.luz_estudio_alta:
       state: 'on'
       brightness: 255
@@ -314,11 +314,6 @@
       brightness: 128
       color_temp_kelvin: 4000
       color_temp: 250
-    light.luz_estudio_derecha:
-      state: 'on'
-      brightness: 128
-      color_temp_kelvin: 4000 # luz fria
-      color_temp: 250
     light.luz_estudio_led_mesa:
       state: 'on'
       brightness: 128
@@ -359,6 +354,8 @@
       state: 'off'
     light.luz_estudio_tv_izquierda:
       state: 'off'
+    light.luz_estudio_tv_derecha:
+      state: 'off'
     light.led_estudio_tv:
       state: 'off'
     light.led_estudio_bar:
@@ -382,11 +379,6 @@
     light.luz_estudio_mesa:
      state: 'off'
     light.luz_estudio_izquierda:
-      state: 'on'
-      brightness: 204
-      color_temp_kelvin: 4000
-      color_temp: 250
-    light.luz_estudio_derecha:
       state: 'on'
       brightness: 204
       color_temp_kelvin: 4000
@@ -430,6 +422,8 @@
     light.luz_estudio_lectura:
       state: 'off'
     light.luz_estudio_tv_izquierda:
+      state: 'off'
+    light.luz_estudio_tv_derecha:
       state: 'off'
     light.led_estudio_tv:
       state: 'off'
@@ -533,28 +527,28 @@
       brightness: 225
       effect: Gradient
       state: 'on'
+    light.luz_estudio_tv_izquierda:
+      state: 'on'
+      brightness: 204
+      color_temp_kelvin: 2202 # calido
+      color_temp: 454
+    light.luz_estudio_tv_derecha:
+      state: 'on'
+      brightness: 204
+      color_temp_kelvin: 2202 # calido
+      color_temp: 454
+    light.luz_estudio_lectura:
+      state: 'on'
+      brightness: 204
+      color_temp_kelvin: 2202 # calido
+      color_temp: 454
     # Luces Neon On
     light.luz_estudio_neon:
       state: 'on'
     light.luz_estudio_neon_bar:
       state: 'on'
-    light.luz_estudio_tv_izquierda:
-      state: 'on'
-      brightness: 102
-    light.luz_estudio_izquierda:
-      state: 'on'
-      brightness: 153
-      color_temp_kelvin: 2202 # calido
-      color_temp: 454
-    light.luz_estudio_derecha:
-      state: 'on'
-      brightness: 153
-      color_temp_kelvin: 2202 # calido
-      color_temp: 454
     # Luces Off
     light.luz_estudio_techo:
-      state: 'off'
-    light.luz_estudio_lectura:
       state: 'off'
     light.luz_estudio_mesa:
      state: 'off'
@@ -699,33 +693,33 @@
       state: 'on'
     light.luz_estudio_nate:
       state: 'on'
-      brightness: 169 # 70%
+      brightness: 204 # 80% 
       color_temp_kelvin: 4000
       color_temp: 250
     light.luz_estudio_led_mesa:
       state: 'on'
       brightness: 255
       rgb_color:
-        - 255
-        - 147
-        - 0
+        - 254
+        - 254
+        - 254
     light.luz_estudio_play_i:
       state: 'on'
       brightness: 255
       rgb_color: 
-        - 255
-        - 147
-        - 0
+        - 254
+        - 254
+        - 254
     light.luz_estudio_play_d:
       state: 'on'
       brightness: 255
       rgb_color: 
         - 255
-        - 147
-        - 0
+        - 254
+        - 254
     light.luz_estudio_webcam:
       state: 'on'
-      brightness: 169 # 70%
+      brightness: 102 # 40%
       color_temp_kelvin: 4000
       color_temp: 250
     light.luz_estudio_alta:
@@ -793,16 +787,23 @@
       state: 'on'
       brightness: 255
       rgb_color: 
-        - 255
-        - 147
-        - 0
+        - 254
+        - 254
+        - 254
     light.luz_estudio_play_d:
       state: 'on'
       brightness: 255
       rgb_color: 
-        - 255
-        - 147
-        - 0
+        - 254
+        - 254
+        - 254
+    light.luz_estudio_led_mesa:
+      state: 'on'
+      brightness: 255
+      rgb_color: 
+        - 254
+        - 254
+        - 254
     light.luz_estudio_play_tv:
       state: 'on'
       brightness: 255
@@ -840,6 +841,9 @@
     light.luz_estudio_tv_izquierda:
       state: 'on'
       brightness: 255
+    light.luz_estudio_tv_derecha:
+      state: 'on'
+      brightness: 255
     light.led_estudio_tv:
       state: 'on'
       brightness: 255
@@ -864,11 +868,18 @@
       color_temp: 250
     light.luz_estudio_taller:
       state: 'on'
-    light.luz_estudio_neon:
+    light.luz_estudio_neon_beer:
       state: 'on'
     light.luz_estudio_neon_bar:
       state: 'on'
-
+    light.luz_estudio_mesa:
+      state: 'on'
+    light.luz_estudio_vidriera:
+      state: 'on'
+#
+#
+# ESCENA ESTUDIO HOME CINEMA 
+#
 - id: estudio_home_cinema
   name: Estudio Home Cinema
   entities:
