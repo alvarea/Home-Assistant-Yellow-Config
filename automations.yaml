@@ -62,8 +62,8 @@
   trigger:
     - platform: time
       at:
-        - '08:00:00'
-        - '21:31:00'
+        - '09:00:00'
+        - '22:30:00'
   action:
     # Establece Volumnen Alexa Entrada/Estudio/Dormitorio según hora del día/noche
     - service: script.alexa_entrada_set_volumen
@@ -4101,7 +4101,7 @@
                 transition: >
                   {% if now().hour >= 0 and now().hour <= 7 %} 5
                   {% elif now().hour >= 8 and now().hour <= 19 %} 0
-                  {% else %} 30
+                  {% else %} 3
                   {% endif %}
               target:
                 entity_id: light.luces_dormitorio_mfc

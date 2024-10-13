@@ -109,7 +109,7 @@
       state: 'off'
     light.led_estudio_bar:
       state: 'off'
-    light.luz_estudio_neon:
+    light.luz_estudio_neon_beer:
       state: 'off'
     light.luz_estudio_neon_bar:
       state: 'off'
@@ -203,7 +203,7 @@
       state: 'off'
     light.luz_estudio_webcam:
       state: 'off'
-    light.luz_estudio_neon:
+    light.luz_estudio_neon_beer:
       state: 'off'
     light.luz_estudio_taller:
       state: 'off'
@@ -314,6 +314,11 @@
       brightness: 128
       color_temp_kelvin: 4000
       color_temp: 250
+    light.luz_estudio_derecha:
+      state: 'on'
+      brightness: 128
+      color_temp_kelvin: 4000
+      color_temp: 250
     light.luz_estudio_led_mesa:
       state: 'on'
       brightness: 128
@@ -362,7 +367,7 @@
       state: 'off'
     light.luz_estudio_webcam:
       state: 'off'
-    light.luz_estudio_neon:
+    light.luz_estudio_neon_beer:
       state: 'off'
     light.luz_estudio_neon_bar:
       state: 'off'
@@ -379,6 +384,11 @@
     light.luz_estudio_mesa:
      state: 'off'
     light.luz_estudio_izquierda:
+      state: 'on'
+      brightness: 204
+      color_temp_kelvin: 4000
+      color_temp: 250
+    light.luz_estudio_derecha:
       state: 'on'
       brightness: 204
       color_temp_kelvin: 4000
@@ -431,7 +441,7 @@
       state: 'off'
     light.luz_estudio_webcam:
       state: 'off'
-    light.luz_estudio_neon:
+    light.luz_estudio_neon_beer:
       state: 'off'
     light.luz_estudio_neon_bar:
       state: 'off'
@@ -448,6 +458,16 @@
       brightness: 76
       color_temp_kelvin: 2202 # calido
       color_temp: 454
+    light.luz_estudio_izquierda:
+      state: 'on'
+      brightness: 128
+      color_temp_kelvin: 4000
+      color_temp: 250
+    light.luz_estudio_derecha:
+      state: 'on'
+      brightness: 128
+      color_temp_kelvin: 4000
+      color_temp: 250
     light.luz_estudio_led_mesa:
       state: 'on'
       brightness: 255
@@ -543,7 +563,7 @@
       color_temp_kelvin: 2202 # calido
       color_temp: 454
     # Luces Neon On
-    light.luz_estudio_neon:
+    light.luz_estudio_neon_beer:
       state: 'on'
     light.luz_estudio_neon_bar:
       state: 'on'
@@ -554,7 +574,10 @@
      state: 'off'
     light.luz_estudio_webcam:
       state: 'off'
-
+    light.luz_estudio_taller:
+      state: 'off'
+    light.luz_estudio_vidriera:
+      state: 'off'
 #
 # ESCENA ESTUDIO OCRE - TRAS ANOCHECER SETUP OCRE CALIDO
 #
@@ -647,7 +670,7 @@
       effect: Breathe
       state: 'on'
     # Luces Neon On
-    light.luz_estudio_neon:
+    light.luz_estudio_neon_beer:
       state: 'on'
     light.luz_estudio_neon_bar:
       state: 'on'
@@ -740,7 +763,7 @@
       state: 'off'
     light.luz_estudio_baja:
       state: 'off'
-    light.luz_estudio_neon:
+    light.luz_estudio_neon_beer:
       state: 'off'
     light.luz_estudio_play_tv:
       state: 'off'
@@ -770,6 +793,11 @@
       state: 'on'
       brightness: 255
     light.luz_estudio_nate:
+      state: 'on'
+      brightness: 255
+      color_temp_kelvin: 4000
+      color_temp: 250
+    light.luz_estudio_izquierda:
       state: 'on'
       brightness: 255
       color_temp_kelvin: 4000
@@ -860,18 +888,19 @@
         - 0
     light.luz_estudio_lectura:
       state: 'on'
-      brightness: 255
+      brightness: 178
     light.luz_estudio_webcam:
       state: 'on'
       brightness: 255
       color_temp_kelvin: 4000
       color_temp: 250
-    light.luz_estudio_taller:
-      state: 'on'
     light.luz_estudio_neon_beer:
       state: 'on'
     light.luz_estudio_neon_bar:
       state: 'on'
+    # LUCES OFF
+    light.luz_estudio_taller:
+      state: 'oN'
     light.luz_estudio_mesa:
       state: 'on'
     light.luz_estudio_vidriera:
@@ -1006,7 +1035,7 @@
         - 76
         - 6
         - 255
-    light.luz_estudio_neon:
+    light.luz_estudio_neon_beer:
       state: 'on'
     light.luz_estudio_neon_bar:
       state: 'on'
