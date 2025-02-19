@@ -11,53 +11,37 @@
 
   # IOS APP ==> prob_given_true: 0.99 - prob_given_false: 0.10
   #   - device_tracker.iphone_aac
-  #   - device_tracker.iphone_malen
+  #   - device_tracker.iphone_mfc
   #   - device_tracker.iphone_paf
-  #   - devoce_tracker.a2f
-
-  # OWNTRACK ==> prob_given_true: 0.99 - prob_given_false: 0.4
-  #   - device_tracker.aac_iphone_owntrack
-  #   - device_tracker.mfc_iphone_owntrack
-  #   - device_tracker.paf_iphone_owntrack
-
-  # GEOFENCY ==> prob_given_true: 0.99 - prob_given_false: 0.1
-  #   - device_tracker.b8b52a3b_f038_4e72_a268_705d9b06e496 #AAC
-  #   - device_tracker.b6cd9e1f_4100_4cac_88d0_f4d6c044a4e6 #MFC
-  #   - device_tracker.863b93f2_f00f_4737_a35f_1ff0cce201a8 #PAF
-  #   - device_tracker.0b495ff5_94fc_4773_9644_f71df3c328ac #AAF
+  #   - devoce_tracker.iphone_aaf
 
   - platform: 'bayesian'
     prior: 0.60
     name: 'baye_home_mfc'
     probability_threshold: 0.95
     observations:
-      - entity_id: 'device_tracker.apple_87_31_3b_iphone_mfc'
+      - entity_id: 'device_tracker.apple_87_31_3b_iphone_mfc' # NMAP
         prob_given_true: 0.8
         prob_given_false: 0.2
         platform: 'state'
         to_state: 'home'
-      - entity_id: 'device_tracker.iphone_malen'  # IOS APP
+      - entity_id: 'device_tracker.iphone_mfc'  # IOS APP
         prob_given_true: 0.99
         prob_given_false: 0.1
         platform: 'state'
         to_state: 'home'
-      - entity_id: 'device_tracker.b6cd9e1f_4100_4cac_88d0_f4d6c044a4e6' #MFC
+      - entity_id: 'device_tracker.geofency_mfc' # GeofencyMFC
         prob_given_true: 0.99
         prob_given_false: 0.1
         platform: 'state'
         to_state: 'home'
-      #- entity_id: 'device_tracker.mfc_iphone_owntrack_2' # OWNTRACK
-      #  prob_given_true: 0.99
-      #  prob_given_false: 0.4
-      #  platform: 'state'
-      #  to_state: 'home'
 
   - platform: 'bayesian'
     prior: 0.60
     name: 'baye_home_aac'
     probability_threshold: 0.95
     observations:
-      - entity_id: 'device_tracker.apple_94_ac_c4_iphone_aac'
+      - entity_id: 'device_tracker.apple_94_ac_c4_iphone_aac' # NMAP
         prob_given_true: 0.8
         prob_given_false: 0.2
         platform: 'state'
@@ -67,23 +51,18 @@
         prob_given_false: 0.1
         platform: 'state'
         to_state: 'home'
-      - entity_id: 'device_tracker.b8b52a3b_f038_4e72_a268_705d9b06e496_2' #AAC
+      - entity_id: 'device_tracker.geofency_aac' # Geofency AAC
         prob_given_true: 0.99
         prob_given_false: 0.1
         platform: 'state'
         to_state: 'home'
-      #- entity_id: 'device_tracker.aac_iphone_owntrack_2' # OWNTRACK
-      #  prob_given_true: 0.99
-      #  prob_given_false: 0.4
-      #  platform: 'state'
-      #  to_state: 'home'
 
   - platform: 'bayesian'
     prior: 0.60
     name: 'baye_home_paf'
     probability_threshold: 0.95  # temporalmente estuvo a 0.98
     observations:
-      - entity_id: 'device_tracker.apple_46_ef_30_iphone_paf'
+      - entity_id: 'device_tracker.apple_c8_49_a6_iphone_paf' # NMAP
         prob_given_true: 0.8
         prob_given_false: 0.2
         platform: 'state'
@@ -93,37 +72,33 @@
         prob_given_false: 0.1
         platform: 'state'
         to_state: 'home'
-      #- entity_id: 'device_tracker.863b93f2_f00f_4737_a35f_1ff0cce201a8' #PAF
-      #  prob_given_true: 0.99
-      #  prob_given_false: 0.1
-      #  platform: 'state'
-      #  to_state: 'home'
-      #- entity_id: 'device_tracker.paf_iphone_owntrack_2' # OWNTRACK
-      #  prob_given_true: 0.99
-      #  prob_given_false: 0.4
-      #  platform: 'state'
-      #  to_state: 'home'
+      - entity_id: 'device_tracker.geofency_paf' # Geofency PAF
+        prob_given_true: 0.99
+        prob_given_false: 0.1
+        platform: 'state'
+        to_state: 'home'
 
   - platform: 'bayesian'
-    prior: 0.66
+    prior: 0.60
     name: 'baye_home_aaf'
-    probability_threshold: 0.95
+    probability_threshold: 0.95  # temporalmente estuvo a 0.98
     observations:
-      - entity_id: 'device_tracker.0b495ff5_94fc_4773_9644_f71df3c328ac' #AAF
-        prob_given_true: 0.99    # original 0.99
-        prob_given_false: 0.1   # original 0.1
-        platform: 'state'
-        to_state: 'home'
-      - entity_id: 'device_tracker.a2f'  # IOS APP
+      - entity_id: 'device_tracker.apple_89_98_36_iphone_aaf' # NMAP
         prob_given_true: 0.8
         prob_given_false: 0.2
         platform: 'state'
         to_state: 'home'
-      - entity_id: 'device_tracker.apple_89_98_36_iphone_aaf'
-        prob_given_true: 0.8
-        prob_given_false: 0.2
+      - entity_id: 'device_tracker.iphone_aaf'  # IOS APP
+        prob_given_true: 0.99
+        prob_given_false: 0.1
         platform: 'state'
         to_state: 'home'
+      - entity_id: 'device_tracker.geofency_aaf' # Geofency PAF
+        prob_given_true: 0.99
+        prob_given_false: 0.1
+        platform: 'state'
+        to_state: 'home'
+
 
   #
   # TEMPLATE SENSORS
@@ -132,46 +107,23 @@
   - platform: template
     sensors:
       #
-      # SENSORES CONTROL PRESENCIA
+      # SENSORES CONTROL PRESENCIA ==> PASAN A HELPER BINARY SENSOR TEMPLATE EN UI
       #
       # Sensores finales de control de presencia basados en el bayesian(on/off) AND input_boolean(on/off) de cada Uno.
       #
-      # and is_state('binary_sensor.baye_home_aac','on') %}
-      family_home_aac:
-        value_template: >-
-          {% if is_state('input_boolean.family_home_aac','on')
-              and is_state('person.agustin','home') %}
-            true
-          {% else %}
-            false
-          {% endif %}
+      #family_home_aac:
+      #  value_template: >-
+      #    {% if is_state('input_boolean.family_home_aac','on')
+      #        and is_state('person.agustin','home') %}
+      #      true
+      #    {% else %}
+      #      false
+      #    {% endif %}
+      #
+      # Borro el resto de entidades y pasan a helper en UI.
+      #
+      #      family_home_mfc,   family_home_paf, family_home_aaf:
 
-      family_home_mfc:
-        value_template: >-
-          {% if is_state('input_boolean.family_home_mfc','on')
-              and is_state('person.malen','home') %}
-            true
-          {% else %}
-            false
-          {% endif %}
-
-      family_home_paf:
-        value_template: >-
-          {% if is_state('input_boolean.family_home_paf','on')
-              and is_state('person.paloma','home') %}
-            true
-          {% else %}
-            false
-          {% endif %}
-
-      family_home_aaf:
-        value_template: >-
-          {% if is_state('input_boolean.family_home_aaf','on')
-              and is_state('person.agu','home') %}
-            true
-          {% else %}
-            false
-          {% endif %}
 
       # Todos en Casa:  IF sensor.family_home >= sensor.family_sleep_home THEN TRUE
       #

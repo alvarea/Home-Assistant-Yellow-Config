@@ -97,8 +97,6 @@
       color_temp: 153
     light.luz_estudio_webcam:
       state: 'off'
-    light.luz_estudio_play_tv:
-      state: 'off'
     light.luz_estudio_techo:
       state: 'off'
     light.luz_estudio_lectura:
@@ -191,8 +189,6 @@
     light.luz_estudio_techo:
       state: 'off'
       brightness: 204
-    light.luz_estudio_play_tv:
-      state: 'off'
     light.luz_estudio_lectura:
       state: 'off'
     light.luz_estudio_tv_izquierda:
@@ -341,8 +337,6 @@
         - 255
         - 147
         - 0
-    light.luz_estudio_play_tv:
-      state: 'off'
     light.luz_estudio_mesa:
       state: 'off'
     light.luz_estudio_alta:
@@ -419,8 +413,6 @@
         - 255
         - 147
         - 0
-    light.luz_estudio_play_tv:
-      state: 'off'
     light.luz_estudio_alta:
       state: 'off'
     light.luz_estudio_media:
@@ -509,14 +501,6 @@
         - 6
         - 255
     light.luz_estudio_baja:
-      state: 'on'
-      brightness: 255
-      # Azul: gb_color: 70, 6, 255
-      rgb_color:
-        - 76
-        - 6
-        - 255
-    light.luz_estudio_play_tv:
       state: 'on'
       brightness: 255
       # Azul: gb_color: 70, 6, 255
@@ -633,14 +617,6 @@
     light.luz_estudio_baja:
       state: 'on'
       brightness: 204
-      # Color Ocre
-      rgb_color:
-        - 255
-        - 147
-        - 0
-    light.luz_estudio_play_tv:
-      state: 'on'
-      brightness: 255
       # Color Ocre
       rgb_color:
         - 255
@@ -765,8 +741,6 @@
       state: 'off'
     light.luz_estudio_neon_beer:
       state: 'off'
-    light.luz_estudio_play_tv:
-      state: 'off'
     light.led_estudio_tv:
       state: 'off'
     light.led_estudio_bar:
@@ -832,13 +806,6 @@
         - 254
         - 254
         - 254
-    light.luz_estudio_play_tv:
-      state: 'on'
-      brightness: 255
-      rgb_color: 
-        - 255
-        - 147
-        - 0
     light.luz_estudio_alta:
       state: 'on'
       brightness: 255
@@ -1004,13 +971,6 @@
         - 255
         - 147
         - 0
-    light.luz_estudio_play_tv:
-      state: 'on'
-      brightness: 76
-      rgb_color:
-        - 255
-        - 147
-        - 0
     light.luz_estudio_alta:
       state: 'on'
       brightness: 76
@@ -1073,6 +1033,8 @@
       state: 'off'
     light.led_salon_tv:
       state: 'off'
+      light.luz_salon_play_tv:
+      state: 'off'
   icon: mdi:weather-sunset-down
 
 #
@@ -1093,6 +1055,14 @@
     light.luz_salon_sofa:
       state: 'on'
       brightness: 204
+    light.luz_salon_play_tv:
+      state: 'on'
+      brightness: 255
+      # Azul: gb_color: 70, 6, 255
+      rgb_color:
+        - 76
+        - 6
+        - 255
     light.led_salon_tv:
       effect_list:
       - Android
@@ -1255,6 +1225,14 @@
     light.luz_salon_sofa:
       state: 'on'
       brightness: 204
+    light.luz_salon_play_tv:
+      state: 'on'
+      brightness: 255
+      # Azul: gb_color: 70, 6, 255
+      rgb_color:
+        - 76
+        - 6
+        - 255
   icon: mdi:lamps
 
 - id: salon_home_cinema
@@ -1275,6 +1253,14 @@
       icon: mdi:playlist-play
       friendly_name: led-estudio-tv Preset
       state: Gradient
+    light.luz_salon_play_tv:
+      state: 'on'
+      brightness: 76
+      # Azul: gb_color: 70, 6, 255
+      rgb_color:
+        - 76
+        - 6
+        - 255
     light.led_salon_tv:
       effect_list:
       - Android
@@ -1462,3 +1448,87 @@
       state: 'on'
       brightness: 25
   icon: mdi:lightbulb-on-10
+
+
+# ESCENA COCINA
+#
+- id: cocina_noche
+  name: Cocina Noche
+  entities:
+    light.luz_cocina_izquierda:
+      state: 'on'
+      brightness: 204
+    light.luz_cocina_derecha:
+      state: 'on'
+      brightness: 204
+    select.wled_cocina_tv_preset:
+      options:
+        - Solid Ocre
+        - Gradient
+        - Solid Blanco
+      friendly_name: wled-cocina-tv Preset
+      state: Solid Ocre
+    light.led_cocina_tv:
+      supported_color_modes:
+      - rgb
+      icon: mdi:led-strip-variant
+      friendly_name: Led TV
+      supported_features: 36
+      color_mode: rgb
+      brightness: 204
+      hs_color:
+      - 300
+      - 100
+      rgb_color:
+      - 255
+      - 0
+      - 255
+      xy_color:
+      - 0.385
+      - 0.155
+      effect: Gradient
+      state: 'on'
+  metadata:
+    light.led_cocina_tv:
+      entity_only: true
+  icon: mdi:lamps-outline
+
+- id: cocina_solo_led
+  name: Cocina Led TV
+  entities:
+    light.luz_cocina_izquierda:
+      state: 'off'
+    light.luz_cocina_derecha:
+      state: 'off'
+    select.wled_cocina_tv_preset:
+      options:
+        - Solid Ocre
+        - Gradient
+        - Solid Blanco
+      friendly_name: wled-cocina-tv Preset
+      state: Gradien
+    light.led_cocina_tv:
+      supported_color_modes:
+      - rgb
+      icon: mdi:led-strip-variant
+      friendly_name: Led TV
+      supported_features: 36
+      color_mode: rgb
+      brightness: 204
+      hs_color:
+      - 300
+      - 100
+      rgb_color:
+      - 255
+      - 0
+      - 255
+      xy_color:
+      - 0.385
+      - 0.155
+      effect: Gradient
+      state: 'on'
+  metadata:
+    light.led_cocina_tv:
+      entity_only: true
+  icon: mdi:lamps-outline
+

@@ -203,42 +203,13 @@
           mensaje: >
             >>> URGENTE: SENSOR AGUA ARQUETA BAÑO
 #
-# ALARMA AUTOMATICA SENSOR PUERTA CANCELA ABIERTA
+# ALARMA AUTOMATICA SENSOR PUERTA FRIGORIFICO COCINA ABIERTA
 #
-- id: X3_alarma_cancela_abierta
-  alias: 'X3 Alarma Cancela Abierta'
+- id: X3_alarma_frigo_cocina_abierto
+  alias: 'X3 Alarma Frigorifico Cocina Abierto'
   trigger:
     - platform: state
-      entity_id: binary_sensor.ikea_sensor_puerta_cancela
-      from: 'off'
-      to: 'on'
-      for: '00:10:00'
-  action:
-    # Micro Aviso Sirena Interior
-    - service: script.sirena_alarma_micro_aviso
-
-    # Script Envío Sonido Alexa Alexa
-    - service: script.alexa_secuencia
-      data_template:
-        sonido: "{{ states('input_select.alarma_sonido_disparado') }}"
-        repeticion: 1
-        voz: 'ATENCION. La cancela exterior lleva abierta más de 10 minutos'
-
-    # Script Notificación Alarma
-    - service: script.notifica_alarma
-      data:
-        variables:
-          titulo: '*ATENCION ALARMA PUERTA CANCELA*'
-          mensaje: >
-            >>> URGENTE: PUERTA CANCELA ABIERTA 
-#
-# ALARMA AUTOMATICA SENSOR PUERTA FRIGORIFICO ABIERTA
-#
-- id: X4_alarma_frigorifico_abierta
-  alias: 'X4 Alarma Frigorifico Abierta'
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.ikea_sensor_puerta_frigorifico
+      entity_id: binary_sensor.ikea_sensor_frigo_cocina
       from: 'off'
       to: 'on'
       for: '00:02:00'
@@ -251,15 +222,44 @@
       data_template:
         sonido: "{{ states('input_select.alarma_sonido_disparado') }}"
         repeticion: 1
-        voz: 'ATENCION. La puerta del frigorífico lleva abierta más de 2 minutos'
+        voz: 'ATENCION. frigorífico cocina abierto más de 2 minutos'
 
     # Script Notificación Alarma
     - service: script.notifica_alarma
       data:
         variables:
-          titulo: '*ATENCION ALARMA PUERTA FRIGORIFICO*'
+          titulo: '*ATENCION ALARMA FRIGORIFICO COCINA*'
           mensaje: >
-            >>> URGENTE: PUERTA FRIGORIFICO ABIERTA 
+            >>> URGENTE: FRIGORIFICO COCINA ABIERTO
+#
+# ALARMA AUTOMATICA SENSOR PUERTA FRIGORIFICO BEBIDAS ABIERTA
+#
+- id: X4_alarma_frigorifico_bebidas_abierto
+  alias: 'X4 Alarma Frigorifico Bebidas Abierto'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.ikea_sensor_frigo_bebidas
+      from: 'off'
+      to: 'on'
+      for: '00:02:00'
+  action:
+    # Micro Aviso Sirena Interior
+    - service: script.sirena_alarma_micro_aviso
+
+    # Script Envío Sonido Alexa Alexa
+    - service: script.alexa_secuencia
+      data_template:
+        sonido: "{{ states('input_select.alarma_sonido_disparado') }}"
+        repeticion: 1
+        voz: 'ATENCION. frigorífico bebidas abierto más de 2 minutos'
+
+    # Script Notificación Alarma
+    - service: script.notifica_alarma
+      data:
+        variables:
+          titulo: '*ATENCION ALARMA FRIGORIFICO BEBIDAS*'
+          mensaje: >
+            >>> URGENTE: FRIGORIFICO BEBIDAS ABIERTO
 #
 # ALARMA AUTOMATICA SENSOR HUMEDAD FREGADERO.
 #
@@ -384,14 +384,6 @@
         sonido: "{{ states('input_select.alarma_sonido_armado') }}"
         repeticion: 1
 
-    # Notifica Evento
-    - service: script.notifica_evento
-      data:
-        titulo: '*ALARMA HOMY*'
-        mensaje: >
-          >>> ESTADO: ARMADO TOTAL (AWAY)
-          >>> ACCION: Apagado Total Casa
-
     # Llamada a Script Apagado Casa
     - service: script.home_switch_off
 
@@ -431,14 +423,6 @@
         sonido: "{{ states('input_select.alarma_sonido_armado') }}"
         repeticion: 1
 
-    # Notifica Evento
-    - service: script.notifica_evento
-      data:
-        titulo: '*ALARMA HOMY*'
-        mensaje: >
-          >>> ESTADO: ARMADO PARCIAL (HOME)
-
-
     # Revisar
     # https://community.home-assistant.io/t/automation-with-is-state-trigger-to-state-on-not-working/54691/2
     #        >>> MODO: "{{ trigger.to_state.state }}"
@@ -473,13 +457,6 @@
         voz: "ATENCION!. Alarma desactivada."
         sonido: "{{ states('input_select.alarma_sonido_desarmado') }}"
         repeticion: 1
-
-    # Script Notificación Evento
-    - service: script.notifica_evento
-      data:
-        titulo: '*ALARMA HOMY*'
-        mensaje: >
-          >>> ESTADO: Alarma Desactivada
 #
 # REGLA: TRIGGER SENSOR => MODO ARMADO AWAY => PENDING ==> ALARMA TRIGGERED
 #
@@ -666,13 +643,6 @@
         entity_id: binary_sensor.alarma_check_listo_para_armar
         state: 'on'
       sequence:
-        # Notifica Evento
-        - service: script.notifica_evento
-          data:
-            titulo: '*FAMILY HOME*'
-            mensaje: >
-              >>> MADRUGADA ALGUIEN EN CASA. AUTO ARMADO HOME EN 5' 
-        - delay: '00:00:05'
         - service: alarm_control_panel.alarm_arm_home
           entity_id: alarm_control_panel.ha
     default:
@@ -713,11 +683,11 @@
     # Check sensores perimetro
     - service: script.check_sensores_magneticos_perimetro
     # Notifica Evento
-    - service: script.notifica_evento
-      data:
-        titulo: '*ALARMA HOMY*'
-        mensaje: >
-          >>> ESTADO: Desarmado automático al amanecer.
+    #- service: script.notifica_evento
+    #  data:
+    #    titulo: '*ALARMA HOMY*'
+    #    mensaje: >
+    #      >>> ESTADO: Desarmado automático al amanecer.
 
 - id: A11_check_status_sensores_perimetros
   alias: 'A11 Check Status Sensores Perimetro'
@@ -788,17 +758,8 @@
   action:
     # Llamada al contador de personas que actualiza sensor.family_home
     - service: python_script.countpeople
-
     - service: input_boolean.turn_on
       entity_id: input_boolean.family_sleep_home_mfc
-    # Notifica Evento
-    - service: script.notifica_evento
-      data:
-        titulo: '*FAMILY HOME*'
-        mensaje: >
-          >>> Malen está en casa a las 23:00
-
-          >>> Activado el control de Duerme en Casa.
 
 - id: F07
   alias: 'F07 Family AAF - Check Sleep'
@@ -817,17 +778,8 @@
   action:
     # Llamada al contador de personas que actualiza sensor.family_home
     - service: python_script.countpeople
-
     - service: input_boolean.turn_on
       entity_id: input_boolean.family_sleep_home_aaf
-    # Notifica Evento
-    - service: script.notifica_evento
-      data:
-        titulo: '*FAMILY HOME*'
-        mensaje: >
-          >>> Agu está en casa a las 23:00
-
-          >>> Activado el control de Duerme en Casa.
 
 - id: F08
   alias: 'F08 Family PAF - Check Sleep'
@@ -846,17 +798,8 @@
   action:
     # Llamada al contador de personas que actualiza sensor.family_home
     - service: python_script.countpeople
-
     - service: input_boolean.turn_on
       entity_id: input_boolean.family_sleep_home_paf
-    # Notifica Evento
-    - service: script.notifica_evento
-      data:
-        titulo: '*FAMILY HOME*'
-        mensaje: >
-          >>> Paloma está en casa a las 23:00
-
-          >>> Activado el control de Duerme en Casa.
 
 - id: F09
   alias: 'F09 Family AAC - Check Sleep'
@@ -875,17 +818,8 @@
   action:
     # Llamada al contador de personas que actualiza sensor.family_home
     - service: python_script.countpeople
-
     - service: input_boolean.turn_on
       entity_id: input_boolean.family_sleep_home_paf
-    # Notifica Evento
-    - service: script.notifica_evento
-      data:
-        titulo: '*FAMILY HOME*'
-        mensaje: >
-          >>> Agustín está en casa a las 23:00
-
-          >>> Activado el control de Duerme en Casa.
 
 - id: F10
   alias: 'F10 Family Any Change - Actualiza Contador'
@@ -936,8 +870,6 @@
       data: {}
       target:
         area_id: dormitorio_paf
-
-
 
 #-----------------------------------------------------------------------------#
 #                                                                             #
@@ -1061,14 +993,14 @@
     # Encendido Luces Exterior y Jardín
     - service: script.luces_exterior_on
     # Notifica a Familia
-    - service: script.notifica_evento
-      data:
-        voz: 'Se ha puesto el sol. Enciendo luces del jardín'
-        titulo: '*ALUMBRADO*'
-        mensaje: >
-          >>> EVENTO: Puesta de Sol hace 15'
-
-          >>> LUCES: Alumbrado Exterior On
+    #- service: script.notifica_evento
+    #  data:
+    #    voz: 'Se ha puesto el sol. Enciendo luces del jardín'
+    #    titulo: '*ALUMBRADO*'
+    #    mensaje: >
+    #      >>> EVENTO: Puesta de Sol hace 15'
+    #
+    #      >>> LUCES: Alumbrado Exterior On
 
 - id: L02
   alias: 'L02 Luces Off Exterior Medianoche'
@@ -1094,14 +1026,14 @@
     - service: light.turn_off
       entity_id: light.luces_exterior
     # Notifica a Familia
-    - service: script.notifica_evento
-      data:
-        voz: 'Es  medianoche. Apagando luces Exterior y Jardín'
-        titulo: '*ALUMBRADO*'
-        mensaje: >
-          >>> EVENTO: Es Medianoche
-
-          >>> LUCES: Apagado Alumbrado Exterior + Jardín
+    #- service: script.notifica_evento
+    #  data:
+    #    voz: 'Es  medianoche. Apagando luces Exterior y Jardín'
+    #    titulo: '*ALUMBRADO*'
+    #    mensaje: >
+    #      >>> EVENTO: Es Medianoche
+    #
+    #      >>> LUCES: Apagado Alumbrado Exterior + Jardín
     - delay: 60
     
 - id: L04
@@ -1223,8 +1155,8 @@
       data:
         brightness_pct: >
           {% if now().hour >= 0 and now().hour <= 7 %} 10
-          {% elif now().hour >= 8 and now().hour <= 17 %} 40
-          {% else %} 50
+          {% elif now().hour >= 11 and now().hour <= 17 %} 50
+          {% else %} 80
           {% endif %}
       target:
         entity_id: light.luz_entrada
@@ -1234,13 +1166,12 @@
     - delay:
         minutes: >
           {% if now().hour >= 1 and now().hour <= 7 %} 1
-          {% else %} 3
+          {% else %} 5
           {% endif %}
     # Luces Entrada OFF
     - service: light.turn_off
       entity_id:
         - light.luz_entrada
-        - light.luz_gateway_aqara
         - light.tagreader_led
 
 - id: L08
@@ -1419,32 +1350,32 @@
     conditions:
       - condition: sun
         after: sunset
-        after_offset: "+00:30:00"
+        # after_offset: "+00:30:00"
       - condition: template
-        value_template: "{{ (now().hour >= 18 and now().hour <= 23) or (now().hour >= 0 and now().hour <=7) }}"
+        value_template: "{{ (now().hour >= 18 and now().hour <= 23) or (now().hour >= 0 and now().hour <=8) }}"
       - condition: state
-        entity_id: light.luz_cocina
+        entity_id: light.luces_cocina
         state: 'off'
   action:
     - service: light.turn_on
       data:
         brightness_pct: >
-          {% if now().hour >= 0 and now().hour <= 7 %} 50
+          {% if now().hour >= 0 and now().hour <= 8 %} 75
           {% elif now().hour >= 18 and now().hour <= 23 %} 90
           {% else %} 90
           {% endif %}
       target:
-        entity_id: light.luz_cocina
+        entity_id: light.luces_cocina
     # Espera de 10'
     - delay:
         minutes: >
-          {% if now().hour >= 1 and now().hour <= 7 %} 2
+          {% if now().hour >= 1 and now().hour <= 6 %} 2
           {% else %} 10
           {% endif %}
     # Luces Off + Led
     - service: light.turn_off
       entity_id: 
-        - light.luz_cocina
+        - light.luces_cocina
 
 #-----------------------------------------------------------------------------#
 #                                                                             #
@@ -2586,7 +2517,7 @@
   action:
     - service: script.jardin_riego_off
     # Notifica a Familia
-    - service: script.notifica_evento
+    - service: script.notifica_alarma
       data:
         titulo: '*JARDIN: SOBRERIEGO DETECTADO*'
         mensaje: >
@@ -2612,7 +2543,7 @@
   action:
     - service: script.piscina_depuradora_off
     # Notifica a Familia
-    - service: script.notifica_evento
+    - service: script.notifica_alarma
       data:
         titulo: '*PISCINA: SOBRE-DEPURACION DETECTADO*'
         mensaje: >
@@ -4123,3 +4054,97 @@
               data: {}
               target:
                 entity_id: light.luz_dormitorio_malen
+
+#  alias: ZHA Cocina IKEA Styrbar Dimmer
+- id: ZHA_L13
+  alias: ZHA Cocina IKEA Styrbar Dimmer
+  mode: queued
+  # Realiza un ciclo cada vez que se pulsa en el boton left-right
+  # scene.dormitorio_full, scene.dormitorio_lectura, scene.dormitorio_relax, scene.dormitorio_noche
+  #
+  # Event Type: remote_button_short_press, remote_button_double_press
+  # Event Subtype: turn_on, turn_off, dim_up, dim_down
+  #
+  trigger:
+    - device_id: ee7a47bbd991782f2589fb9a26478a38
+      domain: zha
+      platform: device
+      type: remote_button_short_press
+      subtype: turn_on
+      id: on_short_press
+    - device_id: ee7a47bbd991782f2589fb9a26478a38
+      domain: zha
+      platform: device
+      type: remote_button_short_press
+      subtype: turn_off
+      id: off_short_press
+    - device_id: ee7a47bbd991782f2589fb9a26478a38
+      domain: zha
+      platform: device
+      type: remote_button_short_press
+      subtype: left
+      id: left
+    - device_id: ee7a47bbd991782f2589fb9a26478a38
+      domain: zha
+      platform: device
+      type: remote_button_short_press
+      subtype: right
+      id: right
+    - device_id: ee7a47bbd991782f2589fb9a26478a38
+      domain: zha
+      platform: device
+      type: remote_button_long_press
+      subtype: dim_up
+      id: dim_up
+    - device_id: ee7a47bbd991782f2589fb9a26478a38
+      domain: zha
+      platform: device
+      type: remote_button_long_press
+      subtype: dim_down
+      id: dim_down
+  condition: []
+  # input_text.helper_ikea_dimmer_switch_salon
+  action:
+    - choose:
+        # IF trigger.id = on_short_press
+        - conditions:
+          - condition: trigger
+            id: on_short_press
+          sequence:
+            - service: scene.turn_on
+              target:
+                entity_id: scene.cocina_noche
+        # ELIF off_short_press
+        - conditions:
+          - condition: trigger
+            id: off_short_press
+          sequence:
+            - service: light.turn_off
+              target:
+                entity_id: light.luces_cocina
+        # ELIF left
+        - conditions:
+          - condition: trigger
+            id: left
+          sequence:
+            - service: input_select.select_previous
+              data:
+                cycle: true
+              target:
+                entity_id: input_select.helper_scene_cocina
+            - service: scene.turn_on
+              target:
+                entity_id: "{{ states('input_select.helper_scene_cocina')}}"
+        # ELIF right
+        - conditions:
+          - condition: trigger
+            id: right
+          sequence:
+            - service: input_select.select_next
+              data:
+                cycle: true
+              target:
+                entity_id: input_select.helper_scene_cocina
+            - service: scene.turn_on
+              target:
+                entity_id: "{{ states('input_select.helper_scene_cocina')}}"

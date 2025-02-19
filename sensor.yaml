@@ -240,33 +240,6 @@
       #  entity_picture_template: "{{ states.device_tracker.meta_aaf.attributes.entity_picture if states('device_tracker.meta_aaf') is not none }}"
       #  value_template: "{{ states('device_tracker.meta_aaf') if is_state('sensor.family_home_aaf','on') and states('device_tracker.meta_aaf') is not none }}"
 
-      # Sensores read-only de configuración on/off Tracking Family Home AAC, MFC, PAF, AAF
-      # input_boolean.family_home_mfc,input_boolean.family_home_aac,input_boolean.family_home_paf,input_boolean.family_home_aaf
-      #
-      family_home_aac:
-        value_template: "{{ states('input_boolean.family_home_aac') if states('input_boolean.family_home_aac') is not none }}"
-        friendly_name: 'Iphone AAC operativo'
-        icon_template: mdi:cellphone-iphone
-        #entity_picture_template: "{{ states.device_tracker.meta_aaf.attributes.entity_picture if states('input_boolean.family_home_aac') is not none }}"
-
-      family_home_mfc:
-        value_template: "{{ states('input_boolean.family_home_mfc') if states('input_boolean.family_home_mfc') is not none }}"
-        friendly_name: 'Iphone MFC operativo'
-        icon_template: mdi:cellphone-iphone
-        #entity_picture_template: "{{ states.device_tracker.meta_aaf.attributes.entity_picture if states('input_boolean.family_home_mfc') is not none }}"
-
-      family_home_paf:
-        value_template: "{{ states('input_boolean.family_home_paf') if states('input_boolean.family_home_paf') is not none }}"
-        friendly_name: 'Iphone PAF operativo'
-        icon_template: mdi:cellphone-iphone
-        #entity_picture_template: "{{ states.device_tracker.meta_aaf.attributes.entity_picture if states('input_boolean.family_home_paf') is not none }}"
-
-      family_home_aaf:
-        value_template: "{{ states('input_boolean.family_home_aaf') if states('input_boolean.family_home_aaf') is not none }}"
-        friendly_name: 'Iphone AAF operativo'
-        icon_template: mdi:cellphone-iphone
-        #entity_picture_template: "{{ states.device_tracker.meta_aaf.attributes.entity_picture if states('input_boolean.family_home_aaf') is not none }}"
-
       # Bayesian Binarysensor tracker AAC, MFC, PAF, AAF ==> Probability
       baye_probability_aac:
         value_template: "{{ ((states.binary_sensor.baye_home_aac.attributes.probability)|float *100)|round(2) }}"

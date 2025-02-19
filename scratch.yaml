@@ -1,3 +1,152 @@
+type: grid
+cards:
+  - show_state: true
+    show_name: true
+    camera_view: live
+    type: picture-entity
+    image: /local/AAF_header_col.jpg
+    entity: binary_sensor.family_home_paf
+    aspect_ratio: "5"
+  - type: tile
+    entity: person.agu
+    show_entity_picture: true
+    vertical: false
+    hide_state: false
+    state_content:
+      - state
+      - last_changed
+      - latitude
+      - longitude
+      - gps_accuracy
+    name: MALEN
+    grid_options:
+      columns: 12
+      rows: 1
+  - type: custom:mushroom-chips-card
+    chips:
+      - type: entity
+        entity: sensor.iphone_paf_battery_level
+        icon: mdi:cellphone-charging
+      - type: entity
+        entity: sensor.iphone_paf_battery_state
+        icon: mdi:cellphone-arrow-down-variant
+      - type: entity
+        entity: sensor.iphone_paf_watch_battery_level
+        icon: mdi:watch-variant
+      - type: entity
+        entity: sensor.iphone_paf_watch_battery_state
+        icon: mdi:watch-import-variant
+      - type: entity
+        entity: sensor.iphone_paf_storage
+      - type: entity
+        entity: sensor.iphone_paf_steps
+      - type: entity
+        entity: sensor.iphone_paf_floors_ascended
+      - type: entity
+        entity: sensor.iphone_paf_floors_descended
+  - type: tile
+    entity: binary_sensor.family_home_paf
+    state_content:
+      - state
+      - last_changed
+    name: Famly Home AAC
+  - type: tile
+    entity: input_boolean.family_sleep_home_paf
+    name: Input Tracking AAC
+  - type: tile
+    show_entity_picture: false
+    state_content:
+      - last_changed
+      - Name
+      - Locality
+    entity: sensor.iphone_paf_geocoded_location
+    grid_options:
+      columns: 12
+      rows: 1
+  - type: tile
+    show_entity_picture: false
+    entity: sensor.iphone_paf_location_permission
+    grid_options:
+      columns: 6
+      rows: 1
+    state_content: state
+  - type: tile
+    show_entity_picture: false
+    grid_options:
+      columns: 6
+      rows: 1
+    state_content: state
+    entity: sensor.iphone_paf_app_version
+  - type: heading
+    icon: ""
+    heading: Device Trackers
+    heading_style: subtitle
+  - type: tile
+    show_entity_picture: false
+    grid_options:
+      columns: 12
+      rows: 1
+    state_content:
+      - state
+      - last_changed
+      - latitude
+      - longitude
+    entity: device_tracker.iphone_paf
+  - type: tile
+    show_entity_picture: false
+    grid_options:
+      columns: 12
+      rows: 1
+    state_content:
+      - state
+      - last_changed
+      - latitude
+      - longitude
+    entity: device_tracker.geofency_agu
+  - type: tile
+    show_entity_picture: false
+    grid_options:
+      columns: 12
+      rows: 1
+    state_content:
+      - state
+      - last_changed
+      - latitude
+      - longitude
+    entity: device_tracker.apple_89_98_36_iphone_paf
+  - type: tile
+    entity: binary_sensor.baye_home_paf
+    show_entity_picture: false
+    state_content:
+      - state
+      - last_changed
+  - type: tile
+    entity: sensor.baye_probability_paf
+    show_entity_picture: false
+    state_content:
+      - state
+      - last_changed
+  - type: heading
+    icon: ""
+    heading: Red
+    heading_style: subtitle
+  - type: tile
+    show_entity_picture: false
+    state_content:
+      - state
+      - last_changed
+    entity: sensor.iphone_paf_connection_type
+  - type: tile
+    show_entity_picture: false
+    state_content:
+      - state
+      - last_changed
+    entity: sensor.iphone_paf_ssid
+
+
+ ********************************
+
+
 cloud:
   alexa:
     filter:
