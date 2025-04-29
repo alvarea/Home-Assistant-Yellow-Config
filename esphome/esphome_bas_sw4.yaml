@@ -1,5 +1,5 @@
 #
-# ESPHOME SONOFF BASIC R2 - SW4 - MESA TALLER ESTUDIO-
+# ESPHOME SONOFF BASIC R2 - SW4 - 
 #
 # 12.05.2023 : Fix error Network not found tras upgrade a ESPHOME 2023.04.  Elimino componentes innecesarios, dejando solo binary_sensor + switch
 #

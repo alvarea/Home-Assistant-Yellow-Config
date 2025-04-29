@@ -79,8 +79,12 @@ http:
   trusted_proxies:
     - 127.0.0.1
     - 192.168.0.1
-  ip_ban_enabled: true 
-  login_attempts_threshold: 5
+  ip_ban_enabled: false
+  login_attempts_threshold: 50
+
+# If you want to use Home Assistant to host or serve static files then create a directory called www under the configuration path (/config).
+# The static files in www/ can be accessed by the following URL http://your.domain:8123/local/,
+# for example audio.mp3 would be accessed as http://your.domain:8123/local/audio.mp3.
 
 # Checks for available updates
 # Note: This component will send some information about your system to

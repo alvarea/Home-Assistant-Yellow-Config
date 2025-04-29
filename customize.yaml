@@ -114,39 +114,6 @@ binary_sensor.esphome_4ch_status:
 # SERIE SONOFF POW-R2
 #
 
-# Nativo del codigo ESPHOME. Boton  pulsador del sensor esphome
-# Sensor Read-Only para mostrar en front-end
-binary_sensor.esphome_pow_sw2_boton:
-  friendly_name: Lavadora Pulsador On/off
-
-# Nativo del codigo ESPHOME. Indica solo la conectividad del sensor esphome
-# Sensor Read-Only para mostrar en front-end
-binary_sensor.esphome_pow_sw2_status:
-  friendly_name: POW.SW2 Lavadora
-
-# Nativo del codigo ESPHOME. SWITCH
-# Interruptor real (no usado en front-end)
-switch.esphome_pow_sw2:
-  friendly_name: Lavadora (Power-On)
-  icon: mdi:power-plug
-
-# Binary sensor calculado en base al anterior
-# Sensor Read-Only para mostrar en front-end
-binary_sensor.esphome_pow_sw2_switch:
-  friendly_name: Lavadora (Power-On)
-  icon: mdi:power-plug
-
-# Nativo del codigo ESPHOME. Light LED azul
-# Luz real (no usado en front-end)
-light.esphome_pow_sw2_led:
-  friendly_name: Lavado Activo (LED)
-
-# Binary sensor calculado en base al anterior
-# Sensor Read-Only para mostrar en front-end
-binary_sensor.esphome_pow_sw2_blue_led:
-  friendly_name: Lavado Activo (LED)
-  icon: mdi:washing-machine
-
 # Nativo del codigo ESPHOME. Sensor Consumo A
 # Sensor real (no usado en front-end)
 sensor.esphome_pow_sw2_current:

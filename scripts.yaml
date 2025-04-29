@@ -1080,7 +1080,7 @@ riego_tomates_ch0_timer_cancel:
     - service: timer.cancel
       entity_id: timer.riego_tomates_ch0
     - service: switch.turn_off
-      entity_id: switch.esphome_bas_sw4
+      entity_id: switch.esphome_pow_sw2
 
 riego_cesped_ch1_timer_cancel:
   alias: Timer Riego Cesped CH1 Cancel
@@ -1190,32 +1190,32 @@ piscina_depuradora_off:
 
 # SONOFF POW R2 - LAVADORA
 #
-lavadora_switch_off:
-  alias: Lavadora Switch Off
-  sequence:
-    - delay: 00:00:02
+#lavadora_switch_off:
+#  alias: Lavadora Switch Off
+#  sequence:
+#    - delay: 00:00:02
 
-    - service: switch.turn_off
-      entity_id: switch.esphome_pow_sw2
-    
-    - service: script.alexa_secuencia
-      data_template:
-        sonido: "{{ states('input_select.alarma_sonido_armado') }}"
-        repeticion: 1
-        voz: >
-          {% if states.sensor.aemet_condition.state | string == 'sunny' 
-            %}
-            "Lavado terminado. El tiempo está soleado, se puede tender."
-          {% elif (states.sensor.aemet_condition.state | string == 'rainy' ) 
-            %}
-            "Lavado terminado. Hay previsión de lluvia."
-          {% elif (states.sensor.aemet_condition.state | string == 'partlycloudy'
-                or states.sensor.aemet_condition.state | string == 'cloudy')
-            %}
-            "Lavado terminado. Está nublado,revisa el tiempo."
-          {% else  %}
-            "Lavado terminado. Revisa la previsión del tiempo antes de tender."
-          {% endif %}
+#    - service: switch.turn_off
+#      entity_id: switch.esphome_pow_sw2
+#    
+#    - service: script.alexa_secuencia
+#      data_template:
+#        sonido: "{{ states('input_select.alarma_sonido_armado') }}"
+#        repeticion: 1
+#        voz: >
+#          {% if states.sensor.aemet_condition.state | string == 'sunny' 
+#            %}
+#            "Lavado terminado. El tiempo está soleado, se puede tender."
+#          {% elif (states.sensor.aemet_condition.state | string == 'rainy' ) 
+#            %}
+#            "Lavado terminado. Hay previsión de lluvia."
+#          {% elif (states.sensor.aemet_condition.state | string == 'partlycloudy'
+#                or states.sensor.aemet_condition.state | string == 'cloudy')
+#            %}
+#            "Lavado terminado. Está nublado,revisa el tiempo."
+#          {% else  %}
+#            "Lavado terminado. Revisa la previsión del tiempo antes de tender."
+#          {% endif %}
 
 
     # Si la diferencia de hora ultimo cambio entre Warning y Lavando < 5' => TRUE => CONTINUA
@@ -1265,7 +1265,7 @@ sonoff_initialize:
         - switch.esphome_4ch_sw3_relay_2
         - switch.esphome_4ch_sw3_relay_3
         - switch.esphome_4ch_sw3_relay_4
-        - switch.esphome_bas_sw4                  # SONOFF_BAS_SW2 HUERTO TOMATERAS
+        - switch.esphome_pow_sw2                  # SONOFF_BAS_SW2 HUERTO TOMATERAS
         - switch.esphome_pow_sw3                  # SONOFF_POW_SW3 DEPURADORA PISCINA
     - service: valve.close_valve
       entity_id:

@@ -391,8 +391,6 @@
           {% endif %}
 
       #
-      # CONTROL LAVADORA
-      #
       # SONOFF POW_SW2. Sensores control consumo potencia
       #
       esphome_pow_sw2_switch:
@@ -435,28 +433,29 @@
             false
           {% endif %}
 
-      esphome_pow_sw2_lavadora_lavando:
-        value_template: >-
-          {%  if is_state('binary_sensor.esphome_pow_sw2_switch','on')
-              and states('sensor.esphome_pow_sw2_voltage')|int(0) >= 200
-              and states('sensor.esphome_pow_sw2_current')|round(1) >= 0.2
-          %}
-            true
-          {% else %}
-            false
-          {% endif %}
+      #esphome_pow_sw2_lavadora_lavando:
+      #  value_template: >-
+      #    {%  if is_state('binary_sensor.esphome_pow_sw2_switch','on')
+      #        and states('sensor.esphome_pow_sw2_voltage')|int(0) >= 200
+      #        and states('sensor.esphome_pow_sw2_current')|round(1) >= 0.2
+      #    %}
+      #      true
+      #    {% else %}
+      #      false
+      #    {% endif %}
 
-      esphome_pow_sw2_lavadora_warning:
-        value_template: >-
-          {%  if is_state('binary_sensor.esphome_pow_sw2_switch','on')
-              and states('sensor.esphome_pow_sw2_voltage')|round(1) >= 200
-              and states('sensor.esphome_pow_sw2_current')|round(1) < 0.2
-          %}
-            true
-          {% else %}
-            false
-          {% endif %}
-      # and (as_timestamp(now()) - as_timestamp(states.binary_sensor.esphome_pow_sw2_lavadora_lavando.last_changed)) > 300
+      #esphome_pow_sw2_lavadora_warning:
+      #  value_template: >-
+      #    {%  if is_state('binary_sensor.esphome_pow_sw2_switch','on')
+      #        and states('sensor.esphome_pow_sw2_voltage')|round(1) >= 200
+      #        and states('sensor.esphome_pow_sw2_current')|round(1) < 0.2
+      #    %}
+      #      true
+      #    {% else %}
+      #      false
+      #    {% endif %}
+      #
+      ## and (as_timestamp(now()) - as_timestamp(states.binary_sensor.esphome_pow_sw2_lavadora_lavando.last_changed)) > 300
 
       
       #
@@ -1120,12 +1119,12 @@
       #
       riego_tomates_ch0_status:
         value_template: >-
-          {% if is_state('switch.esphome_bas_sw4','on') %}
+          {% if is_state('switch.esphome_pow_sw2','on') %}
             true
           {% else %}
             false
           {% endif %}
-        friendly_name: 'Riego Huerto Tomates  on/off'
+        friendly_name: 'Riego Huerto Tomates on/off'
         icon_template: mdi:sprout
 
       riego_tomates_ch0_dia_ejecucion_t1:

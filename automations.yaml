@@ -1342,17 +1342,25 @@
   alias: 'L12 Luces On Cocina Según Sensor'
   mode: restart
   trigger:
+    - device_id: 4c8afd437bce2dcbf656d22ed1e47134
+      entity_id: 68988e370d1feb2c5fc8eb6b54e6a7a1
+      domain: binary_sensor
+      platform: device
+      type: motion
+      id: motion
     - platform: state
-      entity_id: binary_sensor.ikea_sensor_movimiento_cocina
+      entity_id: binary_sensor.hue_movimiento_pasillo_presencia
       to: 'on'
   condition:
     condition: and
     conditions:
+      #  # after_offset: "-02:00:00"  ==> Horario Invierno GMT+1, en el amanecer -2h
+      #  # after_offset: "-00:30:00" ==> Horario Verano GMT+2, el amanecer -30m
       - condition: sun
         after: sunset
-        # after_offset: "+00:30:00"
+        after_offset: "-00:30:00"
       - condition: template
-        value_template: "{{ (now().hour >= 18 and now().hour <= 23) or (now().hour >= 0 and now().hour <=8) }}"
+        value_template: "{{ (now().hour >= 0 and now().hour < 9) or (now().hour > 18 and now().hour <= 23) }}"
       - condition: state
         entity_id: light.luces_cocina
         state: 'off'
@@ -1360,22 +1368,22 @@
     - service: light.turn_on
       data:
         brightness_pct: >
-          {% if now().hour >= 0 and now().hour <= 8 %} 75
-          {% elif now().hour >= 18 and now().hour <= 23 %} 90
-          {% else %} 90
+          {% if now().hour >= 0 and now().hour <= 7 %} 50
+          {% else %} 50
           {% endif %}
       target:
         entity_id: light.luces_cocina
-    # Espera de 10'
+    # Espera de 5'
     - delay:
         minutes: >
-          {% if now().hour >= 1 and now().hour <= 6 %} 2
+          {% if now().hour >= 1 and now().hour <= 7 %} 2
           {% else %} 10
           {% endif %}
     # Luces Off + Led
     - service: light.turn_off
       entity_id: 
         - light.luces_cocina
+
 
 #-----------------------------------------------------------------------------#
 #                                                                             #
@@ -1756,65 +1764,65 @@
 #
 # ESPHOME POW R2 SW2 - LAVADORA
 #
-- id: S16
-  alias: 'S16 Sonoff POW Lavadora Boton Switch on'
-  trigger:
-    platform: state
-    entity_id: binary_sensor.esphome_pow_sw2_boton
-    from: 'off'
-    to: 'on'
-    for: '00:00:02'
-  action:
-    - service: switch.toggle
-      entity_id: switch.esphome_pow_sw2
-
-- id: S16b
-  alias: 'S16b Sonoff POW Lavadora Led'
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.esphome_pow_sw2_lavadora_lavando
-  action:
-    - service: light.toggle
-      target:
-        entity_id: light.esphome_pow_sw2_led
-
-- id: S16c
-  alias: 'Auto-Apagado Warning Lavadora (S16c)'
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.esphome_pow_sw2_lavadora_warning
-      from: 'off'
-      to: 'on'
-      for: '00:00:15'
-  condition:
-    - condition: template
-      value_template: '{{ (as_timestamp(states.binary_sensor.esphome_pow_sw2_lavadora_warning.last_changed) | timestamp_custom("%H:%M:%S"))
-                          > (states.input_datetime.lavadora_inicio_lavado.attributes.timestamp | timestamp_custom("%H:%M:%S"))
-                      }}'
-  action:
-    - service: input_datetime.set_datetime
-      entity_id: input_datetime.lavadora_fin_lavado
-      data:
-        time: '{{ now().strftime("%H:%M:%S") }}'
-    # Llama al script de apagado de Sonoof POW si viene de un lavado
-    - service: script.lavadora_switch_off
-
-- id: S16d
-  alias: 'S16d Lavadora Hora Inicio'
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.esphome_pow_sw2_lavadora_lavando
-      from: 'off'
-      to: 'on'
-  action:
-    - service: input_datetime.set_datetime
-      entity_id: input_datetime.lavadora_inicio_lavado
-      data:
-        time: '{{ now().strftime("%H:%M") }}'
-    - service: input_datetime.set_datetime
-      entity_id: input_datetime.lavadora_fin_lavado
-      data:
-        time: '00:00'
+#- id: S16
+#  alias: 'S16 Sonoff POW Lavadora Boton Switch on'
+#  trigger:
+#    platform: state
+#    entity_id: binary_sensor.esphome_pow_sw2_boton
+#    from: 'off'
+#    to: 'on'
+#    for: '00:00:02'
+#  action:
+#    - service: switch.toggle
+#      entity_id: switch.esphome_pow_sw2
+#
+#- id: S16b
+#  alias: 'S16b Sonoff POW Lavadora Led'
+#  trigger:
+#    - platform: state
+#      entity_id: binary_sensor.esphome_pow_sw2_lavadora_lavando
+#  action:
+#    - service: light.toggle
+#      target:
+#        entity_id: light.esphome_pow_sw2_led
+#
+#- id: S16c
+#  alias: 'Auto-Apagado Warning Lavadora (S16c)'
+#  trigger:
+#    - platform: state
+#      entity_id: binary_sensor.esphome_pow_sw2_lavadora_warning
+#      from: 'off'
+#      to: 'on'
+#      for: '00:00:15'
+#  condition:
+#    - condition: template
+#      value_template: '{{ (as_timestamp(states.binary_sensor.esphome_pow_sw2_lavadora_warning.last_changed) | timestamp_custom("%H:%M:%S"))
+#                          > (states.input_datetime.lavadora_inicio_lavado.attributes.timestamp | timestamp_custom("%H:%M:%S"))
+#                      }}'
+#  action:
+#    - service: input_datetime.set_datetime
+#      entity_id: input_datetime.lavadora_fin_lavado
+#      data:
+#        time: '{{ now().strftime("%H:%M:%S") }}'
+#    # Llama al script de apagado de Sonoof POW si viene de un lavado
+#    - service: script.lavadora_switch_off
+#
+#- id: S16d
+#  alias: 'S16d Lavadora Hora Inicio'
+#  trigger:
+#    - platform: state
+#      entity_id: binary_sensor.esphome_pow_sw2_lavadora_lavando
+#      from: 'off'
+#      to: 'on'
+#  action:
+#    - service: input_datetime.set_datetime
+#      entity_id: input_datetime.lavadora_inicio_lavado
+#      data:
+#        time: '{{ now().strftime("%H:%M") }}'
+#    - service: input_datetime.set_datetime
+#      entity_id: input_datetime.lavadora_fin_lavado
+#      data:
+#        time: '00:00'
 
 #
 # ESPHOME 4CH-R2 SW2 RIEGO BONSAIS
@@ -2182,7 +2190,7 @@
         entity_id: timer.riego_tomates_ch0
         duration: '{{ states.sensor.riego_tomates_ch0_duracion_planificada_t1.state|int * 60 }}'
     - service: switch.turn_on
-      entity_id: switch.esphome_bas_sw4
+      entity_id: switch.esphome_pow_sw2
       
 - id: S29
   alias: 'S29 Timer Riego Huerto Tramo2'
@@ -2205,7 +2213,7 @@
         entity_id: timer.riego_tomates_ch0
         duration: '{{ states.sensor.riego_tomates_ch0_duracion_planificada_t2.state|int * 60 }}'
     - service: switch.turn_on
-      entity_id: switch.esphome_bas_sw4
+      entity_id: switch.esphome_pow_sw2
 
 - id: S30
   alias: 'S30 Timer Riego Huerto End'
@@ -2504,7 +2512,7 @@
   trigger:
     - platform: state
       entity_id:
-        - switch.esphome_bas_sw4          # Riego Tomates
+        - switch.esphome_pow_sw2          # Riego Tomates
         - valve.esphome_pow_sw1           # Riego Bonsais Producción
         - valve.esphome_4ch_sw2_relay_1   # Riego Bonsais Top
         - valve.esphome_4ch_sw2_relay_2   # Riego Plantas Aromáticas
@@ -3579,7 +3587,7 @@
               target:
                 entity_id: input_text.helper_ikea_dimmer_switch_estudio
 
-#  alias: ZHA  Dormitorio AAF IKEA Tradfri
+#  alias: ZHA Dormitorio AAF IKEA Tradfri
 - id: ZHA_L8
   alias: ZHA IKEA Dormitorio AAF IKEA Tradfri
   mode: restart
