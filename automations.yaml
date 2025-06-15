@@ -212,7 +212,7 @@
       entity_id: binary_sensor.ikea_sensor_frigo_cocina
       from: 'off'
       to: 'on'
-      for: '00:02:00'
+      for: '00:03:00'
   action:
     # Micro Aviso Sirena Interior
     - service: script.sirena_alarma_micro_aviso
@@ -222,7 +222,7 @@
       data_template:
         sonido: "{{ states('input_select.alarma_sonido_disparado') }}"
         repeticion: 1
-        voz: 'ATENCION. frigorífico cocina abierto más de 2 minutos'
+        voz: 'ATENCION. frigorífico cocina abierto más de 3 minutos'
 
     # Script Notificación Alarma
     - service: script.notifica_alarma
@@ -241,7 +241,7 @@
       entity_id: binary_sensor.ikea_sensor_frigo_bebidas
       from: 'off'
       to: 'on'
-      for: '00:02:00'
+      for: '00:03:00'
   action:
     # Micro Aviso Sirena Interior
     - service: script.sirena_alarma_micro_aviso
@@ -251,7 +251,7 @@
       data_template:
         sonido: "{{ states('input_select.alarma_sonido_disparado') }}"
         repeticion: 1
-        voz: 'ATENCION. frigorífico bebidas abierto más de 2 minutos'
+        voz: 'ATENCION. frigorífico bebidas abierto más de 3 minutos'
 
     # Script Notificación Alarma
     - service: script.notifica_alarma
@@ -2514,6 +2514,10 @@
       entity_id:
         - switch.esphome_pow_sw2          # Riego Tomates
         - valve.esphome_pow_sw1           # Riego Bonsais Producción
+      to: 'on'
+      for: '00:15:00'
+    - platform: state
+      entity_id:
         - valve.esphome_4ch_sw2_relay_1   # Riego Bonsais Top
         - valve.esphome_4ch_sw2_relay_2   # Riego Plantas Aromáticas
         - switch.esphome_4ch_sw3_relay_1  # Riego turbinas
@@ -2522,6 +2526,7 @@
         - switch.esphome_4ch_sw3_relay_4  # Libre
       to: 'on'
       for: '00:10:00'
+
   action:
     - service: script.jardin_riego_off
     # Notifica a Familia
