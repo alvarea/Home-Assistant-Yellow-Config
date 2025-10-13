@@ -610,3 +610,17 @@ sirena_alarma_triggered:
     max: 100
     step: 2
     icon: mdi:volume-high
+
+
+
+      - binary_sensor.blink_hall_motion
+      - binary_sensor.blink_cocina_motion
+      - binary_sensor.blink_estudio_motion
+      - binary_sensor.blink_salon_motion
+      - binary_sensor.aqara_movimiento_entrada
+      - binary_sensor.ikea_sensor_movimiento_cocina
+      - binary_sensor.hue_movimiento_pasillo_presencia
+      - binary_sensor.aqara_movimiento_salon
+      - binary_sensor.aqara_movimiento_principal
+      - binary_sensor.aqara_movimiento_estudio
+      - binary_sensor.alarma_sensores_presencia_interior

@@ -1256,6 +1256,9 @@ sonoff_initialize:
   sequence:
     - service: siren.turn_off
       entity_id: siren.sirena
+    - service: switch.turn_on
+      entity_id:
+        - switch.esphome_pow_sw4
     - service: switch.turn_off
       entity_id:
         - switch.esphome_bas_sw0                  # SONOFF_BAS_SW0
@@ -1289,7 +1292,9 @@ trigger_blink_all_cameras:
   sequence:
     - service: script.trigger_blink_hall
     - delay: '00:00:05'
-    - service: script.trigger_blink_puerta_principal
+    - service: script.trigger_blink_cancela_left
+    - delay: '00:00:05'
+    - service: script.trigger_blink_cancela_right
     - delay: '00:00:05'
     - service: script.trigger_blink_puerta_exterior
     - delay: '00:00:05'
@@ -1327,17 +1332,29 @@ trigger_blink_puerta_principal:
       data:
         filename: /config/www/blink_puerta.jpg
 
-trigger_blink_puerta_exterior:
-  alias: 'Trigger Blink Cámara Exterior'
+trigger_blink_cancela_left:
+  alias: 'Trigger Blink Cancela Left'
   sequence:
     - service: blink.trigger_camera
       target:
-        entity_id: camera.blink_puerta_exterior
+        entity_id: camera.blink_cancela_left
     - service: camera.snapshot
       target:
-        entity_id: camera.blink_puerta_exterior
+        entity_id: camera.blink_cancela_left
       data:
-        filename: /config/www/blink_puerta_exterior.jpg
+        filename: /config/www/blink_cancela_left.jpg
+
+trigger_blink_cancela_right:
+  alias: 'Trigger Blink Cancela Right'
+  sequence:
+    - service: blink.trigger_camera
+      target:
+        entity_id: camera.blink_cancela_right
+    - service: camera.snapshot
+      target:
+        entity_id: camera.blink_cancela_right
+      data:
+        filename: /config/www/blink_cancela_right.jpg
 
 trigger_blink_piscina:
   alias: 'Trigger Blink Cámara Piscina'
@@ -1422,8 +1439,6 @@ estudio_persiana_up_full:
       position: 100
     target:
       entity_id: cover.persiana_estudio
-
-
 
 #-----------------------------------------------------------------------------#
 #                                                                             #

@@ -200,7 +200,7 @@
       # Genera un binary_sensor nuevo a partir del sensor movimiento original en ZHA y un selector input_boolean  
       # lo que permite desactivar en la pestaña configuración el sensor que esté dando problemas.
       #
-      # La alarma usa estos sensores en el grupo <group.alarma_sensores_presencia_interior_grp> durante el armado away.
+      # La alarma usa estos sensores con el helper tipo grupo correspondiente durante el armado away.
       #
       #
       # SENSORES PRESENCIA INTERIOR
@@ -235,7 +235,7 @@
           {% else %} mdi:motion-sensor-off
           {% endif %}
 
-      # AQARA Movimiento Entrada Hall Interior - ZHA OK
+      # AQARA Movimiento Entrada Hall Interior - ZHA
       alarma_sensor_movimiento_entrada_hall:
         value_template: >-
           {%  if is_state('input_boolean.control_alarma_sensor_presencia_entrada_hall','on')
@@ -363,7 +363,7 @@
       # AQARA Movimiento Entrada Exterior - ZHA OK
       alarma_sensor_movimiento_entrada_exterior:
         value_template: >-
-          {%  if is_state('input_boolean.alarma_sensor_movimiento_entrada_exterior','on')
+          {%  if is_state('input_boolean.control_alarma_sensor_presencia_entrada_exterior','on')
               and is_state('binary_sensor.aqara_movimiento_entrada_exterior','on')
           %}
             true
@@ -375,18 +375,49 @@
           {% else %} mdi:motion-sensor-off
           {% endif %}
 
-      # BLINK Cámara Puerta Garaje
-      alarma_sensor_movimiento_blink_puerta_garaje:
+      # IKEA Movimiento Cancela  - ZHA
+      alarma_sensor_movimiento_ikea_cancela:
         value_template: >-
-          {%  if is_state('binary_sensor.blink_puerta_garaje_camera_armed','on')
-              and is_state('binary_sensor.blink_puerta_garaje_motion_detected','on')
+          {%  if is_state('input_boolean.control_alarma_sensor_presencia_ikea_cancela','on')
+              and is_state('binary_sensor.ikea_sensor_movimiento_entrada_exterior','on')
           %}
             true
           {% else %}
             false
           {% endif %}
         icon_template: >-
-          {% if is_state('binary_sensor.alarma_sensor_movimiento_blink_puerta_garaje','on') %} mdi:motion-sensor
+          {% if is_state('binary_sensor.ikea_sensor_movimiento_entrada_exterior','on') %} mdi:motion-sensor
+          {% else %} mdi:motion-sensor-off
+          {% endif %}
+
+
+      # BLINK Cámara Cancela Left
+      alarma_sensor_movimiento_blink_cancela_left:
+        value_template: >-
+          {%  if is_state('binary_sensor.blink_cancela_left_camera_armed','on')
+              and is_state('binary_sensor.blink_cancela_left_motion_detected','on')
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        icon_template: >-
+          {% if is_state('binary_sensor.alarma_sensor_movimiento_blink_cancela_left','on') %} mdi:motion-sensor
+          {% else %} mdi:motion-sensor-off
+          {% endif %}
+
+      # BLINK Cámara Cancela Right
+      alarma_sensor_movimiento_blink_cancela_right:
+        value_template: >-
+          {%  if is_state('binary_sensor.blink_cancela_right_camera_armed','on')
+              and is_state('binary_sensor.blink_cancela_right_motion_detected','on')
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        icon_template: >-
+          {% if is_state('binary_sensor.alarma_sensor_movimiento_blink_cancela_right','on') %} mdi:motion-sensor
           {% else %} mdi:motion-sensor-off
           {% endif %}
 

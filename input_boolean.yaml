@@ -15,29 +15,6 @@
     icon: mdi:cellphone-iphone
 
 #
-# ON/OFF Camaras Seguridad
-#
-  camara_estudio:
-    name: Camara Estudio on/off
-    icon: mdi:webcam
-
-  camara_jardin:
-    name: Camara Jardín on/off
-    icon: mdi:webcam
-
-  camara_hall_interior:
-    name: Camara Hall on/off
-    icon: mdi:webcam
-
-  camara_puerta_exterior:
-    name: Camara Puerta on/off
-    icon: mdi:webcam
-
-  camara_cancela_exterior:
-    name: Camara Cancela on/off
-    icon: mdi:webcam
-
-#
 # ON/OFF SENSORES PRESENCIA ALARMA
 #
   control_alarma_sensor_presencia_salon:
@@ -49,9 +26,6 @@
   control_alarma_sensor_presencia_entrada_hall:
     name: Control Sensor Presencia Entrada Hall
     icon: mdi:motion-sensor
-  control_alarma_sensor_presencia_entrada_exterior:
-    name: Control Sensor Presencia Entrada Exterior
-    icon: mdi:motion-sensor
   control_alarma_sensor_presencia_dormitorio_principal:
     name: Control Sensor Presencia Dormitorio Principal
     icon: mdi:motion-sensor
@@ -60,6 +34,12 @@
     icon: mdi:motion-sensor
   control_alarma_sensor_presencia_cocina:
     name: Control Sensor Presencia Cocina
+    icon: mdi:motion-sensor
+  control_alarma_sensor_presencia_ikea_cancela:
+    name: Control Sensor Presencia Ikea Cancela 
+    icon: mdi:motion-sensor
+  control_alarma_sensor_presencia_entrada_exterior:
+    name: Control Sensor Presencia Entrada Exterior
     icon: mdi:motion-sensor
 
 #
