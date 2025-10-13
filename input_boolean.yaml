@@ -40,23 +40,26 @@
 #
 # ON/OFF SENSORES PRESENCIA ALARMA
 #
-  alarma_sensor_presencia_salon:
-    name: Sensor Presencia Salón
+  control_alarma_sensor_presencia_salon:
+    name: Control Sensor Presencia Salón
     icon: mdi:motion-sensor
-  alarma_sensor_presencia_estudio:
-    name: Sensor Presencia Estudio
+  control_alarma_sensor_presencia_estudio:
+    name: Control Sensor Presencia Estudio
     icon: mdi:motion-sensor
-  alarma_sensor_presencia_entrada_hall:
-    name: Sensor Presencia Entrada Hall
+  control_alarma_sensor_presencia_entrada_hall:
+    name: Control Sensor Presencia Entrada Hall
     icon: mdi:motion-sensor
-  alarma_sensor_presencia_entrada_exterior:
-    name: Sensor Presencia Entrada Exterior
+  control_alarma_sensor_presencia_entrada_exterior:
+    name: Control Sensor Presencia Entrada Exterior
     icon: mdi:motion-sensor
-  alarma_sensor_presencia_dormitorio_principal:
-    name: Sensor Presencia Dormitorio Principal
+  control_alarma_sensor_presencia_dormitorio_principal:
+    name: Control Sensor Presencia Dormitorio Principal
     icon: mdi:motion-sensor
-  alarma_sensor_presencia_pasillo:
-    name: Sensor Presencia Pasillo
+  control_alarma_sensor_presencia_pasillo:
+    name: Control Sensor Presencia Pasillo
+    icon: mdi:motion-sensor
+  control_alarma_sensor_presencia_cocina:
+    name: Control Sensor Presencia Cocina
     icon: mdi:motion-sensor
 
 #

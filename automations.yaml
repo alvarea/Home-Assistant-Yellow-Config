@@ -1091,7 +1091,7 @@
         state: 'off'
       - condition: numeric_state
         entity_id: sensor.aqara_movimiento_exterior_luminosidad
-        below: 10
+        below: 20
   action:
     - service: light.turn_on
       entity_id: light.luz_exterior
@@ -1342,14 +1342,14 @@
   alias: 'L12 Luces On Cocina Según Sensor'
   mode: restart
   trigger:
-    - device_id: 4c8afd437bce2dcbf656d22ed1e47134
-      entity_id: 68988e370d1feb2c5fc8eb6b54e6a7a1
-      domain: binary_sensor
-      platform: device
-      type: motion
-      id: motion
+    #- device_id: 4c8afd437bce2dcbf656d22ed1e47134
+    #  entity_id: 68988e370d1feb2c5fc8eb6b54e6a7a1
+    #  domain: binary_sensor
+    #  platform: device
+    #  type: motion
+    #  id: motion
     - platform: state
-      entity_id: binary_sensor.hue_movimiento_pasillo_presencia
+      entity_id: binary_sensor.ikea_sensor_movimiento_cocina
       to: 'on'
   condition:
     condition: and

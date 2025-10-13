@@ -208,7 +208,7 @@
       # AQARA Movimiento Salón - ZHA OK
       alarma_sensor_movimiento_salon:
         value_template: >-
-          {%  if is_state('input_boolean.alarma_sensor_presencia_salon','on')
+          {%  if is_state('input_boolean.control_alarma_sensor_presencia_salon','on')
               and is_state('binary_sensor.aqara_movimiento_salon','on')
           %}
             true
@@ -223,7 +223,7 @@
       # AQARA Movimiento Estudio ZHA
       alarma_sensor_movimiento_estudio:
         value_template: >-
-          {%  if is_state('input_boolean.alarma_sensor_presencia_estudio','on')
+          {%  if is_state('input_boolean.control_alarma_sensor_presencia_estudio','on')
               and is_state('binary_sensor.aqara_movimiento_estudio','on')
           %}
             true
@@ -238,7 +238,7 @@
       # AQARA Movimiento Entrada Hall Interior - ZHA OK
       alarma_sensor_movimiento_entrada_hall:
         value_template: >-
-          {%  if is_state('input_boolean.alarma_sensor_presencia_entrada_hall','on')
+          {%  if is_state('input_boolean.control_alarma_sensor_presencia_entrada_hall','on')
               and is_state('binary_sensor.aqara_movimiento_entrada','on')
           %}
             true
@@ -250,10 +250,10 @@
           {% else %} mdi:motion-sensor-off
           {% endif %}
 
-      # AQARA Movimiento Dormitorio Principal - ZHA PENDING
+      # AQARA Movimiento Dormitorio Principal - ZHA
       alarma_sensor_movimiento_dormitorio_principal:
         value_template: >-
-          {%  if is_state('input_boolean.alarma_sensor_presencia_dormitorio_principal','on')
+          {%  if is_state('input_boolean.control_alarma_sensor_presencia_dormitorio_principal','on')
               and is_state('binary_sensor.aqara_movimiento_principal','on')
           %}
             true
@@ -265,10 +265,10 @@
           {% else %} mdi:motion-sensor-off
           {% endif %}
 
-      # HUE Movimiento Pasillo - ZHA OK
+      # HUE Movimiento Pasillo - ZHA
       alarma_sensor_movimiento_pasillo:
         value_template: >-
-          {%  if is_state('input_boolean.alarma_sensor_presencia_pasillo','on')
+          {%  if is_state('input_boolean.control_alarma_sensor_presencia_pasillo','on')
               and is_state('binary_sensor.hue_movimiento_pasillo_presencia','on')
           %}
             true
@@ -280,6 +280,22 @@
           {% else %} mdi:motion-sensor-off
           {% endif %}
 
+      # IKEA Movimiento Cocina - ZHA
+      alarma_sensor_movimiento_cocina:
+        value_template: >-
+          {%  if is_state('input_boolean.control_alarma_sensor_presencia_cocina','on')
+              and is_state('binary_sensor.ikea_sensor_movimiento_cocina','on')
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        icon_template: >-
+          {% if is_state('binary_sensor.alarma_sensor_movimiento_cocina','on') %} mdi:motion-sensor
+          {% else %} mdi:motion-sensor-off
+          {% endif %}
+
+ 
       # BLINK Cámara Hall Entrada 
       # Se genera un binary_sensor nuevo a partir del switch nativo (binary_sensor.blink_hall_camera_armed) que se cambia en Blink App
       # y el estado del binary_sensor de movimiento real de la camara.
@@ -309,6 +325,35 @@
           {% endif %}
         icon_template: >-
           {% if is_state('binary_sensor.alarma_sensor_movimiento_blink_estudio','on') %} mdi:motion-sensor
+          {% else %} mdi:motion-sensor-off
+          {% endif %}
+
+      alarma_sensor_movimiento_blink_cocina:
+        value_template: >-
+          {%  if is_state('binary_sensor.blink_cocina_camera_armed','on')
+              and is_state('binary_sensor.blink_cocina_motion_detected','on')
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        icon_template: >-
+          {% if is_state('binary_sensor.alarma_sensor_movimiento_blink_cocina','on') %} mdi:motion-sensor
+          {% else %} mdi:motion-sensor-off
+          {% endif %}
+
+
+      alarma_sensor_movimiento_blink_salon:
+        value_template: >-
+          {%  if is_state('binary_sensor.blink_salon_camera_armed','on')
+              and is_state('binary_sensor.blink_salon_motion_detected','on')
+          %}
+            true
+          {% else %}
+            false
+          {% endif %}
+        icon_template: >-
+          {% if is_state('binary_sensor.alarma_sensor_movimiento_blink_salon','on') %} mdi:motion-sensor
           {% else %} mdi:motion-sensor-off
           {% endif %}
 

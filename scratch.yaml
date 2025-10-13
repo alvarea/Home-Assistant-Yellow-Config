@@ -1,3 +1,10 @@
+binary_sensor.riego_cesped_ch1_dia_ejecucion
+/local/Riego_Cesped_s1_1900x800.jpeg
+
+binary_sensor.riego_cesped_ch2_dia_ejecucion
+/local/Riego_Cesped_s2_1991x821.jpeg
+
+
 type: grid
 cards:
   - show_state: true

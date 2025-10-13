@@ -270,13 +270,14 @@ notify:
     chat_id: !secret telegram_aac
 
 # Notifications via Telegram Bot
-telegram_bot:
-  - platform: polling
-    api_key: !secret telegram_apikey
-    allowed_chat_ids:
-      - !secret telegram_grp_notif
-      - !secret telegram_grp_alarm
-      #- !secret telegram_chat_aac
+# HA 2025_07 , la configuracion pasa a UI y es necesario eliminarla
+# telegram_bot:
+#   - platform: polling
+#     api_key: !secret telegram_apikey
+#     allowed_chat_ids:
+#       - !secret telegram_grp_notif
+#       - !secret telegram_grp_alarm
+#       #- !secret telegram_chat_aac
 
 alert:
   alerta_alarma_ha:
