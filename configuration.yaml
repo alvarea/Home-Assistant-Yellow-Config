@@ -34,7 +34,6 @@ homeassistant:
 group: !include groups.yaml
 script: !include scripts.yaml
 automation: !include automations.yaml
-sensor: !include sensor.yaml
 binary_sensor: !include binary_sensor.yaml
 input_boolean: !include input_boolean.yaml
 input_select: !include input_select.yaml
@@ -43,6 +42,8 @@ input_number: !include input_number.yaml
 input_datetime: !include input_datetime.yaml
 zone: !include zone.yaml
 scene: !include scenes.yaml
+template: !include template.yaml
+#sensor: !include sensor.yaml
 
 # This integration is a meta-component and configures a default set of integrations for Home Assistant to load.
 default_config:

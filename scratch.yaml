@@ -613,14 +613,38 @@ sirena_alarma_triggered:
 
 
 
-      - binary_sensor.blink_hall_motion
-      - binary_sensor.blink_cocina_motion
-      - binary_sensor.blink_estudio_motion
-      - binary_sensor.blink_salon_motion
-      - binary_sensor.aqara_movimiento_entrada
-      - binary_sensor.ikea_sensor_movimiento_cocina
-      - binary_sensor.hue_movimiento_pasillo_presencia
-      - binary_sensor.aqara_movimiento_salon
-      - binary_sensor.aqara_movimiento_principal
-      - binary_sensor.aqara_movimiento_estudio
-      - binary_sensor.alarma_sensores_presencia_interior
+# SENSOR TEMPLATE
+#################
+  
+    #
+    # CONTROL LAVADORA
+    #
+    lavadora_inicio_lavado:
+      name: Lavadora Inicio Lavado
+      state: >-
+        {% if states.input_datetime.lavadora_inicio_lavado.state is not none %} 
+          {{ states.input_datetime.lavadora_inicio_lavado.state }}
+        {% else %} 
+          {{ states.input_datetime.lavadora_inicio_lavado.attributes.timestamp | timestamp_custom("%H:%M:%S")}}
+        {% endif %}
+      icon: mdi:washing-machine-alert
+
+    lavadora_fin_lavado:
+      name: Lavadora Fin Lavado
+      state: >-
+        {% if states.input_datetime.lavadora_fin_lavado.state is not none %} 
+          {{ states.input_datetime.lavadora_fin_lavado.state }}
+        {% else %} 
+          {{ states.input_datetime.lavadora_fin_lavado.attributes.timestamp | timestamp_custom("%H:%M:%S")}}
+        {% endif %}
+      icon: mdi:washing-machine-off
+
+    lavadora_duracion_lavado:
+      name: 'Lavadora Duración Lavado)'
+      icon: "{{ 'mdi:timer-sand' if states('sensor.lavadora_duracion_lavado') is not none }}"
+      state: >-
+        {% if states.sensor.lavadora_fin_lavado.state is none or states.sensor.lavadora_fin_lavado.state == '00:00:00'%} 
+          none
+        {% else %} 
+          {{ "{:}".format((states.input_datetime.lavadora_fin_lavado.attributes.timestamp -  states.input_datetime.lavadora_inicio_lavado.attributes.timestamp)/60)|int }}
+        {% endif %}

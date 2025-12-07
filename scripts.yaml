@@ -1291,21 +1291,21 @@ trigger_blink_all_cameras:
   alias: 'Trigger Blink All Canera'
   sequence:
     - service: script.trigger_blink_hall
-    - delay: '00:00:05'
+    - delay: '00:00:01'
     - service: script.trigger_blink_cancela_left
-    - delay: '00:00:05'
+    - delay: '00:00:01'
     - service: script.trigger_blink_cancela_right
-    - delay: '00:00:05'
+    - delay: '00:00:01'
     - service: script.trigger_blink_puerta_exterior
-    - delay: '00:00:05'
+    - delay: '00:00:01'
     - service: script.trigger_blink_piscina
-    - delay: '00:00:05'
+    - delay: '00:00:01'
     - service: script.trigger_blink_porche
-    - delay: '00:00:05'
+    - delay: '00:00:01'
     - service: script.trigger_blink_estudio
-    - delay: '00:00:05'
+    - delay: '00:00:01'
     - service: script.trigger_blink_salon
-    - delay: '00:00:05'
+    - delay: '00:00:01'
     - service: script.trigger_blink_cocina
 
 trigger_blink_hall:
