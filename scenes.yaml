@@ -692,7 +692,7 @@
       state: 'on'
     light.luz_estudio_nate:
       state: 'on'
-      brightness: 204 # 80% 
+      brightness: 254 # 80% 
       color_temp_kelvin: 4000
       color_temp: 250
     light.luz_estudio_led_mesa:
@@ -718,7 +718,7 @@
         - 254
     light.luz_estudio_webcam:
       state: 'on'
-      brightness: 102 # 40%
+      brightness: 204 # 80%
       color_temp_kelvin: 4000
       color_temp: 250
     light.luz_estudio_alta:
@@ -740,19 +740,19 @@
     light.luz_estudio_baja:
       state: 'off'
     light.luz_estudio_neon_beer:
-      state: 'off'
+      state: 'on'
     light.led_estudio_tv:
-      state: 'off'
+      state: 'on'
     light.led_estudio_bar:
       state: 'off'
     light.luz_estudio_tv_izquierda:
-      state: 'off'
+      state: 'on'
     light.luz_estudio_lectura:
       state: 'off'
     light.luz_estudio_techo:
       state: 'off'
     light.luz_estudio_neon_bar:
-      state: 'off'
+      state: 'on'
 
 #
 # ESCENA ESTUDIO FULL - MODO TODAS ENCENDIDAS A FULL
