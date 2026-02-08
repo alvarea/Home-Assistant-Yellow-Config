@@ -1203,7 +1203,7 @@
     - service: light.turn_on
       entity_id: 
         - light.luces_dormitorio_mfc
-        - light.esphome_s20_sw1_led
+        - light.esphome_s20_sw3_led
     - service: input_text.set_value
       data:
         value: "sensor turn_on light.luces_dormitorio"
@@ -1215,7 +1215,7 @@
     - service: light.turn_off
       entity_id: 
         - light.luces_dormitorio_mfc
-        - light.esphome_s20_sw1_led
+        - light.esphome_s20_sw3_led
     - service: input_text.set_value
       data:
         value: "sensor turn_off light.luces_dormitorio_mfc"
@@ -1629,7 +1629,6 @@
       from: 'off'
       to: 'on'
   action:
-    # Freidora Toggle
     - service: switch.toggle
       entity_id: switch.esphome_s26_sw1
 
@@ -1645,13 +1644,13 @@
       entity_id: switch.esphome_s26_sw2
 
 - id: S10
-  alias: 'S10 Switch Dormitorio MFC On'
+  alias: 'S10 Switch Dormitorio M&D Calefacción On'
   trigger:
     - platform: sun
       # offset: "+03:00:00"   # Horario Invierno GMT+2  => 18:30 + 3:00 = 21:30 => Calefacción
       # offset: "+00:30:00"   # Horario Verano GMT+1  => 21:30 + 0:30 = 22:00 => Mosquitoes
       event: sunset
-      offset: "+00:30:00"
+      offset: "+03:30:00"
     #- platform: time # Solo Invierno Calefacción
     #  at: '06:45:00'
     #- platform: sun  # solo para calefacción
@@ -1668,80 +1667,27 @@
         value_template: "{{ is_state('input_boolean.family_sleep_home_mfc','on') or is_state('input_boolean.family_sleep_home_aac','on') }}"
   action:
     - service: switch.turn_on
-      entity_id: switch.esphome_s20_sw1
-
-- id: S10b
-  alias: 'S10b Switch Dormitorio PAF On'
-  trigger:
-    - platform: sun
-      # offset: "+02:30:00"   # Horario Invierno GMT+1  => 18:30 + 3:30 = 22:00
-      # offset: "+00:30:00"   # Horario Verano GMT+2  => 21:30 + 0:30 = 22:00
-      event: sunset
-      # MODO VERANO => MOSQUITOS
-      offset: "+00:30:00"
-  condition:
-    condition: and
-    conditions:
-      # Hay alguien en casa
-      - condition: state
-        entity_id: input_boolean.calefac_programador_paf
-        state: 'on'
-      - condition: state
-        entity_id: input_boolean.family_sleep_home_paf
-        state: 'on'
-  action:
-    - service: switch.turn_on
       entity_id: switch.esphome_s20_sw3
-
-#- id: S10c
-#  alias: 'S10c Switch Dormitorio AAF On'
-#  trigger:
-#    - platform: sun
-#      # offset: "+02:30:00"   # Horario Invierno GMT+1  => 18:30 + 3:30 = 22:00
-#      # offset: "+00:30:00"   # Horario Verano GMT+2  => 21:30 + 0:30 = 22:00
-#      event: sunset
-#      offset: "+02:30:00"
-#  condition:
-#    condition: and
-#    conditions:
-#      # Hay alguien en casa
-#      - condition: state
-#        entity_id: input_boolean.calefac_programador_aaf
-#        state: 'on'
-#      - condition: state
-#        entity_id: input_boolean.family_sleep_home_aaf
-#        state: 'on'
-#  action:
-#    - service: switch.turn_on
-#      entity_id: switch.sonoff_S26_sw1
 
 - id: S12
   alias: 'S12 Switch Dormitorios Off'
   trigger:
-    #- platform: time # Solo Invierno Calefacción
-    #  at: 
-    #    - "00:30:00"
-    #    - "01:00:00"
-    #    - "02:00:00"
-    #    - "03:00:00"
-    #    - "04:00:00"
-    #    - "05:00:00"
+    - platform: time # Solo Invierno Calefacción
+      at: 
+        - "03:00:00"
+        - "04:00:00"
+        - "05:00:00"
     - platform: sun
       event: sunrise
   condition:
     condition: or
     conditions:
       - condition: state
-        entity_id: switch.esphome_s20_sw1
-        state: 'on'
-      - condition: state
         entity_id: switch.esphome_s20_sw3
         state: 'on'
   action:
     - service: switch.turn_off
-      entity_id: 
-        - switch.esphome_s20_sw1
-        - switch.esphome_s20_sw3
+      entity_id: switch.esphome_s20_sw3
 
 #
 # SAI RACK COMUNICACIONES
@@ -3637,7 +3583,7 @@
           sequence:
             - service: light.toggle
               target:
-                entity_id: light.led_mesa_agu
+                entity_id: light.luz_setup_agu
         # ELIF off_short_press 
         - conditions:
           - condition: trigger
@@ -3651,9 +3597,9 @@
           - condition: trigger
             id: dim_up
           sequence:
-            - service: fan.turn_on
+            - service: light.toggle
               target:
-                entity_id: fan.aire_acondicionado_agu
+                entity_id: light.led_mesa_agu
         # ELIF dim_down
         - conditions:
           - condition: trigger

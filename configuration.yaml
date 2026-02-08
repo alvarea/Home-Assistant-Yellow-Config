@@ -22,13 +22,6 @@ homeassistant:
     www: "/config/www"
   allowlist_external_urls:
     - "https://youtu.be/fLWacgcUMKw"
-#
-#  auth_providers:
-#    - type: homeassistant
-#    - type: trusted_networks
-#      trusted_networks:
-#        - 127.0.0.1
-#        - 192.168.0.0/24
 
 # External configuration files
 group: !include groups.yaml
@@ -65,23 +58,32 @@ default_config:
 #   updater
 #   zeroconf
 
-#shopping_list:
 
 # Enable Python Scripts
 python_script:
 
 # HTTP - SSL
-# base_url: https://alvareahomy.duckdns.org
+# base_url: https://alvareahomy.duckdns
+# server_port: 2309
+# ssl_certificate: /ssl/fullchain.pem
+# ssl_key: /ssl/privkey.pem
+# 08.02.2026: Elimino el acceso externo con DuckDNS y el certificado Let'sencript.
+#
 http:
-  server_port: 2309
-  ssl_certificate: /ssl/fullchain.pem
-  ssl_key: /ssl/privkey.pem
   use_x_forwarded_for: true
   trusted_proxies:
     - 127.0.0.1
     - 192.168.0.1
-  ip_ban_enabled: false
-  login_attempts_threshold: 50
+  ip_ban_enabled: true
+  login_attempts_threshold: 10
+
+#
+#  auth_providers:
+#    - type: homeassistant
+#    - type: trusted_networks
+#      trusted_networks:
+#        - 127.0.0.1∫
+#        - 192.168.0.0/24
 
 # If you want to use Home Assistant to host or serve static files then create a directory called www under the configuration path (/config).
 # The static files in www/ can be accessed by the following URL http://your.domain:8123/local/,

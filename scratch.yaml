@@ -612,9 +612,9 @@ sirena_alarma_triggered:
     icon: mdi:volume-high
 
 
-
-# SENSOR TEMPLATE
-#################
+#########################
+#     SENSOR TEMPLATE   #
+#########################
   
     #
     # CONTROL LAVADORA
@@ -648,3 +648,11 @@ sirena_alarma_triggered:
         {% else %} 
           {{ "{:}".format((states.input_datetime.lavadora_fin_lavado.attributes.timestamp -  states.input_datetime.lavadora_inicio_lavado.attributes.timestamp)/60)|int }}
         {% endif %}
+
+
+#########################
+#  BINARY SENSOR TEMPLATE   #
+#########################
+
+
+  

@@ -1,8 +1,6 @@
   #
   # BAYESIAN SENSORS
   #
-  #
-
   # NMAP ==> prob_given_true: 0.8 - prob_given_false: 0.2
   #   - device_tracker.apple_94_ac_c4_iphone_aac
   #   - device_tracker.apple_87_31_3b_iphone_mfc
@@ -125,46 +123,13 @@
       #      family_home_mfc,   family_home_paf, family_home_aaf:
 
 
+      # TRASPASADOS A HELPER UI
       # Todos en Casa:  IF sensor.family_home >= sensor.family_sleep_home THEN TRUE
       #
-      family_all_home:
-        value_template: >-
-          {% if states('sensor.family_sleep_home')|int(0) > 0
-              and states('sensor.family_home')|int(0) >= states('sensor.family_sleep_home')|int(0) %}
-            true
-          {% else %}
-            false
-          {% endif %}
-        friendly_name: '¿Todos?' #'Todos en Casa'
-        icon_template: mdi:home-map-marker
-        #entity_id:
-        #  - sensor.family_home
-        #  - sensor.family_sleep_home
-
-      # Alguien en Casa:  IF sensor.family_home > 0 THEN TRUE
-      #
-      family_any_home:
-        value_template: >-
-          {% if states('sensor.family_home')|int(0) > 0 %}
-            true
-          {% else %}
-            false
-          {% endif %}
-        friendly_name: '¿Alguien?' #'Alguien en Casa'
-        icon_template: mdi:home
-        #entity_id:
-        #  - sensor.family_home
-
-      # Alarma SONOFF_SW1 SIRENA INTERIOR
-      sensor_sirena:
-        value_template: >-
-          {% if is_state('siren.sirena','on') %}
-            true
-          {% else %}
-            false
-          {% endif %}
-        friendly_name: 'Alarma Sirena Interior'
-        icon_template: mdi:alarm-light
+      # family_all_home => ¿Todos?
+      # family_any_home => Alguien en Casa:  IF sensor.family_home > 0 THEN TRUE
+      # sensor_sirena
+      
 
       #
       # CONTROL SENSORES PRESENCIA ALARMA 
