@@ -7,6 +7,8 @@
 	"settings": {
 		"files.associations": {
 			"*.yaml": "home-assistant"
-		}
+		},
+		"vscode-home-assistant.longLivedAccessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI4ODA3ZjI0NjQ4M2Y0NTI1ODc1OGNiMzk3ZWViMzIyNSIsImlhdCI6MTc3MTY2NDU5MywiZXhwIjoyMDg3MDI0NTkzfQ.0V6qJsLv6QVMvDSDD8vdIsYreHvz09fx1ZiPL-pt6Tk",
+		"vscode-home-assistant.hostUrl": "https://s4cuufn01gghnkuq3b7edp92nalcf6ji.ui.nabu.casa"
 	}
 }

@@ -74,7 +74,7 @@ http:
   trusted_proxies:
     - 127.0.0.1
     - 192.168.0.1
-  ip_ban_enabled: true
+  ip_ban_enabled: false
   login_attempts_threshold: 10
 
 #
@@ -82,7 +82,7 @@ http:
 #    - type: homeassistant
 #    - type: trusted_networks
 #      trusted_networks:
-#        - 127.0.0.1∫
+#        - 127.0.0.1
 #        - 192.168.0.0/24
 
 # If you want to use Home Assistant to host or serve static files then create a directory called www under the configuration path (/config).

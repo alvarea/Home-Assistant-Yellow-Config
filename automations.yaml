@@ -130,6 +130,43 @@
     - service: script.trigger_blink_salon
     - delay: '00:00:05'
     - service: script.trigger_blink_cocina
+
+ 
+- id: wallpanel_ipad_battery
+  alias: 'IPAD Battery Check' 
+  mode: single
+  trigger: 
+    - platform: numeric_state
+      entity_id: sensor.ipad_battery_level
+      below: 10
+      id: battery_low
+    - platform: numeric_state
+      entity_id: sensor.ipad_battery_level
+      below: 99
+      id: battery_full
+  condition: []
+  action:
+  - choose:
+      # IF on_short_press
+      - conditions:
+        - condition: trigger
+          id: battery_low
+        sequence:
+          - service: switch.turn_on
+            target:
+              entity_id: switch.esphome_mini_sw4
+      # ELIF off_short_press 
+      - conditions:
+        - condition: trigger
+          id: battery_full
+        sequence:
+          - service: switch.turn_off
+            target:
+              entity_id: switch.esphome_mini_sw4
+
+
+
+
 #-----------------------------------------------------------------------------#
 #                                                                             #
 # ALARMA: Armado y Control de la Alarma                                       #
@@ -1035,9 +1072,9 @@
     #    mensaje: >
     #      >>> EVENTO: Es Medianoche
     #
+    
     #      >>> LUCES: Apagado Alumbrado Exterior + Jardín
     - delay: 60
-    
 - id: L04
   alias: 'L04 Luces On Salon Sunset'
   trigger:
