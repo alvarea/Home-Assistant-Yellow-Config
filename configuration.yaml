@@ -340,37 +340,41 @@ recorder:
       - input_select
 
 #
-# InfluxDB database . 05.11.2021
+# InfluxDB database . 05.11.2021 version previa eliminada.
+#                     15.03.2026 nueva version en homy yellow
 #
-#influxdb:
-#  host: !secret influxdb_host
-#  port: 8086
-#  database: !secret influxdb_database
-#  username: !secret influxdb_username
-#  password: !secret influxdb_pwd
-#  max_retries: 3
-#  default_measurement: state
-#  include:
-#    domains:
-#      - alarm_control_panel
-#      - light
-#      - input_boolean
-#      - sensor
-#      - binary_sensor
-#      - switch
-#      - energy
-#      - person
+influxdb:
+  include:
+    domains:
+      - alarm_control_panel
+      - sensor
+      - binary_sensor
+      - person
+      - person
 #      - device_tracker
 #      - weather
-#      - person
-
-#weather:
-#  - platform: darksky
-#    api_key: !secret weather_apikey
-#    mode: daily
-#    latitude: !secret latitude_home
-#    longitude: !secret longitude_home
-
+#      - switch
+#      - energy
+#      - light
+#      - input_boolean
+  exclude:
+      entities:
+        - sensor.time
+        - sensor.date
+        - sensor.last_boot
+        - sensor.uptime
+      entity_globs:
+        - "*_linkquality"
+        - "*_rssi"
+        - "*_wifi_signal"
+  tags:
+    source: HA
+  tags_attributes:
+    - friendly_name
+  ignore_attributes:
+    - icon
+    - attribution
+    - supported_features
 
 #apcupsd:
 #  host: 127.0.0.1
