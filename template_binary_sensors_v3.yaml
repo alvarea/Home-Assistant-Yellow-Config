@@ -1,15 +1,13 @@
 # ============================================================
 # BINARY SENSOR TEMPLATES MIGRADOS DESDE binary_sensor.yaml
 # Migración requerida por deprecación del formato legacy en HA 2026.6
+# v3: name = friendly_name o snake_to_title; unique_id = nombre interno
 # ============================================================
 
 # INSTRUCCIONES DE USO:
 #   Si ya tienes contenido en template.yaml, añade el bloque
 #   '- binary_sensor:' a continuación del contenido existente.
 #   NO puede haber más de una sección 'template:' en configuration.yaml.
-
-# Si template.yaml está vacío o es nuevo, usa este contenido tal cual.
-# Si ya tiene contenido, omite la línea 'template:' del principio.
 
 template:
 
@@ -18,7 +16,8 @@ template:
     # ------------------------------------------------------------
     # CONTROL ALARMA
     # ------------------------------------------------------------
-    - name: alarma_estado_general
+    - name: 'Alarma Estado General'
+      unique_id: alarma_estado_general
       state: >-
         {%  if is_state('alarm_control_panel.ha','disarmed')
             and is_state('alarm_control_panel.blink_casa','disarmed')
@@ -32,7 +31,8 @@ template:
         {% else %} mdi:alarm-light-off
         {% endif %}
 
-    - name: alarma_check_listo_para_armar
+    - name: 'Alarma Check Listo Para Armar'
+      unique_id: alarma_check_listo_para_armar
       state: >-
         {%  if is_state('binary_sensor.alarma_sensores_perimetro_principal','off')
             and is_state('binary_sensor.aqara_humo_cocina','off')
@@ -49,7 +49,8 @@ template:
     # ------------------------------------------------------------
     # SENSORES PRESENCIA INTERIOR (ALARMA)
     # ------------------------------------------------------------
-    - name: alarma_sensor_movimiento_salon
+    - name: 'Alarma Sensor Movimiento Salon'
+      unique_id: alarma_sensor_movimiento_salon
       state: >-
         {%  if is_state('input_boolean.control_alarma_sensor_presencia_salon','on')
             and is_state('binary_sensor.aqara_movimiento_salon','on')
@@ -63,7 +64,8 @@ template:
         {% else %} mdi:motion-sensor-off
         {% endif %}
 
-    - name: alarma_sensor_movimiento_estudio
+    - name: 'Alarma Sensor Movimiento Estudio'
+      unique_id: alarma_sensor_movimiento_estudio
       state: >-
         {%  if is_state('input_boolean.control_alarma_sensor_presencia_estudio','on')
             and is_state('binary_sensor.aqara_movimiento_estudio','on')
@@ -77,7 +79,8 @@ template:
         {% else %} mdi:motion-sensor-off
         {% endif %}
 
-    - name: alarma_sensor_movimiento_entrada_hall
+    - name: 'Alarma Sensor Movimiento Entrada Hall'
+      unique_id: alarma_sensor_movimiento_entrada_hall
       state: >-
         {%  if is_state('input_boolean.control_alarma_sensor_presencia_entrada_hall','on')
             and is_state('binary_sensor.aqara_movimiento_entrada','on')
@@ -91,7 +94,8 @@ template:
         {% else %} mdi:motion-sensor-off
         {% endif %}
 
-    - name: alarma_sensor_movimiento_dormitorio_principal
+    - name: 'Alarma Sensor Movimiento Dormitorio Principal'
+      unique_id: alarma_sensor_movimiento_dormitorio_principal
       state: >-
         {%  if is_state('input_boolean.control_alarma_sensor_presencia_dormitorio_principal','on')
             and is_state('binary_sensor.aqara_movimiento_principal','on')
@@ -105,7 +109,8 @@ template:
         {% else %} mdi:motion-sensor-off
         {% endif %}
 
-    - name: alarma_sensor_movimiento_pasillo
+    - name: 'Alarma Sensor Movimiento Pasillo'
+      unique_id: alarma_sensor_movimiento_pasillo
       state: >-
         {%  if is_state('input_boolean.control_alarma_sensor_presencia_pasillo','on')
             and is_state('binary_sensor.hue_movimiento_pasillo_presencia','on')
@@ -119,7 +124,8 @@ template:
         {% else %} mdi:motion-sensor-off
         {% endif %}
 
-    - name: alarma_sensor_movimiento_cocina
+    - name: 'Alarma Sensor Movimiento Cocina'
+      unique_id: alarma_sensor_movimiento_cocina
       state: >-
         {%  if is_state('input_boolean.control_alarma_sensor_presencia_cocina','on')
             and is_state('binary_sensor.ikea_sensor_movimiento_cocina','on')
@@ -136,7 +142,8 @@ template:
     # ------------------------------------------------------------
     # SENSORES MOVIMIENTO BLINK (ALARMA)
     # ------------------------------------------------------------
-    - name: alarma_sensor_movimiento_blink_hall
+    - name: 'Alarma Sensor Movimiento Blink Hall'
+      unique_id: alarma_sensor_movimiento_blink_hall
       state: >-
         {%  if is_state('binary_sensor.blink_hall_camera_armed','on')
             and is_state('binary_sensor.blink_hall_motion_detected','on')
@@ -150,7 +157,8 @@ template:
         {% else %} mdi:motion-sensor-off
         {% endif %}
 
-    - name: alarma_sensor_movimiento_blink_estudio
+    - name: 'Alarma Sensor Movimiento Blink Estudio'
+      unique_id: alarma_sensor_movimiento_blink_estudio
       state: >-
         {%  if is_state('binary_sensor.blink_estudio_camera_armed','on')
             and is_state('binary_sensor.blink_estudio_motion_detected','on')
@@ -164,7 +172,8 @@ template:
         {% else %} mdi:motion-sensor-off
         {% endif %}
 
-    - name: alarma_sensor_movimiento_blink_cocina
+    - name: 'Alarma Sensor Movimiento Blink Cocina'
+      unique_id: alarma_sensor_movimiento_blink_cocina
       state: >-
         {%  if is_state('binary_sensor.blink_cocina_camera_armed','on')
             and is_state('binary_sensor.blink_cocina_motion_detected','on')
@@ -178,7 +187,8 @@ template:
         {% else %} mdi:motion-sensor-off
         {% endif %}
 
-    - name: alarma_sensor_movimiento_blink_salon
+    - name: 'Alarma Sensor Movimiento Blink Salon'
+      unique_id: alarma_sensor_movimiento_blink_salon
       state: >-
         {%  if is_state('binary_sensor.blink_salon_camera_armed','on')
             and is_state('binary_sensor.blink_salon_motion_detected','on')
@@ -192,7 +202,8 @@ template:
         {% else %} mdi:motion-sensor-off
         {% endif %}
 
-    - name: alarma_sensor_movimiento_blink_cancela_left
+    - name: 'Alarma Sensor Movimiento Blink Cancela Left'
+      unique_id: alarma_sensor_movimiento_blink_cancela_left
       state: >-
         {%  if is_state('binary_sensor.blink_cancela_left_camera_armed','on')
             and is_state('binary_sensor.blink_cancela_left_motion_detected','on')
@@ -206,7 +217,8 @@ template:
         {% else %} mdi:motion-sensor-off
         {% endif %}
 
-    - name: alarma_sensor_movimiento_blink_cancela_right
+    - name: 'Alarma Sensor Movimiento Blink Cancela Right'
+      unique_id: alarma_sensor_movimiento_blink_cancela_right
       state: >-
         {%  if is_state('binary_sensor.blink_cancela_right_camera_armed','on')
             and is_state('binary_sensor.blink_cancela_right_motion_detected','on')
@@ -220,7 +232,8 @@ template:
         {% else %} mdi:motion-sensor-off
         {% endif %}
 
-    - name: alarma_sensor_movimiento_blink_puerta_principal
+    - name: 'Alarma Sensor Movimiento Blink Puerta Principal'
+      unique_id: alarma_sensor_movimiento_blink_puerta_principal
       state: >-
         {%  if is_state('binary_sensor.blink_puerta_principal_camera_armed','on')
             and is_state('binary_sensor.blink_puerta_principal_motion_detected','on')
@@ -234,7 +247,8 @@ template:
         {% else %} mdi:motion-sensor-off
         {% endif %}
 
-    - name: alarma_sensor_movimiento_blink_piscina
+    - name: 'Alarma Sensor Movimiento Blink Piscina'
+      unique_id: alarma_sensor_movimiento_blink_piscina
       state: >-
         {%  if is_state('binary_sensor.blink_piscina_camera_armed','on')
             and is_state('binary_sensor.blink_piscina_motion_detected','on')
@@ -248,7 +262,8 @@ template:
         {% else %} mdi:motion-sensor-off
         {% endif %}
 
-    - name: alarma_sensor_movimiento_blink_porche
+    - name: 'Alarma Sensor Movimiento Blink Porche'
+      unique_id: alarma_sensor_movimiento_blink_porche
       state: >-
         {%  if is_state('binary_sensor.blink_porche_camera_armed','on')
             and is_state('binary_sensor.blink_porche_motion_detected','on')
@@ -265,7 +280,8 @@ template:
     # ------------------------------------------------------------
     # SENSORES PRESENCIA EXTERIOR (ALARMA)
     # ------------------------------------------------------------
-    - name: alarma_sensor_movimiento_entrada_exterior
+    - name: 'Alarma Sensor Movimiento Entrada Exterior'
+      unique_id: alarma_sensor_movimiento_entrada_exterior
       state: >-
         {%  if is_state('input_boolean.control_alarma_sensor_presencia_entrada_exterior','on')
             and is_state('binary_sensor.aqara_movimiento_entrada_exterior','on')
@@ -279,7 +295,8 @@ template:
         {% else %} mdi:motion-sensor-off
         {% endif %}
 
-    - name: alarma_sensor_movimiento_ikea_cancela
+    - name: 'Alarma Sensor Movimiento Ikea Cancela'
+      unique_id: alarma_sensor_movimiento_ikea_cancela
       state: >-
         {%  if is_state('input_boolean.control_alarma_sensor_presencia_ikea_cancela','on')
             and is_state('binary_sensor.ikea_sensor_movimiento_entrada_exterior','on')
@@ -296,7 +313,8 @@ template:
     # ------------------------------------------------------------
     # SONOFF POW SW2
     # ------------------------------------------------------------
-    - name: esphome_pow_sw2_switch
+    - name: 'Esphome Pow Sw2 Switch'
+      unique_id: esphome_pow_sw2_switch
       state: >-
         {% if is_state('switch.esphome_pow_sw2','on') %}
           true
@@ -304,7 +322,8 @@ template:
           false
         {% endif %}
 
-    - name: esphome_pow_sw2_blue_led
+    - name: 'Esphome Pow Sw2 Blue Led'
+      unique_id: esphome_pow_sw2_blue_led
       state: >-
         {% if is_state('light.esphome_pow_sw2_led','on') %}
           true
@@ -312,7 +331,8 @@ template:
           false
         {% endif %}
 
-    - name: esphome_pow_sw2_current
+    - name: 'Esphome Pow Sw2 Current'
+      unique_id: esphome_pow_sw2_current
       state: >-
         {% if states('sensor.esphome_pow_sw2_current')|int(0) > 0 %}
           true
@@ -320,7 +340,8 @@ template:
           false
         {% endif %}
 
-    - name: esphome_pow_sw2_power
+    - name: 'Esphome Pow Sw2 Power'
+      unique_id: esphome_pow_sw2_power
       state: >-
         {% if states('sensor.esphome_pow_sw2_power')|int(0) > 0 %}
           true
@@ -328,7 +349,8 @@ template:
           false
         {% endif %}
 
-    - name: esphome_pow_sw2_voltage
+    - name: 'Esphome Pow Sw2 Voltage'
+      unique_id: esphome_pow_sw2_voltage
       state: >-
         {% if states('sensor.esphome_pow_sw2_voltage')|int(0) > 0 %}
           true
@@ -339,7 +361,8 @@ template:
     # ------------------------------------------------------------
     # PISCINA DEPURADORA
     # ------------------------------------------------------------
-    - name: piscina_interruptor_global
+    - name: 'Interruptor General Piscina'
+      unique_id: piscina_interruptor_global
       state: >-
         {% if is_state('input_boolean.piscina_interruptor_global','on') %}
           true
@@ -350,9 +373,9 @@ template:
         {% if is_state('input_boolean.piscina_interruptor_global','on') %} mdi:pool
         {% else %} mdi:swim
         {% endif %}
-      friendly_name: 'Interruptor General Piscina'
 
-    - name: piscina_depuradora_ch0_status
+    - name: 'Motor Depuradora Piscina'
+      unique_id: piscina_depuradora_ch0_status
       state: >-
         {% if is_state('switch.esphome_pow_sw3','on') %}
           true
@@ -360,9 +383,9 @@ template:
           false
         {% endif %}
       icon: mdi:pool
-      friendly_name: 'Motor Depuradora Piscina'
 
-    - name: esphome_pow_sw3_blue_led
+    - name: 'Esphome Pow Sw3 Blue Led'
+      unique_id: esphome_pow_sw3_blue_led
       state: >-
         {% if is_state('light.esphome_pow_sw3_led','on') %}
           true
@@ -370,7 +393,8 @@ template:
           false
         {% endif %}
 
-    - name: esphome_pow_sw3_current
+    - name: 'Esphome Pow Sw3 Current'
+      unique_id: esphome_pow_sw3_current
       state: >-
         {% if states('sensor.esphome_pow_sw3_current')|int(0) > 1 %}
           true
@@ -378,7 +402,8 @@ template:
           false
         {% endif %}
 
-    - name: esphome_pow_sw3_power
+    - name: 'Esphome Pow Sw3 Power'
+      unique_id: esphome_pow_sw3_power
       state: >-
         {% if states('sensor.esphome_pow_sw3_power')|int(0) > 1 %}
           true
@@ -386,7 +411,8 @@ template:
           false
         {% endif %}
 
-    - name: esphome_pow_sw3_voltage
+    - name: 'Esphome Pow Sw3 Voltage'
+      unique_id: esphome_pow_sw3_voltage
       state: >-
         {% if states('sensor.esphome_pow_sw3_voltage')|int(0) > 1 %}
           true
@@ -394,7 +420,8 @@ template:
           false
         {% endif %}
 
-    - name: piscina_depuradora_ch0_motor_on
+    - name: 'Piscina Depuradora Ch0 Motor On'
+      unique_id: piscina_depuradora_ch0_motor_on
       state: >-
         {%  if states('sensor.esphome_pow_sw3_voltage')|int(0) > 200
             and states('sensor.esphome_pow_sw3_power')|round(1) > 1.0
@@ -404,7 +431,8 @@ template:
           false
         {% endif %}
 
-    - name: piscina_depuradora_ch0_warning
+    - name: 'Piscina Depuradora Ch0 Warning'
+      unique_id: piscina_depuradora_ch0_warning
       state: >-
         {%  if states('sensor.esphome_pow_sw3_voltage')|int(0) > 200
             and states('sensor.esphome_pow_sw3_power')|round(1) > 4.0
@@ -414,7 +442,8 @@ template:
           false
         {% endif %}
 
-    - name: piscina_depuradora_ch0_on
+    - name: 'Depuradora on/off'
+      unique_id: piscina_depuradora_ch0_on
       state: >-
         {% if is_state('switch.esphome_pow_sw3','on') %}
           true
@@ -422,9 +451,9 @@ template:
           false
         {% endif %}
       icon: mdi:power
-      friendly_name: 'Depuradora on/off'
 
-    - name: piscina_depuradora_ch0_dia_ejecucion_t1
+    - name: '¿Próxima Ejecución Hoy? (CH0-T1)'
+      unique_id: piscina_depuradora_ch0_dia_ejecucion_t1
       state: >-
         {% if is_state('input_select.piscina_depuradora_ch0_programador_dias','Diario') and is_state('input_boolean.piscina_depuradora_ch0_programador_t1','on') %}
           true
@@ -443,9 +472,9 @@ template:
           false
         {% endif %}
       icon: mdi:calendar-check
-      friendly_name: '¿Próxima Ejecución Hoy? (CH0-T1)'
 
-    - name: piscina_depuradora_ch0_dia_ejecucion_t2
+    - name: '¿Próxima Ejecución Hoy? (CH0-T2)'
+      unique_id: piscina_depuradora_ch0_dia_ejecucion_t2
       state: >-
         {% if is_state('input_select.piscina_depuradora_ch0_programador_dias','Diario') and is_state('input_boolean.piscina_depuradora_ch0_programador_t2','on') %}
           true
@@ -464,9 +493,9 @@ template:
           false
         {% endif %}
       icon: mdi:calendar-check
-      friendly_name: '¿Próxima Ejecución Hoy? (CH0-T2)'
 
-    - name: piscina_depuradora_ch0_dia_ejecucion
+    - name: '¿Próxima Ejecución Hoy? (CH0)'
+      unique_id: piscina_depuradora_ch0_dia_ejecucion
       state: >-
         {% if is_state('input_boolean.piscina_interruptor_global','on')
               and (is_state('binary_sensor.piscina_depuradora_ch0_dia_ejecucion_t1','on') or is_state('binary_sensor.piscina_depuradora_ch0_dia_ejecucion_t2','on'))
@@ -476,12 +505,12 @@ template:
           false
         {% endif %}
       icon: mdi:pool
-      friendly_name: '¿Próxima Ejecución Hoy? (CH0)'
 
     # ------------------------------------------------------------
     # RIEGO BOMBA POZO
     # ------------------------------------------------------------
-    - name: esphome_pow_sw4_current
+    - name: 'Esphome Pow Sw4 Current'
+      unique_id: esphome_pow_sw4_current
       state: >-
         {% if states('sensor.esphome_pow_sw4_current')|int(0) > 1 %}
           true
@@ -489,7 +518,8 @@ template:
           false
         {% endif %}
 
-    - name: esphome_pow_sw4_power
+    - name: 'Esphome Pow Sw4 Power'
+      unique_id: esphome_pow_sw4_power
       state: >-
         {% if states('sensor.esphome_pow_sw4_power')|int(0) > 1 %}
           true
@@ -497,7 +527,8 @@ template:
           false
         {% endif %}
 
-    - name: esphome_pow_sw4_voltage
+    - name: 'Esphome Pow Sw4 Voltage'
+      unique_id: esphome_pow_sw4_voltage
       state: >-
         {% if states('sensor.esphome_pow_sw4_voltage')|int(0) > 1 %}
           true
@@ -505,7 +536,8 @@ template:
           false
         {% endif %}
 
-    - name: riego_bomba_pozo_status
+    - name: 'Control Bomba Riego'
+      unique_id: riego_bomba_pozo_status
       state: >-
         {% if is_state('switch.esphome_pow_sw4','on') %}
           true
@@ -513,9 +545,9 @@ template:
           false
         {% endif %}
       icon: mdi:water-well
-      friendly_name: 'Control Bomba Riego'
 
-    - name: riego_bomba_pozo_motor_on
+    - name: 'Riego Bomba Pozo Motor On'
+      unique_id: riego_bomba_pozo_motor_on
       state: >-
         {%  if states('sensor.esphome_pow_sw4_voltage')|int(0) > 200
             and states('sensor.esphome_pow_sw4_power')|round(1) > 100
@@ -526,7 +558,8 @@ template:
         {% endif %}
       icon: mdi:flash-outline
 
-    - name: riego_bomba_pozo_warning_motor_off
+    - name: 'Riego Bomba Pozo Warning Motor Off'
+      unique_id: riego_bomba_pozo_warning_motor_off
       state: >-
         {% if (is_state('binary_sensor.riego_cesped_ch1_status','on') or
                is_state('binary_sensor.riego_cesped_ch2_status','on') or
@@ -539,7 +572,8 @@ template:
         {% endif %}
       icon: mdi:flash-alert
 
-    - name: riego_bomba_pozo_warning_consumo
+    - name: 'Riego Bomba Pozo Warning Consumo'
+      unique_id: riego_bomba_pozo_warning_consumo
       state: >-
         {%  if states('sensor.esphome_pow_sw4_voltage')|int(0) > 200
             and states('sensor.esphome_pow_sw4_power')|round(1) > 1800
@@ -553,7 +587,8 @@ template:
     # ------------------------------------------------------------
     # AEMET PREVISION METEOROLOGICA
     # ------------------------------------------------------------
-    - name: aemet_prevision_lluvia_0d
+    - name: 'Pronóstico Lluvia 0d'
+      unique_id: aemet_prevision_lluvia_0d
       state: >-
         {% if (is_state('sensor.aemet_icono_0d','rainy') or
                is_state('sensor.aemet_icono_0d','snow') or
@@ -568,9 +603,9 @@ template:
         {% if is_state('binary_sensor.aemet_prevision_lluvia_0d','on') %} mdi:weather-rainy
         {% else %} mdi:weather-sunny
         {% endif %}
-      friendly_name: 'Pronóstico Lluvia 0d'
 
-    - name: aemet_prevision_lluvia_1d
+    - name: 'Pronóstico Lluvia +1d'
+      unique_id: aemet_prevision_lluvia_1d
       state: >-
         {% if (is_state('sensor.aemet_icono_1d','rainy') or
                is_state('sensor.aemet_icono_1d','snow') or
@@ -585,9 +620,9 @@ template:
         {% if is_state('binary_sensor.aemet_prevision_lluvia_1d','on') %} mdi:weather-rainy
         {% else %} mdi:weather-sunny
         {% endif %}
-      friendly_name: 'Pronóstico Lluvia +1d'
 
-    - name: aemet_prevision_lluvia_2d
+    - name: 'Pronóstico Lluvia +2d'
+      unique_id: aemet_prevision_lluvia_2d
       state: >-
         {% if (is_state('sensor.aemet_icono_2d','rainy') or
                is_state('sensor.aemet_icono_2d','snow') or
@@ -602,9 +637,9 @@ template:
         {% if is_state('binary_sensor.aemet_prevision_lluvia_2d','on') %} mdi:weather-rainy
         {% else %} mdi:weather-sunny
         {% endif %}
-      friendly_name: 'Pronóstico Lluvia +2d'
 
-    - name: aemet_prevision_lluvia_3d
+    - name: 'Pronóstico Lluvia +3d'
+      unique_id: aemet_prevision_lluvia_3d
       state: >-
         {% if (is_state('sensor.aemet_icono_3d','rainy') or
                is_state('sensor.aemet_icono_3d','snow') or
@@ -619,12 +654,12 @@ template:
         {% if is_state('binary_sensor.aemet_prevision_lluvia_0d','on') %} mdi:weather-rainy
         {% else %} mdi:weather-sunny
         {% endif %}
-      friendly_name: 'Pronóstico Lluvia +3d'
 
     # ------------------------------------------------------------
     # RIEGO CONTROL GENERAL
     # ------------------------------------------------------------
-    - name: riego_automatico_hoy
+    - name: '¿IA Riego Hoy?'
+      unique_id: riego_automatico_hoy
       state: >-
         {% if (is_state('binary_sensor.aemet_prevision_lluvia_0d','on')
                     or  is_state('binary_sensor.aemet_prevision_lluvia_1d','on')
@@ -638,9 +673,9 @@ template:
         {% if is_state('binary_sensor.riego_automatico_hoy','on') %} mdi:head-cog-outline
         {% else %} mdi:head-remove-outline
         {% endif %}
-      friendly_name: '¿IA Riego Hoy?'
 
-    - name: riego_interruptor_global
+    - name: 'Interruptor General Riego'
+      unique_id: riego_interruptor_global
       state: >-
         {% if is_state('input_boolean.riego_interruptor_global','on') %}
           true
@@ -651,9 +686,9 @@ template:
         {% if is_state('binary_sensor.riego_interruptor_global','on') %} mdi:sprinkler-var
         {% else %} mdi:sprinkler
         {% endif %}
-      friendly_name: 'Interruptor General Riego'
 
-    - name: riego_algun_sector_activo
+    - name: 'Riego Algun Sector Activo?'
+      unique_id: riego_algun_sector_activo
       state: >-
         {% if is_state('binary_sensor.riego_bonsais_ch1_status','on') or
               is_state('binary_sensor.riego_bonsais_ch2_status','on') or
@@ -672,12 +707,12 @@ template:
         {% if is_state('binary_sensor.riego_algun_sector_activo','on') %} mdi:watering-can
         {% else %} mdi:watering-can-outline
         {% endif %}
-      friendly_name: 'Riego Algun Sector Activo?'
 
     # ------------------------------------------------------------
     # RIEGO BONSAIS CH1
     # ------------------------------------------------------------
-    - name: riego_bonsais_ch1_status
+    - name: 'Riego CH1 on/off'
+      unique_id: riego_bonsais_ch1_status
       state: >-
         {% if is_state('valve.esphome_4ch_sw2_relay_1','on') %}
           true
@@ -685,9 +720,9 @@ template:
           false
         {% endif %}
       icon: mdi:leaf
-      friendly_name: 'Riego CH1 on/off'
 
-    - name: riego_bonsais_ch1_dia_ejecucion_t1
+    - name: '¿Próxima Ejecución Hoy? (CH1-T1)'
+      unique_id: riego_bonsais_ch1_dia_ejecucion_t1
       state: >-
         {% if is_state('input_select.riego_bonsais_ch1_programador_dias','Diario') and is_state('input_boolean.riego_bonsais_ch1_programador_t1','on') %}
           true
@@ -705,9 +740,9 @@ template:
           false
         {% endif %}
       icon: mdi:calendar-check
-      friendly_name: '¿Próxima Ejecución Hoy? (CH1-T1)'
 
-    - name: riego_bonsais_ch1_dia_ejecucion_t2
+    - name: '¿Próxima Ejecución Hoy? (CH1-T2)'
+      unique_id: riego_bonsais_ch1_dia_ejecucion_t2
       state: >-
         {% if is_state('input_select.riego_bonsais_ch1_programador_dias','Diario') and is_state('input_boolean.riego_bonsais_ch1_programador_t2','on') %}
           true
@@ -725,9 +760,9 @@ template:
           false
         {% endif %}
       icon: mdi:calendar-check
-      friendly_name: '¿Próxima Ejecución Hoy? (CH1-T2)'
 
-    - name: riego_bonsais_ch1_dia_ejecucion
+    - name: '¿Próxima Ejecución Hoy? (CH1)'
+      unique_id: riego_bonsais_ch1_dia_ejecucion
       state: >-
         {% if is_state('input_boolean.riego_interruptor_global','on')
               and (is_state('binary_sensor.riego_bonsais_ch1_dia_ejecucion_t1','on') or is_state('binary_sensor.riego_bonsais_ch1_dia_ejecucion_t2','on'))
@@ -737,12 +772,12 @@ template:
           false
         {% endif %}
       icon: mdi:tree
-      friendly_name: '¿Próxima Ejecución Hoy? (CH1)'
 
     # ------------------------------------------------------------
     # RIEGO BONSAIS CH2
     # ------------------------------------------------------------
-    - name: riego_bonsais_ch2_status
+    - name: 'Riego CH2 on/off'
+      unique_id: riego_bonsais_ch2_status
       state: >-
         {% if is_state('valve.esphome_4ch_sw2_relay_2','on') %}
           true
@@ -750,9 +785,9 @@ template:
           false
         {% endif %}
       icon: mdi:flower
-      friendly_name: 'Riego CH2 on/off'
 
-    - name: riego_bonsais_ch2_dia_ejecucion_t1
+    - name: '¿Próxima Ejecución Hoy? (CH2-T1)'
+      unique_id: riego_bonsais_ch2_dia_ejecucion_t1
       state: >-
         {% if is_state('input_select.riego_bonsais_ch2_programador_dias','Diario') and is_state('input_boolean.riego_bonsais_ch2_programador_t1','on') %}
           true
@@ -770,9 +805,9 @@ template:
           false
         {% endif %}
       icon: mdi:calendar-check
-      friendly_name: '¿Próxima Ejecución Hoy? (CH2-T1)'
 
-    - name: riego_bonsais_ch2_dia_ejecucion_t2
+    - name: '¿Próxima Ejecución Hoy? (CH2-T2)'
+      unique_id: riego_bonsais_ch2_dia_ejecucion_t2
       state: >-
         {% if is_state('input_select.riego_bonsais_ch2_programador_dias','Diario') and is_state('input_boolean.riego_bonsais_ch2_programador_t2','on') %}
           true
@@ -790,9 +825,9 @@ template:
           false
         {% endif %}
       icon: mdi:calendar-check
-      friendly_name: '¿Próxima Ejecución Hoy? (CH2-T2)'
 
-    - name: riego_bonsais_ch2_dia_ejecucion
+    - name: '¿Próxima Ejecución Hoy? (CH2)'
+      unique_id: riego_bonsais_ch2_dia_ejecucion
       state: >-
         {% if is_state('input_boolean.riego_interruptor_global','on')
               and (is_state('binary_sensor.riego_bonsais_ch2_dia_ejecucion_t1','on') or is_state('binary_sensor.riego_bonsais_ch2_dia_ejecucion_t2','on'))
@@ -802,12 +837,12 @@ template:
           false
         {% endif %}
       icon: mdi:tree
-      friendly_name: '¿Próxima Ejecución Hoy? (CH2)'
 
     # ------------------------------------------------------------
     # RIEGO BONSAIS CH3 (FUENTE ZEN)
     # ------------------------------------------------------------
-    - name: riego_bonsais_ch3_status
+    - name: 'Riego CH3 on/off'
+      unique_id: riego_bonsais_ch3_status
       state: >-
         {% if is_state('switch.esphome_4ch_sw2_relay_3','on') %}
           true
@@ -815,9 +850,9 @@ template:
           false
         {% endif %}
       icon: mdi:power
-      friendly_name: 'Riego CH3 on/off'
 
-    - name: riego_bonsais_ch3_dia_ejecucion_t0
+    - name: '¿Próxima Ejecución Hoy? (CH3) Precheck'
+      unique_id: riego_bonsais_ch3_dia_ejecucion_t0
       state: >-
         {% if is_state('input_select.riego_bonsais_ch3_programador_dias','Diario') and is_state('input_boolean.riego_bonsais_ch3_programador','on') %}
           true
@@ -831,9 +866,9 @@ template:
           false
         {% endif %}
       icon: mdi:calendar-check
-      friendly_name: '¿Próxima Ejecución Hoy? (CH3) Precheck'
 
-    - name: riego_bonsais_ch3_dia_ejecucion
+    - name: '¿Próxima Ejecución Hoy? (CH3)'
+      unique_id: riego_bonsais_ch3_dia_ejecucion
       state: >-
         {% if is_state('input_boolean.riego_interruptor_global','on')
               and is_state('binary_sensor.riego_bonsais_ch3_dia_ejecucion_t0','on')
@@ -843,12 +878,12 @@ template:
           false
         {% endif %}
       icon: mdi:calendar-check
-      friendly_name: '¿Próxima Ejecución Hoy? (CH3)'
 
     # ------------------------------------------------------------
     # RIEGO BONSAIS CH4
     # ------------------------------------------------------------
-    - name: riego_bonsais_ch4_status
+    - name: 'Riego CH4 on/off'
+      unique_id: riego_bonsais_ch4_status
       state: >-
         {% if is_state('switch.esphome_4ch_sw2_relay_4','on') %}
           true
@@ -856,9 +891,9 @@ template:
           false
         {% endif %}
       icon: mdi:power
-      friendly_name: 'Riego CH4 on/off'
 
-    - name: riego_bonsais_ch4_dia_ejecucion
+    - name: '¿Próxima Ejecución Hoy? (CH4)'
+      unique_id: riego_bonsais_ch4_dia_ejecucion
       state: >-
         {% if is_state('input_select.riego_bonsais_ch4_programador_dias','Diario') and is_state('input_boolean.riego_bonsais_ch4_programador','on') %}
           true
@@ -872,12 +907,12 @@ template:
           false
         {% endif %}
       icon: mdi:calendar-check
-      friendly_name: '¿Próxima Ejecución Hoy? (CH4)'
 
     # ------------------------------------------------------------
     # RIEGO BONSAIS PRODUCCION (CH0)
     # ------------------------------------------------------------
-    - name: riego_bonsais_ch0_status
+    - name: 'Riego Bonsais Produccion on/off'
+      unique_id: riego_bonsais_ch0_status
       state: >-
         {% if is_state('valve.esphome_pow_sw1','on') %}
           true
@@ -885,9 +920,9 @@ template:
           false
         {% endif %}
       icon: mdi:tree
-      friendly_name: 'Riego Bonsais Produccion on/off'
 
-    - name: riego_bonsais_ch0_dia_ejecucion_t1
+    - name: '¿Próxima Ejecución Hoy? (SW2-T1)'
+      unique_id: riego_bonsais_ch0_dia_ejecucion_t1
       state: >-
         {% if is_state('input_select.riego_bonsais_ch0_programador_dias','Diario') and is_state('input_boolean.riego_bonsais_ch0_programador_t1','on') %}
           true
@@ -905,9 +940,9 @@ template:
           false
         {% endif %}
       icon: mdi:calendar-check
-      friendly_name: '¿Próxima Ejecución Hoy? (SW2-T1)'
 
-    - name: riego_bonsais_ch0_dia_ejecucion_t2
+    - name: '¿Próxima Ejecución Hoy? (SW2-T2)'
+      unique_id: riego_bonsais_ch0_dia_ejecucion_t2
       state: >-
         {% if is_state('input_select.riego_bonsais_ch0_programador_dias','Diario') and is_state('input_boolean.riego_bonsais_ch0_programador_t2','on') %}
           true
@@ -925,9 +960,9 @@ template:
           false
         {% endif %}
       icon: mdi:calendar-check
-      friendly_name: '¿Próxima Ejecución Hoy? (SW2-T2)'
 
-    - name: riego_bonsais_ch0_dia_ejecucion
+    - name: '¿Próxima Ejecución Hoy?'
+      unique_id: riego_bonsais_ch0_dia_ejecucion
       state: >-
         {% if is_state('input_boolean.riego_interruptor_global','on')
               and (is_state('binary_sensor.riego_bonsais_ch0_dia_ejecucion_t1','on') or is_state('binary_sensor.riego_bonsais_ch0_dia_ejecucion_t2','on'))
@@ -937,12 +972,12 @@ template:
           false
         {% endif %}
       icon: mdi:pine-tree
-      friendly_name: '¿Próxima Ejecución Hoy?'
 
     # ------------------------------------------------------------
     # RIEGO HUERTO TOMATES
     # ------------------------------------------------------------
-    - name: riego_tomates_ch0_status
+    - name: 'Riego Huerto Tomates on/off'
+      unique_id: riego_tomates_ch0_status
       state: >-
         {% if is_state('switch.esphome_pow_sw2','on') %}
           true
@@ -950,9 +985,9 @@ template:
           false
         {% endif %}
       icon: mdi:sprout
-      friendly_name: 'Riego Huerto Tomates on/off'
 
-    - name: riego_tomates_ch0_dia_ejecucion_t1
+    - name: '¿Próxima Ejecución Hoy? (POW1-T1)'
+      unique_id: riego_tomates_ch0_dia_ejecucion_t1
       state: >-
         {% if is_state('input_select.riego_tomates_ch0_programador_dias','Diario') and is_state('input_boolean.riego_tomates_ch0_programador_t1','on') %}
           true
@@ -970,9 +1005,9 @@ template:
           false
         {% endif %}
       icon: mdi:calendar-check
-      friendly_name: '¿Próxima Ejecución Hoy? (POW1-T1)'
 
-    - name: riego_tomates_ch0_dia_ejecucion_t2
+    - name: '¿Próxima Ejecución Hoy? (POW1-T2)'
+      unique_id: riego_tomates_ch0_dia_ejecucion_t2
       state: >-
         {% if is_state('input_select.riego_tomates_ch0_programador_dias','Diario') and is_state('input_boolean.riego_tomates_ch0_programador_t2','on') %}
           true
@@ -990,9 +1025,9 @@ template:
           false
         {% endif %}
       icon: mdi:calendar-check
-      friendly_name: '¿Próxima Ejecución Hoy? (POW1-T2)'
 
-    - name: riego_tomates_ch0_dia_ejecucion
+    - name: '¿Próxima Ejecución Hoy?'
+      unique_id: riego_tomates_ch0_dia_ejecucion
       state: >-
         {% if is_state('input_boolean.riego_interruptor_global','on')
               and (is_state('binary_sensor.riego_tomates_ch0_dia_ejecucion_t1','on') or is_state('binary_sensor.riego_tomates_ch0_dia_ejecucion_t2','on'))
@@ -1002,12 +1037,12 @@ template:
           false
         {% endif %}
       icon: mdi:sprout
-      friendly_name: '¿Próxima Ejecución Hoy?'
 
     # ------------------------------------------------------------
     # RIEGO CESPED CH1
     # ------------------------------------------------------------
-    - name: riego_cesped_ch1_status
+    - name: 'Riego Cesped CH1 on/off'
+      unique_id: riego_cesped_ch1_status
       state: >-
         {% if is_state('switch.esphome_4ch_sw3_relay_1','on') %}
           true
@@ -1015,9 +1050,9 @@ template:
           false
         {% endif %}
       icon: mdi:sprinkler
-      friendly_name: 'Riego Cesped CH1 on/off'
 
-    - name: riego_cesped_ch1_dia_ejecucion_t1
+    - name: '¿Próxima Ejecución Hoy? (CH1-T1)'
+      unique_id: riego_cesped_ch1_dia_ejecucion_t1
       state: >-
         {% if is_state('input_select.riego_cesped_ch1_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch1_programador_t1','on') %}
           true
@@ -1034,9 +1069,9 @@ template:
           false
         {% endif %}
       icon: mdi:calendar-check
-      friendly_name: '¿Próxima Ejecución Hoy? (CH1-T1)'
 
-    - name: riego_cesped_ch1_dia_ejecucion_t2
+    - name: '¿Próxima Ejecución Hoy? (CH1-T2)'
+      unique_id: riego_cesped_ch1_dia_ejecucion_t2
       state: >-
         {% if is_state('input_select.riego_cesped_ch1_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch1_programador_t2','on') %}
           true
@@ -1053,9 +1088,9 @@ template:
           false
         {% endif %}
       icon: mdi:calendar-check
-      friendly_name: '¿Próxima Ejecución Hoy? (CH1-T2)'
 
-    - name: riego_cesped_ch1_dia_ejecucion_t3
+    - name: '¿Próxima Ejecución Hoy? (CH1-T3)'
+      unique_id: riego_cesped_ch1_dia_ejecucion_t3
       state: >-
         {% if is_state('input_select.riego_cesped_ch1_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch1_programador_t3','on') %}
           true
@@ -1072,9 +1107,9 @@ template:
           false
         {% endif %}
       icon: mdi:calendar-check
-      friendly_name: '¿Próxima Ejecución Hoy? (CH1-T3)'
 
-    - name: riego_cesped_ch1_dia_ejecucion
+    - name: '¿Próxima Ejecución Hoy? (CH1)'
+      unique_id: riego_cesped_ch1_dia_ejecucion
       state: >-
         {% if is_state('input_boolean.riego_interruptor_global','on')
               and (is_state('binary_sensor.riego_cesped_ch1_dia_ejecucion_t1','on') 
@@ -1087,12 +1122,12 @@ template:
           false
         {% endif %}
       icon: mdi:tree
-      friendly_name: '¿Próxima Ejecución Hoy? (CH1)'
 
     # ------------------------------------------------------------
     # RIEGO CESPED CH2
     # ------------------------------------------------------------
-    - name: riego_cesped_ch2_status
+    - name: 'Riego Cesped CH2 on/off'
+      unique_id: riego_cesped_ch2_status
       state: >-
         {% if is_state('switch.esphome_4ch_sw3_relay_2','on') %}
           true
@@ -1100,9 +1135,9 @@ template:
           false
         {% endif %}
       icon: mdi:sprinkler-variant
-      friendly_name: 'Riego Cesped CH2 on/off'
 
-    - name: riego_cesped_ch2_dia_ejecucion_t1
+    - name: '¿Próxima Ejecución Hoy? (CH2-T1)'
+      unique_id: riego_cesped_ch2_dia_ejecucion_t1
       state: >-
         {% if is_state('input_select.riego_cesped_ch2_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch2_programador_t1','on') %}
           true
@@ -1119,9 +1154,9 @@ template:
           false
         {% endif %}
       icon: mdi:calendar-check
-      friendly_name: '¿Próxima Ejecución Hoy? (CH2-T1)'
 
-    - name: riego_cesped_ch2_dia_ejecucion_t2
+    - name: '¿Próxima Ejecución Hoy? (CH2-T2)'
+      unique_id: riego_cesped_ch2_dia_ejecucion_t2
       state: >-
         {% if is_state('input_select.riego_cesped_ch2_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch2_programador_t2','on') %}
           true
@@ -1138,9 +1173,9 @@ template:
           false
         {% endif %}
       icon: mdi:calendar-check
-      friendly_name: '¿Próxima Ejecución Hoy? (CH2-T2)'
 
-    - name: riego_cesped_ch2_dia_ejecucion_t3
+    - name: '¿Próxima Ejecución Hoy? (CH2-T3)'
+      unique_id: riego_cesped_ch2_dia_ejecucion_t3
       state: >-
         {% if is_state('input_select.riego_cesped_ch2_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch2_programador_t3','on') %}
           true
@@ -1157,9 +1192,9 @@ template:
           false
         {% endif %}
       icon: mdi:calendar-check
-      friendly_name: '¿Próxima Ejecución Hoy? (CH2-T3)'
 
-    - name: riego_cesped_ch2_dia_ejecucion
+    - name: '¿Próxima Ejecución Hoy? (CH2)'
+      unique_id: riego_cesped_ch2_dia_ejecucion
       state: >-
         {% if is_state('input_boolean.riego_interruptor_global','on')
               and (is_state('binary_sensor.riego_cesped_ch2_dia_ejecucion_t1','on') 
@@ -1172,12 +1207,12 @@ template:
           false
         {% endif %}
       icon: mdi:tree
-      friendly_name: '¿Próxima Ejecución Hoy? (CH2)'
 
     # ------------------------------------------------------------
     # RIEGO CESPED CH3
     # ------------------------------------------------------------
-    - name: riego_cesped_ch3_status
+    - name: 'Riego Cesped CH3 on/off'
+      unique_id: riego_cesped_ch3_status
       state: >-
         {% if is_state('switch.esphome_4ch_sw3_relay_3','on') %}
           true
@@ -1185,9 +1220,9 @@ template:
           false
         {% endif %}
       icon: mdi:sprinkler-fire
-      friendly_name: 'Riego Cesped CH3 on/off'
 
-    - name: riego_cesped_ch3_dia_ejecucion_t1
+    - name: '¿Próxima Ejecución Hoy? (CH3-T1)'
+      unique_id: riego_cesped_ch3_dia_ejecucion_t1
       state: >-
         {% if is_state('input_select.riego_cesped_ch3_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch3_programador_t1','on') %}
           true
@@ -1204,9 +1239,9 @@ template:
           false
         {% endif %}
       icon: mdi:calendar-check
-      friendly_name: '¿Próxima Ejecución Hoy? (CH3-T1)'
 
-    - name: riego_cesped_ch3_dia_ejecucion_t2
+    - name: '¿Próxima Ejecución Hoy? (CH3-T2)'
+      unique_id: riego_cesped_ch3_dia_ejecucion_t2
       state: >-
         {% if is_state('input_select.riego_cesped_ch3_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch3_programador_t2','on') %}
           true
@@ -1223,9 +1258,9 @@ template:
           false
         {% endif %}
       icon: mdi:calendar-check
-      friendly_name: '¿Próxima Ejecución Hoy? (CH3-T2)'
 
-    - name: riego_cesped_ch3_dia_ejecucion_t3
+    - name: '¿Próxima Ejecución Hoy? (CH3-T3)'
+      unique_id: riego_cesped_ch3_dia_ejecucion_t3
       state: >-
         {% if is_state('input_select.riego_cesped_ch3_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch3_programador_t3','on') %}
           true
@@ -1242,9 +1277,9 @@ template:
           false
         {% endif %}
       icon: mdi:calendar-check
-      friendly_name: '¿Próxima Ejecución Hoy? (CH3-T3)'
 
-    - name: riego_cesped_ch3_dia_ejecucion
+    - name: '¿Próxima Ejecución Hoy? (CH3)'
+      unique_id: riego_cesped_ch3_dia_ejecucion
       state: >-
         {% if is_state('input_boolean.riego_interruptor_global','on')
               and (is_state('binary_sensor.riego_cesped_ch3_dia_ejecucion_t1','on') 
@@ -1257,12 +1292,12 @@ template:
           false
         {% endif %}
       icon: mdi:tree
-      friendly_name: '¿Próxima Ejecución Hoy? (CH3)'
 
     # ------------------------------------------------------------
     # RIEGO CESPED CH4
     # ------------------------------------------------------------
-    - name: riego_cesped_ch4_status
+    - name: 'Riego Cesped CH4 on/off'
+      unique_id: riego_cesped_ch4_status
       state: >-
         {% if is_state('switch.esphome_4ch_sw3_relay_4','on') %}
           true
@@ -1270,9 +1305,9 @@ template:
           false
         {% endif %}
       icon: mdi:power
-      friendly_name: 'Riego Cesped CH4 on/off'
 
-    - name: riego_cesped_ch4_dia_ejecucion_t1
+    - name: '¿Próxima Ejecución Hoy? (CH4-T1)'
+      unique_id: riego_cesped_ch4_dia_ejecucion_t1
       state: >-
         {% if is_state('input_select.riego_cesped_ch4_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch4_programador_t1','on') %}
           true
@@ -1289,9 +1324,9 @@ template:
           false
         {% endif %}
       icon: mdi:calendar-check
-      friendly_name: '¿Próxima Ejecución Hoy? (CH4-T1)'
 
-    - name: riego_cesped_ch4_dia_ejecucion_t2
+    - name: '¿Próxima Ejecución Hoy? (CH4-T2)'
+      unique_id: riego_cesped_ch4_dia_ejecucion_t2
       state: >-
         {% if is_state('input_select.riego_cesped_ch4_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch4_programador_t2','on') %}
           true
@@ -1308,9 +1343,9 @@ template:
           false
         {% endif %}
       icon: mdi:calendar-check
-      friendly_name: '¿Próxima Ejecución Hoy? (CH4-T2)'
 
-    - name: riego_cesped_ch4_dia_ejecucion_t3
+    - name: '¿Próxima Ejecución Hoy? (CH4-T3)'
+      unique_id: riego_cesped_ch4_dia_ejecucion_t3
       state: >-
         {% if is_state('input_select.riego_cesped_ch4_programador_dias','Diario') and is_state('input_boolean.riego_cesped_ch4_programador_t3','on') %}
           true
@@ -1327,9 +1362,9 @@ template:
           false
         {% endif %}
       icon: mdi:calendar-check
-      friendly_name: '¿Próxima Ejecución Hoy? (CH4-T3)'
 
-    - name: riego_cesped_ch4_dia_ejecucion
+    - name: '¿Próxima Ejecución Hoy? (CH4)'
+      unique_id: riego_cesped_ch4_dia_ejecucion
       state: >-
         {% if is_state('input_boolean.riego_interruptor_global','on')
               and (is_state('binary_sensor.riego_cesped_ch4_dia_ejecucion_t1','on') 
@@ -1342,12 +1377,12 @@ template:
           false
         {% endif %}
       icon: mdi:tree
-      friendly_name: '¿Próxima Ejecución Hoy? (CH4)'
 
     # ------------------------------------------------------------
     # SENSORES XIAOMI PLANT
     # ------------------------------------------------------------
-    - name: plant_mp_01_problem
+    - name: 'Problemas Sensor Bonsai MP1'
+      unique_id: plant_mp_01_problem
       state: >-
         {% if states.plant.mp_01.attributes.problem == 'none' %}
           false
@@ -1355,9 +1390,9 @@ template:
           true
         {% endif %}
       icon: mdi:power
-      friendly_name: 'Problemas Sensor Bonsai MP1'
 
-    - name: plant_mp_02_problem
+    - name: 'Problemas Sensor Bonsai MP2'
+      unique_id: plant_mp_02_problem
       state: >-
         {% if states.plant.mp_02.attributes.problem == 'none' %}
           false
@@ -1365,9 +1400,9 @@ template:
           true
         {% endif %}
       icon: mdi:power
-      friendly_name: 'Problemas Sensor Bonsai MP2'
 
-    - name: plant_mp_03_problem
+    - name: 'Problemas Sensor Bonsai MP3'
+      unique_id: plant_mp_03_problem
       state: >-
         {% if states.plant.mp_03.attributes.problem == 'none' %}
           false
@@ -1375,9 +1410,9 @@ template:
           true
         {% endif %}
       icon: mdi:power
-      friendly_name: 'Problemas Sensor Bonsai MP3'
 
-    - name: plant_mp_problem
+    - name: 'Problemas Sensor Bonsais'
+      unique_id: plant_mp_problem
       state: >-
         {% if states.binary_sensor.plant_mp_01_problem.state == 'on'
            or states.binary_sensor.plant_mp_02_problem.state == 'on'
@@ -1388,12 +1423,12 @@ template:
           false
         {% endif %}
       icon: mdi:power
-      friendly_name: 'Problemas Sensor Bonsais'
 
     # ------------------------------------------------------------
     # EQUIPOS Y MONITORES
     # ------------------------------------------------------------
-    - name: ups_status
+    - name: 'SAI APC·700 Rack'
+      unique_id: ups_status
       state: >-
         {% if is_state('sensor.ups_status','ONLINE') %}
           true
@@ -1401,9 +1436,9 @@ template:
           false
         {% endif %}
       icon: mdi:car-battery
-      friendly_name: 'SAI APC·700 Rack'
 
-    - name: melcloud_estudio
+    - name: 'AC/Estudio'
+      unique_id: melcloud_estudio
       state: >-
         {% if is_state('climate.aa_estudio','off') %}
           false
@@ -1411,9 +1446,9 @@ template:
           true
         {% endif %}
       icon: mdi:air-conditioner
-      friendly_name: 'AC/Estudio'
 
-    - name: climatizacion_estudio
+    - name: 'Clima Estudio'
+      unique_id: climatizacion_estudio
       state: >-
         {% if is_state('binary_sensor.melcloud_estudio','on') or is_state('fan.estudio','on') %}
           true
@@ -1421,9 +1456,9 @@ template:
           false
         {% endif %}
       icon: mdi:air-conditioner
-      friendly_name: 'Clima Estudio'
 
-    - name: macbook_monitor_lg1
+    - name: 'LG 4K (1)'
+      unique_id: macbook_monitor_lg1
       state: >-
         {% if is_state('binary_sensor.macbook_aac_active','on') and
               (is_state('sensor.macbook_aac_displays','2') or is_state('sensor.macbook_aac_displays','3'))  %}
@@ -1432,9 +1467,9 @@ template:
           false
         {% endif %}
       icon: mdi:monitor-dashboard
-      friendly_name: 'LG 4K (1)'
 
-    - name: macbook_monitor_lg2
+    - name: 'LG 4K (2)'
+      unique_id: macbook_monitor_lg2
       state: >-
         {% if is_state('binary_sensor.macbook_aac_active','on') and is_state('sensor.macbook_aac_displays','3') %}
           true
@@ -1442,12 +1477,12 @@ template:
           false
         {% endif %}
       icon: mdi:monitor-shimmer
-      friendly_name: 'LG 4K (2)'
 
     # ------------------------------------------------------------
     # PERSIANA ESTUDIO
     # ------------------------------------------------------------
-    - name: estudio_persiana_motor_up
+    - name: 'Persiana Subiendo (SW2)'
+      unique_id: estudio_persiana_motor_up
       state: >-
         {% if is_state('switch.esphome_dual_sw1_relay_1','on') %}
           true
@@ -1460,9 +1495,9 @@ template:
         {% else %}
           mdi:window-shutter-open
         {% endif %}
-      friendly_name: 'Persiana Subiendo (SW2)'
 
-    - name: estudio_persiana_motor_down
+    - name: 'Persiana Bajando (SW5)'
+      unique_id: estudio_persiana_motor_down
       state: >-
         {% if is_state('switch.esphome_dual_sw1_relay_2','on') %}
           true
@@ -1475,9 +1510,9 @@ template:
         {% else %}
           mdi:window-shutter
         {% endif %}
-      friendly_name: 'Persiana Bajando (SW5)'
 
-    - name: estudio_persiana_motor_en_marcha
+    - name: 'Persiana Motor en Marcha'
+      unique_id: estudio_persiana_motor_en_marcha
       state: >-
         {% if is_state('switch.esphome_dual_sw1_relay_1','on') or is_state('switch.esphome_dual_sw1_relay_2','on') %}
           true
@@ -1490,12 +1525,12 @@ template:
         {% else %}
           mdi:window-shutter
         {% endif %}
-      friendly_name: 'Persiana Motor en Marcha'
 
     # ------------------------------------------------------------
     # LAPTOPS Y DISPOSITIVOS
     # ------------------------------------------------------------
-    - name: setup_devices_status
+    - name: 'Setup Devices Status'
+      unique_id: setup_devices_status
       state: >-
         {{ states('binary_sensor.laptop_macbook_aac') == 'on' 
            or states('binary_sensor.laptop_dell_aac') == 'on' 
@@ -1504,9 +1539,9 @@ template:
            or states('media_player.echo_alexa_estudio') == 'playing' 
         }}
       icon: mdi:laptop
-      friendly_name: 'Setup Devices Status'
 
-    - name: laptop_aac
+    - name: 'Portátiles Mac/Dell AAC '
+      unique_id: laptop_aac
       state: >-
         {% if is_state('binary_sensor.laptop_macbook_aac','on') 
             or is_state('binary_sensor.laptop_dell_aac','on')%}
@@ -1515,9 +1550,9 @@ template:
           false
         {% endif %}
       icon: mdi:laptop
-      friendly_name: 'Portátiles Mac/Dell AAC '
 
-    - name: laptop_macbook_aac
+    - name: 'Portátil Macbook AAC '
+      unique_id: laptop_macbook_aac
       state: >-
         {% if is_state('device_tracker.apple_13_b4_97_mac_aac_lan','home') 
             or is_state('device_tracker.apple_69_64_86_mac_aac','home') 
@@ -1528,9 +1563,9 @@ template:
           false
         {% endif %}
       icon: mdi:laptop
-      friendly_name: 'Portátil Macbook AAC '
 
-    - name: laptop_macbook_mfc
+    - name: 'Portátil Macbook MFC'
+      unique_id: laptop_macbook_mfc
       state: >-
         {% if is_state('device_tracker.apple_1a_fb_1c_mac_mfc','home') %}
           true
@@ -1538,9 +1573,9 @@ template:
           false
         {% endif %}
       icon: mdi:laptop
-      friendly_name: 'Portátil Macbook MFC'
 
-    - name: laptop_macbook_paf
+    - name: 'Portátil Macbook PAF'
+      unique_id: laptop_macbook_paf
       state: >-
         {% if is_state('device_tracker.apple_43_6d_ca_mac_paf','home') %}
           true
@@ -1548,9 +1583,9 @@ template:
           false
         {% endif %}
       icon: mdi:laptop
-      friendly_name: 'Portátil Macbook PAF'
 
-    - name: laptop_dell_aac
+    - name: 'Portátil Dell CGI AAC'
+      unique_id: laptop_dell_aac
       state: >-
         {% if is_state('device_tracker.dell_6c_55_bf_win_aac','home') 
             or is_state('binary_sensor.ping_dell_windows_cgi_aac','on') %}
@@ -1559,9 +1594,9 @@ template:
           false
         {% endif %}
       icon: mdi:laptop
-      friendly_name: 'Portátil Dell CGI AAC'
 
-    - name: laptop_zenbook_aaf
+    - name: 'Portátil Zenbook AAF'
+      unique_id: laptop_zenbook_aaf
       state: >-
         {% if is_state('device_tracker.asus_59_60_50_win_aaf','home') %}
           true
@@ -1569,4 +1604,3 @@ template:
           false
         {% endif %}
       icon: mdi:laptop
-      friendly_name: 'Portátil Zenbook AAF'

@@ -253,24 +253,35 @@ notify:
   - name: notifica_grupo_ios
     platform: group # notification group for IOS
     services:
-      - service: mobile_app_iphone_aac
-      - service: mobile_app_iphone_malen
-      - service: mobile_app_iphone_paf
-      - service: ios_aaf_ios
-  - name: notifica_grupo_agus
+      - service: iphone_aac
+      - service: iphone_aaf
+      - service: iphone_mfc
+      - service: iphone_paf
+
+  - name: telegram_alarm
     platform: group
     services:
-      - service: mobile_app_iphone_aac
-      - service: ios_aaf_ios
-  - name: telegram_alarm
-    platform: telegram
-    chat_id: !secret telegram_grp_alarm
-  - name: telegram_notify
-    platform: telegram
-    chat_id: !secret telegram_grp_notif
-  - name: telegram_aac
-    platform: telegram
-    chat_id: !secret telegram_aac
+      - service: telegram_bot_461013933_1001277406243
+
+  - name: telegram_notif
+    platform: group
+    services:
+      - service: telegram_bot_461013933_306604561
+
+# Las notificaciones tienen un nuevo formato a partir de 2026.08
+# The target parameter is being deprecated. You should update any automations and scripts that use that parameter in Telegram bot actions. 
+# se entity_id to specify Telegram bot notify entities or chat_id to replace target
+#  - name: telegram_alarm
+#    platform: telegram
+#    chat_id: !secret telegram_grp_alarm
+#  - name: telegram_notify
+#    platform: telegram
+#    chat_id: !secret telegram_grp_notif
+#
+# Claude me recomienda crear  un alias con notify en YAML ⭐ Recomendada
+# Puedes crear grupos de notify que apunten a las entidades nuevas, con nombres cortos
+# Así sigues usando notify.telegram_alarm y notify.telegram_notif en todos tus scripts sin cambiar nada más. Solo cambias este fichero.
+
 
 # Notifications via Telegram Bot
 # HA 2025_07 , la configuracion pasa a UI y es necesario eliminarla
