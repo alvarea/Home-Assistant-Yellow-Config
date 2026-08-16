@@ -69,14 +69,13 @@ python_script:
 # ssl_key: /ssl/privkey.pem
 # 08.02.2026: Elimino el acceso externo con DuckDNS y el certificado Let'sencript.
 #
-http:
-  use_x_forwarded_for: true
-  trusted_proxies:
-    - 127.0.0.1
-    - 192.168.0.1
-  ip_ban_enabled: false
-  login_attempts_threshold: 10
-
+# http:
+#  use_x_forwarded_for: true
+#  trusted_proxies:
+#    - 127.0.0.1
+#    - 192.168.0.1
+#  ip_ban_enabled: false
+#  login_attempts_threshold: 10
 #
 #  auth_providers:
 #    - type: homeassistant
@@ -571,4 +570,4 @@ device_tracker:
 #    max_temperature: 32
 #    min_brightness: 1000
 #    max_brightness: 30000
-#    min_battery: 20
+#    min_battery: 2

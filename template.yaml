@@ -1748,7 +1748,7 @@
       #name: 'Bonsais CH1 - Duración Total (Min)'
       icon: "{{ 'mdi:timer-sand' if states('sensor.riego_bonsais_ch1_duracion_planificada_total') is not none }}"
 
-    # RIEGO CH1 - Plantas Aromáticas
+    # RIEGO CH2 - Plantas Aromáticas
     - name: 'riego bonsais ch2 duracion planificada t1'
       state: '{{ "{:}".format((states.input_datetime.riego_bonsais_ch2_end_time_t1.attributes.timestamp -  states.input_datetime.riego_bonsais_ch2_start_time_t1.attributes.timestamp)/60)|int }}'
       #name: 'Bonsais CH2 - Duración Tramo-1 Planificado (Min)'
@@ -1772,12 +1772,6 @@
       (states.sensor.riego_bonsais_ch2_duracion_planificada_t2.state|int*states.sensor.riego_bonsais_ch2_programador_t2_estado.state|int)}}'
       #name: 'Bonsais CH2 - Duración Total (Min)'
       icon: "{{ 'mdi:timer-sand' if states('sensor.riego_bonsais_ch2_duracion_planificada_total') is not none }}"
-
-    # Fuente Zen
-    - name: 'riego bonsais ch3 duracion planificada'
-      state: '{{ "{:}".format((states.input_datetime.riego_bonsais_ch3_end_time.attributes.timestamp -  states.input_datetime.riego_bonsais_ch3_start_time.attributes.timestamp)/60)|int }}'
-      #name: 'Bonsais CH3 - Duración Tramo-1 (Min)'
-      icon: "{{ 'mdi:timer-sand' if states('sensor.riego_bonsais_ch3_duracion_planificada') is not none }}"
 
 
     # Comentado 17.09.22 por error en log, aparentemente no utilizado
