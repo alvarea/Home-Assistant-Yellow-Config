@@ -1,13 +1,21 @@
 #
 # ESPHOME - ESP32S HUB1 - BLUETOOTH BLE - SENSORES MIFLORA BONSAIS TOP
 #
+# MIGRACION ESPHOME 2024.2.2 -> 2026.9.0: 26.09.2026
+#   - platform/board salen de 'esphome:' a bloque 'esp32:' (framework arduino explicito)
+#   - 'ota:' pasa a lista con '- platform: esphome'
+#   - MiFlora: se mantiene 'xiaomi_hhccjcy01' (sigue vigente en 2026.9; 'xiaomi_ble' es solo la pagina de docs)
+#
 substitutions:
   device_name: esphome_esp32_hub1_ble_tracker
 
 esphome:
   name: ${device_name}
-  platform: ESP32
+
+esp32:
   board: nodemcu-32s
+  framework:
+    type: arduino
 
 wifi:
   ssid: !secret wifi_ssid_wlan
@@ -27,6 +35,7 @@ binary_sensor:
     name: ${device_name}_status
 
 ota:
+  - platform: esphome
 
 # Example configuration entry
 esp32_ble_tracker:
