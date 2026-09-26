@@ -3,7 +3,8 @@
 #
 esphome:
   name: esphome_s26_sw1
-  platform: ESP8266
+
+esp8266:
   board: esp01_1m
   board_flash_mode: dout
 
@@ -21,6 +22,7 @@ api:
 logger:
 
 ota:
+  - platform: esphome
 
 binary_sensor:
   - platform: gpio
