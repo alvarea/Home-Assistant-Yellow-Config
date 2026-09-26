@@ -1,6 +1,9 @@
 #
 # ESPHOME SONOFF MINI R4 EXTREME - SW8
 #
+# MIGRACION ESPHOME 2024.2.2 -> 2026.9.0: 26.09.2026
+#   - 'ota:' pasa a lista con '- platform: esphome'
+#
 substitutions:
   device_name: esphome_mini_sw8
 
@@ -36,6 +39,7 @@ wifi:
 logger:
 
 ota:
+  - platform: esphome
 
 api:
   
