@@ -7,13 +7,19 @@
 #   TX  => NARANJA
 #   VCC => AMARILLO - 3.3V
 #
+# MIGRACION ESPHOME 2024.2.2 -> 2026.9.0: 26.09.2026
+#   - platform/board salen de 'esphome:' a bloque 'esp8266:'
+#   - 'ota:' pasa a lista con '- platform: esphome'
+#   - uart: 'parity: EVEN' obligatorio para cse7766 desde ESPHome 2026.9
+#
 substitutions:
   device_name: esphome_pow_sw4
   update_interval: 30s
 
 esphome:
   name: ${device_name}
-  platform: ESP8266
+
+esp8266:
   board: esp01_1m
   board_flash_mode: dout
 
@@ -28,6 +34,7 @@ wifi:
 api:
 
 ota:
+  - platform: esphome
 
 binary_sensor:
   - platform: gpio
@@ -66,6 +73,7 @@ logger:
 uart:
   rx_pin: RX
   baud_rate: 4800
+  parity: EVEN
 
 sensor:
   - platform: cse7766

@@ -1,9 +1,14 @@
 #
 # ESPHOME SONOFF S26 SW1
 #
+# MIGRACION ESPHOME 2024.2.2 -> 2026.9.0: 26.09.2026
+#   - platform/board salen de 'esphome:' a bloque 'esp8266:'
+#   - 'ota:' pasa a lista con '- platform: esphome'
+#
 esphome:
   name: esphome_s26_sw1
-  platform: ESP8266
+
+esp8266:
   board: esp01_1m
   board_flash_mode: dout
 
@@ -21,6 +26,7 @@ api:
 logger:
 
 ota:
+  - platform: esphome
 
 binary_sensor:
   - platform: gpio

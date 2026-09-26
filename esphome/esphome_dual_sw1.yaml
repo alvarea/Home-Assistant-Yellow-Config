@@ -10,14 +10,21 @@
 # 
 # SENSOR BL0939 POWER => https://esphome.io/components/sensor/bl0939.html
 #
+# MIGRACION ESPHOME 2024.2.2 -> 2026.9.0: 26.09.2026
+#   - platform/board salen de 'esphome:' a bloque 'esp32:' (framework arduino explicito)
+#   - 'ota:' pasa a lista con '- platform: esphome'
+#
 
 substitutions:
   device_name: esphome_dual_sw1
 
 esphome:
   name: ${device_name}
-  platform: ESP32
+
+esp32:
   board: esp32dev
+  framework:
+    type: arduino
   
 wifi:
   ssid: !secret wifi_ssid_wlan
@@ -30,6 +37,7 @@ wifi:
 api:
 
 ota:
+  - platform: esphome
 
 # Enable logging
 logger:

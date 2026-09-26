@@ -2,12 +2,17 @@
 # ESPHOME SONOFF 4CH PRO R2 V.1.0 - SWITCH3 - PROGRAMADOR RIEGO CESPED.-
 # INSTALACION: 20.04.2022
 #
+# MIGRACION ESPHOME 2024.2.2 -> 2026.9.0: 26.09.2026
+#   - platform/board salen de 'esphome:' a bloque 'esp8266:'
+#   - 'ota:' pasa a lista con '- platform: esphome'
+#
 substitutions:
   device_name: esphome_4ch_sw3
 
 esphome:
   name: ${device_name}
-  platform: ESP8266
+
+esp8266:
   board: esp01_1m
   board_flash_mode: dout
 
@@ -25,6 +30,7 @@ api:
 logger:
 
 ota:
+  - platform: esphome
 
 binary_sensor:
   - platform: gpio
