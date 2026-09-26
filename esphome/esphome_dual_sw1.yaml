@@ -38,6 +38,10 @@ logger:
 # ESP32 Bluetooth Low Energy Tracker Hub
 esp32_ble_tracker:
 
+# Bluetooth proxy activo para HA (necesario para comisionar Matter por BLE)
+bluetooth_proxy:
+  active: true
+
 status_led:
   pin:
     number: GPIO13
@@ -160,11 +164,9 @@ sensor:
     humidity:
       name: "LY1 Desk_Setup Humedad"
     battery_level:
-      name: "LY1 Desk_Setup Batería Nivel"
-    battery_voltage:
       name: "LY1 Desk_Setup Batería"
-    # signal_strength:
-    #  name: "LY1 Desk_Setup Señal"
+    battery_voltage:
+      name: "LY1 Desk_Setup Batería Voltage"
 
   # LY02 Estudio Sala
   - platform: atc_mithermometer
@@ -175,3 +177,5 @@ sensor:
       name: "LY2 Estudio Sala Humedad"
     battery_level:
       name: "LY2 Estudio Sala Batería"
+    battery_voltage:
+      name: "LY2 Estudio Sala Batería Voltage"
