@@ -5399,7 +5399,7 @@ views:
           - entity: automation.l06_luces_off_before_sunrise
           - entity: automation.l07_luces_on_entrada_segun_sensor
           - entity: automation.l08_luces_on_dormitorio_segun_sensor
-          - entity: automation.l09_luces_on_dormitorio_warning
+          - entity: automation.l09_luces_on_pasillo_segun_sensor
           - entity: automation.l10_luces_on_estudio_segun_sensor
           - entity: automation.p01_ping_router_fibra
           - entity: automation.p02_ping_ap_wifi_tplink

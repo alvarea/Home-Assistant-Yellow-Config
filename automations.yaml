@@ -1169,38 +1169,63 @@
 
 - id: L07
   alias: 'L07 Luces On Entrada Según Sensor'
+  # v2 (2026-10-04): añade sensor Matter IKEA MYGGSPRAY (occupancy) junto al Aqara.
+  # - El apagado ya no es un delay fijo: espera a que NINGÚN sensor de movimiento
+  #   detecte presencia y entonces cuenta 1 min (01-07h) o 5 min (resto).
+  # - Cada nuevo movimiento/apertura mientras la regla está en marcha reinicia la cuenta (mode: restart).
+  # - Luminosidad: basta con que uno de los dos sensores marque < 100 lx (si ambos caen, se considera oscuro).
+  # - Si la luz se encendió a mano (la regla no está en marcha), no la toca, igual que antes.
   mode: restart
   trigger:
     - platform: state
-      entity_id: binary_sensor.aqara_movimiento_entrada
-      to: 'on'
-    - platform: state
-      entity_id: binary_sensor.aqara_puerta_entrada_principal
+      entity_id:
+        - binary_sensor.aqara_movimiento_entrada
+        - binary_sensor.ikea_movimiento_entrada
+        - binary_sensor.aqara_puerta_entrada_principal
       to: 'on'
   condition:
-    condition: and
+    condition: or
     conditions:
+      # Caso 1: arranque normal => luz apagada, franja horaria y poca luz
+      - condition: and
+        conditions:
+          - condition: state
+            entity_id: light.luz_entrada
+            state: 'off'
+          - condition: template
+            value_template: "{{ now().hour < 11 or now().hour >= 18 }}"
+          - condition: template
+            value_template: >
+              {% set lux = [states('sensor.aqara_movimiento_entrada_luminosidad'),
+                            states('sensor.ikea_movimiento_entrada_iluminacion')]
+                           | select('is_number') | map('float') | list %}
+              {{ lux | count == 0 or lux | min < 100 }}
+      # Caso 2: la regla ya está en marcha (luz encendida por L07) => reiniciar la cuenta
       - condition: template
-        value_template: "{{ (now().hour >= 0 and now().hour < 11) or (now().hour > 17 and now().hour <= 23) }}"
-      - condition: state
-        entity_id: light.luz_entrada
-        state: 'off'
-      - condition: numeric_state
-        entity_id: sensor.aqara_movimiento_entrada_luminosidad
-        below: 100
+        value_template: "{{ state_attr('automation.l07_luces_on_entrada_segun_sensor', 'current') | int(0) > 0 }}"
   action:
-    # Luces Entrada ON
-    - service: light.turn_on
-      data:
-        brightness_pct: >
-          {% if now().hour >= 0 and now().hour <= 7 %} 10
-          {% elif now().hour >= 11 and now().hour <= 17 %} 50
-          {% else %} 80
-          {% endif %}
-      target:
-        entity_id: light.luz_entrada
-    # Si Alarm.Armed_Home => Piloto ON
-    - service: script.luz_on_armed_home
+    # Luces Entrada ON (solo si está apagada)
+    - if:
+        - condition: state
+          entity_id: light.luz_entrada
+          state: 'off'
+      then:
+        - service: light.turn_on
+          data:
+            brightness_pct: >
+              {% if now().hour <= 7 %} 10
+              {% else %} 80
+              {% endif %}
+          target:
+            entity_id: light.luz_entrada
+        # Si Alarm.Armed_Home => Piloto ON
+        - service: script.luz_on_armed_home
+    # Espera a que ningún sensor de movimiento detecte presencia (máx. 30 min por seguridad)
+    - wait_template: >
+        {{ not is_state('binary_sensor.aqara_movimiento_entrada', 'on')
+           and not is_state('binary_sensor.ikea_movimiento_entrada', 'on') }}
+      timeout: '00:30:00'
+      continue_on_timeout: true
     # Espera de x minutos en función de la hora
     - delay:
         minutes: >
@@ -1261,46 +1286,73 @@
 
 - id: L09
   alias: 'L09 Luces On Pasillo Según Sensor'
+  # v2 (2026-10-04): añade sensor Matter IKEA MYGGSPRAY de la entrada junto al Hue del pasillo.
+  # - El apagado ya no es un delay fijo: espera a que NINGÚN sensor detecte presencia
+  #   y entonces cuenta 1 min (01-07h) o 3 min (resto).
+  # - Cada nuevo movimiento mientras la regla está en marcha reinicia la cuenta (mode: restart).
+  # - Luminosidad: solo la del Hue del pasillo (< 4 lx); si el Hue no da lectura, se considera oscuro.
+  # - Si la luz se encendió a mano (la regla no está en marcha), no la toca, igual que antes.
   mode: restart
   trigger:
     - platform: state
-      entity_id: binary_sensor.hue_movimiento_pasillo_presencia
+      entity_id:
+        - binary_sensor.hue_movimiento_pasillo_presencia
+        - binary_sensor.ikea_movimiento_entrada
       to: 'on'
   condition:
-    condition: and
+    condition: or
     conditions:
-      #  # after_offset: "-02:00:00"  ==> Horario Invierno GMT+1, en el amanecer -2h
-      #  # after_offset: "-00:30:00" ==> Horario Verano GMT+2, el amanecer -30m
-      #- condition: sun
-      #  after: sunset
-      #  after_offset: "-02:00:00"
+      # Caso 1: arranque normal => luz apagada, franja horaria y poca luz
+      - condition: and
+        conditions:
+          #  # after_offset: "-02:00:00"  ==> Horario Invierno GMT+1, en el amanecer -2h
+          #  # after_offset: "-00:30:00" ==> Horario Verano GMT+2, el amanecer -30m
+          #- condition: sun
+          #  after: sunset
+          #  after_offset: "-02:00:00"
+          - condition: template
+            value_template: "{{ now().hour < 11 or now().hour >= 18 }}"
+          - condition: template
+            value_template: >
+              {% set lux = states('sensor.hue_movimiento_pasillo_luminosidad') %}
+              {{ not is_number(lux) or lux | float < 4 }}
+          - condition: state
+            entity_id: light.luz_pasillo
+            state: 'off'
+      # Caso 2: la regla ya está en marcha (luz encendida por L09) => reiniciar la cuenta
       - condition: template
-        value_template: "{{ (now().hour >= 0 and now().hour < 11) or (now().hour > 17 and now().hour <= 23) }}"
-      - condition: numeric_state
-        entity_id: sensor.hue_movimiento_pasillo_luminosidad
-        below: 4
-      - condition: state
-        entity_id: light.luz_pasillo
-        state: 'off'
+        value_template: "{{ state_attr('automation.l09_luces_on_pasillo_segun_sensor', 'current') | int(0) > 0 }}"
   action:
-    - service: light.turn_on
-      data:
-        brightness_pct: >
-          {% if now().hour >= 0 and now().hour <= 7 %} 10
-          {% elif now().hour >= 8 and now().hour <= 17 %} 40
-          {% else %} 50
-          {% endif %}
-      target:
-        entity_id: light.luz_pasillo
-    # Espera de 5'
+    # Luces Pasillo ON (solo si está apagada)
+    - if:
+        - condition: state
+          entity_id: light.luz_pasillo
+          state: 'off'
+      then:
+        - service: light.turn_on
+          data:
+            brightness_pct: >
+              {% if now().hour >= 0 and now().hour <= 7 %} 10
+              {% elif now().hour >= 8 and now().hour <= 17 %} 40
+              {% else %} 50
+              {% endif %}
+          target:
+            entity_id: light.luz_pasillo
+    # Espera a que ningún sensor detecte presencia (máx. 30 min por seguridad)
+    - wait_template: >
+        {{ not is_state('binary_sensor.hue_movimiento_pasillo_presencia', 'on')
+           and not is_state('binary_sensor.ikea_movimiento_entrada', 'on') }}
+      timeout: '00:30:00'
+      continue_on_timeout: true
+    # Espera de x minutos en función de la hora
     - delay:
         minutes: >
           {% if now().hour >= 1 and now().hour <= 7 %} 1
           {% else %} 3
           {% endif %}
-    # Luces Off + Led
+    # Luces Off
     - service: light.turn_off
-      entity_id: 
+      entity_id:
         - light.luz_pasillo
 
 - id: L10

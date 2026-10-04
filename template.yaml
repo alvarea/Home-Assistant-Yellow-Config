@@ -93,6 +93,21 @@
         {% else %} mdi:motion-sensor-off
         {% endif %}
 
+    - name: alarma_sensor_movimiento_entrada_pasillo
+      unique_id: alarma_sensor_movimiento_entrada_pasillo
+      state: >-
+        {%  if is_state('input_boolean.control_alarma_sensor_presencia_entrada_pasillo','on')
+            and is_state('binary_sensor.ikea_movimiento_entrada','on')
+        %}
+          true
+        {% else %}
+          false
+        {% endif %}
+      icon: >-
+        {% if is_state('binary_sensor.alarma_sensor_presencia_entrada_pasillo','on') %} mdi:motion-sensor
+        {% else %} mdi:motion-sensor-off
+        {% endif %}
+
     - name: alarma_sensor_movimiento_dormitorio_principal
       unique_id: alarma_sensor_movimiento_dormitorio_principal
       state: >-
