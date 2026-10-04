@@ -59,7 +59,7 @@
           false
         {% endif %}
       icon: >-
-        {% if is_state('binary_sensor.alarma_sensor_presencia_salon','on') %} mdi:motion-sensor
+        {% if is_state('binary_sensor.alarma_sensor_movimiento_salon','on') %} mdi:motion-sensor
         {% else %} mdi:motion-sensor-off
         {% endif %}
 
@@ -74,7 +74,7 @@
           false
         {% endif %}
       icon: >-
-        {% if is_state('binary_sensor.alarma_sensor_presencia_estudio','on') %} mdi:motion-sensor
+        {% if is_state('binary_sensor.alarma_sensor_movimiento_estudio','on') %} mdi:motion-sensor
         {% else %} mdi:motion-sensor-off
         {% endif %}
 
@@ -89,7 +89,7 @@
           false
         {% endif %}
       icon: >-
-        {% if is_state('binary_sensor.alarma_sensor_presencia_entrada_hall','on') %} mdi:motion-sensor
+        {% if is_state('binary_sensor.alarma_sensor_movimiento_entrada_hall','on') %} mdi:motion-sensor
         {% else %} mdi:motion-sensor-off
         {% endif %}
 
@@ -104,7 +104,7 @@
           false
         {% endif %}
       icon: >-
-        {% if is_state('binary_sensor.alarma_sensor_presencia_entrada_pasillo','on') %} mdi:motion-sensor
+        {% if is_state('binary_sensor.alarma_sensor_movimiento_entrada_pasillo','on') %} mdi:motion-sensor
         {% else %} mdi:motion-sensor-off
         {% endif %}
 
