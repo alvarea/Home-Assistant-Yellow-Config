@@ -1002,7 +1002,7 @@
       state: 'off'
     light.led_salon_tv:
       state: 'off'
-      light.luz_salon_play_tv:
+    light.luz_salon_play_tv:
       state: 'off'
   icon: mdi:weather-sunset-down
 

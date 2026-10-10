@@ -197,7 +197,7 @@ alexa_dormitorio_set_volumen_alarma:
   sequence:
     # Almacena el Volumen Actual de Alexa Dormitorio
     - action: input_number.set_value
-      data_template:
+      data:
         entity_id: input_number.alexa_dormitorio_volumen_anterior
         # 2026-10-10: Alexa Media no publica volume_level cuando el Echo está idle.
         # Si falta, se conserva el último volumen guardado (evita que falle el script).
@@ -206,7 +206,7 @@ alexa_dormitorio_set_volumen_alarma:
              | float(states('input_number.alexa_dormitorio_volumen_anterior') | float(0.4)) }}
     # Almacena y Ajusta el Volumen Alexa Dormitorio según tipo mensaje-hora
     - action: input_number.set_value
-      data_template:
+      data:
         entity_id: input_number.alexa_dormitorio_volumen_nuevo
         value: >
           {% if states.alarm_control_panel.ha.state == 'triggered' and now().hour >= 0 and now().hour <= 9 %}
@@ -236,7 +236,7 @@ alexa_entrada_set_volumen_alarma:
   sequence:
     # Almacena el Volumen Actual de Alexa Entrada
     - action: input_number.set_value
-      data_template:
+      data:
         entity_id: input_number.alexa_entrada_volumen_anterior
         # 2026-10-10: Alexa Media no publica volume_level cuando el Echo está idle.
         # Si falta, se conserva el último volumen guardado (evita que falle el script).
@@ -245,7 +245,7 @@ alexa_entrada_set_volumen_alarma:
              | float(states('input_number.alexa_entrada_volumen_anterior') | float(0.31)) }}
     # Almacena y Ajusta el Volumen Alexa entrada según tipo mensaje-hora
     - action: input_number.set_value
-      data_template:
+      data:
         entity_id: input_number.alexa_entrada_volumen_nuevo
         value: >
           {% if states.alarm_control_panel.ha.state == 'triggered' and now().hour >= 0 and now().hour <= 9 %}
@@ -319,7 +319,7 @@ alexa_sonido_alarma:
         count: "{{ repeticion|int }}"
         sequence:
           - action: media_player.play_media
-            data_template:
+            data:
               entity_id: "media_player.echo_alexa_{{ alexa }}"
               media_content_type: sound
               media_content_id: "{{ sonido }}"
@@ -342,7 +342,7 @@ alexa_sirena_alarma:
             # value_template: "{{ states.alarm_control_panel.ha.state == 'triggered' }}"
         sequence:
           - action: media_player.play_media
-            data_template:
+            data:
               entity_id:
                 - media_player.echo_alexa_entrada
                 - media_player.echo_alexa_dormitorio
@@ -364,7 +364,7 @@ alexa_anuncio:
   sequence:
     # envio mensaje voz
     - action: notify.alexa_media
-      data_template:
+      data:
         target: "media_player.echo_alexa_{{ alexa }}"
         title: "{{ titulo }}"
         message: "{{ voz }}"
@@ -383,7 +383,7 @@ alexa_sonido:
   sequence:
     # Envio Sonido
     - action: media_player.play_media
-      data_template:
+      data:
         entity_id: "media_player.echo_alexa_{{ alexa }}"
         media_content_type: sound
         media_content_id: "{{ sonido }}"
@@ -410,11 +410,11 @@ alexa_secuencia:
           sequence:
             - action: script.alexa_dormitorio_set_volumen_alarma
             - action: script.alexa_anuncio
-              data_template:
+              data:
                 alexa: 'dormitorio'
                 voz: "{{ voz }}"
             - action: script.alexa_sonido_alarma
-              data_template:
+              data:
                 alexa: 'dormitorio'
                 sonido: "{{ sonido }}"
                 repeticion: "{{ repeticion }}"
@@ -424,11 +424,11 @@ alexa_secuencia:
         # SALIDA ALEXA ENTRADA
         - action: script.alexa_entrada_set_volumen_alarma
         - action: script.alexa_anuncio
-          data_template:
+          data:
             alexa: 'entrada'
             voz: "{{ voz }}"
         - action: script.alexa_sonido_alarma
-          data_template:
+          data:
             alexa: 'entrada'
             sonido: "{{ sonido }}"
             repeticion: "{{ repeticion }}"
@@ -449,11 +449,11 @@ alexa_entrada_secuencia:
   sequence:
     - action: script.alexa_entrada_set_volumen_alarma
     - action: script.alexa_anuncio
-      data_template:
+      data:
         alexa: 'entrada'
         voz: "{{ voz }}"
     - action: script.alexa_sonido_alarma
-      data_template:
+      data:
         alexa: 'entrada'
         sonido: "{{ sonido }}"
         repeticion: "{{ repeticion }}"
@@ -466,11 +466,11 @@ alexa_dormitorio_secuencia:
   sequence:
     - action: script.alexa_dormitorio_set_volumen_alarma
     - action: script.alexa_anuncio
-      data_template:
+      data:
         alexa: 'dormitorio'
         voz: "{{ voz }}"
     - action: script.alexa_sonido_alarma
-      data_template:
+      data:
         alexa: 'dormitorio'
         sonido: "{{ sonido }}"
         repeticion: "{{ repeticion }}"
@@ -482,11 +482,11 @@ alexa_estudio_secuencia:
   sequence:
     - action: script.alexa_estudio_set_volumen
     - action: script.alexa_anuncio
-      data_template:
+      data:
         alexa: 'estudio'
         voz: "{{ voz }}"
     - action: script.alexa_sonido_alarma
-      data_template:
+      data:
         alexa: 'estudio'
         sonido: "{{ sonido }}"
         repeticion: "{{ repeticion }}"
@@ -513,7 +513,7 @@ alexa_secuencia_alarma_armado:
           sequence:
             - action: script.alexa_dormitorio_set_volumen_alarma
             - action: script.alexa_anuncio
-              data_template:
+              data:
                 alexa: 'dormitorio'
                 voz: "{{ voz }}"
             - repeat:
@@ -524,7 +524,7 @@ alexa_secuencia_alarma_armado:
                     #  value_template: "{{ states.alarm_control_panel.ha.state == 'arming' }}"
                 sequence:
                   - action: media_player.play_media
-                    data_template:
+                    data:
                       entity_id: '{{ states.input_select.alarma_media_player.state }}'
                       media_content_type: sound
                       media_content_id: "{{ sonido }}"
@@ -534,7 +534,7 @@ alexa_secuencia_alarma_armado:
       default:
         - action: script.alexa_entrada_set_volumen_alarma
         - action: script.alexa_anuncio
-          data_template:
+          data:
             alexa: 'entrada'
             voz: "{{ voz }}"
         - repeat:
@@ -545,7 +545,7 @@ alexa_secuencia_alarma_armado:
                 #  value_template: "{{ states.alarm_control_panel.ha.state == 'arming' }}"
             sequence:
               - action: media_player.play_media
-                data_template:
+                data:
                   entity_id: '{{ states.input_select.alarma_media_player.state }}'
                   media_content_type: sound
                   media_content_id: "{{ sonido }}"
@@ -573,7 +573,7 @@ alexa_secuencia_alarma_desarmado:
           sequence:
             - action: script.alexa_dormitorio_set_volumen_alarma
             - action: script.alexa_anuncio
-              data_template:
+              data:
                 alexa: 'dormitorio'
                 voz: "{{ voz }}"
             - repeat:
@@ -584,7 +584,7 @@ alexa_secuencia_alarma_desarmado:
                     #value_template: "{{ states.alarm_control_panel.ha.state == 'pending' }}"
                 sequence:
                   - action: media_player.play_media
-                    data_template:
+                    data:
                       entity_id: '{{ states.input_select.alarma_media_player.state }}'
                       media_content_type: sound
                       media_content_id: "{{ sonido }}"
@@ -594,7 +594,7 @@ alexa_secuencia_alarma_desarmado:
       default:
         - action: script.alexa_entrada_set_volumen_alarma
         - action: script.alexa_anuncio
-          data_template:
+          data:
             alexa: 'entrada'
             voz: "{{ voz }}"
         - repeat:
@@ -605,7 +605,7 @@ alexa_secuencia_alarma_desarmado:
                 #value_template: "{{ states.alarm_control_panel.ha.state == 'pending' }}"
             sequence:
               - action: media_player.play_media
-                data_template:
+                data:
                   entity_id: '{{ states.input_select.alarma_media_player.state }}'
                   media_content_type: sound
                   media_content_id: "{{ sonido }}"
@@ -627,7 +627,7 @@ alexa_secuencia_alarma_disparada:
     - action: script.alexa_entrada_set_volumen_alarma
     - action: script.alexa_dormitorio_set_volumen_alarma
     - action: media_player.play_media
-      data_template:
+      data:
         entity_id:
           - media_player.echo_alexa_entrada
           - media_player.echo_alexa_dormitorio
@@ -650,7 +650,7 @@ alexa_secuencia_alarma_disparada:
             #value_template: "{{ states.alarm_control_panel.ha.state == 'triggered' }}"
         sequence:
           - action: media_player.play_media
-            data_template:
+            data:
               entity_id:
                 - media_player.echo_alexa_entrada
                 - media_player.echo_alexa_dormitorio
@@ -676,7 +676,7 @@ test_alexa_secuencia_armado:
     - action: light.turn_on
       entity_id: light.luz_vitrina
     - action: script.alexa_dormitorio_secuencia
-      data_template:
+      data:
         voz: 'ATENCION!. Luz Vitrina Entendida'
         sonido: "{{ states('input_select.alarma_sonido_armado') }}"
         repeticion: 1
@@ -687,7 +687,7 @@ test_alexa_secuencia_armado:
             state: 'on'
         sequence:
           - action: media_player.play_media
-            data_template:
+            data:
               entity_id: '{{ states.input_select.alarma_media_player.state }}'
               media_content_type: sound
               media_content_id: "{{ states('input_select.alarma_sonido_armado') }}"
@@ -698,7 +698,7 @@ test_alexa_secuencia_desarmado:
   mode: restart
   sequence:
     - action: script.alexa_entrada_secuencia
-      data_template:
+      data:
         voz: 'ATENCION!. Sistema desarmado.'
         sonido: "{{ states('input_select.alarma_sonido_desarmado') }}"
         repeticion: 1
@@ -710,18 +710,18 @@ test_alexa_anuncio:
     - action: script.alexa_dormitorio_set_volumen_alarma
 
     - action: script.alexa_anuncio
-      data_template:
+      data:
         alexa: 'dormitorio'
         voz: 'ATENCION!. Armado Total activado.'
 
     - action: script.alexa_sonido_alarma
-      data_template:
+      data:
         alexa: 'dormitorio'
         sonido: "{{ states('input_select.alarma_sonido_armado') }}"
         repeticion: 2
 
     - action: script.alexa_sirena_alarma
-      data_template:
+      data:
         sonido: "{{ states('input_select.alarma_sonido_disparado') }}"
 
     - action: script.alexa_dormitorio_restaura_volumen
@@ -731,7 +731,7 @@ test_media_player_announce:
   sequence:
     # envio mensaje voz
     - action: notify.alexa_media
-      data_template:
+      data:
         target: >
           {{ states('input_select.alarma_media_player') }}
         message: >
@@ -743,7 +743,7 @@ test_media_player_secuencia:
   alias: 'Alexa Skill'
   sequence:
     - action: media_player.play_media
-      data_template:
+      data:
         entity_id: >
           {{ states('input_select.alarma_media_player') }}
         media_content_type: sequence
@@ -753,7 +753,7 @@ test_media_player_secuencia:
 test_sonido_alarma_desarmado:
   sequence:
     - action: media_player.play_media
-      data_template:
+      data:
         entity_id: >
           {{ states('input_select.alarma_media_player') }}
         media_content_type: sound
@@ -763,7 +763,7 @@ test_sonido_alarma_desarmado:
 test_sonido_alarma_armado:
   sequence:
     - action: media_player.play_media
-      data_template:
+      data:
         entity_id: >
           {{ states('input_select.alarma_media_player') }}
         media_content_type: sound
@@ -773,7 +773,7 @@ test_sonido_alarma_armado:
 test_sonido_alarma_disparado:
   sequence:
     - action: media_player.play_media
-      data_template:
+      data:
         entity_id: >
           {{ states('input_select.alarma_media_player') }}
         media_content_type: sound
@@ -791,19 +791,19 @@ notifica_alarma:
   # Actualiza el valor de input_text.mensaje_tit con el título recibido.
   - action: input_text.set_value
     entity_id: input_text.mensaje_tit
-    data_template:
+    data:
       value: "{{ titulo }}"
 
   # Actualiza el valor de input_text.mensaje_msg con el mensaje recibido.
   - action: input_text.set_value
     entity_id: input_text.mensaje_msg
-    data_template:
+    data:
       value: "{{ mensaje }}"
 
   # Notificación Telegram
   - action: notify.telegram_alarm
     continue_on_error: true
-    data_template:
+    data:
       title: >
         {{ states('input_text.mensaje_tit') }}
       message: >
@@ -834,7 +834,7 @@ notifica_alarma:
 
   # Notificación Persistente App HOMY
   - action: persistent_notification.create
-    data_template:
+    data:
       title: >
         {{ states('input_text.mensaje_tit') }}
       message: >
@@ -850,18 +850,18 @@ notifica_evento:
   # Actualiza el valor de input_text.mensaje_tit con el título recibido.
   - action: input_text.set_value
     entity_id: input_text.mensaje_tit
-    data_template:
+    data:
       value: "{{ titulo }}"
 
   # Actualiza el valor de input_text.mensaje_msg con el cuerpo del mensaje recibido.
   - action: input_text.set_value
     entity_id: input_text.mensaje_msg
-    data_template:
+    data:
       value: "{{ mensaje }}"
 
   # Notificación Telegram
   - action: notify.telegram_notif
-    data_template:
+    data:
       title: >
         {{ states('input_text.mensaje_tit') }}
       message: >
@@ -980,7 +980,7 @@ piscina_depuradora_ch0_timer_start:
   alias: Timer Piscina Start
   sequence:
     - action: timer.start
-      data_template:
+      data:
         entity_id: timer.piscina_depuradora_ch0
         duration: '{{ states.sensor.piscina_depuradora_ch0_manual_segundos.state}}'
     - action: switch.turn_on
@@ -1000,7 +1000,7 @@ piscina_depuradora_ch0_timer_start_diario:
   alias: Timer Piscina Start
   sequence:
     - action: timer.start
-      data_template:
+      data:
         entity_id: timer.piscina_depuradora_ch0
         duration: '{{ states.sensor.piscina_duracion_planificada.state}}'
     - action: switch.turn_on
@@ -1542,7 +1542,7 @@ check_sensores_magneticos_perimetro:
   alias: 'Check Sensores Magneticos Perimetro'
   sequence:
     - action: input_text.set_value
-      data_template:
+      data:
         entity_id: input_text.alarma_check_sensores_magneticos
         value: >
           {% if states.binary_sensor.alarma_sensores_perimetro.state == 'off' %} 
@@ -1559,13 +1559,13 @@ check_sensores_magneticos_perimetro:
             Atención, alarma no lista para armar. Revise el sensor {{ state_attr('binary_sensor.aqara_ventana_dormitorio_paloma', 'friendly_name') }}
           {%endif%}
     - action: script.alexa_entrada_secuencia
-      data_template:
+      data:
         sonido: 'clock_01'
         repeticion: 1
         voz: "{{ states.input_text.alarma_check_sensores_magneticos.state }}" 
     - action: light.turn_on
       entity_id: light.tagreader_led
-      data_template:
+      data:
         brightness: 128
         color_name: >
           {% if states.binary_sensor.alarma_check_listo_para_armar.state == 'on' %}

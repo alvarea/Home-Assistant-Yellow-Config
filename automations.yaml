@@ -83,7 +83,7 @@
   actions:
     # Script Envío Sonido Alexa Alexa
     - action: script.alexa_secuencia
-      data_template:
+      data:
         sonido: 'clock_01'
         repeticion: 1
         voz: >
@@ -201,7 +201,7 @@
 
     # Script Envío Sonido Alexa Alexa
     - action: script.alexa_secuencia
-      data_template:
+      data:
         sonido: "{{ states('input_select.alarma_sonido_disparado') }}"
         repeticion: 1
         voz: 'ATENCION! ¡ALARMA HUMO COCINA!. Sensor Humo Cocina. ¡ATENCION! ¡ALARMA!'
@@ -229,7 +229,7 @@
 
     # Script Envío Sonido Alexa Alexa
     - action: script.alexa_secuencia
-      data_template:
+      data:
         sonido: "{{ states('input_select.alarma_sonido_disparado') }}"
         repeticion: 1
         voz: 'ATENCION! ¡ALARMA AGUA ARQUETA!. Sensor Agua Arqueta. ¡ATENCION! ¡ALARMA!'
@@ -258,7 +258,7 @@
 
     # Script Envío Sonido Alexa Alexa
     - action: script.alexa_secuencia
-      data_template:
+      data:
         sonido: "{{ states('input_select.alarma_sonido_disparado') }}"
         repeticion: 1
         voz: 'ATENCION. frigorífico cocina abierto más de 3 minutos'
@@ -287,7 +287,7 @@
 
     # Script Envío Sonido Alexa Alexa
     - action: script.alexa_secuencia
-      data_template:
+      data:
         sonido: "{{ states('input_select.alarma_sonido_disparado') }}"
         repeticion: 1
         voz: 'ATENCION. frigorífico bebidas abierto más de 3 minutos'
@@ -314,7 +314,7 @@
 
     # Script Envío Sonido Alexa Alexa
     - action: script.alexa_secuencia
-      data_template:
+      data:
         sonido: "{{ states('input_select.alarma_sonido_disparado') }}"
         repeticion: 1
         voz: 'ATENCION. Sensor Humedad Fregadero Activado'
@@ -340,7 +340,7 @@
   actions:   
     # Script Envío Sonido Alexa Alexa
     - action: script.alexa_secuencia_alarma_armado
-      data_template:
+      data:
         voz: "¡ATENCION!, alarma activada. Tiene un minuto para salir. ATENCION!, alarma activada. Salga ahora, por favor."
         sonido: "{{ states('input_select.alarma_sonido_desarmado') }}"
 #
@@ -390,7 +390,7 @@
           sequence:         
             # Script Envío Sonido Alexa Alexa
             - action: script.alexa_secuencia_alarma_desarmado
-              data_template:
+              data:
                 voz: "¡ATENCION!, Aviso previo a salto alarma. Tiene un minuto para desarmar. ¡ATENCION!, Desarme ahora, por favor."
                 sonido: "{{ states('input_select.alarma_sonido_desarmado') }}"
 
@@ -413,12 +413,12 @@
     # INICIALIZA EL SENSOR DEL TRIGGER
     - action: input_text.set_value
       entity_id: input_text.alarm_trigger
-      data_template:
+      data:
         value: " "
 
     # Script Envío Sonido Alexa Alexa
     - action: script.alexa_secuencia
-      data_template:
+      data:
         voz: "ATENCION!. Armado Total activado."
         sonido: "{{ states('input_select.alarma_sonido_armado') }}"
         repeticion: 1
@@ -452,12 +452,12 @@
     # ALMACENA EL SENSOR DEL TRIGGER
     - action: input_text.set_value
       entity_id: input_text.alarm_trigger
-      data_template:
+      data:
         value: " "
 
     # Script Envío Sonido Alexa Alexa
     - action: script.alexa_secuencia
-      data_template:
+      data:
         voz: "ATENCION!. Armado parcial activado."
         sonido: "{{ states('input_select.alarma_sonido_armado') }}"
         repeticion: 1
@@ -492,7 +492,7 @@
       
     # Script Envío Sonido Alexa Alexa
     - action: script.alexa_secuencia
-      data_template:
+      data:
         voz: "ATENCION!. Alarma desactivada."
         sonido: "{{ states('input_select.alarma_sonido_desarmado') }}"
         repeticion: 1
@@ -532,7 +532,7 @@
     # ALMACENA EL SENSOR DEL TRIGGER
     - action: input_text.set_value
       entity_id: input_text.alarm_trigger
-      data_template:
+      data:
         value: "{{ trigger.to_state.attributes.friendly_name }}"
     #
     # DISPARA LA ALARMA, que pasa a estado PENDING durante 60'
@@ -571,7 +571,7 @@
     # ALMACENA EL SENSOR DEL TRIGGER
     - action: input_text.set_value
       entity_id: input_text.alarm_trigger
-      data_template:
+      data:
         value: "{{ trigger.to_state.attributes.friendly_name }}"
 
     # DISPARA LA ALARMA, que pasa a estado PENDING durante 60'
@@ -596,7 +596,7 @@
           sequence:         
             # Script Notificación Alarma
             - action: script.notifica_alarma
-              data_template:
+              data:
                 titulo: '*ALARMA HOMY*'
                 mensaje: >
                   >>> ESTADO: ATENCION ALARMA DISPARADA
@@ -686,7 +686,7 @@
           entity_id: alarm_control_panel.ha
     default:
       - action: script.alexa_anuncio
-        data_template:
+        data:
           alexa: 'entrada'
           voz: Atención. Alarma no lista para armado parcial. Revise puertas y ventanas.
 
@@ -712,7 +712,7 @@
     # ALMACENA EL SENSOR DEL TRIGGER
     - action: input_text.set_value
       entity_id: input_text.alarm_trigger
-      data_template:
+      data:
         value: "A10 Alarm Home Auto Disarm"
     # Desarmado de Alarmas
     - action: alarm_control_panel.alarm_disarm
@@ -736,7 +736,7 @@
   actions:
     - action: light.turn_on
       entity_id: light.tagreader_led
-      data_template:
+      data:
         brightness: 96
         color_name: >
           {% if states.binary_sensor.alarma_check_listo_para_armar.state == 'on' %}
@@ -1720,7 +1720,7 @@
   actions:
     # Timer Programador Diario
     - action: timer.start
-      data_template:
+      data:
         entity_id: timer.piscina_depuradora_ch0
         duration: '{{ states.sensor.piscina_depuradora_ch0_duracion_planificada_t1.state|int * 60}}'
     - action: switch.turn_on
@@ -1743,7 +1743,7 @@
   actions:
     # Timer Programador Diario
     - action: timer.start
-      data_template:
+      data:
         entity_id: timer.piscina_depuradora_ch0
         duration: '{{ states.sensor.piscina_depuradora_ch0_duracion_planificada_t2.state|int * 60}}'
     - action: switch.turn_on
@@ -2051,7 +2051,7 @@
         - '23:59:00'
   actions:
     - action: input_text.set_value
-      data_template:
+      data:
         entity_id: input_text.riego_prevision_lluvia_ayer
         value: "{{ states('sensor.dark_sky_icon') }}"
 
@@ -2085,7 +2085,7 @@
   actions:
     # Timer Programador Diario
     - action: timer.start
-      data_template:
+      data:
         entity_id: timer.riego_bonsais_ch1
         duration: '{{ states.sensor.riego_bonsais_ch1_duracion_planificada_t1.state|int * 60}}'
     - action: valve.open_valve
@@ -2108,7 +2108,7 @@
   actions:
     # Timer Programador Diario
     - action: timer.start
-      data_template:
+      data:
         entity_id: timer.riego_bonsais_ch1
         duration: '{{ states.sensor.riego_bonsais_ch1_duracion_planificada_t2.state|int * 60}}'
     - action: valve.open_valve
@@ -2144,7 +2144,7 @@
   actions:
     # Timer Programador Diario
     - action: timer.start
-      data_template:
+      data:
         entity_id: timer.riego_bonsais_ch2
         duration: '{{ states.sensor.riego_bonsais_ch2_duracion_planificada_t1.state|int * 60}}'
     - action: valve.open_valve
@@ -2167,7 +2167,7 @@
   actions:
     # Timer Programador Diario
     - action: timer.start
-      data_template:
+      data:
         entity_id: timer.riego_bonsais_ch2
         duration: '{{ states.sensor.riego_bonsais_ch2_duracion_planificada_t2.state|int * 60}}'
     - action: valve.open_valve
@@ -2203,7 +2203,7 @@
   actions:
     # Timer Programador Automático
     - action: timer.start
-      data_template:
+      data:
         entity_id: timer.riego_bonsais_ch3
         duration: '{{ states.sensor.riego_bonsais_ch3_duracion_planificada.state|int * 60}}'
     - action: switch.turn_on
@@ -2239,7 +2239,7 @@
   actions:
     # Timer Programador Automático
     - action: timer.start
-      data_template:
+      data:
         entity_id: timer.riego_bonsais_ch0
         duration: '{{ states.sensor.riego_bonsais_ch0_duracion_planificada_t1.state|int * 60 }}'
     - action: valve.open_valve
@@ -2262,7 +2262,7 @@
   actions:
     # Timer Programador Automático
     - action: timer.start
-      data_template:
+      data:
         entity_id: timer.riego_bonsais_ch0
         duration: '{{ states.sensor.riego_bonsais_ch0_duracion_planificada_t2.state|int * 60 }}'
     - action: valve.open_valve
@@ -2298,7 +2298,7 @@
   actions:
     # Timer Programador Automático
     - action: timer.start
-      data_template:
+      data:
         entity_id: timer.riego_tomates_ch0
         duration: '{{ states.sensor.riego_tomates_ch0_duracion_planificada_t1.state|int * 60 }}'
     - action: switch.turn_on
@@ -2321,7 +2321,7 @@
   actions:
     # Timer Programador Automático
     - action: timer.start
-      data_template:
+      data:
         entity_id: timer.riego_tomates_ch0
         duration: '{{ states.sensor.riego_tomates_ch0_duracion_planificada_t2.state|int * 60 }}'
     - action: switch.turn_on
@@ -2357,7 +2357,7 @@
   actions:
     # Timer Programador Diario
     - action: timer.start
-      data_template:
+      data:
         entity_id: timer.riego_cesped_ch1
         duration: '{{ states.sensor.riego_cesped_ch1_duracion_planificada_t1.state|int * 60}}'
     - action: switch.turn_on
@@ -2380,7 +2380,7 @@
   actions:
     # Timer Programador Diario
     - action: timer.start
-      data_template:
+      data:
         entity_id: timer.riego_cesped_ch1
         duration: '{{ states.sensor.riego_cesped_ch1_duracion_planificada_t2.state|int * 60}}'
     - action: switch.turn_on
@@ -2403,7 +2403,7 @@
   actions:
     # Timer Programador Diario
     - action: timer.start
-      data_template:
+      data:
         entity_id: timer.riego_cesped_ch1
         duration: '{{ states.sensor.riego_cesped_ch1_duracion_planificada_t3.state|int * 60}}'
     - action: switch.turn_on
@@ -2439,7 +2439,7 @@
   actions:
     # Timer Programador Diario
     - action: timer.start
-      data_template:
+      data:
         entity_id: timer.riego_cesped_ch2
         duration: '{{ states.sensor.riego_cesped_ch2_duracion_planificada_t1.state|int * 60}}'
     - action: switch.turn_on
@@ -2462,7 +2462,7 @@
   actions:
     # Timer Programador Diario
     - action: timer.start
-      data_template:
+      data:
         entity_id: timer.riego_cesped_ch2
         duration: '{{ states.sensor.riego_cesped_ch2_duracion_planificada_t2.state|int * 60}}'
     - action: switch.turn_on
@@ -2485,7 +2485,7 @@
   actions:
     # Timer Programador Diario
     - action: timer.start
-      data_template:
+      data:
         entity_id: timer.riego_cesped_ch2
         duration: '{{ states.sensor.riego_cesped_ch2_duracion_planificada_t3.state|int * 60}}'
     - action: switch.turn_on
@@ -2521,7 +2521,7 @@
   actions:
     # Timer Programador Diario
     - action: timer.start
-      data_template:
+      data:
         entity_id: timer.riego_cesped_ch3
         duration: '{{ states.sensor.riego_cesped_ch3_duracion_planificada_t1.state|int * 60}}'
     - action: switch.turn_on
@@ -2544,7 +2544,7 @@
   actions:
     # Timer Programador Diario
     - action: timer.start
-      data_template:
+      data:
         entity_id: timer.riego_cesped_ch3
         duration: '{{ states.sensor.riego_cesped_ch3_duracion_planificada_t2.state|int * 60}}'
     - action: switch.turn_on
@@ -2580,7 +2580,7 @@
   actions:
     # Timer Programador Diario
     - action: timer.start
-      data_template:
+      data:
         entity_id: timer.riego_cesped_ch4
         duration: '{{ states.sensor.riego_cesped_ch4_duracion_planificada_t1.state|int * 60}}'
     - action: switch.turn_on
@@ -2603,7 +2603,7 @@
   actions:
     # Timer Programador Diario
     - action: timer.start
-      data_template:
+      data:
         entity_id: timer.riego_cesped_ch4
         duration: '{{ states.sensor.riego_cesped_ch4_duracion_planificada_t2.state|int * 60}}'
     - action: switch.turn_on
@@ -2763,7 +2763,7 @@
     # Script Notificación Alarma
     - action: input_text.set_value
       entity_id: input_text.alarm_trigger
-      data_template:
+      data:
         value: "{{ trigger.to_state.attributes.friendly_name }}"
     - action: script.notifica_alarma
       data:
@@ -3889,7 +3889,7 @@
             - action: light.turn_off
               entity_id: light.luz_estudio_izquierda
             - action: script.alexa_estudio_secuencia
-              data_template:
+              data:
                 sonido: 'clock_01'
                 repeticion: 1
                 voz: "OK"
@@ -3907,7 +3907,7 @@
               target:
                 entity_id: input_text.helper_ikea_dimmer_switch_estudio
             - action: script.alexa_estudio_secuencia
-              data_template:
+              data:
                 sonido: 'clock_01'
                 repeticion: 1
                 voz: "Vale, Activo Lavando Palaustre. Que descanses."

@@ -1,6 +1,11 @@
 #
 # ESPHOME SONOFF MINI R4 EXTREME - SW8
 #
+# *** SIN USO (2026-10-10) ***
+#   Dispositivo desmontado. Controlaba light.luz_estudio_mesa (helper switch_as_x ya eliminado).
+#   Se mantiene el dispositivo/integración en HA para reutilizar el mini en otro uso.
+#   Referencias a luz_estudio_mesa eliminadas de scenes.yaml el 2026-10-10.
+#
 # MIGRACION ESPHOME 2024.2.2 -> 2026.9.0: 26.09.2026
 #   - 'ota:' pasa a lista con '- platform: esphome'
 #
