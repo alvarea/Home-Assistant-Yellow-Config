@@ -1,0 +1,397 @@
+###############################################################################
+#  ALARM HOMY · Motor de alarma propio (package)
+#
+#  - Helpers (estado, modo, timers, tiempos, interruptores) y etiquetas: en la UI,
+#    todos con prefijo alarm_homy_ y etiqueta "alarm_homy".
+#  - Configuración por sensor: etiquetas alarm_homy_* en la UI (ver custom_templates/alarm_homy.jinja).
+#  - Este fichero solo contiene lógica: panel, sensores del motor, scripts y automatizaciones.
+#
+#  Estados (input_select.alarm_homy_estado):
+#    disarmed → arming (timer salida) → armed_x → pending (timer entrada) → triggered (timer disparo) → armed_x
+#  Eventos emitidos:
+#    alarm_homy_fallo_armado       {modo, origen, sensores, nombres}
+#    alarm_homy_registrar_disparo  {sensores, origen}
+#    alarm_homy_set_excluidos      {entidades}
+#    alarm_homy_reset_disparo      {}
+#    alarm_homy_codigo_incorrecto  {origen}
+###############################################################################
+
+template:
+  # ---------------------------------------------------------------------------
+  # PANEL
+  # ---------------------------------------------------------------------------
+  - alarm_control_panel:
+      - name: Alarm HOMY
+        unique_id: alarm_homy
+        state: "{{ states('input_select.alarm_homy_estado') }}"
+        code_arm_required: false
+        code_format: number
+        arm_away:
+          - action: script.alarm_homy_armar
+            data: {modo: armed_away, origen: panel}
+        arm_home:
+          - action: script.alarm_homy_armar
+            data: {modo: armed_home, origen: panel}
+        arm_night:
+          - action: script.alarm_homy_armar
+            data: {modo: armed_night, origen: panel}
+        arm_vacation:
+          - action: script.alarm_homy_armar
+            data: {modo: armed_vacation, origen: panel}
+        disarm:
+          - action: script.alarm_homy_desarmar
+            data:
+              code: "{{ code }}"
+              origen: panel
+        trigger:
+          - action: script.alarm_homy_panico
+            data: {tipo: panico_silencioso, origen: panel}
+
+  # ---------------------------------------------------------------------------
+  # SENSORES ACTIVOS: los que han saltado tras el último cambio de estado
+  # ---------------------------------------------------------------------------
+  - sensor:
+      - name: alarm_homy_activos
+        unique_id: alarm_homy_activos
+        icon: mdi:shield-alert
+        state: >-
+          {% from 'alarm_homy.jinja' import activos %}{{ activos() | from_json | count }}
+        attributes:
+          entidades: >-
+            {% from 'alarm_homy.jinja' import activos %}{{ activos() | from_json }}
+
+  # ---------------------------------------------------------------------------
+  # REGISTRO DEL DISPARO (persistente): primer sensor + lista acumulada
+  # ---------------------------------------------------------------------------
+  - triggers:
+      - trigger: event
+        event_type: alarm_homy_registrar_disparo
+        id: registrar
+      - trigger: event
+        event_type: alarm_homy_reset_disparo
+        id: reset
+    sensor:
+      - name: alarm_homy_disparo
+        unique_id: alarm_homy_disparo
+        icon: mdi:alarm-light
+        state: >-
+          {% if trigger.id == 'reset' %}ninguno
+          {% elif this.state in ['ninguno', 'unknown', 'unavailable', '', none] %}
+            {%- set e = trigger.event.data.sensores[0] -%}
+            {{ 'PÁNICO' if e == 'panico' else (state_attr(e, 'friendly_name') or e) }}
+          {% else %}{{ this.state }}{% endif %}
+        attributes:
+          entity_id: >-
+            {% if trigger.id == 'reset' %}{{ none }}
+            {% elif this.state in ['ninguno', 'unknown', 'unavailable', '', none] %}{{ trigger.event.data.sensores[0] }}
+            {% else %}{{ this.attributes.get('entity_id') }}{% endif %}
+          area: >-
+            {% if trigger.id == 'reset' %}{{ none }}
+            {% elif this.state in ['ninguno', 'unknown', 'unavailable', '', none] %}{{ area_name(trigger.event.data.sensores[0]) }}
+            {% else %}{{ this.attributes.get('area') }}{% endif %}
+          hora: >-
+            {% if trigger.id == 'reset' %}{{ none }}
+            {% elif this.state in ['ninguno', 'unknown', 'unavailable', '', none] %}{{ now().strftime('%H:%M:%S') }}
+            {% else %}{{ this.attributes.get('hora') }}{% endif %}
+          origen: >-
+            {% if trigger.id == 'reset' %}{{ none }}
+            {% else %}{{ trigger.event.data.get('origen', 'sensor') }}{% endif %}
+          entidades: >-
+            {% if trigger.id == 'reset' %}{{ [] }}
+            {% else %}{{ ((this.attributes.get('entidades') or []) + trigger.event.data.sensores) | unique | list }}{% endif %}
+          lista: >-
+            {% if trigger.id == 'reset' %}{{ [] }}
+            {% else %}
+              {%- set ns = namespace(l=[]) -%}
+              {%- for e in ((this.attributes.get('entidades') or []) + trigger.event.data.sensores) | unique -%}
+                {%- set ns.l = ns.l + ['PÁNICO' if e == 'panico' else (state_attr(e, 'friendly_name') or e)] -%}
+              {%- endfor -%}
+              {{ ns.l }}
+            {% endif %}
+
+  # ---------------------------------------------------------------------------
+  # SENSORES EXCLUIDOS en la sesión de armado (auto-excluir)
+  # ---------------------------------------------------------------------------
+  - triggers:
+      - trigger: event
+        event_type: alarm_homy_set_excluidos
+    sensor:
+      - name: alarm_homy_excluidos
+        unique_id: alarm_homy_excluidos
+        icon: mdi:shield-off-outline
+        state: "{{ trigger.event.data.entidades | count }}"
+        attributes:
+          entidades: "{{ trigger.event.data.entidades }}"
+          nombres: >-
+            {% from 'alarm_homy.jinja' import nombres %}{{ nombres(trigger.event.data.entidades) }}
+
+script:
+  # ---------------------------------------------------------------------------
+  # ARMAR: comprueba sensores, aplica auto-exclusión y arranca el tiempo de salida
+  # ---------------------------------------------------------------------------
+  alarm_homy_armar:
+    alias: Alarm HOMY · Armar
+    icon: mdi:shield-lock
+    mode: restart
+    fields:
+      modo:
+        description: armed_away | armed_home | armed_night | armed_vacation
+        required: true
+        selector:
+          select:
+            options: [armed_away, armed_home, armed_night, armed_vacation]
+      origen:
+        description: panel, nfc, ios, alexa, automatico…
+        selector:
+          text:
+    sequence:
+      - variables:
+          origen: "{{ origen | default('desconocido') }}"
+          estado: "{{ states('input_select.alarm_homy_estado') }}"
+      - condition: template
+        value_template: "{{ estado not in ['pending', 'triggered'] }}"
+      - variables:
+          bloqueantes: >-
+            {% from 'alarm_homy.jinja' import bloqueantes %}{{ bloqueantes(modo) | from_json }}
+          excluibles: >-
+            {% from 'alarm_homy.jinja' import excluibles %}{{ excluibles(modo) | from_json }}
+          txt: >-
+            {% from 'alarm_homy.jinja' import texto_modo %}{{ texto_modo(modo) }}
+          salida: "{{ states('input_number.alarm_homy_' ~ txt ~ '_salida') | int(0) }}"
+      - if:
+          - condition: template
+            value_template: "{{ bloqueantes | count > 0 }}"
+        then:
+          - event: alarm_homy_fallo_armado
+            event_data:
+              modo: "{{ modo }}"
+              origen: "{{ origen }}"
+              sensores: "{{ bloqueantes }}"
+              nombres: >-
+                {% from 'alarm_homy.jinja' import nombres %}{{ nombres(bloqueantes) }}
+          - stop: Fallo al armar
+      - action: timer.cancel
+        target:
+          entity_id: [timer.alarm_homy_salida, timer.alarm_homy_entrada, timer.alarm_homy_disparo]
+      - event: alarm_homy_set_excluidos
+        event_data:
+          entidades: "{{ excluibles }}"
+      - event: alarm_homy_reset_disparo
+      - action: input_select.select_option
+        target: {entity_id: input_select.alarm_homy_tipo_disparo}
+        data: {option: normal}
+      - action: input_select.select_option
+        target: {entity_id: input_select.alarm_homy_modo}
+        data: {option: "{{ modo }}"}
+      - if:
+          - condition: template
+            value_template: "{{ salida > 0 }}"
+        then:
+          - action: input_select.select_option
+            target: {entity_id: input_select.alarm_homy_estado}
+            data: {option: arming}
+          - action: timer.start
+            target: {entity_id: timer.alarm_homy_salida}
+            data: {duration: "{{ salida }}"}
+        else:
+          - action: input_select.select_option
+            target: {entity_id: input_select.alarm_homy_estado}
+            data: {option: "{{ modo }}"}
+
+  # ---------------------------------------------------------------------------
+  # DESARMAR: valida código (si se pide) y resetea todo
+  # ---------------------------------------------------------------------------
+  alarm_homy_desarmar:
+    alias: Alarm HOMY · Desarmar
+    icon: mdi:shield-off
+    mode: restart
+    fields:
+      code:
+        description: Código (obligatorio si validar = true)
+        selector:
+          text:
+      validar:
+        description: false para llamadas internas de confianza (automatizaciones)
+        default: true
+        selector:
+          boolean:
+      origen:
+        selector:
+          text:
+    sequence:
+      - variables:
+          pin: !secret alarm_control_code
+          origen: "{{ origen | default('desconocido') }}"
+          validar: "{{ validar | default(true) }}"
+      - if:
+          - condition: template
+            value_template: "{{ validar and (code | default('') | string) != (pin | string) }}"
+        then:
+          - event: alarm_homy_codigo_incorrecto
+            event_data: {origen: "{{ origen }}"}
+          - stop: Código incorrecto
+      - action: timer.cancel
+        target:
+          entity_id: [timer.alarm_homy_salida, timer.alarm_homy_entrada, timer.alarm_homy_disparo]
+      - action: input_select.select_option
+        target: {entity_id: input_select.alarm_homy_estado}
+        data: {option: disarmed}
+      - action: input_select.select_option
+        target: {entity_id: input_select.alarm_homy_modo}
+        data: {option: disarmed}
+      - action: input_select.select_option
+        target: {entity_id: input_select.alarm_homy_tipo_disparo}
+        data: {option: normal}
+      - event: alarm_homy_set_excluidos
+        event_data:
+          entidades: []
+
+  # ---------------------------------------------------------------------------
+  # DISPARAR: pasa a triggered y arranca el tiempo de disparo
+  # ---------------------------------------------------------------------------
+  alarm_homy_disparar:
+    alias: Alarm HOMY · Disparar
+    icon: mdi:alarm-light
+    mode: single
+    sequence:
+      - variables:
+          modo: "{{ states('input_select.alarm_homy_modo') }}"
+          tipo: "{{ states('input_select.alarm_homy_tipo_disparo') }}"
+          txt: >-
+            {% from 'alarm_homy.jinja' import texto_modo %}{{ texto_modo(modo) }}
+          duracion: >-
+            {% if tipo != 'normal' or txt == '' %}{{ states('input_number.alarm_homy_panico_disparo') | int(300) }}
+            {% else %}{{ states('input_number.alarm_homy_' ~ txt ~ '_disparo') | int(300) }}{% endif %}
+      - action: timer.cancel
+        target:
+          entity_id: [timer.alarm_homy_salida, timer.alarm_homy_entrada]
+      - action: input_select.select_option
+        target: {entity_id: input_select.alarm_homy_estado}
+        data: {option: triggered}
+      - action: timer.start
+        target: {entity_id: timer.alarm_homy_disparo}
+        data: {duration: "{{ duracion }}"}
+
+  # ---------------------------------------------------------------------------
+  # PÁNICO: dispara desde cualquier estado (silencioso o sonoro)
+  # ---------------------------------------------------------------------------
+  alarm_homy_panico:
+    alias: Alarm HOMY · Pánico
+    icon: mdi:alarm-light-outline
+    mode: single
+    fields:
+      tipo:
+        default: panico_silencioso
+        selector:
+          select:
+            options: [panico_silencioso, panico_sonoro]
+      origen:
+        selector:
+          text:
+    sequence:
+      - action: input_select.select_option
+        target: {entity_id: input_select.alarm_homy_tipo_disparo}
+        data: {option: "{{ tipo | default('panico_silencioso') }}"}
+      - event: alarm_homy_registrar_disparo
+        event_data:
+          sensores: [panico]
+          origen: "{{ origen | default('desconocido') }}"
+      - action: script.alarm_homy_disparar
+
+automation:
+  # ---------------------------------------------------------------------------
+  # DETECCIÓN: nuevo sensor activo → entrada (pending) o disparo inmediato
+  # ---------------------------------------------------------------------------
+  - id: alarm_homy_deteccion
+    alias: Alarm HOMY · Detección
+    mode: queued
+    max: 20
+    triggers:
+      - trigger: state
+        entity_id: sensor.alarm_homy_activos
+        attribute: entidades
+    variables:
+      antes: "{{ trigger.from_state.attributes.entidades if trigger.from_state else [] }}"
+      ahora: "{{ trigger.to_state.attributes.entidades or [] }}"
+      nuevos: "{{ ahora | reject('in', antes) | list }}"
+      estado: "{{ states('input_select.alarm_homy_estado') }}"
+      modo: "{{ states('input_select.alarm_homy_modo') }}"
+      inmediato: "{{ nuevos | select('in', label_entities('alarm_homy_inmediato')) | list | count > 0 }}"
+      txt: >-
+        {% from 'alarm_homy.jinja' import texto_modo %}{{ texto_modo(modo) }}
+      entrada: "{{ states('input_number.alarm_homy_' ~ txt ~ '_entrada') | int(0) }}"
+    conditions:
+      - condition: template
+        value_template: "{{ nuevos | count > 0 and estado in ['armed_away', 'armed_home', 'armed_night', 'armed_vacation', 'pending', 'triggered'] }}"
+    actions:
+      - event: alarm_homy_registrar_disparo
+        event_data:
+          sensores: "{{ nuevos }}"
+          origen: sensor
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: "{{ estado == 'triggered' }}"
+            sequence: []   # ya disparada: solo se registra el sensor
+          - conditions:
+              - condition: template
+                value_template: "{{ inmediato or entrada == 0 }}"
+            sequence:
+              - action: script.alarm_homy_disparar
+          - conditions:
+              - condition: template
+                value_template: "{{ estado != 'pending' }}"
+            sequence:
+              - action: input_select.select_option
+                target: {entity_id: input_select.alarm_homy_estado}
+                data: {option: pending}
+              - action: timer.start
+                target: {entity_id: timer.alarm_homy_entrada}
+                data: {duration: "{{ entrada }}"}
+
+  # ---------------------------------------------------------------------------
+  # FIN DE TIEMPOS: salida → armada · entrada → disparo · disparo → vuelve al modo
+  # ---------------------------------------------------------------------------
+  - id: alarm_homy_timers
+    alias: Alarm HOMY · Fin de tiempos
+    mode: queued
+    triggers:
+      - trigger: event
+        event_type: timer.finished
+        event_data: {entity_id: timer.alarm_homy_salida}
+        id: salida
+      - trigger: event
+        event_type: timer.finished
+        event_data: {entity_id: timer.alarm_homy_entrada}
+        id: entrada
+      - trigger: event
+        event_type: timer.finished
+        event_data: {entity_id: timer.alarm_homy_disparo}
+        id: disparo
+    actions:
+      - variables:
+          estado: "{{ states('input_select.alarm_homy_estado') }}"
+          modo: "{{ states('input_select.alarm_homy_modo') }}"
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: "{{ trigger.id == 'salida' and estado == 'arming' }}"
+            sequence:
+              - action: input_select.select_option
+                target: {entity_id: input_select.alarm_homy_estado}
+                data: {option: "{{ modo }}"}
+          - conditions:
+              - condition: template
+                value_template: "{{ trigger.id == 'entrada' and estado == 'pending' }}"
+            sequence:
+              - action: script.alarm_homy_disparar
+          - conditions:
+              - condition: template
+                value_template: "{{ trigger.id == 'disparo' and estado == 'triggered' }}"
+            sequence:
+              - action: input_select.select_option
+                target: {entity_id: input_select.alarm_homy_tipo_disparo}
+                data: {option: normal}
+              - action: input_select.select_option
+                target: {entity_id: input_select.alarm_homy_estado}
+                data: {option: "{{ modo }}"}

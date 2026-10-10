@@ -1,0 +1,83 @@
+{#- ==========================================================================
+    ALARM HOMY · Macros del motor de alarma
+    Uso: {% from 'alarm_homy.jinja' import <macro> %}
+    Las macros devuelven JSON (usar | from_json) salvo etiqueta_modo / nombres.
+    Configuración por sensor = etiquetas (labels) en la UI:
+      alarm_homy_ausente/casa/noche/vacaciones  -> modos en que está activo
+      alarm_homy_inmediato     -> dispara sin retardo de entrada
+      alarm_homy_armar_abierto -> permite armar abierto (se ignora hasta que cierre)
+      alarm_homy_auto_excluir  -> si está abierto al armar, se excluye esa sesión
+      alarm_homy_unavailable   -> unavailable > 60 s cuenta como disparo
+    Habilitado = input_boolean.alarm_homy_sensor_<object_id del sensor> != off
+   ========================================================================== -#}
+
+{%- macro etiqueta_modo(modo) -%}
+{{ {'armed_away':'alarm_homy_ausente','armed_home':'alarm_homy_casa','armed_night':'alarm_homy_noche','armed_vacation':'alarm_homy_vacaciones'}.get(modo, '') }}
+{%- endmacro -%}
+
+{%- macro texto_modo(modo) -%}
+{{ {'armed_away':'ausente','armed_home':'casa','armed_night':'noche','armed_vacation':'vacaciones'}.get(modo, '') }}
+{%- endmacro -%}
+
+{#- Sensores con etiqueta del modo y habilitados -#}
+{%- macro sensores_modo(modo) -%}
+{%- set ns = namespace(l=[]) -%}
+{%- set lab = etiqueta_modo(modo) -%}
+{%- if lab -%}
+{%- for e in label_entities(lab) if e.startswith('binary_sensor.') and states('input_boolean.alarm_homy_sensor_' ~ e.split('.')[1]) != 'off' -%}
+{%- set ns.l = ns.l + [e] -%}
+{%- endfor -%}
+{%- endif -%}
+{{ ns.l | to_json }}
+{%- endmacro -%}
+
+{#- Abiertos (o unavailable si tienen la etiqueta) que IMPIDEN armar en el modo -#}
+{%- macro bloqueantes(modo) -%}
+{%- set ns = namespace(l=[]) -%}
+{%- set permitidos = label_entities('alarm_homy_armar_abierto') + label_entities('alarm_homy_auto_excluir') -%}
+{%- set unav = label_entities('alarm_homy_unavailable') -%}
+{%- for e in sensores_modo(modo) | from_json if e not in permitidos -%}
+{%- if is_state(e, 'on') or (e in unav and states(e) in ['unavailable', 'unknown']) -%}
+{%- set ns.l = ns.l + [e] -%}
+{%- endif -%}
+{%- endfor -%}
+{{ ns.l | to_json }}
+{%- endmacro -%}
+
+{#- Abiertos con auto-excluir: se excluyen durante la sesión de armado -#}
+{%- macro excluibles(modo) -%}
+{%- set ex = label_entities('alarm_homy_auto_excluir') -%}
+{{ sensores_modo(modo) | from_json | select('in', ex) | select('is_state', 'on') | list | to_json }}
+{%- endmacro -%}
+
+{#- Sensores que han pasado a on (o unavailable > 60 s) DESPUÉS del último cambio de estado de la alarma -#}
+{%- macro activos() -%}
+{%- set ns = namespace(l=[]) -%}
+{%- set estado = states('input_select.alarm_homy_estado') -%}
+{%- set modo = states('input_select.alarm_homy_modo') -%}
+{%- if estado in ['armed_away','armed_home','armed_night','armed_vacation','pending','triggered'] and modo != 'disarmed' -%}
+{%- set t0 = as_timestamp(states.input_select.alarm_homy_estado.last_changed) -%}
+{%- set excl = state_attr('sensor.alarm_homy_excluidos', 'entidades') or [] -%}
+{%- set unav = label_entities('alarm_homy_unavailable') -%}
+{%- for e in sensores_modo(modo) | from_json if e not in excl and states[e] is not none -%}
+{%- set s = states[e] -%}
+{%- set tc = as_timestamp(s.last_changed) -%}
+{%- if s.state == 'on' and tc >= t0 -%}
+{%- set ns.l = ns.l + [e] -%}
+{%- elif e in unav and s.state in ['unavailable','unknown'] and tc >= t0 and (as_timestamp(now()) - tc) > 60 -%}
+{%- set ns.l = ns.l + [e] -%}
+{%- endif -%}
+{%- endfor -%}
+{%- endif -%}
+{{ ns.l | to_json }}
+{%- endmacro -%}
+
+{#- Lista de entity_id -> "Nombre (Área)" separados por coma -#}
+{%- macro nombres(lista) -%}
+{%- set ns = namespace(l=[]) -%}
+{%- for e in lista -%}
+{%- set a = area_name(e) -%}
+{%- set ns.l = ns.l + [(state_attr(e, 'friendly_name') or e) ~ (' (' ~ a ~ ')' if a else '')] -%}
+{%- endfor -%}
+{{ ns.l | join(', ') }}
+{%- endmacro -%}

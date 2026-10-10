@@ -13,6 +13,8 @@ homeassistant:
   country: ES
   # Customization file
   customize: !include customize.yaml
+  # Packages: funcionalidades autocontenidas (ALARM HOMY, ...)
+  packages: !include_dir_named packages
   allowlist_external_dirs:
     - '/share'
   # legacy_templates: true

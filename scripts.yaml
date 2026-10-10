@@ -151,7 +151,7 @@ alexa_dormitorio_set_volumen:
       target:
         entity_id:
           - media_player.echo_alexa_dormitorio
-          - media_player.echo_alexa_dormitorio_aac
+          - media_player.echo_alexa_dormitorio_paf
 
 alexa_entrada_set_volumen:
   alias: 'Alexa Entrada Set Vol'
@@ -299,7 +299,7 @@ alexa_dormitorio_restaura_volumen:
       target:
         entity_id:
           - media_player.echo_alexa_dormitorio
-          - media_player.echo_alexa_dormitorio_aac
+          - media_player.echo_alexa_dormitorio_paf
 
 alexa_estudio_restaura_volumen:
   alias: 'Alexa Estudio Restaura Vol'
@@ -898,12 +898,6 @@ luz_on_armed_home:
       entity_id: alarm_control_panel.ha
       state: 'armed_home'
     # Enciende Piloto Azul Alarma
-    - action: light.turn_on
-      target:
-        entity_id: light.luz_gateway_aqara
-      data:
-        brightness: 75
-        rgb_color: [0, 0, 254]
     - action: light.turn_on
       target:
         entity_id: light.tagreader_led
