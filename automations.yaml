@@ -360,12 +360,6 @@
   actions:
     # Encendido Led Tag Reader ROJO
     - action: light.turn_on
-      entity_id: light.luz_gateway_aqara
-      data:
-        color_name: red
-        brightness: 255
-    # Encendido Led Gateway ROJO
-    - action: light.turn_on
       entity_id: light.tagreader_led
       data:
         color_name: red
@@ -487,7 +481,6 @@
     # Apaga Luz Piloto Alarma
     - action: light.turn_off
       entity_id: 
-        - light.luz_gateway_aqara
         - light.tagreader_led
       
     # Script Envío Sonido Alexa Alexa
@@ -773,7 +766,7 @@
     - trigger: state
       entity_id:
         - input_boolean.family_sleep_home_mfc
-        - input_boolean.family_sleep_home_acc
+        - input_boolean.family_sleep_home_aac
         - input_boolean.family_sleep_home_paf
         - input_boolean.family_sleep_home_aaf
   actions:
@@ -2560,65 +2553,6 @@
   actions:
     - action: script.riego_cesped_ch3_timer_cancel
 
-#
-# ESPHOME 4CH-R2 SW3 RIEGO CESPED CH4
-#
-- id: S34
-  alias: 'S34 Timer Riego Cesped CH4 Tramo1'
-  triggers:
-    - trigger: template
-      value_template: "{{ states('sensor.time') == (states.input_datetime.riego_cesped_ch4_start_time_t1.attributes.timestamp | int | timestamp_custom('%H:%M', False)) }}"
-  conditions:
-    condition: and
-    conditions:
-      - condition: state
-        entity_id: input_boolean.riego_interruptor_global  # Interruptor General Riego segun Forecast Tiempo
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.riego_cesped_ch4_dia_ejecucion_t1  # Sensor del programador on/off
-        state: 'on'
-  actions:
-    # Timer Programador Diario
-    - action: timer.start
-      data:
-        entity_id: timer.riego_cesped_ch4
-        duration: '{{ states.sensor.riego_cesped_ch4_duracion_planificada_t1.state|int * 60}}'
-    - action: switch.turn_on
-      entity_id: switch.esphome_4ch_sw3_relay_4
-
-- id: S34b
-  alias: 'S34b Timer Riego Cesped CH4 Tramo2'
-  triggers:
-    - trigger: template
-      value_template: "{{ states('sensor.time') == (states.input_datetime.riego_cesped_ch4_start_time_t2.attributes.timestamp | int | timestamp_custom('%H:%M', False)) }}"
-  conditions:
-    condition: and
-    conditions:
-      - condition: state
-        entity_id: input_boolean.riego_interruptor_global  # Interruptor General Riego segun Forecast Tiempo
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.riego_cesped_ch4_dia_ejecucion_t2  # Sensor del programador on/off
-        state: 'on'
-  actions:
-    # Timer Programador Diario
-    - action: timer.start
-      data:
-        entity_id: timer.riego_cesped_ch4
-        duration: '{{ states.sensor.riego_cesped_ch4_duracion_planificada_t2.state|int * 60}}'
-    - action: switch.turn_on
-      entity_id: switch.esphome_4ch_sw3_relay_4
-
-- id: S34c
-  alias: 'S34c Timer Riego Cesped CH4 End'
-  triggers:
-    - trigger: event
-      event_type: timer.finished
-      event_data:
-        entity_id: timer.riego_cesped_ch4
-  actions:
-    - action: script.riego_cesped_ch4_timer_cancel
-
 - id: S40
   alias: 'S40 Control Jardin Sobreriego'
   triggers:
@@ -3016,154 +2950,156 @@
         #  sequence:
 
 #  alias: ZHA Dormitorio MFC Philips HUE Dimmer
-- id: ZHA_L2
-  alias: ZHA Dormitorio MFC Philips HUE Dimmer
-  mode: queued
-  # Realiza un ciclo cada vez que se pulsa en el boton up/down
-  # scene.dormitorio_full, scene.dormitorio_lectura, scene.dormitorio_relax, scene.dormitorio_noche
-  #
-  # Device: Hue Dimmer Switch
-  # Event Type: remote_button_short_press, remote_button_double_press
-  # Event Subtype: turn_on, turn_off, dim_up, dim_down
-  #
-  triggers:
-    - device_id: bef6e070a0c12e5234501e01092f27e8
-      domain: zha
-      trigger: device
-      type: remote_button_short_press
-      subtype: turn_on
-      id: on_short_press
-    - device_id: bef6e070a0c12e5234501e01092f27e8
-      domain: zha
-      trigger: device
-      type: remote_button_double_press
-      subtype: turn_on
-      id: on_double_press
-    - device_id: bef6e070a0c12e5234501e01092f27e8
-      domain: zha
-      trigger: device
-      type: remote_button_short_press
-      subtype: turn_off
-      id: off_short_press
-    - device_id: bef6e070a0c12e5234501e01092f27e8
-      domain: zha
-      trigger: device
-      type: remote_button_double_press
-      subtype: turn_off
-      id: off_double_press
-    - device_id: bef6e070a0c12e5234501e01092f27e8
-      domain: zha
-      trigger: device
-      type: remote_button_short_press
-      subtype: dim_up
-      id: dim_up
-    - device_id: bef6e070a0c12e5234501e01092f27e8
-      domain: zha
-      trigger: device
-      type: remote_button_short_press
-      subtype: dim_down
-      id: dim_down
-  conditions: []
-  actions:
-    # value: "{{ trigger.to_state.attributes.friendly_name }}"
-    - choose:
-        # IF trigger.id = on_short_press => Escena Dormitorio Lectura
-        - conditions:
-          - condition: trigger
-            id: on_short_press
-          sequence:
-            - action: scene.turn_on
-              target:
-                entity_id: scene.dormitorio_lectura
-            - action: input_text.set_value
-              data:
-                value: "scene.dormitorio_lectura"
-              target:
-                entity_id: input_text.helper_hue_dimmer_switch_dormitorio
-        # ELIF on_double_press
-        - conditions:
-          - condition: trigger
-            id: on_double_press
-          sequence:
-            # Enciende Luz Agustin y Apaga Luz Malen
-            - action: light.turn_on
-              target:
-                entity_id: light.luz_dormitorio_agustin
-            - action: light.turn_off
-              target:
-                entity_id: light.luz_dormitorio_malen
-            - action: input_text.set_value
-              data:
-                value: "turn_on light.luz_agustin"
-              target:
-                entity_id: input_text.helper_hue_dimmer_switch_dormitorio
-        # ELIF off_short_press
-        - conditions:
-          - condition: trigger
-            id: off_short_press
-          sequence:
-            # Apaga Luz Agustin y Apaga Luz Malen
-            - action: light.turn_off
-              target:
-                entity_id: light.luces_dormitorio_mfc
-            - action: input_text.set_value
-              data:
-                value: "turn_off light.luces_dormitorio"
-              target:
-                entity_id: input_text.helper_hue_dimmer_switch_dormitorio
-        # ELIF off_double_press
-        - conditions:
-          - condition: trigger
-            id: off_double_press
-          sequence:
-            # Enciende Luz Malen y Apaga Luz Agustín
-            - action: light.turn_on
-              target:
-                entity_id: light.luz_dormitorio_malen
-            - action: light.turn_off
-              target:
-                entity_id: light.luz_dormitorio_agustin
-            - action: input_text.set_value
-              data:
-                value: "turn_on light.luz_malen"
-              target:
-                entity_id: input_text.helper_hue_dimmer_switch_dormitorio
-        # ELIF dim_up
-        - conditions:
-          - condition: trigger
-            id: dim_up
-          sequence:
-            - action: input_select.select_next
-              data:
-                cycle: true
-              target:
-                entity_id: input_select.helper_scene_dormitorio
-            - action: scene.turn_on
-              target:
-                entity_id: "{{ states('input_select.helper_scene_dormitorio')}}"
-            - action: input_text.set_value
-              data:
-                value: "turn_on {{ states('input_select.helper_scene_dormitorio')}}"
-              target:
-                entity_id: input_text.helper_hue_dimmer_switch_dormitorio
-        # ELIF dim_down
-        - conditions:
-          - condition: trigger
-            id: dim_down
-          sequence:
-            - action: input_select.select_previous
-              data:
-                cycle: true
-              target:
-                entity_id: input_select.helper_scene_dormitorio
-            - action: scene.turn_on
-              target:
-                entity_id: "{{ states('input_select.helper_scene_dormitorio')}}"
-            - action: input_text.set_value
-              data:
-                value: "turn_on {{ states('input_select.helper_scene_dormitorio')}}"
-              target:
-                entity_id: input_text.helper_hue_dimmer_switch_dormitorio
+# (2026-10-11) ZHA_L2 COMENTADA: el Hue Dimmer del dormitorio MFC ya no está emparejado en ZHA
+# (device_id bef6e070a0c12e5234501e01092f27e8 inexistente). Re-emparejar, actualizar device_id y descomentar.
+# - id: ZHA_L2
+#   alias: ZHA Dormitorio MFC Philips HUE Dimmer
+#   mode: queued
+#   # Realiza un ciclo cada vez que se pulsa en el boton up/down
+#   # scene.dormitorio_full, scene.dormitorio_lectura, scene.dormitorio_relax, scene.dormitorio_noche
+#   #
+#   # Device: Hue Dimmer Switch
+#   # Event Type: remote_button_short_press, remote_button_double_press
+#   # Event Subtype: turn_on, turn_off, dim_up, dim_down
+#   #
+#   triggers:
+#     - device_id: bef6e070a0c12e5234501e01092f27e8
+#       domain: zha
+#       trigger: device
+#       type: remote_button_short_press
+#       subtype: turn_on
+#       id: on_short_press
+#     - device_id: bef6e070a0c12e5234501e01092f27e8
+#       domain: zha
+#       trigger: device
+#       type: remote_button_double_press
+#       subtype: turn_on
+#       id: on_double_press
+#     - device_id: bef6e070a0c12e5234501e01092f27e8
+#       domain: zha
+#       trigger: device
+#       type: remote_button_short_press
+#       subtype: turn_off
+#       id: off_short_press
+#     - device_id: bef6e070a0c12e5234501e01092f27e8
+#       domain: zha
+#       trigger: device
+#       type: remote_button_double_press
+#       subtype: turn_off
+#       id: off_double_press
+#     - device_id: bef6e070a0c12e5234501e01092f27e8
+#       domain: zha
+#       trigger: device
+#       type: remote_button_short_press
+#       subtype: dim_up
+#       id: dim_up
+#     - device_id: bef6e070a0c12e5234501e01092f27e8
+#       domain: zha
+#       trigger: device
+#       type: remote_button_short_press
+#       subtype: dim_down
+#       id: dim_down
+#   conditions: []
+#   actions:
+#     # value: "{{ trigger.to_state.attributes.friendly_name }}"
+#     - choose:
+#         # IF trigger.id = on_short_press => Escena Dormitorio Lectura
+#         - conditions:
+#           - condition: trigger
+#             id: on_short_press
+#           sequence:
+#             - action: scene.turn_on
+#               target:
+#                 entity_id: scene.dormitorio_lectura
+#             - action: input_text.set_value
+#               data:
+#                 value: "scene.dormitorio_lectura"
+#               target:
+#                 entity_id: input_text.helper_hue_dimmer_switch_dormitorio
+#         # ELIF on_double_press
+#         - conditions:
+#           - condition: trigger
+#             id: on_double_press
+#           sequence:
+#             # Enciende Luz Agustin y Apaga Luz Malen
+#             - action: light.turn_on
+#               target:
+#                 entity_id: light.luz_dormitorio_agustin
+#             - action: light.turn_off
+#               target:
+#                 entity_id: light.luz_dormitorio_malen
+#             - action: input_text.set_value
+#               data:
+#                 value: "turn_on light.luz_agustin"
+#               target:
+#                 entity_id: input_text.helper_hue_dimmer_switch_dormitorio
+#         # ELIF off_short_press
+#         - conditions:
+#           - condition: trigger
+#             id: off_short_press
+#           sequence:
+#             # Apaga Luz Agustin y Apaga Luz Malen
+#             - action: light.turn_off
+#               target:
+#                 entity_id: light.luces_dormitorio_mfc
+#             - action: input_text.set_value
+#               data:
+#                 value: "turn_off light.luces_dormitorio"
+#               target:
+#                 entity_id: input_text.helper_hue_dimmer_switch_dormitorio
+#         # ELIF off_double_press
+#         - conditions:
+#           - condition: trigger
+#             id: off_double_press
+#           sequence:
+#             # Enciende Luz Malen y Apaga Luz Agustín
+#             - action: light.turn_on
+#               target:
+#                 entity_id: light.luz_dormitorio_malen
+#             - action: light.turn_off
+#               target:
+#                 entity_id: light.luz_dormitorio_agustin
+#             - action: input_text.set_value
+#               data:
+#                 value: "turn_on light.luz_malen"
+#               target:
+#                 entity_id: input_text.helper_hue_dimmer_switch_dormitorio
+#         # ELIF dim_up
+#         - conditions:
+#           - condition: trigger
+#             id: dim_up
+#           sequence:
+#             - action: input_select.select_next
+#               data:
+#                 cycle: true
+#               target:
+#                 entity_id: input_select.helper_scene_dormitorio
+#             - action: scene.turn_on
+#               target:
+#                 entity_id: "{{ states('input_select.helper_scene_dormitorio')}}"
+#             - action: input_text.set_value
+#               data:
+#                 value: "turn_on {{ states('input_select.helper_scene_dormitorio')}}"
+#               target:
+#                 entity_id: input_text.helper_hue_dimmer_switch_dormitorio
+#         # ELIF dim_down
+#         - conditions:
+#           - condition: trigger
+#             id: dim_down
+#           sequence:
+#             - action: input_select.select_previous
+#               data:
+#                 cycle: true
+#               target:
+#                 entity_id: input_select.helper_scene_dormitorio
+#             - action: scene.turn_on
+#               target:
+#                 entity_id: "{{ states('input_select.helper_scene_dormitorio')}}"
+#             - action: input_text.set_value
+#               data:
+#                 value: "turn_on {{ states('input_select.helper_scene_dormitorio')}}"
+#               target:
+#                 entity_id: input_text.helper_hue_dimmer_switch_dormitorio
 
 #  alias: ZHA Cocina IKEA Rodret Dimmer
 - id: ZHA_L3
