@@ -1,0 +1,575 @@
+homeassistant:
+  # Name of the location where Home Assistant is running
+  name: HOMY home assistant
+  # Location required to calculate the time the sun rises and sets
+  latitude: !secret latitude_home
+  longitude: !secret longitude_home
+  # Impacts weather/sunrise data (altitude above sea level in meters)
+  elevation: 172
+  # metric for Metric, imperial for Imperial
+  unit_system: metric
+  # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  time_zone: Europe/Madrid
+  country: ES
+  # Customization file
+  customize: !include customize.yaml
+  allowlist_external_dirs:
+    - '/share'
+  # legacy_templates: true
+  # Media content
+  media_dirs:
+    media: "/media"
+    www: "/config/www"
+  allowlist_external_urls:
+    - "https://youtu.be/fLWacgcUMKw"
+
+# External configuration files
+group: !include groups.yaml
+script: !include scripts.yaml
+automation: !include automations.yaml
+binary_sensor: !include binary_sensor.yaml
+input_boolean: !include input_boolean.yaml
+input_select: !include input_select.yaml
+input_text: !include input_text.yaml
+input_number: !include input_number.yaml
+input_datetime: !include input_datetime.yaml
+zone: !include zone.yaml
+scene: !include scenes.yaml
+sensor: !include sensor.yaml
+template: !include template.yaml
+
+# This integration is a meta-component and configures a default set of integrations for Home Assistant to load.
+default_config:
+
+# The integrations that will be loaded are:
+#   automation
+#   cloud
+#   config
+#   frontend
+#   history
+#   logbook
+#   map
+#   mobile_app
+#   person
+#   script
+#   ssdp
+#   sun
+#   system_health
+#   updater
+#   zeroconf
+
+
+# Enable Python Scripts
+python_script:
+
+# HTTP - SSL
+# base_url: https://alvareahomy.duckdns
+# server_port: 2309
+# ssl_certificate: /ssl/fullchain.pem
+# ssl_key: /ssl/privkey.pem
+# 08.02.2026: Elimino el acceso externo con DuckDNS y el certificado Let'sencript.
+#
+# http:
+#  use_x_forwarded_for: true
+#  trusted_proxies:
+#    - 127.0.0.1
+#    - 192.168.0.1
+#  ip_ban_enabled: false
+#  login_attempts_threshold: 10
+#
+#  auth_providers:
+#    - type: homeassistant
+#    - type: trusted_networks
+#      trusted_networks:
+#        - 127.0.0.1
+#        - 192.168.0.0/24
+
+# If you want to use Home Assistant to host or serve static files then create a directory called www under the configuration path (/config).
+# The static files in www/ can be accessed by the following URL http://your.domain:8123/local/,
+# for example audio.mp3 would be accessed as http://your.domain:8123/local/audio.mp3.
+
+# Checks for available updates
+# Note: This component will send some information about your system to
+# the developers to assist with development of Home Assistant.
+# For more information, please see:
+# https://home-assistant.io/blog/2016/10/25/explaining-the-updater/
+#updater:
+  # Optional, allows Home Assistant developers to focus on popular components.
+  # include_used_components: true
+
+# Discover some devices automatically
+#
+# Deja de estar operativo bajo YAML
+# https://github.com/home-assistant/core/issues/97630
+#
+# discovery:
+
+logbook:
+  exclude:
+    entities:
+      - sensor.now_astimezone_time
+    entity_globs:
+      - sensor.macbook*
+      - sensor.time*
+      - sensor.date*
+    domains:
+      - sun
+
+# Philips Hue Bridge ==> INTEGRATION
+#hue:
+#  bridges:
+#    - host: 192.168.0.20
+#      allow_unreachable: true
+
+# Dispositivos Apple IOS
+ios:
+
+# ALARM MANUAL CONTROL PANEL
+#
+#   TRANSICION: Disarmed => Armed (Home/Night/Away) => Triggered => Disarmed
+#
+#   STATUS      DURACION TRANSICION               DESCRIPCION
+#   ========    =============================     ==================================================
+#   DISARMED    Permanante                        Estado inicial de alarma desarmada
+#   ARMING      <ARMING_TIME>                     Estado transición a ARMED durante <arming_time> Segundos
+#   ARMED_X     Permanante                        Estado de alarma ARMED HOME / ARMED AWAY
+#   PENDING     <DELAY_TIME>                      Estado transición a TRIGGERED durante <delay_time> Segundos
+#   TRIGGERED   <TRIGGER_TIME>                    Estado de alarma TRIGGERED durante <trigger_time> segundos
+#   ARMED_X     Permanante                        Estado anterior de alarma armada
+#
+alarm_control_panel:
+  - platform: manual
+    name: HA
+    # code: !secret alarm_control_code
+    # Pending: The time in seconds of the pending time before effecting a state change. Default is 60 seconds.
+    # Delay: The time in seconds of the pending time before triggering the alarm. Default is 0 seconds.
+    # Trigger: The time in seconds of the trigger time in which the alarm is firing. Default is 120 seconds
+    code: !secret alarm_control_code
+    code_arm_required: false
+    arming_time: 60
+    delay_time: 60
+    trigger_time: 300
+    disarmed:
+      trigger_time: 0 # the disarmed state never triggers the alarm;
+    armed_home:
+      arming_time: 0
+
+# Timer temporizadores
+timer:
+  # Temporizadores para interruptores Sonoff Sueltos BAS y POW
+  piscina_depuradora_ch0:
+    name: Timer Piscina
+    icon: mdi:timer
+  riego_bonsais_ch0:
+    name: Timer Bonsais Producción
+    icon: mdi:timer
+  riego_tomates_ch0:
+    name: Timer Huerto Tomates
+    icon: mdi:timer
+  # Programador SONOFF esphome_4ch_sw2 Riego Bonsáis
+  riego_bonsais_ch1:
+    name: Timer CH1 Bonsais Top
+    icon: mdi:timer
+  riego_bonsais_ch2:
+    name: Timer CH2 Plantas Aromáticas
+    icon: mdi:timer
+  riego_bonsais_ch3:
+    name: Timer CH3 Fuente Zen
+    icon: mdi:timer
+  riego_bonsais_ch4:
+    name: Timer CH4 Disponible
+    icon: mdi:timer
+  # Programador SONOFF esphome_4ch_sw3 Riego Cesped
+  riego_cesped_ch1:
+    name: Timer CH1
+    icon: mdi:timer
+  riego_cesped_ch2:
+    name: Timer CH2
+    icon: mdi:timer
+  riego_cesped_ch3:
+    name: Timer CH3
+    icon: mdi:timer
+  riego_cesped_ch4:
+    name: Timer CH4
+    icon: mdi:timer
+
+
+#history_graph:
+#  piscina_duracion:
+#    entities:
+#      - binary_sensor.piscina_depuradora_ch0_on
+#    name: Duracion Depuradora Piscina
+#    hours_to_show: 168
+#    refresh: 1800
+
+# GENERIC IP CAMERA 
+# 
+# THIS YAML CONF STOP WORKING ON 2024.02.0
+#
+  #camera:
+  #- platform: generic
+  #  still_image_url: https://api.sat24.com/mostrecent/SP/visual5hdcomplete%20width=500%20height=304
+  #  name: Weather Satelite
+  #- platform: generic
+  #  still_image_url: !secret still_image_url_cam_jardin
+  #  ##stream_source: !secret stream_source_url_cam_jardin
+  #  name: IPcam Jardín
+  #  username: admin
+  #  password: !secret IPcam_jardin
+
+#ffmpeg:
+
+# Mediaplayer FireTV
+#media_player:
+#  - platform: androidtv
+#    name: Fire TV
+#    host: !secret firetv_host
+#    adbkey: "/config/android/adbkey"
+#    ####adbkey: "/home/homeassistant/.homeassistant/config/android/adbkey"
+
+# MQTT - BROKER: Local Mosquitto Broker
+#
+#mqtt:
+#  broker: alvarea.duckdns.org
+#  port: 1883
+#  client_id: hassbian_alvarea
+#  keepalive: 60
+#  username: hassbian_mqtt
+#  password: !secret hassbian_mqtt
+#  discovery: true
+#  discovery_prefix: homeassistant#
+
+#  broker: m23.cloudmqtt.com
+#  port: 11024
+#  client_id: hass_alvarea
+#  keepalive: 60
+#  username: HASS
+#  password: !secret cloudmqtt
+
+
+# NOTIFICACIONES
+notify:
+  # 2026-10-10: los servicios iphone_xxx (plataforma ios: legacy) ya no existen.
+  # Se apunta a los servicios notify.mobile_app_* actuales (admiten push crítico).
+  - name: notifica_grupo_ios
+    platform: group # notification group for IOS
+    services:
+      - service: mobile_app_iphone_aac     # Agustín - iPhone 14 Pro
+      - service: mobile_app_iphone_paf     # Paloma  - iPhone 17
+      - service: mobile_app_a2f            # Agu     - iPhone 17
+      - service: mobile_app_iphone_malen   # Malen   - iPhone 12
+
+  - name: telegram_alarm
+    platform: group
+    services:
+      - service: telegram_bot_461013933_1001277406243
+
+  - name: telegram_notif
+    platform: group
+    services:
+      - service: telegram_bot_461013933_306604561
+
+# Las notificaciones tienen un nuevo formato a partir de 2026.08
+# The target parameter is being deprecated. You should update any automations and scripts that use that parameter in Telegram bot actions. 
+# se entity_id to specify Telegram bot notify entities or chat_id to replace target
+#  - name: telegram_alarm
+#    platform: telegram
+#    chat_id: !secret telegram_grp_alarm
+#  - name: telegram_notify
+#    platform: telegram
+#    chat_id: !secret telegram_grp_notif
+#
+# Claude me recomienda crear  un alias con notify en YAML ⭐ Recomendada
+# Puedes crear grupos de notify que apunten a las entidades nuevas, con nombres cortos
+# Así sigues usando notify.telegram_alarm y notify.telegram_notif en todos tus scripts sin cambiar nada más. Solo cambias este fichero.
+
+
+# Notifications via Telegram Bot
+# HA 2025_07 , la configuracion pasa a UI y es necesario eliminarla
+# telegram_bot:
+#   - platform: polling
+#     api_key: !secret telegram_apikey
+#     allowed_chat_ids:
+#       - !secret telegram_grp_notif
+#       - !secret telegram_grp_alarm
+#       #- !secret telegram_chat_aac
+
+alert:
+  alerta_alarma_ha:
+    name: ALERTA - ALARMA HOMY ACTIVADA
+    done_message: Alarma Desactivada OK
+    entity_id: alarm_control_panel.ha
+    state: 'triggered'
+    repeat: 1
+    can_acknowledge: true
+    skip_first: true
+    notifiers:
+      - telegram_alarm
+
+  alerta_test:
+    name: ALERTA - LUCES ENCENDIDAS DE DIA
+    done_message: Test Alerta De Día Solucionado
+    entity_id: binary_sensor.test_alert_sensor
+    state: 'on'
+    repeat: 1
+    can_acknowledge: true
+    skip_first: false
+    notifiers:
+      - telegram_aac
+
+
+# Cloud -  Home Assistant Cloud - NABU CASA
+#
+# https://developer.amazon.com/es-ES/docs/alexa/device-apis/alexa-discovery.html#display-categories
+#
+# Desde HOMY 2023.05 la gestión y configuración se realiza desde UI.
+#
+cloud:
+
+#
+# MariaDB database . 01.11.2021
+#
+recorder:
+  db_url: !secret mariadb_url
+  purge_keep_days: 90
+  auto_purge: true
+  commit_interval: 60
+  include:
+    domains:
+      - alarm_control_panel
+      - light
+      - sensor
+      - binary_sensor
+      - switch
+      - energy
+      - person
+      - device_tracker
+      - weather
+      - person
+      - input_boolean
+      - input_datetime
+      - input_number
+      - input_select
+
+#
+# InfluxDB database . 05.11.2021 version previa eliminada.
+#                     15.03.2026 nueva version en homy yellow
+#
+influxdb:
+  include:
+    domains:
+      - alarm_control_panel
+      - sensor
+      - binary_sensor
+      - person
+      - person
+#      - device_tracker
+#      - weather
+#      - switch
+#      - energy
+#      - light
+#      - input_boolean
+  exclude:
+      entities:
+        - sensor.time
+        - sensor.date
+        - sensor.last_boot
+        - sensor.uptime
+      entity_globs:
+        - "*_linkquality"
+        - "*_rssi"
+        - "*_wifi_signal"
+  tags:
+    source: HA
+  tags_attributes:
+    - friendly_name
+  ignore_attributes:
+    - icon
+    - attribution
+    - supported_features
+
+#apcupsd:
+#  host: 127.0.0.1
+#  port: 3551
+#  mode: netserver
+
+person:
+
+# The stream component provides a way to proxy live streams through Home Assistant.
+# The component currently only supports the HLS format.
+stream:
+
+
+#
+# Sensores Xiaomi Flower Care - Componente Plant - Integracion ESPHOME - ESP32S Hub BLE ESP32S
+#
+plant:
+  mp_01:
+    sensors:
+      moisture: sensor.humedad_plant_monitor_pm01
+      temperature: sensor.temperatura_plant_monitor_pm01
+      conductivity: sensor.fertilidad_plant_monitor_pm01
+      brightness: sensor.luminosidad_plant_monitor_pm01
+      # battery: sensor.miflora_s1_bateria
+    min_moisture: 15
+    min_conductivity: 50
+    min_temperature: 5
+    max_temperature: 38
+  mp_02:
+    sensors:
+      moisture: sensor.humedad_plant_monitor_pm02
+      temperature: sensor.temperatura_plant_monitor_pm02
+      conductivity: sensor.fertilidad_plant_monitor_pm02
+      brightness: sensor.luminosidad_plant_monitor_pm02
+      # battery: sensor.miflora_s1_bateria
+    min_moisture: 15
+    min_conductivity: 50
+    min_temperature: 5
+    max_temperature: 38
+  mp_03:
+    sensors:
+      moisture: sensor.humedad_plant_monitor_pm03
+      temperature: sensor.temperatura_plant_monitor_pm03
+      conductivity: sensor.fertilidad_plant_monitor_pm03
+      brightness: sensor.luminosidad_plant_monitor_pm03
+      # battery: sensor.miflora_s1_bateria
+    min_moisture: 15
+    min_conductivity: 50
+    min_temperature: 5
+    max_temperature: 38
+
+# Integración con dispositivos sonoff a traves de componente sonoff
+# 
+# sonoff:
+#   username: !secret sonoff_ewelink_user
+#   password: !secret sonoff_ewelink_pwd
+#   devices:
+
+
+# iCloud Calendar Integration - CALDAV
+calendar:
+  - platform: caldav
+    username: !secret icloud_usr
+    password: !secret icloud_pwd
+    url: !secret icloud_url
+    custom_calendars:
+      - name: Universidad AAF
+        calendar: Universidad
+        search: "Agu"
+      - name: Universidad PAF
+        calendar: Universidad
+        search: "Paloma"
+      - name: Almuerzo
+        calendar: Family
+        search: "Almuerzo"
+      - name: Cena
+        calendar: Family
+        search: "Cena"
+      - name: Eventos
+        calendar: Family
+        search: "Evento"
+      - name: Festivos
+        calendar: "Festivos"
+        search: "*"
+
+device_tracker:
+  - platform: aruba
+    host: 192.168.0.3
+    username: !secret aruba_usr
+    password: !secret aruba_pwd
+
+#
+# COVER TEMPLATE - PERSIANAS  => Paso a generar el cover directamente en ESPHOME - SONOFF DUAL R3
+#
+#cover:
+#  - platform: template
+#    covers:
+#      estudio_persiana:
+#        device_class: shutter
+#        friendly_name: "Persiana Estudio"
+#        #value_template: "{{is_state('cover.tapparelle_studio', 'open')}}"
+#        position_template: "{{ state_attr('cover.estudio_persiana', 'current_position') }}"
+#        set_cover_position:
+#          service: cover.set_cover_position 
+#          target:
+#            entity_id: cover.estudio_persiana
+#          data:
+#            position: "{{ position }}"
+#        open_cover:
+#          service: script.estudio_persiana_up_full
+#        close_cover:
+#          service: script.estudio_persiana_down_full
+#        stop_cover:
+#          service: script.estudio_persiana_stop
+
+# 
+# PRESENT BASED LIGHTS 
+# Home Assistant has a built-in integration called device_sun_light_trigger to help you automate your lights. The integration will:
+#  1.Fade in the lights when the sun is setting and there are people home
+#  2.Turn on the lights when people get home after the sun has set
+#  3.Turn off the lights when all people leave the house
+#
+# 25.12.2022. DESCARTADO por mal funcionamiento. Enciende las luces de madrugada al llegar alguien nuevo a casa.
+#device_sun_light_trigger:
+#  light_group: group.luces_device_sun_light_trigger_grp
+#  #light_profile: relax
+#  device_group: group.person_device_sun_light_trigger_grp
+#  disable_turn_off: true
+
+# Sensores Xiaomi BLE Temperatura, utilizando el componente custom HACS: ble_monitor ==> DEPRECATED
+# Paso a componente ESPHOME_ESP32_Hub2_BLE
+# ble_monitor:
+#  rounding: True
+#  decimals: 1
+#  period: 60
+#  log_spikes: False
+#  use_median: False
+#  active_scan: False
+#  hci_interface: 0
+#  batt_entities: False
+#  report_unknown: False
+#  discovery: False
+#  devices:
+#    - mac: 'A4:C1:38:6B:AA:C8'  # Estudio
+#      encryption_key: 'A7EC07B7EDC9D349CC462CB9744AC756'
+#    - mac: 'A4:C1:38:E8:02:EF'  # Rack Armario
+#      encryption_key: 'A5ED5C2C2D9D3E14C1894ADFEEF46E1C'
+#    - mac: 'A4:C1:38:4B:D6:7C'  # Exterior
+#      encryption_key: 'DACA7EDCEF444035A7B8C40600A4A99E'
+
+# Old Configuration mi_temp custom component before migration to 0.81 ==> ble_monitor:
+#- sensor:
+#  - platform: mi_temp
+#      rounding: True
+#      decimals: 1ƒ
+#      period: 60
+#      log_spikes: False
+#      use_median: False
+#      active_scan: False
+#      hci_interface: 0
+#      batt_entities: False
+#      report_unknown: False
+#      whitelist: False
+#      encryptors:
+#        'A4:C1:38:6B:AA:C8': 'A7EC07B7EDC9D349CC462CB9744AC756'
+#        'A4:C1:38:E8:02:EF': 'A5ED5C2C2D9D3E14C1894ADFEEF46E1C'
+#        'A4:C1:38:4B:D6:7C': 'DACA7EDCEF444035A7B8C40600A4A99E'
+
+#
+#  Sensores Miflorea - Basado en Sensor Bluetooth Nativo Rasperry y Componente mitemp_bt
+#  miflora_s1:
+#    sensors:
+#      moisture: sensor.mi_m_c47c8d67c19e
+#      battery: sensor.mi_b_c47c8d67c19e
+#      temperature: sensor.mi_t_c47c8d67c19e
+#      conductivity: sensor.mi_c_c47c8d67c19e
+#      brightness: sensor.mi_l_c47c8d67c19e
+#    min_moisture: 20
+#    max_moisture: 60
+#    min_conductivity: 350
+#    max_conductivity: 2000
+#    min_temperature: 10
+#    max_temperature: 32
+#    min_brightness: 1000
+#    max_brightness: 30000
+#    min_battery: 2
