@@ -8,17 +8,20 @@ home_switch_off:
   sequence:
     # APAGADO LUCES PLANTA BAJA Y ALTA
     - action: light.turn_off
-      entity_id: 
-        - light.luces_planta_baja
-        - light.luces_planta_alta
+      target:
+        entity_id: 
+          - light.luces_planta_baja
+          - light.luces_planta_alta
 
     # APAGADO LUCES JARDIN EXCEPTO FAROLES EXTERIOR (TODAS TIPO SWITCH)
     - action: light.turn_off
-      entity_id: light.luces_jardin
+      target:
+        entity_id: light.luces_jardin
 
     # APAGADO LUCES JARDIN EXCEPTO FAROLES EXTERIOR (TODAS TIPO SWITCH)
     - action: switch.turn_off
-      entity_id: group.switch_calefaccion_grp
+      target:
+        entity_id: group.switch_calefaccion_grp
 
 
 # SCRIPT PARA UN MICRO AVISO DE SIRENA INTERIOR
@@ -33,11 +36,13 @@ sirena_alarma_micro_aviso:
     #
     # CICLO 1:
     - action: siren.turn_on
-      entity_id: siren.sirena
+      target:
+        entity_id: siren.sirena
     - delay:
         milliseconds: 50
     - action: siren.turn_off
-      entity_id: siren.sirena
+      target:
+        entity_id: siren.sirena
 
 # SCRIPT PARA ENCENDER SIRENAS INTERIOR TRAS PULSAR EL DOBLE BOTON PANICO DESDE APP HOMY IOS
 #
@@ -58,7 +63,8 @@ alarma_boton_panico:
       value_template: "{% if is_state('input_boolean.alarm_panic_button', 'on') %}true{% endif %}"
     # Llamada ACTIVA SIRENAS ALARMA
     - action: siren.turn_on
-      entity_id: siren.sirena
+      target:
+        entity_id: siren.sirena
     # Notifica Telegram
     - action: script.notifica_alarma
       data:
@@ -87,7 +93,8 @@ homy_armado_parcial:
     - condition: template
       value_template: "{% if not is_state('alarm_control_panel.ha', 'armed_home') %}true{% endif %}"
     - action: alarm_control_panel.alarm_arm_home
-      entity_id: alarm_control_panel.ha
+      target:
+        entity_id: alarm_control_panel.ha
     # La notificación se hace mediente la activación de la regla:
     # alias: 'A2 Alarm Armed Away'
 
@@ -98,7 +105,8 @@ homy_armado_total:
     - condition: template
       value_template: "{% if not is_state('alarm_control_panel.ha', 'armed_away') %}true{% endif %}"
     - action: alarm_control_panel.alarm_arm_away
-      entity_id: alarm_control_panel.ha
+      target:
+        entity_id: alarm_control_panel.ha
     # La notificación se hace mediente la activación de la regla:
     # alias: 'A2 Alarm Armed Away'
 
@@ -106,7 +114,8 @@ homy_desarmado_code:
   alias: 'Homy Desarmado'
   sequence:
     - action: alarm_control_panel.alarm_disarm
-      entity_id: alarm_control_panel.ha
+      target:
+        entity_id: alarm_control_panel.ha
       data:
         code: !secret alarm_control_code
     # La notificación se hace mediente la activación de la regla:
@@ -639,7 +648,8 @@ alexa_secuencia_alarma_disparada:
     # SONOFF_SW1_SIRENA INTERIOR ==> ON
     #######################################
     - action: siren.turn_on
-      entity_id: siren.sirena
+      target:
+        entity_id: siren.sirena
     #
     # Bucle sirena Alexa mientras la alarma esté disparada.
     - repeat:
@@ -661,7 +671,8 @@ alexa_secuencia_alarma_disparada:
     # SONOFF_SW1_SIRENA INTERIOR ==> OFF
     #######################################
     - action: siren.turn_off
-      entity_id: siren.sirena
+      target:
+        entity_id: siren.sirena
     - delay: 00:00:10
     - action: script.alexa_entrada_restaura_volumen
     - action: script.alexa_dormitorio_restaura_volumen
@@ -674,7 +685,8 @@ test_alexa_secuencia_armado:
   mode: restart
   sequence:
     - action: light.turn_on
-      entity_id: light.luz_vitrina
+      target:
+        entity_id: light.luz_vitrina
     - action: script.alexa_dormitorio_secuencia
       data:
         voz: 'ATENCION!. Luz Vitrina Entendida'
@@ -790,13 +802,15 @@ notifica_alarma:
   sequence:
   # Actualiza el valor de input_text.mensaje_tit con el título recibido.
   - action: input_text.set_value
-    entity_id: input_text.mensaje_tit
+    target:
+      entity_id: input_text.mensaje_tit
     data:
       value: "{{ titulo }}"
 
   # Actualiza el valor de input_text.mensaje_msg con el mensaje recibido.
   - action: input_text.set_value
-    entity_id: input_text.mensaje_msg
+    target:
+      entity_id: input_text.mensaje_msg
     data:
       value: "{{ mensaje }}"
 
@@ -849,13 +863,15 @@ notifica_evento:
 
   # Actualiza el valor de input_text.mensaje_tit con el título recibido.
   - action: input_text.set_value
-    entity_id: input_text.mensaje_tit
+    target:
+      entity_id: input_text.mensaje_tit
     data:
       value: "{{ titulo }}"
 
   # Actualiza el valor de input_text.mensaje_msg con el cuerpo del mensaje recibido.
   - action: input_text.set_value
-    entity_id: input_text.mensaje_msg
+    target:
+      entity_id: input_text.mensaje_msg
     data:
       value: "{{ mensaje }}"
 
@@ -883,12 +899,14 @@ luz_on_armed_home:
       state: 'armed_home'
     # Enciende Piloto Azul Alarma
     - action: light.turn_on
-      entity_id: light.luz_gateway_aqara
+      target:
+        entity_id: light.luz_gateway_aqara
       data:
         brightness: 75
         rgb_color: [0, 0, 254]
     - action: light.turn_on
-      entity_id: light.tagreader_led
+      target:
+        entity_id: light.tagreader_led
       data:
         color_name: blue
         transition: 3
@@ -902,7 +920,8 @@ luces_on_family_home:
     - condition: sun
       after: sunset
     - action: light.turn_on
-      entity_id: light.luz_entrada
+      target:
+        entity_id: light.luz_entrada
 
 luces_exterior_on:
   alias: 'Luces Exterior y Jardín On'
@@ -922,7 +941,8 @@ programador_luz_faroles_exterior:
     entity_id: input_boolean.programador_luz_faroles_exterior
     state: 'on'
   - action: light.turn_on
-    entity_id: light.luz_exterior
+    target:
+      entity_id: light.luz_exterior
 
 programador_luz_porche_jardin:
   alias: 'Programador Luz Porche Jardín'
@@ -931,7 +951,8 @@ programador_luz_porche_jardin:
     entity_id: input_boolean.programador_luz_porche_jardin
     state: 'on'
   - action: light.turn_on
-    entity_id: light.luz_porche_jardin
+    target:
+      entity_id: light.luz_porche_jardin
 
 programador_luz_balizas_cesped:
   alias: 'Programador Luz Balizas Cesped'
@@ -940,7 +961,8 @@ programador_luz_balizas_cesped:
     entity_id: input_boolean.programador_luz_balizas_cesped
     state: 'on'
   - action: light.turn_on
-    entity_id: light.luz_balizas_cesped
+    target:
+      entity_id: light.luz_balizas_cesped
 
 programador_luz_olivo_grande:
   alias: 'Programador Luz Olivo Grande'
@@ -949,7 +971,8 @@ programador_luz_olivo_grande:
     entity_id: input_boolean.programador_luz_olivo_grande
     state: 'on'
   - action: light.turn_on
-    entity_id: light.luz_olivo_grande
+    target:
+      entity_id: light.luz_olivo_grande
 
 programador_luz_olivo_nubes:
   alias: 'Programador Luz Olivo Nubes'
@@ -958,7 +981,8 @@ programador_luz_olivo_nubes:
     entity_id: input_boolean.programador_luz_olivo_nubes
     state: 'on'
   - action: light.turn_on
-    entity_id: light.luz_olivo_nubes
+    target:
+      entity_id: light.luz_olivo_nubes
 
 programador_luz_entrada_bonsais:
   alias: 'Programador Luz Bonsais Entrada'
@@ -967,7 +991,8 @@ programador_luz_entrada_bonsais:
     entity_id: input_boolean.programador_luz_entrada_bonsais
     state: 'on'
   - action: light.turn_on
-    entity_id: light.luz_entrada_bonsais
+    target:
+      entity_id: light.luz_entrada_bonsais
 
 
 #-----------------------------------------------------------------------------#
@@ -984,7 +1009,8 @@ piscina_depuradora_ch0_timer_start:
         entity_id: timer.piscina_depuradora_ch0
         duration: '{{ states.sensor.piscina_depuradora_ch0_manual_segundos.state}}'
     - action: switch.turn_on
-      entity_id: switch.esphome_pow_sw3
+      target:
+        entity_id: switch.esphome_pow_sw3
     # Actualiza Valor Hora Arranque Real
     #- service: input_datetime.set_datetime
     #  entity_id: input_datetime.piscina_real_start_time
@@ -1004,7 +1030,8 @@ piscina_depuradora_ch0_timer_start_diario:
         entity_id: timer.piscina_depuradora_ch0
         duration: '{{ states.sensor.piscina_duracion_planificada.state}}'
     - action: switch.turn_on
-      entity_id: switch.esphome_pow_sw3
+      target:
+        entity_id: switch.esphome_pow_sw3
     # Actualiza Valor Hora Arranque Real
     #- service: input_datetime.set_datetime
     #  entity_id: input_datetime.piscina_real_start_time
@@ -1020,9 +1047,11 @@ piscina_depuradora_ch0_timer_cancel:
   alias: Timer Piscina Cancel
   sequence:
     - action: timer.cancel
-      entity_id: timer.piscina_depuradora_ch0
+      target:
+        entity_id: timer.piscina_depuradora_ch0
     - action: switch.turn_off
-      entity_id: switch.esphome_pow_sw3
+      target:
+        entity_id: switch.esphome_pow_sw3
     # Actualiza Valor Hora Arranque Real
     #- service: input_datetime.set_datetime
     #  entity_id: input_datetime.piscina_real_end_time
@@ -1038,17 +1067,21 @@ piscina_depuradora_ch0_timer_pause:
   alias: Timer Piscina Pause
   sequence:
     - action: timer.pause
-      entity_id: timer.piscina_depuradora_ch0
+      target:
+        entity_id: timer.piscina_depuradora_ch0
     - action: switch.turn_off
-      entity_id: switch.esphome_pow_sw3
+      target:
+        entity_id: switch.esphome_pow_sw3
 
 piscina_depuradora_ch0_timer_resume:
   alias: Timer Piscina Resume
   sequence:
     - action: timer.start
-      entity_id: timer.piscina_depuradora_ch0
+      target:
+        entity_id: timer.piscina_depuradora_ch0
     - action: switch.turn_on
-      entity_id: switch.esphome_pow_sw3
+      target:
+        entity_id: switch.esphome_pow_sw3
 
 #-----------------------------------------------------------------------------#
 #                                                                             #
@@ -1060,81 +1093,101 @@ riego_bonsais_ch1_timer_cancel:
   alias: Timer Riego Bonsais CH1 Cancel
   sequence:
     - action: timer.cancel
-      entity_id: timer.riego_bonsais_ch1
+      target:
+        entity_id: timer.riego_bonsais_ch1
     - action: valve.close_valve
-      entity_id: valve.esphome_4ch_sw2_relay_1
+      target:
+        entity_id: valve.esphome_4ch_sw2_relay_1
 
 riego_bonsais_ch2_timer_cancel:
   alias: Timer Riego Bonsais CH2 Cancel
   sequence:
     - action: timer.cancel
-      entity_id: timer.riego_bonsais_ch2
+      target:
+        entity_id: timer.riego_bonsais_ch2
     - action: valve.close_valve
-      entity_id: valve.esphome_4ch_sw2_relay_2
+      target:
+        entity_id: valve.esphome_4ch_sw2_relay_2
 
 riego_bonsais_ch3_timer_cancel:
   alias: Timer Riego Bonsais CH3 Cancel
   sequence:
     - action: timer.cancel
-      entity_id: timer.riego_bonsais_ch3
+      target:
+        entity_id: timer.riego_bonsais_ch3
     - action: switch.turn_off
-      entity_id: switch.esphome_4ch_sw2_relay_3
+      target:
+        entity_id: switch.esphome_4ch_sw2_relay_3
 
 riego_bonsais_ch4_timer_cancel:
   alias: Timer Riego Bonsais CH4 Cancel
   sequence:
     - action: timer.cancel
-      entity_id: timer.riego_bonsais_ch4
+      target:
+        entity_id: timer.riego_bonsais_ch4
     - action: switch.turn_off
-      entity_id: switch.esphome_4ch_sw2_relay_4
+      target:
+        entity_id: switch.esphome_4ch_sw2_relay_4
 
 riego_bonsais_ch0_timer_cancel:
   alias: Timer Bonsais Produccion Cancel
   sequence:
     - action: timer.cancel
-      entity_id: timer.riego_bonsais_ch0
+      target:
+        entity_id: timer.riego_bonsais_ch0
     - action: valve.close_valve
-      entity_id: valve.esphome_pow_sw1
+      target:
+        entity_id: valve.esphome_pow_sw1
 
 riego_tomates_ch0_timer_cancel:
   alias: Timer Tomatera Cancel
   sequence:
     - action: timer.cancel
-      entity_id: timer.riego_tomates_ch0
+      target:
+        entity_id: timer.riego_tomates_ch0
     - action: switch.turn_off
-      entity_id: switch.esphome_pow_sw2
+      target:
+        entity_id: switch.esphome_pow_sw2
 
 riego_cesped_ch1_timer_cancel:
   alias: Timer Riego Cesped CH1 Cancel
   sequence:
     - action: timer.cancel
-      entity_id: timer.riego_cesped_ch1
+      target:
+        entity_id: timer.riego_cesped_ch1
     - action: switch.turn_off
-      entity_id: switch.esphome_4ch_sw3_relay_1
+      target:
+        entity_id: switch.esphome_4ch_sw3_relay_1
 
 riego_cesped_ch2_timer_cancel:
   alias: Timer Riego Cesped CH2 Cancel
   sequence:
     - action: timer.cancel
-      entity_id: timer.riego_cesped_ch2
+      target:
+        entity_id: timer.riego_cesped_ch2
     - action: switch.turn_off
-      entity_id: switch.esphome_4ch_sw3_relay_2
+      target:
+        entity_id: switch.esphome_4ch_sw3_relay_2
 
 riego_cesped_ch3_timer_cancel:
   alias: Timer Riego Cesped CH3 Cancel
   sequence:
     - action: timer.cancel
-      entity_id: timer.riego_cesped_ch3
+      target:
+        entity_id: timer.riego_cesped_ch3
     - action: switch.turn_off
-      entity_id: switch.esphome_4ch_sw3_relay_3
+      target:
+        entity_id: switch.esphome_4ch_sw3_relay_3
 
 riego_cesped_ch4_timer_cancel:
   alias: Timer Riego Cesped CH4 Cancel
   sequence:
     - action: timer.cancel
-      entity_id: timer.riego_cesped_ch4
+      target:
+        entity_id: timer.riego_cesped_ch4
     - action: switch.turn_off
-      entity_id: switch.esphome_4ch_sw3_relay_4
+      target:
+        entity_id: switch.esphome_4ch_sw3_relay_4
 
 
 #-----------------------------------------------------------------------------#
@@ -1149,17 +1202,19 @@ jardin_riego_off:
   sequence:
     # Apagado Riego Jardin y Fuentes
     - action: switch.turn_off
-      entity_id:
-        - switch.esphome_4ch_sw2_relay_3
-        - switch.esphome_4ch_sw2_relay_3
-        - switch.esphome_4ch_sw3_relay_1
-        - switch.esphome_4ch_sw3_relay_2
-        - switch.esphome_4ch_sw3_relay_3
-        - switch.esphome_4ch_sw3_relay_4
+      target:
+        entity_id:
+          - switch.esphome_4ch_sw2_relay_3
+          - switch.esphome_4ch_sw2_relay_3
+          - switch.esphome_4ch_sw3_relay_1
+          - switch.esphome_4ch_sw3_relay_2
+          - switch.esphome_4ch_sw3_relay_3
+          - switch.esphome_4ch_sw3_relay_4
     - action: valve.close_valve
-      entity_id:
-        - valve.esphome_4ch_sw2_relay_1
-        - valve.esphome_4ch_sw2_relay_2
+      target:
+        entity_id:
+          - valve.esphome_4ch_sw2_relay_1
+          - valve.esphome_4ch_sw2_relay_2
 
 #Apagado SW Sonoff Piscina Depuradora
 piscina_depuradora_off:
@@ -1167,7 +1222,8 @@ piscina_depuradora_off:
   sequence:
     # Apagado POW Depuradora Piscina
     - action: switch.turn_off
-      entity_id: switch.esphome_pow_sw3
+      target:
+        entity_id: switch.esphome_pow_sw3
 
 # SONOFF S20 - NESSPRESSO
 #
@@ -1277,30 +1333,35 @@ sonoff_initialize:
   alias: 'Parada Seguridad Interruptores SONOFF'
   sequence:
     - action: siren.turn_off
-      entity_id: siren.sirena
+      target:
+        entity_id: siren.sirena
     - action: switch.turn_on
-      entity_id:
-        - switch.esphome_pow_sw4
+      target:
+        entity_id:
+          - switch.esphome_pow_sw4
     - action: switch.turn_off
-      entity_id:
-        - switch.esphome_bas_sw0                  # SONOFF_BAS_SW0
-        - switch.esphome_4ch_sw2_relay_3
-        - switch.esphome_4ch_sw2_relay_4
-        - switch.esphome_4ch_sw3_relay_1          # SONOFF_4CH RIEGO CESPED
-        - switch.esphome_4ch_sw3_relay_2
-        - switch.esphome_4ch_sw3_relay_3
-        - switch.esphome_4ch_sw3_relay_4
-        - switch.esphome_pow_sw2                  # SONOFF_BAS_SW2 HUERTO TOMATERAS
-        - switch.esphome_pow_sw3                  # SONOFF_POW_SW3 DEPURADORA PISCINA
+      target:
+        entity_id:
+          - switch.esphome_bas_sw0                  # SONOFF_BAS_SW0
+          - switch.esphome_4ch_sw2_relay_3
+          - switch.esphome_4ch_sw2_relay_4
+          - switch.esphome_4ch_sw3_relay_1          # SONOFF_4CH RIEGO CESPED
+          - switch.esphome_4ch_sw3_relay_2
+          - switch.esphome_4ch_sw3_relay_3
+          - switch.esphome_4ch_sw3_relay_4
+          - switch.esphome_pow_sw2                  # SONOFF_BAS_SW2 HUERTO TOMATERAS
+          - switch.esphome_pow_sw3                  # SONOFF_POW_SW3 DEPURADORA PISCINA
     - action: valve.close_valve
-      entity_id:
-        - valve.esphome_4ch_sw2_relay_1           # SONOFF_4CH RIEGO BONSAIS
-        - valve.esphome_4ch_sw2_relay_2           # SONOFF_4CH RIEGO PLANTAS AROMATICAS
-        - valve.esphome_pow_sw1                   # SONOFF_POW_SW1 BONSAIS PRODUCCION
+      target:
+        entity_id:
+          - valve.esphome_4ch_sw2_relay_1           # SONOFF_4CH RIEGO BONSAIS
+          - valve.esphome_4ch_sw2_relay_2           # SONOFF_4CH RIEGO PLANTAS AROMATICAS
+          - valve.esphome_pow_sw1                   # SONOFF_POW_SW1 BONSAIS PRODUCCION
     - action: switch.turn_on
-      entity_id:
-        - switch.tagreader_9a0be4_buzzer_enabled  # Activa el zumbido al pasar un tag
-        - switch.tagreader_9a0be4_led_enabled     # Activa un led verde al pasar el tag
+      target:
+        entity_id:
+          - switch.tagreader_9a0be4_buzzer_enabled  # Activa el zumbido al pasar un tag
+          - switch.tagreader_9a0be4_led_enabled     # Activa un led verde al pasar el tag
 
 #-----------------------------------------------------------------------------#
 #                                                                             #
@@ -1564,7 +1625,8 @@ check_sensores_magneticos_perimetro:
         repeticion: 1
         voz: "{{ states.input_text.alarma_check_sensores_magneticos.state }}" 
     - action: light.turn_on
-      entity_id: light.tagreader_led
+      target:
+        entity_id: light.tagreader_led
       data:
         brightness: 128
         color_name: >

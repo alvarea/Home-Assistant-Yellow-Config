@@ -360,7 +360,8 @@
   actions:
     # Encendido Led Tag Reader ROJO
     - action: light.turn_on
-      entity_id: light.tagreader_led
+      target:
+        entity_id: light.tagreader_led
       data:
         color_name: red
         brightness: 255
@@ -399,14 +400,16 @@
   actions:
     # Encendido Led VERDE Tag Reader
     - action: light.turn_on
-      entity_id: light.tagreader_led
+      target:
+        entity_id: light.tagreader_led
       data:
         color_name: orange
         transition: 3
         brightness: 96
     # INICIALIZA EL SENSOR DEL TRIGGER
     - action: input_text.set_value
-      entity_id: input_text.alarm_trigger
+      target:
+        entity_id: input_text.alarm_trigger
       data:
         value: " "
 
@@ -437,7 +440,8 @@
   actions:
     # Encendido Led Azul Tag Reader
     - action: light.turn_on
-      entity_id: light.tagreader_led
+      target:
+        entity_id: light.tagreader_led
       data:
         color_name: blue
         transition: 3
@@ -445,7 +449,8 @@
 
     # ALMACENA EL SENSOR DEL TRIGGER
     - action: input_text.set_value
-      entity_id: input_text.alarm_trigger
+      target:
+        entity_id: input_text.alarm_trigger
       data:
         value: " "
 
@@ -472,16 +477,19 @@
   actions:
     # SONOFF_SW1_SIRENA INTERIOR ==> OFF
     - action: siren.turn_off
-      entity_id: siren.sirena
+      target:
+        entity_id: siren.sirena
 
     # DESARMADO PANEL ALARMA BLINK
     - action: alarm_control_panel.alarm_disarm
-      entity_id: alarm_control_panel.blink_casa
+      target:
+        entity_id: alarm_control_panel.blink_casa
 
     # Apaga Luz Piloto Alarma
     - action: light.turn_off
-      entity_id: 
-        - light.tagreader_led
+      target:
+        entity_id: 
+          - light.tagreader_led
       
     # Script Envío Sonido Alexa Alexa
     - action: script.alexa_secuencia
@@ -524,14 +532,16 @@
   actions:
     # ALMACENA EL SENSOR DEL TRIGGER
     - action: input_text.set_value
-      entity_id: input_text.alarm_trigger
+      target:
+        entity_id: input_text.alarm_trigger
       data:
         value: "{{ trigger.to_state.attributes.friendly_name }}"
     #
     # DISPARA LA ALARMA, que pasa a estado PENDING durante 60'
     # Si no se desactiva, pasa a triggered y se envían notificaciones y Sirena
     - action: alarm_control_panel.alarm_trigger
-      entity_id: alarm_control_panel.ha
+      target:
+        entity_id: alarm_control_panel.ha
 
 #
 # REGLA: TRIGGER SENSOR => MODO ARMADO HOME => PENDING ==> ALARMA TRIGGERED
@@ -563,14 +573,16 @@
   actions:
     # ALMACENA EL SENSOR DEL TRIGGER
     - action: input_text.set_value
-      entity_id: input_text.alarm_trigger
+      target:
+        entity_id: input_text.alarm_trigger
       data:
         value: "{{ trigger.to_state.attributes.friendly_name }}"
 
     # DISPARA LA ALARMA, que pasa a estado PENDING durante 60'
     # Si no se desactiva, pasa a triggered y se envían notificaciones y Sirena
     - action: alarm_control_panel.alarm_trigger
-      entity_id: alarm_control_panel.ha
+      target:
+        entity_id: alarm_control_panel.ha
 
 # REGLA: ALARMA ARMED_AWAY TRIGGERED ==> SIRENA + NOTIFICACION COMPLETA
 #
@@ -676,7 +688,8 @@
         state: 'on'
       sequence:
         - action: alarm_control_panel.alarm_arm_home
-          entity_id: alarm_control_panel.ha
+          target:
+            entity_id: alarm_control_panel.ha
     default:
       - action: script.alexa_anuncio
         data:
@@ -704,7 +717,8 @@
   actions:
     # ALMACENA EL SENSOR DEL TRIGGER
     - action: input_text.set_value
-      entity_id: input_text.alarm_trigger
+      target:
+        entity_id: input_text.alarm_trigger
       data:
         value: "A10 Alarm Home Auto Disarm"
     # Desarmado de Alarmas
@@ -728,7 +742,8 @@
     entity_id: binary_sensor.alarma_check_listo_para_armar
   actions:
     - action: light.turn_on
-      entity_id: light.tagreader_led
+      target:
+        entity_id: light.tagreader_led
       data:
         brightness: 96
         color_name: >
@@ -791,7 +806,8 @@
     # Llamada al contador de personas que actualiza sensor.family_home
     - action: python_script.countpeople
     - action: input_boolean.turn_on
-      entity_id: input_boolean.family_sleep_home_mfc
+      target:
+        entity_id: input_boolean.family_sleep_home_mfc
 
 - id: F07
   alias: 'F07 Family AAF - Check Sleep'
@@ -811,7 +827,8 @@
     # Llamada al contador de personas que actualiza sensor.family_home
     - action: python_script.countpeople
     - action: input_boolean.turn_on
-      entity_id: input_boolean.family_sleep_home_aaf
+      target:
+        entity_id: input_boolean.family_sleep_home_aaf
 
 - id: F08
   alias: 'F08 Family PAF - Check Sleep'
@@ -831,7 +848,8 @@
     # Llamada al contador de personas que actualiza sensor.family_home
     - action: python_script.countpeople
     - action: input_boolean.turn_on
-      entity_id: input_boolean.family_sleep_home_paf
+      target:
+        entity_id: input_boolean.family_sleep_home_paf
 
 - id: F09
   alias: 'F09 Family AAC - Check Sleep'
@@ -851,7 +869,8 @@
     # Llamada al contador de personas que actualiza sensor.family_home
     - action: python_script.countpeople
     - action: input_boolean.turn_on
-      entity_id: input_boolean.family_sleep_home_paf
+      target:
+        entity_id: input_boolean.family_sleep_home_paf
 
 - id: F10
   alias: 'F10 Family Any Change - Actualiza Contador'
@@ -1106,7 +1125,8 @@
   actions:
     # Apagado Luces Exterior Casa + Luces Jardín
     - action: light.turn_off
-      entity_id: light.luces_exterior
+      target:
+        entity_id: light.luces_exterior
     # Notifica a Familia
     #- service: script.notifica_evento
     #  data:
@@ -1193,7 +1213,8 @@
           state: 'off'
       then:
         - action: light.turn_on
-          entity_id: light.luz_exterior
+          target:
+            entity_id: light.luz_exterior
     # Espera a que ningún sensor detecte presencia (máx. 30 min por seguridad)
     - wait_template: >
         {{ not is_state('binary_sensor.aqara_movimiento_entrada_exterior', 'on')
@@ -1204,7 +1225,8 @@
     - delay: '00:05:00'
     # Luz Exterior OFF
     - action: light.turn_off
-      entity_id: light.luz_exterior
+      target:
+        entity_id: light.luz_exterior
 
 - id: L06
   alias: 'L06 Luces Off Before Sunrise'
@@ -1233,7 +1255,8 @@
   actions:
     # Apagado Luces Toda la Casa
     - action: light.turn_off
-      entity_id: light.luces_toda_la_casa
+      target:
+        entity_id: light.luces_toda_la_casa
 
 - id: L07
   alias: 'L07 Luces On Entrada Según Sensor'
@@ -1302,9 +1325,10 @@
           {% endif %}
     # Luces Entrada OFF
     - action: light.turn_off
-      entity_id:
-        - light.luz_entrada
-        - light.tagreader_led
+      target:
+        entity_id:
+          - light.luz_entrada
+          - light.tagreader_led
 
 - id: L08
   alias: 'L08 Luces On Dormitorio Según Sensor'
@@ -1331,9 +1355,10 @@
       #  before_offset: "+02:00:00" # Horario Invierno GMT+1, en el amanecer +60m
   actions:
     - action: light.turn_on
-      entity_id: 
-        - light.luces_dormitorio_mfc
-        - light.esphome_s20_sw3_led
+      target:
+        entity_id: 
+          - light.luces_dormitorio_mfc
+          - light.esphome_s20_sw3_led
     - action: input_text.set_value
       data:
         value: "sensor turn_on light.luces_dormitorio"
@@ -1343,9 +1368,10 @@
     - delay: '00:10:00'
     # Luces Off + Led
     - action: light.turn_off
-      entity_id: 
-        - light.luces_dormitorio_mfc
-        - light.esphome_s20_sw3_led
+      target:
+        entity_id: 
+          - light.luces_dormitorio_mfc
+          - light.esphome_s20_sw3_led
     - action: input_text.set_value
       data:
         value: "sensor turn_off light.luces_dormitorio_mfc"
@@ -1420,8 +1446,9 @@
           {% endif %}
     # Luces Off
     - action: light.turn_off
-      entity_id:
-        - light.luz_pasillo
+      target:
+        entity_id:
+          - light.luz_pasillo
 
 - id: L10
   alias: 'L10 Luces On Estudio Según Sensor'
@@ -1454,8 +1481,9 @@
   actions:
     # Luces On
     - action: light.turn_on
-      entity_id:
-        - light.luz_estudio_techo
+      target:
+        entity_id:
+          - light.luz_estudio_techo
     #- service: scene.turn_on
     #  target:
     #    entity_id: scene.estudio_hall
@@ -1469,8 +1497,9 @@
           {% endif %}
     # Luces Off + Led
     - action: light.turn_off
-      entity_id: 
-        - light.luz_estudio_techo
+      target:
+        entity_id: 
+          - light.luz_estudio_techo
 
 - id: L11
   alias: 'L11 Luces On Armario Estudio Sensor'
@@ -1487,15 +1516,17 @@
           state: 'off' # CERRADO
         sequence:
           - action: light.turn_off
-            entity_id: 
-              - light.luz_estudio_armario
-              - light.esphome_s26_sw1_led
+            target:
+              entity_id: 
+                - light.luz_estudio_armario
+                - light.esphome_s26_sw1_led
       #ELSE puerta abierta
       default:
         - action: light.turn_on
-          entity_id: 
-            - light.luz_estudio_armario
-            - light.esphome_s26_sw1_led
+          target:
+            entity_id: 
+              - light.luz_estudio_armario
+              - light.esphome_s26_sw1_led
 
 - id: L12
   alias: 'L12 Luces On Cocina Según Sensor'
@@ -1540,8 +1571,9 @@
           {% endif %}
     # Luces Off + Led
     - action: light.turn_off
-      entity_id: 
-        - light.luces_cocina
+      target:
+        entity_id: 
+          - light.luces_cocina
 
 
 #-----------------------------------------------------------------------------#
@@ -1562,7 +1594,8 @@
       to: 'on'
   actions:
     - action: switch.toggle
-      entity_id: switch.esphome_4ch_sw1_relay_1
+      target:
+        entity_id: switch.esphome_4ch_sw1_relay_1
 
 - id: S02_4CH_SW1
   alias: 'S02 Sonoff 4CH SW1 Boton2 On'
@@ -1573,7 +1606,8 @@
       to: 'on'
   actions:
     - action: switch.toggle
-      entity_id: switch.esphome_4ch_sw1_relay_2
+      target:
+        entity_id: switch.esphome_4ch_sw1_relay_2
 
 - id: S03_4CH_SW1
   alias: 'S03 Sonoff 4CH SW1 Boton3 On'
@@ -1584,7 +1618,8 @@
       to: 'on'
   actions:
     - action: switch.toggle
-      entity_id: switch.esphome_4ch_sw1_relay_3
+      target:
+        entity_id: switch.esphome_4ch_sw1_relay_3
 
 - id: S04_4CH_SW1
   alias: 'S04 Sonoff 4CH SW1 Boton4 On'
@@ -1595,7 +1630,8 @@
       to: 'on'
   actions:
     - action: switch.toggle
-      entity_id: switch.esphome_4ch_sw1_relay_4
+      target:
+        entity_id: switch.esphome_4ch_sw1_relay_4
 
 #
 # ESPHOME 4CH SW2 -  RIEGO PLANTAS y BONSAIS
@@ -1609,7 +1645,8 @@
       to: 'on'
   actions:
     - action: valve.toggle
-      entity_id: valve.esphome_4ch_sw2_relay_1
+      target:
+        entity_id: valve.esphome_4ch_sw2_relay_1
 
 - id: S02_4CH_SW2
   alias: 'S02 Sonoff 4CH SW2 Boton2 On'
@@ -1620,7 +1657,8 @@
       to: 'on'
   actions:
     - action: valve.toggle
-      entity_id: valve.esphome_4ch_sw2_relay_2
+      target:
+        entity_id: valve.esphome_4ch_sw2_relay_2
 
 - id: S03_4CH_SW2
   alias: 'S03 Sonoff 4CH SW2 Boton3 On'
@@ -1631,7 +1669,8 @@
       to: 'on'
   actions:
     - action: switch.toggle
-      entity_id: switch.esphome_4ch_sw2_relay_3
+      target:
+        entity_id: switch.esphome_4ch_sw2_relay_3
 
 - id: S04_4CH_SW2
   alias: 'S03 Sonoff 4CH SW2 Boton4 On'
@@ -1642,7 +1681,8 @@
       to: 'on'
   actions:
     - action: switch.toggle
-      entity_id: switch.esphome_4ch_sw2_relay_4
+      target:
+        entity_id: switch.esphome_4ch_sw2_relay_4
 
 #
 # ESPHOME 4CH SW3 -  RIEGO CESPED
@@ -1656,7 +1696,8 @@
       to: 'on'
   actions:
     - action: switch.toggle
-      entity_id: switch.esphome_4ch_sw3_relay_1
+      target:
+        entity_id: switch.esphome_4ch_sw3_relay_1
 
 - id: S02_4CH_SW3
   alias: 'S02 Sonoff 4CH SW3 Boton2 On'
@@ -1667,7 +1708,8 @@
       to: 'on'
   actions:
     - action: switch.toggle
-      entity_id: switch.esphome_4ch_sw3_relay_2
+      target:
+        entity_id: switch.esphome_4ch_sw3_relay_2
 
 - id: S03_4CH_SW3
   alias: 'S01 Sonoff 4CH SW3 Boton3 On'
@@ -1678,7 +1720,8 @@
       to: 'on'
   actions:
     - action: switch.toggle
-      entity_id: switch.esphome_4ch_sw3_relay_3
+      target:
+        entity_id: switch.esphome_4ch_sw3_relay_3
 
 - id: S04_4CH_SW3
   alias: 'S03 Sonoff 4CH SW3 Boton4 On'
@@ -1689,7 +1732,8 @@
       to: 'on'
   actions:
     - action: switch.toggle
-      entity_id: switch.esphome_4ch_sw3_relay_4
+      target:
+        entity_id: switch.esphome_4ch_sw3_relay_4
 
 #
 # ESPHOME POW - DEPURADORA PISCINA
@@ -1717,7 +1761,8 @@
         entity_id: timer.piscina_depuradora_ch0
         duration: '{{ states.sensor.piscina_depuradora_ch0_duracion_planificada_t1.state|int * 60}}'
     - action: switch.turn_on
-      entity_id: switch.esphome_pow_sw3
+      target:
+        entity_id: switch.esphome_pow_sw3
 
 - id: S06b
   alias: 'S06b Timer Piscinda Depuradora Tramo2'
@@ -1740,7 +1785,8 @@
         entity_id: timer.piscina_depuradora_ch0
         duration: '{{ states.sensor.piscina_depuradora_ch0_duracion_planificada_t2.state|int * 60}}'
     - action: switch.turn_on
-      entity_id: switch.esphome_pow_sw3
+      target:
+        entity_id: switch.esphome_pow_sw3
 
 - id: S07
   alias: 'S07 Timer Piscina Depuradora CH0 End'
@@ -1765,7 +1811,8 @@
       to: 'on'
   actions:
     - action: switch.toggle
-      entity_id: switch.esphome_s20_sw1
+      target:
+        entity_id: switch.esphome_s20_sw1
 
 - id: S09b
   alias: 'S09b Sonoff S20 SW3 Toggle'
@@ -1776,7 +1823,8 @@
       to: 'on'
   actions:
     - action: switch.toggle
-      entity_id: switch.esphome_s20_sw3
+      target:
+        entity_id: switch.esphome_s20_sw3
 
 - id: S09c
   alias: 'S09c Sonoff S26 SW1 Toggle'
@@ -1787,7 +1835,8 @@
       to: 'on'
   actions:
     - action: switch.toggle
-      entity_id: switch.esphome_s26_sw1
+      target:
+        entity_id: switch.esphome_s26_sw1
 
 - id: S09d
   alias: 'S09d Sonoff S26 SW2 Toggle'
@@ -1798,7 +1847,8 @@
       to: 'on'
   actions:
     - action: switch.toggle
-      entity_id: switch.esphome_s26_sw2
+      target:
+        entity_id: switch.esphome_s26_sw2
 
 - id: S10
   alias: 'S10 Switch Dormitorio M&D Calefacción On'
@@ -1824,7 +1874,8 @@
         value_template: "{{ is_state('input_boolean.family_sleep_home_mfc','on') or is_state('input_boolean.family_sleep_home_aac','on') }}"
   actions:
     - action: switch.turn_on
-      entity_id: switch.esphome_s20_sw3
+      target:
+        entity_id: switch.esphome_s20_sw3
 
 - id: S12
   alias: 'S12 Switch Dormitorios Off'
@@ -1844,7 +1895,8 @@
         state: 'on'
   actions:
     - action: switch.turn_off
-      entity_id: switch.esphome_s20_sw3
+      target:
+        entity_id: switch.esphome_s20_sw3
 
 #
 # SAI RACK COMUNICACIONES
@@ -2057,7 +2109,8 @@
       to: 'on'
   actions:
     - action: switch.toggle
-      entity_id: switch.esphome_pow_sw4
+      target:
+        entity_id: switch.esphome_pow_sw4
 #
 # ESPHOME 4CH-R2 SW2 RIEGO : Relay1 BONSAIS TOP
 #
@@ -2082,7 +2135,8 @@
         entity_id: timer.riego_bonsais_ch1
         duration: '{{ states.sensor.riego_bonsais_ch1_duracion_planificada_t1.state|int * 60}}'
     - action: valve.open_valve
-      entity_id: valve.esphome_4ch_sw2_relay_1
+      target:
+        entity_id: valve.esphome_4ch_sw2_relay_1
 
 - id: S19d
   alias: 'S19d Timer Riego CH1 Bonsais Top Tramo2'
@@ -2105,7 +2159,8 @@
         entity_id: timer.riego_bonsais_ch1
         duration: '{{ states.sensor.riego_bonsais_ch1_duracion_planificada_t2.state|int * 60}}'
     - action: valve.open_valve
-      entity_id: valve.esphome_4ch_sw2_relay_1
+      target:
+        entity_id: valve.esphome_4ch_sw2_relay_1
 
 - id: S19e
   alias: 'S19e Timer Riego CH1 End'
@@ -2141,7 +2196,8 @@
         entity_id: timer.riego_bonsais_ch2
         duration: '{{ states.sensor.riego_bonsais_ch2_duracion_planificada_t1.state|int * 60}}'
     - action: valve.open_valve
-      entity_id: valve.esphome_4ch_sw2_relay_2
+      target:
+        entity_id: valve.esphome_4ch_sw2_relay_2
 
 - id: S20b
   alias: 'S20b Timer Riego CH2 Plantas Aromaticas Tramo2'
@@ -2164,7 +2220,8 @@
         entity_id: timer.riego_bonsais_ch2
         duration: '{{ states.sensor.riego_bonsais_ch2_duracion_planificada_t2.state|int * 60}}'
     - action: valve.open_valve
-      entity_id: valve.esphome_4ch_sw2_relay_2
+      target:
+        entity_id: valve.esphome_4ch_sw2_relay_2
 
 - id: S20c
   alias: 'S20c Timer Riego CH2 Plantas Aromaticas Tramo1'
@@ -2200,7 +2257,8 @@
         entity_id: timer.riego_bonsais_ch3
         duration: '{{ states.sensor.riego_bonsais_ch3_duracion_planificada.state|int * 60}}'
     - action: switch.turn_on
-      entity_id: switch.esphome_4ch_sw2_relay_3
+      target:
+        entity_id: switch.esphome_4ch_sw2_relay_3
 
 - id: S24
   alias: 'S24 Timer Fuente CH3 Fuente Zen End'
@@ -2236,7 +2294,8 @@
         entity_id: timer.riego_bonsais_ch0
         duration: '{{ states.sensor.riego_bonsais_ch0_duracion_planificada_t1.state|int * 60 }}'
     - action: valve.open_valve
-      entity_id: valve.esphome_pow_sw1
+      target:
+        entity_id: valve.esphome_pow_sw1
 
 - id: S26
   alias: 'S26 Timer Riego Bonsais Produccion Tramo2'
@@ -2259,7 +2318,8 @@
         entity_id: timer.riego_bonsais_ch0
         duration: '{{ states.sensor.riego_bonsais_ch0_duracion_planificada_t2.state|int * 60 }}'
     - action: valve.open_valve
-      entity_id: valve.esphome_pow_sw1
+      target:
+        entity_id: valve.esphome_pow_sw1
 
 - id: S27
   alias: 'S27 Timer Riego Bonsais Produccion End'
@@ -2295,7 +2355,8 @@
         entity_id: timer.riego_tomates_ch0
         duration: '{{ states.sensor.riego_tomates_ch0_duracion_planificada_t1.state|int * 60 }}'
     - action: switch.turn_on
-      entity_id: switch.esphome_pow_sw2
+      target:
+        entity_id: switch.esphome_pow_sw2
       
 - id: S29
   alias: 'S29 Timer Riego Huerto Tramo2'
@@ -2318,7 +2379,8 @@
         entity_id: timer.riego_tomates_ch0
         duration: '{{ states.sensor.riego_tomates_ch0_duracion_planificada_t2.state|int * 60 }}'
     - action: switch.turn_on
-      entity_id: switch.esphome_pow_sw2
+      target:
+        entity_id: switch.esphome_pow_sw2
 
 - id: S30
   alias: 'S30 Timer Riego Huerto End'
@@ -2354,7 +2416,8 @@
         entity_id: timer.riego_cesped_ch1
         duration: '{{ states.sensor.riego_cesped_ch1_duracion_planificada_t1.state|int * 60}}'
     - action: switch.turn_on
-      entity_id: switch.esphome_4ch_sw3_relay_1
+      target:
+        entity_id: switch.esphome_4ch_sw3_relay_1
 
 - id: S31b
   alias: 'S31b Timer Riego Cesped CH1 Tramo2'
@@ -2377,7 +2440,8 @@
         entity_id: timer.riego_cesped_ch1
         duration: '{{ states.sensor.riego_cesped_ch1_duracion_planificada_t2.state|int * 60}}'
     - action: switch.turn_on
-      entity_id: switch.esphome_4ch_sw3_relay_1
+      target:
+        entity_id: switch.esphome_4ch_sw3_relay_1
 
 - id: S31c
   alias: 'S31c Timer Riego Cesped CH1 Tramo3'
@@ -2400,7 +2464,8 @@
         entity_id: timer.riego_cesped_ch1
         duration: '{{ states.sensor.riego_cesped_ch1_duracion_planificada_t3.state|int * 60}}'
     - action: switch.turn_on
-      entity_id: switch.esphome_4ch_sw3_relay_1
+      target:
+        entity_id: switch.esphome_4ch_sw3_relay_1
 
 - id: S31z
   alias: 'S31z Timer Riego Cesped CH1 End'
@@ -2436,7 +2501,8 @@
         entity_id: timer.riego_cesped_ch2
         duration: '{{ states.sensor.riego_cesped_ch2_duracion_planificada_t1.state|int * 60}}'
     - action: switch.turn_on
-      entity_id: switch.esphome_4ch_sw3_relay_2
+      target:
+        entity_id: switch.esphome_4ch_sw3_relay_2
 
 - id: S32b
   alias: 'S32b Timer Riego Cesped CH2 Tramo2'
@@ -2459,7 +2525,8 @@
         entity_id: timer.riego_cesped_ch2
         duration: '{{ states.sensor.riego_cesped_ch2_duracion_planificada_t2.state|int * 60}}'
     - action: switch.turn_on
-      entity_id: switch.esphome_4ch_sw3_relay_2
+      target:
+        entity_id: switch.esphome_4ch_sw3_relay_2
 
 - id: S32c
   alias: 'S32c Timer Riego Cesped CH2 Tramo3'
@@ -2482,7 +2549,8 @@
         entity_id: timer.riego_cesped_ch2
         duration: '{{ states.sensor.riego_cesped_ch2_duracion_planificada_t3.state|int * 60}}'
     - action: switch.turn_on
-      entity_id: switch.esphome_4ch_sw3_relay_2
+      target:
+        entity_id: switch.esphome_4ch_sw3_relay_2
 
 - id: S32z
   alias: 'S31z Timer Riego Cesped CH2 End'
@@ -2518,7 +2586,8 @@
         entity_id: timer.riego_cesped_ch3
         duration: '{{ states.sensor.riego_cesped_ch3_duracion_planificada_t1.state|int * 60}}'
     - action: switch.turn_on
-      entity_id: switch.esphome_4ch_sw3_relay_3
+      target:
+        entity_id: switch.esphome_4ch_sw3_relay_3
 
 - id: S33b
   alias: 'S33b Timer Riego Cesped CH3 Tramo2'
@@ -2541,7 +2610,8 @@
         entity_id: timer.riego_cesped_ch3
         duration: '{{ states.sensor.riego_cesped_ch3_duracion_planificada_t2.state|int * 60}}'
     - action: switch.turn_on
-      entity_id: switch.esphome_4ch_sw3_relay_3
+      target:
+        entity_id: switch.esphome_4ch_sw3_relay_3
 
 - id: S33c
   alias: 'S33c Timer Riego Cesped ch3 End'
@@ -2696,7 +2766,8 @@
   actions:
     # Script Notificación Alarma
     - action: input_text.set_value
-      entity_id: input_text.alarm_trigger
+      target:
+        entity_id: input_text.alarm_trigger
       data:
         value: "{{ trigger.to_state.attributes.friendly_name }}"
     - action: script.notifica_alarma
@@ -2774,7 +2845,8 @@
   actions:
     # BOTON DEL PANICO: Secuencia Alexa ALARMA
     - action: input_boolean.turn_on
-      entity_id: input_boolean.alarm_panic_button
+      target:
+        entity_id: input_boolean.alarm_panic_button
     - action: script.alarma_boton_panico
 
 - id: t03_nfc_tags_bigblue_alarm_armed_away'
@@ -3596,10 +3668,10 @@
           sequence:
             # Aviso apagando luces estudio izquierda solo
             - action: light.turn_off
-              entity_id: light.luz_estudio_izquierda
+              target:
+                entity_id: light.luz_estudio_izquierda
             # Apaga luces estudio con retardo variable en función de la hora
             - action: light.turn_off
-              entity_id: light.luz_estudio
               data:
                 transition: >
                   {% if now().hour >= 0 and now().hour <= 7 %} 30
@@ -3823,7 +3895,8 @@
           sequence:
             # Aviso apagando luces estudio izquierda solo
             - action: light.turn_off
-              entity_id: light.luz_estudio_izquierda
+              target:
+                entity_id: light.luz_estudio_izquierda
             - action: script.alexa_estudio_secuencia
               data:
                 sonido: 'clock_01'
