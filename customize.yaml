@@ -9,10 +9,11 @@ input_boolean.alarm_panic_button:
   icon: mdi:key-variant
 script.alarma_boton_panico:
   icon: mdi:arrow-collapse-down
-script.boton_panico_off:
-  icon: mdi:volume-off
-script.sirena_stop_alarma:
-  icon: mdi:volume-off
+# (2026-10-10) Scripts inexistentes
+# script.boton_panico_off:
+#   icon: mdi:volume-off
+# script.sirena_stop_alarma:
+#   icon: mdi:volume-off
 
 # Centro Control Homy
 sensor.version_local:

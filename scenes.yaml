@@ -34,8 +34,6 @@
       state: open
     # Luces Setup High 
     #
-    light.luz_estudio_mesa:
-      state: 'off'
     light.luz_estudio_izquierda:
       state: 'on'
       brightness: 153
@@ -121,8 +119,6 @@
   icon: mdi:monitor-shimmer
   #icon: mdi:lightbulb-night-outline
   entities:
-    light.luz_estudio_mesa:
-     state: 'off'
     light.luz_estudio_izquierda:
       state: 'on'
       brightness: 204
@@ -337,8 +333,6 @@
         - 255
         - 147
         - 0
-    light.luz_estudio_mesa:
-      state: 'off'
     light.luz_estudio_alta:
       state: 'off'
     light.luz_estudio_media:
@@ -375,8 +369,6 @@
   entities:
     switch.echo_alexa_estudio_do_not_disturb_switch:
       state: 'off'
-    light.luz_estudio_mesa:
-     state: 'off'
     light.luz_estudio_izquierda:
       state: 'on'
       brightness: 204
@@ -554,8 +546,6 @@
     # Luces Off
     light.luz_estudio_techo:
       state: 'off'
-    light.luz_estudio_mesa:
-     state: 'off'
     light.luz_estudio_webcam:
       state: 'off'
     light.luz_estudio_taller:
@@ -668,8 +658,6 @@
       state: 'off'
     light.luz_estudio_lectura:
       state: 'off'
-    light.luz_estudio_mesa:
-     state: 'off'
     light.luz_estudio_webcam:
       state: 'off'
 
@@ -731,8 +719,6 @@
       brightness: 204
       color_temp_kelvin: 6535
       color_temp: 153
-    light.luz_estudio_mesa:
-     state: 'off'
     light.luz_estudio_izquierda:
       state: 'off'
     light.luz_estudio_derecha:
@@ -761,8 +747,6 @@
   name: Estudio Full
   icon: mdi:monitor-dashboard
   entities:
-    light.luz_estudio_mesa:
-     state: 'off'
     light.luz_estudio_izquierda:
       state: 'on'
       brightness: 255
@@ -868,8 +852,6 @@
     # LUCES OFF
     light.luz_estudio_taller:
       state: 'oN'
-    light.luz_estudio_mesa:
-      state: 'on'
     light.luz_estudio_vidriera:
       state: 'on'
 #
@@ -1008,8 +990,6 @@
       state: 'off'
     light.luz_estudio_lectura:
       state: 'off'
-    light.luz_estudio_mesa:
-     state: 'off'
     light.luz_estudio_techo:
       state: 'off'
     light.luz_estudio_tv_izquierda:

@@ -71,10 +71,11 @@ helper_automations_cocina_group:
   name: Helper Automatizaciones Cocina
   entities:
     - automation.x1_alarma_humo_cocina
-    - automation.s16_sonoff_pow_lavadora_boton_switch_on
-    - automation.s17b_sonoff_pow_lavadora_led
-    - automation.s16c_sonoff_pow_lavadora_warning
-    - automation.s16d_lavadora_hora_inicio
+    # (2026-10-10) Automatizaciones de lavadora eliminadas
+    # - automation.s16_sonoff_pow_lavadora_boton_switch_on
+    # - automation.s17b_sonoff_pow_lavadora_led
+    # - automation.s16c_sonoff_pow_lavadora_warning
+    # - automation.s16d_lavadora_hora_inicio
     - automation.zha_cocina_ikea_rodret_dimmer
 
 helper_automations_entrada_group:
