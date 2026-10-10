@@ -910,6 +910,56 @@
       target:
         area_id: dormitorio_paf
 
+# REGLA: VIGILANCIA DE LA PRESENCIA (2026-10-10)
+# Avisa si un iPhone pierde el permiso de ubicación "Siempre" (iOS lo pregunta
+# periódicamente y, si se responde "Al usar la app", la presencia se congela),
+# o si un device_tracker GPS lleva más de 24 h sin actualizarse.
+- id: F13
+  alias: 'F13 Family Presence Watchdog'
+  mode: queued
+  trigger:
+    - platform: state
+      entity_id:
+        - sensor.iphone_aac_location_permission
+        - sensor.iphone_mfc_location_permission
+        - sensor.iphone_paf_location_permission
+        - sensor.iphone_aaf_location_permission
+      not_to:
+        - 'Authorized Always'
+        - 'unavailable'
+        - 'unknown'
+      for: '00:05:00'
+      id: permiso
+    - platform: time
+      at: '12:00:00'
+      id: diario
+  action:
+    - variables:
+        problemas: >-
+          {% set ns = namespace(l=[]) %}
+          {% for p in ['aac','mfc','paf','aaf'] %}
+            {% set perm = states('sensor.iphone_' ~ p ~ '_location_permission') %}
+            {% if perm not in ['Authorized Always','unavailable','unknown'] %}
+              {% set ns.l = ns.l + ['iPhone ' ~ p|upper ~ ': permiso de ubicación "' ~ perm ~ '" (debe ser Siempre)'] %}
+            {% endif %}
+            {% set t = states['device_tracker.iphone_' ~ p] %}
+            {% if t is not none and (now() - t.last_updated).total_seconds() > 86400 %}
+              {% set ns.l = ns.l + ['iPhone ' ~ p|upper ~ ': sin actualizar posición desde ' ~ t.last_updated.astimezone().strftime('%d/%m %H:%M')] %}
+            {% endif %}
+          {% endfor %}
+          {{ ns.l | join('\n') }}
+    - condition: template
+      value_template: "{{ problemas | length > 0 }}"
+    - service: persistent_notification.create
+      data:
+        notification_id: presence_watchdog
+        title: 'Presencia: revisar iPhone'
+        message: "{{ problemas }}"
+    - service: script.notifica_evento
+      data:
+        titulo: '*PRESENCIA HOMY*'
+        mensaje: "{{ problemas }}"
+
 #-----------------------------------------------------------------------------#
 #                                                                             #
 # REGLAS DE CONTROL DE ESCENAS                                                #
@@ -1112,29 +1162,54 @@
 #
 - id: L05
   alias: 'L05 Luces On Exterior Segun Sensor'
+  # v2 (2026-10-05): mismo esquema que L07.
+  # - Disparan el Aqara y el IKEA VALLHORN (ZHA, occupancy).
+  # - El apagado ya no es un delay fijo: espera a que NINGÚN sensor detecte presencia
+  #   y entonces cuenta 5 min.
+  # - Cada nuevo movimiento mientras la regla está en marcha reinicia la cuenta (mode: restart).
+  # - Se elimina la condición de luminosidad del Aqara: medía la luz del propio farol
+  #   (20-22 lx tras encenderse) y bloqueaba los re-disparos. Basta con sol bajo el horizonte.
+  # - Si la luz se encendió a mano o por otra regla (la L05 no está en marcha), no la toca.
   mode: restart
   trigger:
     - platform: state
-      entity_id: 
+      entity_id:
         - binary_sensor.aqara_movimiento_entrada_exterior
         - binary_sensor.ikea_sensor_movimiento_entrada_exterior
       to: 'on'
   condition:
-    condition: and
+    condition: or
     conditions:
-      - condition: state
-        entity_id: sun.sun
-        state: 'below_horizon'
-      - condition: state
-        entity_id: light.luz_exterior
-        state: 'off'
-      - condition: numeric_state
-        entity_id: sensor.aqara_movimiento_exterior_luminosidad
-        below: 20
+      # Caso 1: arranque normal => de noche y luz apagada
+      - condition: and
+        conditions:
+          - condition: state
+            entity_id: sun.sun
+            state: 'below_horizon'
+          - condition: state
+            entity_id: light.luz_exterior
+            state: 'off'
+      # Caso 2: la regla ya está en marcha (luz encendida por L05) => reiniciar la cuenta
+      - condition: template
+        value_template: "{{ state_attr('automation.l05_luces_on_exterior_segun_sensor', 'current') | int(0) > 0 }}"
   action:
-    - service: light.turn_on
-      entity_id: light.luz_exterior
+    # Luz Exterior ON (solo si está apagada)
+    - if:
+        - condition: state
+          entity_id: light.luz_exterior
+          state: 'off'
+      then:
+        - service: light.turn_on
+          entity_id: light.luz_exterior
+    # Espera a que ningún sensor detecte presencia (máx. 30 min por seguridad)
+    - wait_template: >
+        {{ not is_state('binary_sensor.aqara_movimiento_entrada_exterior', 'on')
+           and not is_state('binary_sensor.ikea_sensor_movimiento_entrada_exterior', 'on') }}
+      timeout: '00:30:00'
+      continue_on_timeout: true
+    # Espera de 5'
     - delay: '00:05:00'
+    # Luz Exterior OFF
     - service: light.turn_off
       entity_id: light.luz_exterior
 

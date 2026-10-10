@@ -249,13 +249,15 @@ timer:
 
 # NOTIFICACIONES
 notify:
+  # 2026-10-10: los servicios iphone_xxx (plataforma ios: legacy) ya no existen.
+  # Se apunta a los servicios notify.mobile_app_* actuales (admiten push crítico).
   - name: notifica_grupo_ios
     platform: group # notification group for IOS
     services:
-      - service: iphone_aac
-      - service: iphone_aaf
-      - service: iphone_mfc
-      - service: iphone_paf
+      - service: mobile_app_iphone_aac     # Agustín - iPhone 14 Pro
+      - service: mobile_app_iphone_paf     # Paloma  - iPhone 17
+      - service: mobile_app_a2f            # Agu     - iPhone 17
+      - service: mobile_app_iphone_malen   # Malen   - iPhone 12
 
   - name: telegram_alarm
     platform: group

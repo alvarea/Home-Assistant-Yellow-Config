@@ -1,34 +1,38 @@
   #
-  # BAYESIAN SENSORS
+  # BAYESIAN SENSORS  (revisado 2026-10-10)
   #
-  # NMAP ==> prob_given_true: 0.8 - prob_given_false: 0.2
-  #   - device_tracker.apple_94_ac_c4_iphone_aac
-  #   - device_tracker.apple_87_31_3b_iphone_mfc
-  #   - device_tracker.apple_46_ef_30_iphone_paf
-  #   - device_tracker.apple_89_98_36_iphone_aaf
-
-  # IOS APP ==> prob_given_true: 0.99 - prob_given_false: 0.10
-  #   - device_tracker.iphone_aac
-  #   - device_tracker.iphone_mfc
-  #   - device_tracker.iphone_paf
-  #   - devoce_tracker.iphone_aaf
+  # Probabilidades:
+  #   GEOFENCY ==> prob_given_true: 0.99 - prob_given_false: 0.10 (la fuente más fiable)
+  #   IOS APP  ==> prob_given_true: 0.99 - prob_given_false: 0.25 (iOS puede dejarla congelada en 'home')
+  #   NMAP     ==> prob_given_true: 0.70 - prob_given_false: 0.05 (verlo es casi seguro 'home';
+  #                no verlo pesa poco porque el iPhone duerme el WiFi)
+  #   Umbral 0.90 (prior 0.60). Con app+geofency en casa: p=0.98; con NMAP sin ver: 0.95.
+  #
+  # Trackers por persona (los mismos que person.*):
+  #   AAC: iphone_aac + geofency_aac + NMAP apple_3b_84_da_iphone_aac (iPhone 14 Pro, .91)
+  #   MFC: iphone_mfc + geofency_mfc + NMAP apple_c8_49_a6_iphone_mfc (iPhone 12, .94)
+  #   PAF: iphone_paf + geofency_paf  -> PENDIENTE NMAP iPhone 17 (d4:ce:40:42:85:65, .92)
+  #   AAF: iphone_aaf                         -> PENDIENTE NMAP del iPhone 17 y Geofency
+  #
+  # Obsoletos (ya no usar): apple_87_31_3b_iphone_mfc, apple_89_98_36_iphone_aaf,
+  #   apple_46_ef_30_iphone_paf, apple_94_ac_c4_iphone_aac, geofency_mfc_old, geofency_paf_old, geofency_aaf_old
 
   - platform: 'bayesian'
     prior: 0.60
     name: 'baye_home_mfc'
-    probability_threshold: 0.95
+    probability_threshold: 0.90
     observations:
-      - entity_id: 'device_tracker.apple_87_31_3b_iphone_mfc' # NMAP
-        prob_given_true: 0.8
-        prob_given_false: 0.2
+      - entity_id: 'device_tracker.apple_c8_49_a6_iphone_mfc' # NMAP iPhone 12 (f8:4d:89:c8:49:a6, .94)
+        prob_given_true: 0.7
+        prob_given_false: 0.05
         platform: 'state'
         to_state: 'home'
       - entity_id: 'device_tracker.iphone_mfc'  # IOS APP
         prob_given_true: 0.99
-        prob_given_false: 0.1
+        prob_given_false: 0.25
         platform: 'state'
         to_state: 'home'
-      - entity_id: 'device_tracker.geofency_mfc' # GeofencyMFC
+      - entity_id: 'device_tracker.geofency_mfc' # Geofency MFC
         prob_given_true: 0.99
         prob_given_false: 0.1
         platform: 'state'
@@ -37,16 +41,16 @@
   - platform: 'bayesian'
     prior: 0.60
     name: 'baye_home_aac'
-    probability_threshold: 0.95
+    probability_threshold: 0.90
     observations:
-      - entity_id: 'device_tracker.apple_94_ac_c4_iphone_aac' # NMAP
-        prob_given_true: 0.8
-        prob_given_false: 0.2
+      - entity_id: 'device_tracker.apple_3b_84_da_iphone_aac' # NMAP iPhone 14 Pro (e4:9c:67:3b:84:da, .91)
+        prob_given_true: 0.7
+        prob_given_false: 0.05
         platform: 'state'
         to_state: 'home'
       - entity_id: 'device_tracker.iphone_aac'  # IOS APP
         prob_given_true: 0.99
-        prob_given_false: 0.1
+        prob_given_false: 0.25
         platform: 'state'
         to_state: 'home'
       - entity_id: 'device_tracker.geofency_aac' # Geofency AAC
@@ -58,16 +62,17 @@
   - platform: 'bayesian'
     prior: 0.60
     name: 'baye_home_paf'
-    probability_threshold: 0.95  # temporalmente estuvo a 0.98
+    probability_threshold: 0.90
     observations:
-      - entity_id: 'device_tracker.apple_c8_49_a6_iphone_paf' # NMAP
-        prob_given_true: 0.8
-        prob_given_false: 0.2
-        platform: 'state'
-        to_state: 'home'
+      # PENDIENTE: NMAP del iPhone 17 de Paloma (MAC por registrar)
+      #- entity_id: 'device_tracker.<nmap_iphone17_paf>' # NMAP d4:ce:40:42:85:65 (.92)
+      #  prob_given_true: 0.7
+      #  prob_given_false: 0.05
+      #  platform: 'state'
+      #  to_state: 'home'
       - entity_id: 'device_tracker.iphone_paf'  # IOS APP
         prob_given_true: 0.99
-        prob_given_false: 0.1
+        prob_given_false: 0.25
         platform: 'state'
         to_state: 'home'
       - entity_id: 'device_tracker.geofency_paf' # Geofency PAF
@@ -79,23 +84,26 @@
   - platform: 'bayesian'
     prior: 0.60
     name: 'baye_home_aaf'
-    probability_threshold: 0.95  # temporalmente estuvo a 0.98
+    # Temporal 0.80: solo tiene la app (p=0.86 en casa). Volver a 0.90 al añadir NMAP/Geofency.
+    probability_threshold: 0.80
     observations:
-      - entity_id: 'device_tracker.apple_89_98_36_iphone_aaf' # NMAP
-        prob_given_true: 0.8
-        prob_given_false: 0.2
-        platform: 'state'
-        to_state: 'home'
+      # PENDIENTE: NMAP del iPhone 17 de Agu (MAC por registrar)
+      #- entity_id: 'device_tracker.<nmap_iphone17_aaf>' # NMAP
+      #  prob_given_true: 0.7
+      #  prob_given_false: 0.05
+      #  platform: 'state'
+      #  to_state: 'home'
       - entity_id: 'device_tracker.iphone_aaf'  # IOS APP
         prob_given_true: 0.99
-        prob_given_false: 0.1
+        prob_given_false: 0.25
         platform: 'state'
         to_state: 'home'
-      - entity_id: 'device_tracker.geofency_aaf' # Geofency PAF
-        prob_given_true: 0.99
-        prob_given_false: 0.1
-        platform: 'state'
-        to_state: 'home'
+      # PENDIENTE: Geofency de Agu (no configurado en su iPhone 17)
+      #- entity_id: 'device_tracker.geofency_aaf' # Geofency AAF
+      #  prob_given_true: 0.99
+      #  prob_given_false: 0.1
+      #  platform: 'state'
+      #  to_state: 'home'
 
 
   #

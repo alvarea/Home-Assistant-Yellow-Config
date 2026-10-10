@@ -62,10 +62,9 @@ alarma_boton_panico:
     # Notifica Telegram
     - service: script.notifica_alarma
       data:
-        variables:
-          titulo: '*ATENCION ALARMA*'
-          mensaje: >
-            >>> URGENTE: BOTON PANICO ACTIVADO
+        titulo: '*ATENCION ALARMA*'
+        mensaje: >
+          >>> URGENTE: BOTON PANICO ACTIVADO
 
 
 alarma_boton_panico_off:
@@ -200,7 +199,11 @@ alexa_dormitorio_set_volumen_alarma:
     - service: input_number.set_value
       data_template:
         entity_id: input_number.alexa_dormitorio_volumen_anterior
-        value: "{{ states.media_player.echo_alexa_dormitorio.attributes.volume_level|float }}"
+        # 2026-10-10: Alexa Media no publica volume_level cuando el Echo está idle.
+        # Si falta, se conserva el último volumen guardado (evita que falle el script).
+        value: >
+          {{ state_attr('media_player.echo_alexa_dormitorio', 'volume_level')
+             | float(states('input_number.alexa_dormitorio_volumen_anterior') | float(0.4)) }}
     # Almacena y Ajusta el Volumen Alexa Dormitorio según tipo mensaje-hora
     - service: input_number.set_value
       data_template:
@@ -235,7 +238,11 @@ alexa_entrada_set_volumen_alarma:
     - service: input_number.set_value
       data_template:
         entity_id: input_number.alexa_entrada_volumen_anterior
-        value: "{{ states.media_player.echo_alexa_entrada.attributes.volume_level|float }}"
+        # 2026-10-10: Alexa Media no publica volume_level cuando el Echo está idle.
+        # Si falta, se conserva el último volumen guardado (evita que falle el script).
+        value: >
+          {{ state_attr('media_player.echo_alexa_entrada', 'volume_level')
+             | float(states('input_number.alexa_entrada_volumen_anterior') | float(0.31)) }}
     # Almacena y Ajusta el Volumen Alexa entrada según tipo mensaje-hora
     - service: input_number.set_value
       data_template:
@@ -795,6 +802,7 @@ notifica_alarma:
 
   # Notificación Telegram
   - service: notify.telegram_alarm
+    continue_on_error: true
     data_template:
       title: >
         {{ states('input_text.mensaje_tit') }}
@@ -802,13 +810,27 @@ notifica_alarma:
         {{ states('input_text.mensaje_msg') }}
         {{ states('input_text.alarm_trigger') }}
 
-    # Notificación IOS
+  # Notificación IOS CRÍTICA (2026-10-10)
+  # Alerta crítica: suena aunque el iPhone esté en silencio o en Concentración.
+  # Requiere que cada usuario active "Alertas críticas" en
+  # Ajustes > Notificaciones > Home Assistant del iPhone.
+  # Se quitan los '*' (formato Markdown de Telegram) para iOS.
   - service: notify.notifica_grupo_ios
-    data_template:
+    continue_on_error: true
+    data:
       title: >
-        {{ states('input_text.mensaje_tit') }}
+        {{ states('input_text.mensaje_tit') | replace('*', '') }}
       message: >
-        {{ states('input_text.mensaje_msg') }}
+        {{ states('input_text.mensaje_msg') | replace('>>> ', '') }}
+        {{ states('input_text.alarm_trigger') }}
+      data:
+        tag: alarma_homy
+        push:
+          interruption-level: critical
+          sound:
+            name: default
+            critical: 1
+            volume: 1.0
 
   # Notificación Persistente App HOMY
   - service: persistent_notification.create
@@ -838,7 +860,7 @@ notifica_evento:
       value: "{{ mensaje }}"
 
   # Notificación Telegram
-  - service: notify.telegram_notify
+  - service: notify.telegram_notif
     data_template:
       title: >
         {{ states('input_text.mensaje_tit') }}
