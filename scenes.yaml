@@ -747,9 +747,6 @@
   name: Estudio Full
   icon: mdi:monitor-dashboard
   entities:
-    light.luz_estudio_izquierda:
-      state: 'on'
-      brightness: 255
     light.luz_estudio_nate:
       state: 'on'
       brightness: 255
@@ -765,10 +762,6 @@
       brightness: 255
       color_temp_kelvin: 4000
       color_temp: 250
-    light.luz_estudio_led_mesa:
-      state: 'on'
-      brightness: 255
-      rgb_color: 255, 147, 0
     light.luz_estudio_play_i:
       state: 'on'
       brightness: 255
@@ -820,9 +813,6 @@
     light.luz_estudio_tv_izquierda:
       state: 'on'
       brightness: 255
-    light.luz_estudio_tv_derecha:
-      state: 'on'
-      brightness: 255
     light.led_estudio_tv:
       state: 'on'
       brightness: 255
@@ -849,9 +839,8 @@
       state: 'on'
     light.luz_estudio_neon_bar:
       state: 'on'
-    # LUCES OFF
     light.luz_estudio_taller:
-      state: 'oN'
+      state: 'on'
     light.luz_estudio_vidriera:
       state: 'on'
 #
