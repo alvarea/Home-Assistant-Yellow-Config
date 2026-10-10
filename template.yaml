@@ -1591,17 +1591,20 @@
       state: "{{ ((states.binary_sensor.baye_home_aac.attributes.probability)|float *100)|round(2) }}"
       icon: "{{ 'mdi:transit-transfer' if states('binary_sensor.baye_home_aac') is not none }}"
       unit_of_measurement: '%'
+      state_class: measurement
 
     # name: 'Probabilidad Malen'
     - name: 'baye probability mfc'
       state: "{{ ((states.binary_sensor.baye_home_mfc.attributes.probability)|float *100)|round(2) }}"
       unit_of_measurement: '%'
+      state_class: measurement
       icon: "{{ 'mdi:transit-transfer' if states('binary_sensor.baye_home_mfc') is not none }}"
     
     # name: 'Probabilidad Paloma'
     - name: 'baye probability paf'
       state: "{{ ((states.binary_sensor.baye_home_paf.attributes.probability)|float *100)|round(2) }}"  
       unit_of_measurement: '%'
+      state_class: measurement
       icon: "{{ 'mdi:transit-transfer' if states('binary_sensor.baye_home_paf') is not none }}"
 
     # name: 'Probabilidad Agu'
@@ -1609,6 +1612,7 @@
       state: "{{ ((states.binary_sensor.baye_home_aaf.attributes.probability)|float *100)|round(2) }}"
       icon: "{{ 'mdi:transit-transfer' if states('binary_sensor.baye_home_aaf') is not none }}"
       unit_of_measurement: '%'
+      state_class: measurement
 
 
     # Sensor para mostrar Movimientos Xiaomi Magicube:
