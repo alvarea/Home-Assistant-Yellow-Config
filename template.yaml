@@ -12,317 +12,322 @@
 
   - binary_sensor:
 
-    # ------------------------------------------------------------
-    # CONTROL ALARMA
-    # ------------------------------------------------------------
-    - name: alarma_estado_general
-      unique_id: alarma_estado_general
-      state: >-
-        {%  if is_state('alarm_control_panel.ha','disarmed')
-            and is_state('alarm_control_panel.blink_casa','disarmed')
-        %}
-          false
-        {% else %}
-          true
-        {% endif %}
-      icon: >-
-        {% if is_state('binary_sensor.alarma_estado_armado','on') %} mdi:alarm-light
-        {% else %} mdi:alarm-light-off
-        {% endif %}
-
-    - name: alarma_check_listo_para_armar
-      unique_id: alarma_check_listo_para_armar
-      state: >-
-        {%  if is_state('binary_sensor.alarma_sensores_perimetro_principal','off')
-            and is_state('binary_sensor.aqara_humo_cocina','off')
-        %}
-          true
-        {% else %}
-          false
-        {% endif %}
-      icon: >-
-        {% if is_state('binary_sensor.alarma_check_listo_para_armar','on') %} mdi:alarm-light
-        {% else %} mdi:alarm-light-off
-        {% endif %}
-
-    # ------------------------------------------------------------
-    # SENSORES PRESENCIA INTERIOR (ALARMA)
-    # ------------------------------------------------------------
-    - name: alarma_sensor_movimiento_salon
-      unique_id: alarma_sensor_movimiento_salon
-      state: >-
-        {%  if is_state('input_boolean.control_alarma_sensor_presencia_salon','on')
-            and is_state('binary_sensor.aqara_movimiento_salon','on')
-        %}
-          true
-        {% else %}
-          false
-        {% endif %}
-      icon: >-
-        {% if is_state('binary_sensor.alarma_sensor_movimiento_salon','on') %} mdi:motion-sensor
-        {% else %} mdi:motion-sensor-off
-        {% endif %}
-
-    - name: alarma_sensor_movimiento_estudio
-      unique_id: alarma_sensor_movimiento_estudio
-      state: >-
-        {%  if is_state('input_boolean.control_alarma_sensor_presencia_estudio','on')
-            and is_state('binary_sensor.aqara_movimiento_estudio','on')
-        %}
-          true
-        {% else %}
-          false
-        {% endif %}
-      icon: >-
-        {% if is_state('binary_sensor.alarma_sensor_movimiento_estudio','on') %} mdi:motion-sensor
-        {% else %} mdi:motion-sensor-off
-        {% endif %}
-
-    - name: alarma_sensor_movimiento_entrada_hall
-      unique_id: alarma_sensor_movimiento_entrada_hall
-      state: >-
-        {%  if is_state('input_boolean.control_alarma_sensor_presencia_entrada_hall','on')
-            and is_state('binary_sensor.aqara_movimiento_entrada','on')
-        %}
-          true
-        {% else %}
-          false
-        {% endif %}
-      icon: >-
-        {% if is_state('binary_sensor.alarma_sensor_movimiento_entrada_hall','on') %} mdi:motion-sensor
-        {% else %} mdi:motion-sensor-off
-        {% endif %}
-
-    - name: alarma_sensor_movimiento_entrada_pasillo
-      unique_id: alarma_sensor_movimiento_entrada_pasillo
-      state: >-
-        {%  if is_state('input_boolean.control_alarma_sensor_presencia_entrada_pasillo','on')
-            and is_state('binary_sensor.ikea_movimiento_entrada','on')
-        %}
-          true
-        {% else %}
-          false
-        {% endif %}
-      icon: >-
-        {% if is_state('binary_sensor.alarma_sensor_movimiento_entrada_pasillo','on') %} mdi:motion-sensor
-        {% else %} mdi:motion-sensor-off
-        {% endif %}
-
-    - name: alarma_sensor_movimiento_dormitorio_principal
-      unique_id: alarma_sensor_movimiento_dormitorio_principal
-      state: >-
-        {%  if is_state('input_boolean.control_alarma_sensor_presencia_dormitorio_principal','on')
-            and is_state('binary_sensor.aqara_movimiento_principal','on')
-        %}
-          true
-        {% else %}
-          false
-        {% endif %}
-      icon: >-
-        {% if is_state('binary_sensor.alarma_sensor_movimiento_dormitorio_principal','on') %} mdi:motion-sensor
-        {% else %} mdi:motion-sensor-off
-        {% endif %}
-
-    - name: alarma_sensor_movimiento_pasillo
-      unique_id: alarma_sensor_movimiento_pasillo
-      state: >-
-        {%  if is_state('input_boolean.control_alarma_sensor_presencia_pasillo','on')
-            and is_state('binary_sensor.hue_movimiento_pasillo_presencia','on')
-        %}
-          true
-        {% else %}
-          false
-        {% endif %}
-      icon: >-
-        {% if is_state('binary_sensor.alarma_sensor_movimiento_pasillo','on') %} mdi:motion-sensor
-        {% else %} mdi:motion-sensor-off
-        {% endif %}
-
-    - name: alarma_sensor_movimiento_cocina
-      unique_id: alarma_sensor_movimiento_cocina
-      state: >-
-        {%  if is_state('input_boolean.control_alarma_sensor_presencia_cocina','on')
-            and is_state('binary_sensor.ikea_sensor_movimiento_cocina','on')
-        %}
-          true
-        {% else %}
-          false
-        {% endif %}
-      icon: >-
-        {% if is_state('binary_sensor.alarma_sensor_movimiento_cocina','on') %} mdi:motion-sensor
-        {% else %} mdi:motion-sensor-off
-        {% endif %}
-
-    # ------------------------------------------------------------
-    # SENSORES MOVIMIENTO BLINK (ALARMA)
-    # ------------------------------------------------------------
-    - name: alarma_sensor_movimiento_blink_hall
-      unique_id: alarma_sensor_movimiento_blink_hall
-      state: >-
-        {%  if is_state('binary_sensor.blink_hall_camera_armed','on')
-            and is_state('binary_sensor.blink_hall_motion_detected','on')
-        %}
-          true
-        {% else %}
-          false
-        {% endif %}
-      icon: >-
-        {% if is_state('binary_sensor.alarma_sensor_movimiento_blink_hall','on') %} mdi:motion-sensor
-        {% else %} mdi:motion-sensor-off
-        {% endif %}
-
-    - name: alarma_sensor_movimiento_blink_estudio
-      unique_id: alarma_sensor_movimiento_blink_estudio
-      state: >-
-        {%  if is_state('binary_sensor.blink_estudio_camera_armed','on')
-            and is_state('binary_sensor.blink_estudio_motion_detected','on')
-        %}
-          true
-        {% else %}
-          false
-        {% endif %}
-      icon: >-
-        {% if is_state('binary_sensor.alarma_sensor_movimiento_blink_estudio','on') %} mdi:motion-sensor
-        {% else %} mdi:motion-sensor-off
-        {% endif %}
-
-    - name: alarma_sensor_movimiento_blink_cocina
-      unique_id: alarma_sensor_movimiento_blink_cocina
-      state: >-
-        {%  if is_state('binary_sensor.blink_cocina_camera_armed','on')
-            and is_state('binary_sensor.blink_cocina_motion_detected','on')
-        %}
-          true
-        {% else %}
-          false
-        {% endif %}
-      icon: >-
-        {% if is_state('binary_sensor.alarma_sensor_movimiento_blink_cocina','on') %} mdi:motion-sensor
-        {% else %} mdi:motion-sensor-off
-        {% endif %}
-
-    - name: alarma_sensor_movimiento_blink_salon
-      unique_id: alarma_sensor_movimiento_blink_salon
-      state: >-
-        {%  if is_state('binary_sensor.blink_salon_camera_armed','on')
-            and is_state('binary_sensor.blink_salon_motion_detected','on')
-        %}
-          true
-        {% else %}
-          false
-        {% endif %}
-      icon: >-
-        {% if is_state('binary_sensor.alarma_sensor_movimiento_blink_salon','on') %} mdi:motion-sensor
-        {% else %} mdi:motion-sensor-off
-        {% endif %}
-
-    - name: alarma_sensor_movimiento_blink_cancela_left
-      unique_id: alarma_sensor_movimiento_blink_cancela_left
-      state: >-
-        {%  if is_state('binary_sensor.blink_cancela_left_camera_armed','on')
-            and is_state('binary_sensor.blink_cancela_left_motion_detected','on')
-        %}
-          true
-        {% else %}
-          false
-        {% endif %}
-      icon: >-
-        {% if is_state('binary_sensor.alarma_sensor_movimiento_blink_cancela_left','on') %} mdi:motion-sensor
-        {% else %} mdi:motion-sensor-off
-        {% endif %}
-
-    - name: alarma_sensor_movimiento_blink_cancela_right
-      unique_id: alarma_sensor_movimiento_blink_cancela_right
-      state: >-
-        {%  if is_state('binary_sensor.blink_cancela_right_camera_armed','on')
-            and is_state('binary_sensor.blink_cancela_right_motion_detected','on')
-        %}
-          true
-        {% else %}
-          false
-        {% endif %}
-      icon: >-
-        {% if is_state('binary_sensor.alarma_sensor_movimiento_blink_cancela_right','on') %} mdi:motion-sensor
-        {% else %} mdi:motion-sensor-off
-        {% endif %}
-
-    - name: alarma_sensor_movimiento_blink_puerta_principal
-      unique_id: alarma_sensor_movimiento_blink_puerta_principal
-      state: >-
-        {%  if is_state('binary_sensor.blink_puerta_principal_camera_armed','on')
-            and is_state('binary_sensor.blink_puerta_principal_motion_detected','on')
-        %}
-          true
-        {% else %}
-          false
-        {% endif %}
-      icon: >-
-        {% if is_state('binary_sensor.alarma_sensor_movimiento_blink_puerta_principal','on') %} mdi:motion-sensor
-        {% else %} mdi:motion-sensor-off
-        {% endif %}
-
-    - name: alarma_sensor_movimiento_blink_piscina
-      unique_id: alarma_sensor_movimiento_blink_piscina
-      state: >-
-        {%  if is_state('binary_sensor.blink_piscina_camera_armed','on')
-            and is_state('binary_sensor.blink_piscina_motion_detected','on')
-        %}
-          true
-        {% else %}
-          false
-        {% endif %}
-      icon: >-
-        {% if is_state('binary_sensor.alarma_sensor_movimiento_blink_piscina','on') %} mdi:motion-sensor
-        {% else %} mdi:motion-sensor-off
-        {% endif %}
-
-    - name: alarma_sensor_movimiento_blink_porche
-      unique_id: alarma_sensor_movimiento_blink_porche
-      state: >-
-        {%  if is_state('binary_sensor.blink_porche_camera_armed','on')
-            and is_state('binary_sensor.blink_porche_motion_detected','on')
-        %}
-          true
-        {% else %}
-          false
-        {% endif %}
-      icon: >-
-        {% if is_state('binary_sensor.alarma_sensor_movimiento_blink_porche','on') %} mdi:motion-sensor
-        {% else %} mdi:motion-sensor-off
-        {% endif %}
-
-    # ------------------------------------------------------------
-    # SENSORES PRESENCIA EXTERIOR (ALARMA)
-    # ------------------------------------------------------------
-    - name: alarma_sensor_movimiento_entrada_exterior
-      unique_id: alarma_sensor_movimiento_entrada_exterior
-      state: >-
-        {%  if is_state('input_boolean.control_alarma_sensor_presencia_entrada_exterior','on')
-            and is_state('binary_sensor.aqara_movimiento_entrada_exterior','on')
-        %}
-          true
-        {% else %}
-          false
-        {% endif %}
-      icon: >-
-        {% if is_state('binary_sensor.alarma_sensor_movimiento_entrada_exterior','on') %} mdi:motion-sensor
-        {% else %} mdi:motion-sensor-off
-        {% endif %}
-
-    - name: alarma_sensor_movimiento_ikea_cancela
-      unique_id: alarma_sensor_movimiento_ikea_cancela
-      state: >-
-        {%  if is_state('input_boolean.control_alarma_sensor_presencia_ikea_cancela','on')
-            and is_state('binary_sensor.ikea_sensor_movimiento_entrada_exterior','on')
-        %}
-          true
-        {% else %}
-          false
-        {% endif %}
-      icon: >-
-        {% if is_state('binary_sensor.ikea_sensor_movimiento_entrada_exterior','on') %} mdi:motion-sensor
-        {% else %} mdi:motion-sensor-off
-        {% endif %}
+    # ============================================================
+    # ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+    # Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+    # Para recuperar: descomentar este bloque y recargar/reiniciar.
+    # ============================================================
+#    # ------------------------------------------------------------
+#    # CONTROL ALARMA
+#    # ------------------------------------------------------------
+#    - name: alarma_estado_general
+#      unique_id: alarma_estado_general
+#      state: >-
+#        {%  if is_state('alarm_control_panel.ha','disarmed')
+#            and is_state('alarm_control_panel.blink_casa','disarmed')
+#        %}
+#          false
+#        {% else %}
+#          true
+#        {% endif %}
+#      icon: >-
+#        {% if is_state('binary_sensor.alarma_estado_armado','on') %} mdi:alarm-light
+#        {% else %} mdi:alarm-light-off
+#        {% endif %}
+#
+#    - name: alarma_check_listo_para_armar
+#      unique_id: alarma_check_listo_para_armar
+#      state: >-
+#        {%  if is_state('binary_sensor.alarma_sensores_perimetro_principal','off')
+#            and is_state('binary_sensor.aqara_humo_cocina','off')
+#        %}
+#          true
+#        {% else %}
+#          false
+#        {% endif %}
+#      icon: >-
+#        {% if is_state('binary_sensor.alarma_check_listo_para_armar','on') %} mdi:alarm-light
+#        {% else %} mdi:alarm-light-off
+#        {% endif %}
+#
+#    # ------------------------------------------------------------
+#    # SENSORES PRESENCIA INTERIOR (ALARMA)
+#    # ------------------------------------------------------------
+#    - name: alarma_sensor_movimiento_salon
+#      unique_id: alarma_sensor_movimiento_salon
+#      state: >-
+#        {%  if is_state('input_boolean.control_alarma_sensor_presencia_salon','on')
+#            and is_state('binary_sensor.aqara_movimiento_salon','on')
+#        %}
+#          true
+#        {% else %}
+#          false
+#        {% endif %}
+#      icon: >-
+#        {% if is_state('binary_sensor.alarma_sensor_movimiento_salon','on') %} mdi:motion-sensor
+#        {% else %} mdi:motion-sensor-off
+#        {% endif %}
+#
+#    - name: alarma_sensor_movimiento_estudio
+#      unique_id: alarma_sensor_movimiento_estudio
+#      state: >-
+#        {%  if is_state('input_boolean.control_alarma_sensor_presencia_estudio','on')
+#            and is_state('binary_sensor.aqara_movimiento_estudio','on')
+#        %}
+#          true
+#        {% else %}
+#          false
+#        {% endif %}
+#      icon: >-
+#        {% if is_state('binary_sensor.alarma_sensor_movimiento_estudio','on') %} mdi:motion-sensor
+#        {% else %} mdi:motion-sensor-off
+#        {% endif %}
+#
+#    - name: alarma_sensor_movimiento_entrada_hall
+#      unique_id: alarma_sensor_movimiento_entrada_hall
+#      state: >-
+#        {%  if is_state('input_boolean.control_alarma_sensor_presencia_entrada_hall','on')
+#            and is_state('binary_sensor.aqara_movimiento_entrada','on')
+#        %}
+#          true
+#        {% else %}
+#          false
+#        {% endif %}
+#      icon: >-
+#        {% if is_state('binary_sensor.alarma_sensor_movimiento_entrada_hall','on') %} mdi:motion-sensor
+#        {% else %} mdi:motion-sensor-off
+#        {% endif %}
+#
+#    - name: alarma_sensor_movimiento_entrada_pasillo
+#      unique_id: alarma_sensor_movimiento_entrada_pasillo
+#      state: >-
+#        {%  if is_state('input_boolean.control_alarma_sensor_presencia_entrada_pasillo','on')
+#            and is_state('binary_sensor.ikea_movimiento_entrada','on')
+#        %}
+#          true
+#        {% else %}
+#          false
+#        {% endif %}
+#      icon: >-
+#        {% if is_state('binary_sensor.alarma_sensor_movimiento_entrada_pasillo','on') %} mdi:motion-sensor
+#        {% else %} mdi:motion-sensor-off
+#        {% endif %}
+#
+#    - name: alarma_sensor_movimiento_dormitorio_principal
+#      unique_id: alarma_sensor_movimiento_dormitorio_principal
+#      state: >-
+#        {%  if is_state('input_boolean.control_alarma_sensor_presencia_dormitorio_principal','on')
+#            and is_state('binary_sensor.aqara_movimiento_principal','on')
+#        %}
+#          true
+#        {% else %}
+#          false
+#        {% endif %}
+#      icon: >-
+#        {% if is_state('binary_sensor.alarma_sensor_movimiento_dormitorio_principal','on') %} mdi:motion-sensor
+#        {% else %} mdi:motion-sensor-off
+#        {% endif %}
+#
+#    - name: alarma_sensor_movimiento_pasillo
+#      unique_id: alarma_sensor_movimiento_pasillo
+#      state: >-
+#        {%  if is_state('input_boolean.control_alarma_sensor_presencia_pasillo','on')
+#            and is_state('binary_sensor.hue_movimiento_pasillo_presencia','on')
+#        %}
+#          true
+#        {% else %}
+#          false
+#        {% endif %}
+#      icon: >-
+#        {% if is_state('binary_sensor.alarma_sensor_movimiento_pasillo','on') %} mdi:motion-sensor
+#        {% else %} mdi:motion-sensor-off
+#        {% endif %}
+#
+#    - name: alarma_sensor_movimiento_cocina
+#      unique_id: alarma_sensor_movimiento_cocina
+#      state: >-
+#        {%  if is_state('input_boolean.control_alarma_sensor_presencia_cocina','on')
+#            and is_state('binary_sensor.ikea_sensor_movimiento_cocina','on')
+#        %}
+#          true
+#        {% else %}
+#          false
+#        {% endif %}
+#      icon: >-
+#        {% if is_state('binary_sensor.alarma_sensor_movimiento_cocina','on') %} mdi:motion-sensor
+#        {% else %} mdi:motion-sensor-off
+#        {% endif %}
+#
+#    # ------------------------------------------------------------
+#    # SENSORES MOVIMIENTO BLINK (ALARMA)
+#    # ------------------------------------------------------------
+#    - name: alarma_sensor_movimiento_blink_hall
+#      unique_id: alarma_sensor_movimiento_blink_hall
+#      state: >-
+#        {%  if is_state('binary_sensor.blink_hall_camera_armed','on')
+#            and is_state('binary_sensor.blink_hall_motion_detected','on')
+#        %}
+#          true
+#        {% else %}
+#          false
+#        {% endif %}
+#      icon: >-
+#        {% if is_state('binary_sensor.alarma_sensor_movimiento_blink_hall','on') %} mdi:motion-sensor
+#        {% else %} mdi:motion-sensor-off
+#        {% endif %}
+#
+#    - name: alarma_sensor_movimiento_blink_estudio
+#      unique_id: alarma_sensor_movimiento_blink_estudio
+#      state: >-
+#        {%  if is_state('binary_sensor.blink_estudio_camera_armed','on')
+#            and is_state('binary_sensor.blink_estudio_motion_detected','on')
+#        %}
+#          true
+#        {% else %}
+#          false
+#        {% endif %}
+#      icon: >-
+#        {% if is_state('binary_sensor.alarma_sensor_movimiento_blink_estudio','on') %} mdi:motion-sensor
+#        {% else %} mdi:motion-sensor-off
+#        {% endif %}
+#
+#    - name: alarma_sensor_movimiento_blink_cocina
+#      unique_id: alarma_sensor_movimiento_blink_cocina
+#      state: >-
+#        {%  if is_state('binary_sensor.blink_cocina_camera_armed','on')
+#            and is_state('binary_sensor.blink_cocina_motion_detected','on')
+#        %}
+#          true
+#        {% else %}
+#          false
+#        {% endif %}
+#      icon: >-
+#        {% if is_state('binary_sensor.alarma_sensor_movimiento_blink_cocina','on') %} mdi:motion-sensor
+#        {% else %} mdi:motion-sensor-off
+#        {% endif %}
+#
+#    - name: alarma_sensor_movimiento_blink_salon
+#      unique_id: alarma_sensor_movimiento_blink_salon
+#      state: >-
+#        {%  if is_state('binary_sensor.blink_salon_camera_armed','on')
+#            and is_state('binary_sensor.blink_salon_motion_detected','on')
+#        %}
+#          true
+#        {% else %}
+#          false
+#        {% endif %}
+#      icon: >-
+#        {% if is_state('binary_sensor.alarma_sensor_movimiento_blink_salon','on') %} mdi:motion-sensor
+#        {% else %} mdi:motion-sensor-off
+#        {% endif %}
+#
+#    - name: alarma_sensor_movimiento_blink_cancela_left
+#      unique_id: alarma_sensor_movimiento_blink_cancela_left
+#      state: >-
+#        {%  if is_state('binary_sensor.blink_cancela_left_camera_armed','on')
+#            and is_state('binary_sensor.blink_cancela_left_motion_detected','on')
+#        %}
+#          true
+#        {% else %}
+#          false
+#        {% endif %}
+#      icon: >-
+#        {% if is_state('binary_sensor.alarma_sensor_movimiento_blink_cancela_left','on') %} mdi:motion-sensor
+#        {% else %} mdi:motion-sensor-off
+#        {% endif %}
+#
+#    - name: alarma_sensor_movimiento_blink_cancela_right
+#      unique_id: alarma_sensor_movimiento_blink_cancela_right
+#      state: >-
+#        {%  if is_state('binary_sensor.blink_cancela_right_camera_armed','on')
+#            and is_state('binary_sensor.blink_cancela_right_motion_detected','on')
+#        %}
+#          true
+#        {% else %}
+#          false
+#        {% endif %}
+#      icon: >-
+#        {% if is_state('binary_sensor.alarma_sensor_movimiento_blink_cancela_right','on') %} mdi:motion-sensor
+#        {% else %} mdi:motion-sensor-off
+#        {% endif %}
+#
+#    - name: alarma_sensor_movimiento_blink_puerta_principal
+#      unique_id: alarma_sensor_movimiento_blink_puerta_principal
+#      state: >-
+#        {%  if is_state('binary_sensor.blink_puerta_principal_camera_armed','on')
+#            and is_state('binary_sensor.blink_puerta_principal_motion_detected','on')
+#        %}
+#          true
+#        {% else %}
+#          false
+#        {% endif %}
+#      icon: >-
+#        {% if is_state('binary_sensor.alarma_sensor_movimiento_blink_puerta_principal','on') %} mdi:motion-sensor
+#        {% else %} mdi:motion-sensor-off
+#        {% endif %}
+#
+#    - name: alarma_sensor_movimiento_blink_piscina
+#      unique_id: alarma_sensor_movimiento_blink_piscina
+#      state: >-
+#        {%  if is_state('binary_sensor.blink_piscina_camera_armed','on')
+#            and is_state('binary_sensor.blink_piscina_motion_detected','on')
+#        %}
+#          true
+#        {% else %}
+#          false
+#        {% endif %}
+#      icon: >-
+#        {% if is_state('binary_sensor.alarma_sensor_movimiento_blink_piscina','on') %} mdi:motion-sensor
+#        {% else %} mdi:motion-sensor-off
+#        {% endif %}
+#
+#    - name: alarma_sensor_movimiento_blink_porche
+#      unique_id: alarma_sensor_movimiento_blink_porche
+#      state: >-
+#        {%  if is_state('binary_sensor.blink_porche_camera_armed','on')
+#            and is_state('binary_sensor.blink_porche_motion_detected','on')
+#        %}
+#          true
+#        {% else %}
+#          false
+#        {% endif %}
+#      icon: >-
+#        {% if is_state('binary_sensor.alarma_sensor_movimiento_blink_porche','on') %} mdi:motion-sensor
+#        {% else %} mdi:motion-sensor-off
+#        {% endif %}
+#
+#    # ------------------------------------------------------------
+#    # SENSORES PRESENCIA EXTERIOR (ALARMA)
+#    # ------------------------------------------------------------
+#    - name: alarma_sensor_movimiento_entrada_exterior
+#      unique_id: alarma_sensor_movimiento_entrada_exterior
+#      state: >-
+#        {%  if is_state('input_boolean.control_alarma_sensor_presencia_entrada_exterior','on')
+#            and is_state('binary_sensor.aqara_movimiento_entrada_exterior','on')
+#        %}
+#          true
+#        {% else %}
+#          false
+#        {% endif %}
+#      icon: >-
+#        {% if is_state('binary_sensor.alarma_sensor_movimiento_entrada_exterior','on') %} mdi:motion-sensor
+#        {% else %} mdi:motion-sensor-off
+#        {% endif %}
+#
+#    - name: alarma_sensor_movimiento_ikea_cancela
+#      unique_id: alarma_sensor_movimiento_ikea_cancela
+#      state: >-
+#        {%  if is_state('input_boolean.control_alarma_sensor_presencia_ikea_cancela','on')
+#            and is_state('binary_sensor.ikea_sensor_movimiento_entrada_exterior','on')
+#        %}
+#          true
+#        {% else %}
+#          false
+#        {% endif %}
+#      icon: >-
+#        {% if is_state('binary_sensor.ikea_sensor_movimiento_entrada_exterior','on') %} mdi:motion-sensor
+#        {% else %} mdi:motion-sensor-off
+#        {% endif %}
 
     # ------------------------------------------------------------
     # SONOFF POW SW2

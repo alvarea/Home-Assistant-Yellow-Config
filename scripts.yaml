@@ -32,7 +32,7 @@ sirena_alarma_micro_aviso:
   sequence:
     # IF Mute Sonido Sirenas = ON => True => CANCEL SCRIPT
     - condition: template
-      value_template: "{% if is_state('input_boolean.alarm_mute_sonido_sirenas', 'off') %}true{% endif %}"
+      value_template: "{% if is_state('input_boolean.alarm_homy_silenciar_sirenas', 'off') %}true{% endif %}"
     #
     # CICLO 1:
     - action: siren.turn_on
@@ -55,71 +55,77 @@ sirena_alarma_micro_aviso:
 # 1. Retraso de 3 segundos
 # 2. Sirena interior mediante siren.sirena (antes switch.esphome_bas_sw0)
 
-alarma_boton_panico:
-  alias: 'Boton Panico ON'
-  sequence:
-    # When a condition does not return true, the script will finish
-    - condition: template
-      value_template: "{% if is_state('input_boolean.alarm_panic_button', 'on') %}true{% endif %}"
-    # Llamada ACTIVA SIRENAS ALARMA
-    - action: siren.turn_on
-      target:
-        entity_id: siren.sirena
-    # Notifica Telegram
-    - action: script.notifica_alarma
-      data:
-        titulo: '*ATENCION ALARMA*'
-        mensaje: >
-          >>> URGENTE: BOTON PANICO ACTIVADO
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#alarma_boton_panico:
+#  alias: 'Boton Panico ON'
+#  sequence:
+#    # When a condition does not return true, the script will finish
+#    - condition: template
+#      value_template: "{% if is_state('input_boolean.alarm_panic_button', 'on') %}true{% endif %}"
+#    # Llamada ACTIVA SIRENAS ALARMA
+#    - action: siren.turn_on
+#      target:
+#        entity_id: siren.sirena
+#    # Notifica Telegram
+#    - action: script.notifica_alarma
+#      data:
+#        titulo: '*ATENCION ALARMA*'
+#        mensaje: >
+#          >>> URGENTE: BOTON PANICO ACTIVADO
 
 
-alarma_boton_panico_off:
-  alias: 'Boton Panico OFF'
-  sequence:
-    # Notifica Telegram
-    - action: script.notifica_evento
-      data:
-        titulo: '*ALARMA HOMY*'
-        mensaje: >
-          >>> URGENTE: BOTON PANICO DESACTIVADO
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#alarma_boton_panico_off:
+#  alias: 'Boton Panico OFF'
+#  sequence:
+#    # Notifica Telegram
+#    - action: script.notifica_evento
+#      data:
+#        titulo: '*ALARMA HOMY*'
+#        mensaje: >
+#          >>> URGENTE: BOTON PANICO DESACTIVADO
 
 #
 # SCRIPTS PARA GESTION ALARMA DESDE ALEXA
 #
+# 2026-10-12: scripts llamados por las rutinas de Alexa → motor Alarm HOMY
 homy_armado_parcial:
   alias: 'Homy Armado Parcial'
   sequence:
-    # When a condition does not return true, the script will finish
-    - condition: template
-      value_template: "{% if not is_state('alarm_control_panel.ha', 'armed_home') %}true{% endif %}"
-    - action: alarm_control_panel.alarm_arm_home
-      target:
-        entity_id: alarm_control_panel.ha
-    # La notificación se hace mediente la activación de la regla:
-    # alias: 'A2 Alarm Armed Away'
+    - condition: state
+      entity_id: alarm_control_panel.alarm_homy
+      state: 'disarmed'
+    - action: script.alarm_homy_armar
+      data:
+        modo: armed_home
+        origen: Alexa
 
 homy_armado_total:
   alias: 'Homy Armado Total'
   sequence:
-    # When a condition does not return true, the script will finish
-    - condition: template
-      value_template: "{% if not is_state('alarm_control_panel.ha', 'armed_away') %}true{% endif %}"
-    - action: alarm_control_panel.alarm_arm_away
-      target:
-        entity_id: alarm_control_panel.ha
-    # La notificación se hace mediente la activación de la regla:
-    # alias: 'A2 Alarm Armed Away'
+    - condition: state
+      entity_id: alarm_control_panel.alarm_homy
+      state: 'disarmed'
+    - action: script.alarm_homy_armar
+      data:
+        modo: armed_away
+        origen: Alexa
 
 homy_desarmado_code:
   alias: 'Homy Desarmado'
   sequence:
-    - action: alarm_control_panel.alarm_disarm
-      target:
-        entity_id: alarm_control_panel.ha
+    - action: script.alarm_homy_desarmar
       data:
-        code: !secret alarm_control_code
-    # La notificación se hace mediente la activación de la regla:
-    # alias: 'A4_alarma_activa_desarmada'
+        validar: false
+        origen: Alexa
 
 #-----------------------------------------------------------------------------#
 #                                                                             #
@@ -218,13 +224,13 @@ alexa_dormitorio_set_volumen_alarma:
       data:
         entity_id: input_number.alexa_dormitorio_volumen_nuevo
         value: >
-          {% if states.alarm_control_panel.ha.state == 'triggered' and now().hour >= 0 and now().hour <= 9 %}
+          {% if states('alarm_control_panel.alarm_homy') == 'triggered' and now().hour >= 0 and now().hour <= 9 %}
             {{ states('input_number.alexa_dormitorio_volumen_alarma_noc')|float }}
-          {% elif states.alarm_control_panel.ha.state == 'triggered' and now().hour >= 10 and now().hour <= 23 %}
+          {% elif states('alarm_control_panel.alarm_homy') == 'triggered' and now().hour >= 10 and now().hour <= 23 %}
             {{ states('input_number.alexa_dormitorio_volumen_alarma_dia')|float  }}
-          {% elif states.alarm_control_panel.ha.state != 'triggered' and now().hour >= 0 and now().hour <= 9 %}
+          {% elif states('alarm_control_panel.alarm_homy') != 'triggered' and now().hour >= 0 and now().hour <= 9 %}
             {{ states('input_number.alexa_dormitorio_volumen_anuncio_noc')|float  }}
-          {% elif states.alarm_control_panel.ha.state != 'triggered' and now().hour >= 10 and now().hour <= 23 %}
+          {% elif states('alarm_control_panel.alarm_homy') != 'triggered' and now().hour >= 10 and now().hour <= 23 %}
             {{ states('input_number.alexa_dormitorio_volumen_anuncio_dia')|float  }}
           {%endif%}
     # Establece el volumen
@@ -257,13 +263,13 @@ alexa_entrada_set_volumen_alarma:
       data:
         entity_id: input_number.alexa_entrada_volumen_nuevo
         value: >
-          {% if states.alarm_control_panel.ha.state == 'triggered' and now().hour >= 0 and now().hour <= 9 %}
+          {% if states('alarm_control_panel.alarm_homy') == 'triggered' and now().hour >= 0 and now().hour <= 9 %}
             {{ states('input_number.alexa_entrada_volumen_alarma_noc') }}
-          {% elif states.alarm_control_panel.ha.state == 'triggered' and now().hour >= 10 and now().hour <= 23 %}
+          {% elif states('alarm_control_panel.alarm_homy') == 'triggered' and now().hour >= 10 and now().hour <= 23 %}
             {{ states('input_number.alexa_entrada_volumen_alarma_dia') }}
-          {% elif states.alarm_control_panel.ha.state != 'triggered' and now().hour >= 0 and now().hour <= 9 %}
+          {% elif states('alarm_control_panel.alarm_homy') != 'triggered' and now().hour >= 0 and now().hour <= 9 %}
             {{ states('input_number.alexa_entrada_volumen_anuncio_noc') }}
-          {% elif states.alarm_control_panel.ha.state != 'triggered' and now().hour >= 10 and now().hour <= 23 %}
+          {% elif states('alarm_control_panel.alarm_homy') != 'triggered' and now().hour >= 10 and now().hour <= 23 %}
             {{ states('input_number.alexa_entrada_volumen_anuncio_dia') }}
           {%endif%}
     # Establece el volumen
@@ -339,25 +345,30 @@ alexa_sonido_alarma:
 # Parámetros:
 # sonido:     nombre del sonido de Amazon Alexa.
 #
-alexa_sirena_alarma:
-  alias: 'Alex Sirena Alarma'
-  mode: restart
-  sequence:
-    - repeat:
-        while:
-          - condition: state
-            entity_id: alarm_control_panel.ha
-            state: 'triggered'
-            # value_template: "{{ states.alarm_control_panel.ha.state == 'triggered' }}"
-        sequence:
-          - action: media_player.play_media
-            data:
-              entity_id:
-                - media_player.echo_alexa_entrada
-                - media_player.echo_alexa_dormitorio
-              media_content_type: sound
-              media_content_id: "{{ sonido }}"
-          - delay: 00:00:03
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#alexa_sirena_alarma:
+#  alias: 'Alex Sirena Alarma'
+#  mode: restart
+#  sequence:
+#    - repeat:
+#        while:
+#          - condition: state
+#            entity_id: alarm_control_panel.ha
+#            state: 'triggered'
+#            # value_template: "{{ states.alarm_control_panel.ha.state == 'triggered' }}"
+#        sequence:
+#          - action: media_player.play_media
+#            data:
+#              entity_id:
+#                - media_player.echo_alexa_entrada
+#                - media_player.echo_alexa_dormitorio
+#              media_content_type: sound
+#              media_content_id: "{{ sonido }}"
+#          - delay: 00:00:03
 
 #
 # Script genérico y básico para enviar un mensaje de voz a un Alexa Echo
@@ -509,58 +520,63 @@ alexa_estudio_secuencia:
 # voz:        mensaje de voz
 # sonido:     nombre del sonido de Amazon Alexa.
 #
-alexa_secuencia_alarma_armado:
-  alias: 'Alexa Secuencia Alarma Armado'
-  mode: restart
-  sequence:
-    - choose:
-        # Opciones echo_alexa_entrada, echo alexa_dormitorio
-        - conditions:
-            - condition: state
-              entity_id: input_select.alarma_media_player
-              state: 'media_player.echo_alexa_dormitorio'
-          sequence:
-            - action: script.alexa_dormitorio_set_volumen_alarma
-            - action: script.alexa_anuncio
-              data:
-                alexa: 'dormitorio'
-                voz: "{{ voz }}"
-            - repeat:
-                while:
-                  - condition: state
-                    entity_id: alarm_control_panel.ha
-                    state: 'arming'
-                    #  value_template: "{{ states.alarm_control_panel.ha.state == 'arming' }}"
-                sequence:
-                  - action: media_player.play_media
-                    data:
-                      entity_id: '{{ states.input_select.alarma_media_player.state }}'
-                      media_content_type: sound
-                      media_content_id: "{{ sonido }}"
-                  - delay: 00:00:03
-            - delay: 00:00:10
-            - action: script.alexa_dormitorio_restaura_volumen
-      default:
-        - action: script.alexa_entrada_set_volumen_alarma
-        - action: script.alexa_anuncio
-          data:
-            alexa: 'entrada'
-            voz: "{{ voz }}"
-        - repeat:
-            while:
-              - condition: state
-                entity_id: alarm_control_panel.ha
-                state: 'arming'
-                #  value_template: "{{ states.alarm_control_panel.ha.state == 'arming' }}"
-            sequence:
-              - action: media_player.play_media
-                data:
-                  entity_id: '{{ states.input_select.alarma_media_player.state }}'
-                  media_content_type: sound
-                  media_content_id: "{{ sonido }}"
-              - delay: 00:00:03
-    - delay: 00:00:10
-    - action: script.alexa_entrada_restaura_volumen
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#alexa_secuencia_alarma_armado:
+#  alias: 'Alexa Secuencia Alarma Armado'
+#  mode: restart
+#  sequence:
+#    - choose:
+#        # Opciones echo_alexa_entrada, echo alexa_dormitorio
+#        - conditions:
+#            - condition: state
+#              entity_id: input_select.alarma_media_player
+#              state: 'media_player.echo_alexa_dormitorio'
+#          sequence:
+#            - action: script.alexa_dormitorio_set_volumen_alarma
+#            - action: script.alexa_anuncio
+#              data:
+#                alexa: 'dormitorio'
+#                voz: "{{ voz }}"
+#            - repeat:
+#                while:
+#                  - condition: state
+#                    entity_id: alarm_control_panel.ha
+#                    state: 'arming'
+#                    #  value_template: "{{ states.alarm_control_panel.ha.state == 'arming' }}"
+#                sequence:
+#                  - action: media_player.play_media
+#                    data:
+#                      entity_id: '{{ states.input_select.alarma_media_player.state }}'
+#                      media_content_type: sound
+#                      media_content_id: "{{ sonido }}"
+#                  - delay: 00:00:03
+#            - delay: 00:00:10
+#            - action: script.alexa_dormitorio_restaura_volumen
+#      default:
+#        - action: script.alexa_entrada_set_volumen_alarma
+#        - action: script.alexa_anuncio
+#          data:
+#            alexa: 'entrada'
+#            voz: "{{ voz }}"
+#        - repeat:
+#            while:
+#              - condition: state
+#                entity_id: alarm_control_panel.ha
+#                state: 'arming'
+#                #  value_template: "{{ states.alarm_control_panel.ha.state == 'arming' }}"
+#            sequence:
+#              - action: media_player.play_media
+#                data:
+#                  entity_id: '{{ states.input_select.alarma_media_player.state }}'
+#                  media_content_type: sound
+#                  media_content_id: "{{ sonido }}"
+#              - delay: 00:00:03
+#    - delay: 00:00:10
+#    - action: script.alexa_entrada_restaura_volumen
 
 # Script completo para enviar un sonido de cuenta atrás durante el proceso de DESARMADO
 # Alexa estará tocando el sonido desarmado mientras el estado de alarma sea PENDING
@@ -569,58 +585,63 @@ alexa_secuencia_alarma_armado:
 # voz:        mensaje de voz
 # sonido:     nombre del sonido de Amazon Alexa.
 #
-alexa_secuencia_alarma_desarmado:
-  alias: 'Alexa Secuencia Alarma Desrmado'
-  mode: restart
-  sequence:
-    - choose:
-        # Opciones echo_alexa_entrada, echo alexa_dormitorio
-        - conditions:
-            - condition: state
-              entity_id: input_select.alarma_media_player
-              state: 'media_player.echo_alexa_dormitorio'
-          sequence:
-            - action: script.alexa_dormitorio_set_volumen_alarma
-            - action: script.alexa_anuncio
-              data:
-                alexa: 'dormitorio'
-                voz: "{{ voz }}"
-            - repeat:
-                while:
-                  - condition: state
-                    entity_id: alarm_control_panel.ha
-                    state: 'pending'
-                    #value_template: "{{ states.alarm_control_panel.ha.state == 'pending' }}"
-                sequence:
-                  - action: media_player.play_media
-                    data:
-                      entity_id: '{{ states.input_select.alarma_media_player.state }}'
-                      media_content_type: sound
-                      media_content_id: "{{ sonido }}"
-                  - delay: 00:00:03
-            - delay: 00:00:10
-            - action: script.alexa_dormitorio_restaura_volumen
-      default:
-        - action: script.alexa_entrada_set_volumen_alarma
-        - action: script.alexa_anuncio
-          data:
-            alexa: 'entrada'
-            voz: "{{ voz }}"
-        - repeat:
-            while:
-              - condition: state
-                entity_id: alarm_control_panel.ha
-                state: 'pending'
-                #value_template: "{{ states.alarm_control_panel.ha.state == 'pending' }}"
-            sequence:
-              - action: media_player.play_media
-                data:
-                  entity_id: '{{ states.input_select.alarma_media_player.state }}'
-                  media_content_type: sound
-                  media_content_id: "{{ sonido }}"
-              - delay: 00:00:03
-        - delay: 00:00:10
-        - action: script.alexa_entrada_restaura_volumen
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#alexa_secuencia_alarma_desarmado:
+#  alias: 'Alexa Secuencia Alarma Desrmado'
+#  mode: restart
+#  sequence:
+#    - choose:
+#        # Opciones echo_alexa_entrada, echo alexa_dormitorio
+#        - conditions:
+#            - condition: state
+#              entity_id: input_select.alarma_media_player
+#              state: 'media_player.echo_alexa_dormitorio'
+#          sequence:
+#            - action: script.alexa_dormitorio_set_volumen_alarma
+#            - action: script.alexa_anuncio
+#              data:
+#                alexa: 'dormitorio'
+#                voz: "{{ voz }}"
+#            - repeat:
+#                while:
+#                  - condition: state
+#                    entity_id: alarm_control_panel.ha
+#                    state: 'pending'
+#                    #value_template: "{{ states.alarm_control_panel.ha.state == 'pending' }}"
+#                sequence:
+#                  - action: media_player.play_media
+#                    data:
+#                      entity_id: '{{ states.input_select.alarma_media_player.state }}'
+#                      media_content_type: sound
+#                      media_content_id: "{{ sonido }}"
+#                  - delay: 00:00:03
+#            - delay: 00:00:10
+#            - action: script.alexa_dormitorio_restaura_volumen
+#      default:
+#        - action: script.alexa_entrada_set_volumen_alarma
+#        - action: script.alexa_anuncio
+#          data:
+#            alexa: 'entrada'
+#            voz: "{{ voz }}"
+#        - repeat:
+#            while:
+#              - condition: state
+#                entity_id: alarm_control_panel.ha
+#                state: 'pending'
+#                #value_template: "{{ states.alarm_control_panel.ha.state == 'pending' }}"
+#            sequence:
+#              - action: media_player.play_media
+#                data:
+#                  entity_id: '{{ states.input_select.alarma_media_player.state }}'
+#                  media_content_type: sound
+#                  media_content_id: "{{ sonido }}"
+#              - delay: 00:00:03
+#        - delay: 00:00:10
+#        - action: script.alexa_entrada_restaura_volumen
 #
 # Script completo para enviar un sonido de cuenta atrás durante el proceso de armado o desarmado
 # Alexa estará tocando el sonido desarmado mientras el estado de alarma sea TRIGGERED
@@ -629,114 +650,134 @@ alexa_secuencia_alarma_desarmado:
 # voz:        mensaje de voz
 # sonido:     nombre del sonido de Amazon Alexa.
 #
-alexa_secuencia_alarma_disparada:
-  alias: 'Alexa Secuencia Alarma Disparada'
-  mode: restart
-  sequence:
-    - action: script.alexa_entrada_set_volumen_alarma
-    - action: script.alexa_dormitorio_set_volumen_alarma
-    - action: media_player.play_media
-      data:
-        entity_id:
-          - media_player.echo_alexa_entrada
-          - media_player.echo_alexa_dormitorio
-        media_content_type: sound
-        media_content_id: "{{ states('input_select.alarma_sonido_disparado') }}"
-    # RETRASO DE 3 SEGUNDOS "
-    - delay: 00:00:03
-    #######################################
-    # SONOFF_SW1_SIRENA INTERIOR ==> ON
-    #######################################
-    - action: siren.turn_on
-      target:
-        entity_id: siren.sirena
-    #
-    # Bucle sirena Alexa mientras la alarma esté disparada.
-    - repeat:
-        while:
-          - condition: state
-            entity_id: alarm_control_panel.ha
-            state: 'triggered'
-            #value_template: "{{ states.alarm_control_panel.ha.state == 'triggered' }}"
-        sequence:
-          - action: media_player.play_media
-            data:
-              entity_id:
-                - media_player.echo_alexa_entrada
-                - media_player.echo_alexa_dormitorio
-              media_content_type: sound
-              media_content_id: "{{ states('input_select.alarma_sonido_disparado') }}"
-          #- delay: 00:00:03
-    #######################################
-    # SONOFF_SW1_SIRENA INTERIOR ==> OFF
-    #######################################
-    - action: siren.turn_off
-      target:
-        entity_id: siren.sirena
-    - delay: 00:00:10
-    - action: script.alexa_entrada_restaura_volumen
-    - action: script.alexa_dormitorio_restaura_volumen
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#alexa_secuencia_alarma_disparada:
+#  alias: 'Alexa Secuencia Alarma Disparada'
+#  mode: restart
+#  sequence:
+#    - action: script.alexa_entrada_set_volumen_alarma
+#    - action: script.alexa_dormitorio_set_volumen_alarma
+#    - action: media_player.play_media
+#      data:
+#        entity_id:
+#          - media_player.echo_alexa_entrada
+#          - media_player.echo_alexa_dormitorio
+#        media_content_type: sound
+#        media_content_id: "{{ states('input_select.alarma_sonido_disparado') }}"
+#    # RETRASO DE 3 SEGUNDOS "
+#    - delay: 00:00:03
+#    #######################################
+#    # SONOFF_SW1_SIRENA INTERIOR ==> ON
+#    #######################################
+#    - action: siren.turn_on
+#      target:
+#        entity_id: siren.sirena
+#    #
+#    # Bucle sirena Alexa mientras la alarma esté disparada.
+#    - repeat:
+#        while:
+#          - condition: state
+#            entity_id: alarm_control_panel.ha
+#            state: 'triggered'
+#            #value_template: "{{ states.alarm_control_panel.ha.state == 'triggered' }}"
+#        sequence:
+#          - action: media_player.play_media
+#            data:
+#              entity_id:
+#                - media_player.echo_alexa_entrada
+#                - media_player.echo_alexa_dormitorio
+#              media_content_type: sound
+#              media_content_id: "{{ states('input_select.alarma_sonido_disparado') }}"
+#          #- delay: 00:00:03
+#    #######################################
+#    # SONOFF_SW1_SIRENA INTERIOR ==> OFF
+#    #######################################
+#    - action: siren.turn_off
+#      target:
+#        entity_id: siren.sirena
+#    - delay: 00:00:10
+#    - action: script.alexa_entrada_restaura_volumen
+#    - action: script.alexa_dormitorio_restaura_volumen
 
 #
 #---------------------------- PRUEBAS ------------------------
 #
-test_alexa_secuencia_armado:
-  alias: 'Test Alexa Secuencia Alarma Armado'
-  mode: restart
-  sequence:
-    - action: light.turn_on
-      target:
-        entity_id: light.luz_vitrina
-    - action: script.alexa_dormitorio_secuencia
-      data:
-        voz: 'ATENCION!. Luz Vitrina Entendida'
-        sonido: "{{ states('input_select.alarma_sonido_armado') }}"
-        repeticion: 1
-    - repeat:
-        while:
-          - condition: state
-            entity_id: light.luz_vitrina
-            state: 'on'
-        sequence:
-          - action: media_player.play_media
-            data:
-              entity_id: '{{ states.input_select.alarma_media_player.state }}'
-              media_content_type: sound
-              media_content_id: "{{ states('input_select.alarma_sonido_armado') }}"
-          - delay: 00:00:03
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#test_alexa_secuencia_armado:
+#  alias: 'Test Alexa Secuencia Alarma Armado'
+#  mode: restart
+#  sequence:
+#    - action: light.turn_on
+#      target:
+#        entity_id: light.luz_vitrina
+#    - action: script.alexa_dormitorio_secuencia
+#      data:
+#        voz: 'ATENCION!. Luz Vitrina Entendida'
+#        sonido: "{{ states('input_select.alarma_sonido_armado') }}"
+#        repeticion: 1
+#    - repeat:
+#        while:
+#          - condition: state
+#            entity_id: light.luz_vitrina
+#            state: 'on'
+#        sequence:
+#          - action: media_player.play_media
+#            data:
+#              entity_id: '{{ states.input_select.alarma_media_player.state }}'
+#              media_content_type: sound
+#              media_content_id: "{{ states('input_select.alarma_sonido_armado') }}"
+#          - delay: 00:00:03
 
-test_alexa_secuencia_desarmado:
-  alias: 'Test Alexa Secuencia Alarma Desrmado'
-  mode: restart
-  sequence:
-    - action: script.alexa_entrada_secuencia
-      data:
-        voz: 'ATENCION!. Sistema desarmado.'
-        sonido: "{{ states('input_select.alarma_sonido_desarmado') }}"
-        repeticion: 1
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#test_alexa_secuencia_desarmado:
+#  alias: 'Test Alexa Secuencia Alarma Desrmado'
+#  mode: restart
+#  sequence:
+#    - action: script.alexa_entrada_secuencia
+#      data:
+#        voz: 'ATENCION!. Sistema desarmado.'
+#        sonido: "{{ states('input_select.alarma_sonido_desarmado') }}"
+#        repeticion: 1
 
-test_alexa_anuncio:
-  mode: restart
-  sequence:
-    - action: script.alexa_entrada_set_volumen_alarma
-    - action: script.alexa_dormitorio_set_volumen_alarma
-
-    - action: script.alexa_anuncio
-      data:
-        alexa: 'dormitorio'
-        voz: 'ATENCION!. Armado Total activado.'
-
-    - action: script.alexa_sonido_alarma
-      data:
-        alexa: 'dormitorio'
-        sonido: "{{ states('input_select.alarma_sonido_armado') }}"
-        repeticion: 2
-
-    - action: script.alexa_sirena_alarma
-      data:
-        sonido: "{{ states('input_select.alarma_sonido_disparado') }}"
-
-    - action: script.alexa_dormitorio_restaura_volumen
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#test_alexa_anuncio:
+#  mode: restart
+#  sequence:
+#    - action: script.alexa_entrada_set_volumen_alarma
+#    - action: script.alexa_dormitorio_set_volumen_alarma
+#
+#    - action: script.alexa_anuncio
+#      data:
+#        alexa: 'dormitorio'
+#        voz: 'ATENCION!. Armado Total activado.'
+#
+#    - action: script.alexa_sonido_alarma
+#      data:
+#        alexa: 'dormitorio'
+#        sonido: "{{ states('input_select.alarma_sonido_armado') }}"
+#        repeticion: 2
+#
+#    - action: script.alexa_sirena_alarma
+#      data:
+#        sonido: "{{ states('input_select.alarma_sonido_disparado') }}"
+#
+#    - action: script.alexa_dormitorio_restaura_volumen
 
 test_media_player_announce:
   alias: 'Alexa Mensaje Voz'
@@ -762,35 +803,50 @@ test_media_player_secuencia:
         media_content_id: >
           {{ states('input_select.alexa_secuencia') }}
 
-test_sonido_alarma_desarmado:
-  sequence:
-    - action: media_player.play_media
-      data:
-        entity_id: >
-          {{ states('input_select.alarma_media_player') }}
-        media_content_type: sound
-        media_content_id: >
-          {{ states('input_select.alarma_sonido_desarmado') }}
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#test_sonido_alarma_desarmado:
+#  sequence:
+#    - action: media_player.play_media
+#      data:
+#        entity_id: >
+#          {{ states('input_select.alarma_media_player') }}
+#        media_content_type: sound
+#        media_content_id: >
+#          {{ states('input_select.alarma_sonido_desarmado') }}
 
-test_sonido_alarma_armado:
-  sequence:
-    - action: media_player.play_media
-      data:
-        entity_id: >
-          {{ states('input_select.alarma_media_player') }}
-        media_content_type: sound
-        media_content_id: >
-          {{ states('input_select.alarma_sonido_armado') }}
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#test_sonido_alarma_armado:
+#  sequence:
+#    - action: media_player.play_media
+#      data:
+#        entity_id: >
+#          {{ states('input_select.alarma_media_player') }}
+#        media_content_type: sound
+#        media_content_id: >
+#          {{ states('input_select.alarma_sonido_armado') }}
 
-test_sonido_alarma_disparado:
-  sequence:
-    - action: media_player.play_media
-      data:
-        entity_id: >
-          {{ states('input_select.alarma_media_player') }}
-        media_content_type: sound
-        media_content_id: >
-          {{ states('input_select.alarma_sonido_disparado') }}
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#test_sonido_alarma_disparado:
+#  sequence:
+#    - action: media_player.play_media
+#      data:
+#        entity_id: >
+#          {{ states('input_select.alarma_media_player') }}
+#        media_content_type: sound
+#        media_content_id: >
+#          {{ states('input_select.alarma_sonido_disparado') }}
 
 #-----------------------------------------------------------------------------#
 #                                                                             #
@@ -822,7 +878,6 @@ notifica_alarma:
         {{ states('input_text.mensaje_tit') }}
       message: >
         {{ states('input_text.mensaje_msg') }}
-        {{ states('input_text.alarm_trigger') }}
 
   # Notificación IOS CRÍTICA (2026-10-10)
   # Alerta crítica: suena aunque el iPhone esté en silencio o en Concentración.
@@ -836,7 +891,6 @@ notifica_alarma:
         {{ states('input_text.mensaje_tit') | replace('*', '') }}
       message: >
         {{ states('input_text.mensaje_msg') | replace('>>> ', '') }}
-        {{ states('input_text.alarm_trigger') }}
       data:
         tag: alarma_homy
         push:
@@ -889,22 +943,27 @@ notifica_evento:
 #                                                                             #
 #-----------------------------------------------------------------------------#
 
-luz_on_armed_home:
-  alias: 'Leds Alarma On si Sensor'
-  sequence:
-    # When a condition does not return true, the script will finish
-    # Check Panel Alarma <> armed_home ==> Exit
-    - condition: state
-      entity_id: alarm_control_panel.ha
-      state: 'armed_home'
-    # Enciende Piloto Azul Alarma
-    - action: light.turn_on
-      target:
-        entity_id: light.tagreader_led
-      data:
-        color_name: blue
-        transition: 3
-        brightness: 96
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#luz_on_armed_home:
+#  alias: 'Leds Alarma On si Sensor'
+#  sequence:
+#    # When a condition does not return true, the script will finish
+#    # Check Panel Alarma <> armed_home ==> Exit
+#    - condition: state
+#      entity_id: alarm_control_panel.ha
+#      state: 'armed_home'
+#    # Enciende Piloto Azul Alarma
+#    - action: light.turn_on
+#      target:
+#        entity_id: light.tagreader_led
+#      data:
+#        color_name: blue
+#        transition: 3
+#        brightness: 96
 
 luces_on_family_home:
   alias: 'Family at Home Piloto ON'
@@ -1593,42 +1652,47 @@ firetv_estudio_movistar_a3:
 #                                                                             #
 #-----------------------------------------------------------------------------#
 
-check_sensores_magneticos_perimetro:
-  alias: 'Check Sensores Magneticos Perimetro'
-  sequence:
-    - action: input_text.set_value
-      data:
-        entity_id: input_text.alarma_check_sensores_magneticos
-        value: >
-          {% if states.binary_sensor.alarma_sensores_perimetro.state == 'off' %} 
-            Puertas y ventanas cerradas. Alarma lista para armado total.
-          {% elif states.binary_sensor.aqara_puerta_salon.state == 'on' %}
-            Atención, alarma no lista para armar. Revise el sensor {{ state_attr('binary_sensor.aqara_puerta_salon', 'friendly_name') }}
-          {% elif states.binary_sensor.aqara_ventana_dormitorio_principal.state == 'on' %}
-            Atención, alarma no lista para armar. Revise el sensor {{ state_attr('binary_sensor.aqara_ventana_dormitorio_principal', 'friendly_name') }}
-          {% elif states.binary_sensor.aqara_ventana_dormitorio_plancha.state == 'on' %}
-            Atención, alarma no lista para armar. Revise el sensor {{ state_attr('binary_sensor.aqara_ventana_dormitorio_plancha', 'friendly_name') }}
-          {% elif states.binary_sensor.aqara_ventana_dormitorio_agu.state == 'on' %}
-            Atención, alarma no lista para armar. Revise el sensor {{ state_attr('binary_sensor.aqara_ventana_dormitorio_agu', 'friendly_name') }}
-          {% elif states.binary_sensor.aqara_ventana_dormitorio_paloma.state == 'on' %}
-            Atención, alarma no lista para armar. Revise el sensor {{ state_attr('binary_sensor.aqara_ventana_dormitorio_paloma', 'friendly_name') }}
-          {%endif%}
-    - action: script.alexa_entrada_secuencia
-      data:
-        sonido: 'clock_01'
-        repeticion: 1
-        voz: "{{ states.input_text.alarma_check_sensores_magneticos.state }}" 
-    - action: light.turn_on
-      target:
-        entity_id: light.tagreader_led
-      data:
-        brightness: 128
-        color_name: >
-          {% if states.binary_sensor.alarma_check_listo_para_armar.state == 'on' %}
-            green
-          {% else %}
-            red
-          {%endif%}
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#check_sensores_magneticos_perimetro:
+#  alias: 'Check Sensores Magneticos Perimetro'
+#  sequence:
+#    - action: input_text.set_value
+#      data:
+#        entity_id: input_text.alarma_check_sensores_magneticos
+#        value: >
+#          {% if states.binary_sensor.alarma_sensores_perimetro.state == 'off' %} 
+#            Puertas y ventanas cerradas. Alarma lista para armado total.
+#          {% elif states.binary_sensor.aqara_puerta_salon.state == 'on' %}
+#            Atención, alarma no lista para armar. Revise el sensor {{ state_attr('binary_sensor.aqara_puerta_salon', 'friendly_name') }}
+#          {% elif states.binary_sensor.aqara_ventana_dormitorio_principal.state == 'on' %}
+#            Atención, alarma no lista para armar. Revise el sensor {{ state_attr('binary_sensor.aqara_ventana_dormitorio_principal', 'friendly_name') }}
+#          {% elif states.binary_sensor.aqara_ventana_dormitorio_plancha.state == 'on' %}
+#            Atención, alarma no lista para armar. Revise el sensor {{ state_attr('binary_sensor.aqara_ventana_dormitorio_plancha', 'friendly_name') }}
+#          {% elif states.binary_sensor.aqara_ventana_dormitorio_agu.state == 'on' %}
+#            Atención, alarma no lista para armar. Revise el sensor {{ state_attr('binary_sensor.aqara_ventana_dormitorio_agu', 'friendly_name') }}
+#          {% elif states.binary_sensor.aqara_ventana_dormitorio_paloma.state == 'on' %}
+#            Atención, alarma no lista para armar. Revise el sensor {{ state_attr('binary_sensor.aqara_ventana_dormitorio_paloma', 'friendly_name') }}
+#          {%endif%}
+#    - action: script.alexa_entrada_secuencia
+#      data:
+#        sonido: 'clock_01'
+#        repeticion: 1
+#        voz: "{{ states.input_text.alarma_check_sensores_magneticos.state }}" 
+#    - action: light.turn_on
+#      target:
+#        entity_id: light.tagreader_led
+#      data:
+#        brightness: 128
+#        color_name: >
+#          {% if states.binary_sensor.alarma_check_listo_para_armar.state == 'on' %}
+#            green
+#          {% else %}
+#            red
+#          {%endif%}
 
 
 

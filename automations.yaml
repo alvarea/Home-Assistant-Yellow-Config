@@ -175,16 +175,21 @@
 
 # REGLAS: TEST SONIDOS ALARMA
 #
-- id: X0_test
-  alias: 'X0 TEST ON'
-  triggers:
-    - trigger: state
-      entity_id: input_boolean.alarm_test_sirenas
-      from: 'off'
-      to: 'on'
-  actions:
-    # Micro Aviso Sirena Interior
-    - action: script.sirena_alarma_micro_aviso
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#- id: X0_test
+#  alias: 'X0 TEST ON'
+#  triggers:
+#    - trigger: state
+#      entity_id: input_boolean.alarm_test_sirenas
+#      from: 'off'
+#      to: 'on'
+#  actions:
+#    # Micro Aviso Sirena Interior
+#    - action: script.sirena_alarma_micro_aviso
 #
 # ALARMA AUTOMATICA SENSOR HUMO COCINA
 #
@@ -330,98 +335,113 @@
 #
 # REGLA: ALARMA DISARMED A <ARMING>
 #
-- id: A0
-  alias: 'A0 Alarma Disarmed to Pending'
-  triggers:
-    - trigger: state
-      entity_id: alarm_control_panel.ha
-      from: 'disarmed'
-      to: 'arming'
-  actions:   
-    # Script Envío Sonido Alexa Alexa
-    - action: script.alexa_secuencia_alarma_armado
-      data:
-        voz: "¡ATENCION!, alarma activada. Tiene un minuto para salir. ATENCION!, alarma activada. Salga ahora, por favor."
-        sonido: "{{ states('input_select.alarma_sonido_desarmado') }}"
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#- id: A0
+#  alias: 'A0 Alarma Disarmed to Pending'
+#  triggers:
+#    - trigger: state
+#      entity_id: alarm_control_panel.ha
+#      from: 'disarmed'
+#      to: 'arming'
+#  actions:   
+#    # Script Envío Sonido Alexa Alexa
+#    - action: script.alexa_secuencia_alarma_armado
+#      data:
+#        voz: "¡ATENCION!, alarma activada. Tiene un minuto para salir. ATENCION!, alarma activada. Salga ahora, por favor."
+#        sonido: "{{ states('input_select.alarma_sonido_desarmado') }}"
 #
 # REGLA: ALARMA ARMED A <PENDING>
 #
-- id: A1
-  alias: 'A1 Alarma Armed to Pending'
-  triggers:
-    - trigger: state
-      entity_id: alarm_control_panel.ha
-      from: 'armed_home'
-      to: 'pending'
-    - trigger: state
-      entity_id: alarm_control_panel.ha
-      from: 'armed_away'
-      to: 'pending'
-  actions:
-    # Encendido Led Tag Reader ROJO
-    - action: light.turn_on
-      target:
-        entity_id: light.tagreader_led
-      data:
-        color_name: red
-        brightness: 255
-    - choose:
-        # IF entity_id: alarm_control_panel.ha == state: 'triggered'
-        - conditions:
-          - condition: template
-            value_template: "{{ states('input_text.alarm_trigger') == 'Puerta Entrada Principal' }}"
-          sequence:         
-            # Script Envío Sonido Alexa Alexa
-            - action: script.alexa_secuencia_alarma_desarmado
-            # RETRASO de 10 segundos para que, si es falsa alarma al abrir puerta de entrada, de tiempo a desarmar con el tag NFC
-            - delay: 00:00:10
-            # Tras los 5 segundos de espera, comprueba si la alarma sigue en estado Triggered o alguien la ha desarmado.
-            # Si sigue en estado Triggered, se inicia la secuencia de alarma disparada.
-    - choose:
-        # IF entity_id: alarm_control_panel.ha == state: 'triggered'
-        - conditions:
-          - condition: template
-            value_template: "{{ states('alarm_control_panel.ha') == 'pending' }}"
-          sequence:         
-            # Script Envío Sonido Alexa Alexa
-            - action: script.alexa_secuencia_alarma_desarmado
-              data:
-                voz: "¡ATENCION!, Aviso previo a salto alarma. Tiene un minuto para desarmar. ¡ATENCION!, Desarme ahora, por favor."
-                sonido: "{{ states('input_select.alarma_sonido_desarmado') }}"
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#- id: A1
+#  alias: 'A1 Alarma Armed to Pending'
+#  triggers:
+#    - trigger: state
+#      entity_id: alarm_control_panel.ha
+#      from: 'armed_home'
+#      to: 'pending'
+#    - trigger: state
+#      entity_id: alarm_control_panel.ha
+#      from: 'armed_away'
+#      to: 'pending'
+#  actions:
+#    # Encendido Led Tag Reader ROJO
+#    - action: light.turn_on
+#      target:
+#        entity_id: light.tagreader_led
+#      data:
+#        color_name: red
+#        brightness: 255
+#    - choose:
+#        # IF entity_id: alarm_control_panel.ha == state: 'triggered'
+#        - conditions:
+#          - condition: template
+#            value_template: "{{ states('input_text.alarm_trigger') == 'Puerta Entrada Principal' }}"
+#          sequence:         
+#            # Script Envío Sonido Alexa Alexa
+#            - action: script.alexa_secuencia_alarma_desarmado
+#            # RETRASO de 10 segundos para que, si es falsa alarma al abrir puerta de entrada, de tiempo a desarmar con el tag NFC
+#            - delay: 00:00:10
+#            # Tras los 5 segundos de espera, comprueba si la alarma sigue en estado Triggered o alguien la ha desarmado.
+#            # Si sigue en estado Triggered, se inicia la secuencia de alarma disparada.
+#    - choose:
+#        # IF entity_id: alarm_control_panel.ha == state: 'triggered'
+#        - conditions:
+#          - condition: template
+#            value_template: "{{ states('alarm_control_panel.ha') == 'pending' }}"
+#          sequence:         
+#            # Script Envío Sonido Alexa Alexa
+#            - action: script.alexa_secuencia_alarma_desarmado
+#              data:
+#                voz: "¡ATENCION!, Aviso previo a salto alarma. Tiene un minuto para desarmar. ¡ATENCION!, Desarme ahora, por favor."
+#                sonido: "{{ states('input_select.alarma_sonido_desarmado') }}"
 
 # REGLA: ARMADO AWAY COMPLETADO
 #
-- id: A2
-  alias: 'A2 Alarma Armado Away OK'
-  triggers:
-    - trigger: state
-      entity_id: alarm_control_panel.ha
-      to: 'armed_away'
-  actions:
-    # Encendido Led VERDE Tag Reader
-    - action: light.turn_on
-      target:
-        entity_id: light.tagreader_led
-      data:
-        color_name: orange
-        transition: 3
-        brightness: 96
-    # INICIALIZA EL SENSOR DEL TRIGGER
-    - action: input_text.set_value
-      target:
-        entity_id: input_text.alarm_trigger
-      data:
-        value: " "
-
-    # Script Envío Sonido Alexa Alexa
-    - action: script.alexa_secuencia
-      data:
-        voz: "ATENCION!. Armado Total activado."
-        sonido: "{{ states('input_select.alarma_sonido_armado') }}"
-        repeticion: 1
-
-    # Llamada a Script Apagado Casa
-    - action: script.home_switch_off
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#- id: A2
+#  alias: 'A2 Alarma Armado Away OK'
+#  triggers:
+#    - trigger: state
+#      entity_id: alarm_control_panel.ha
+#      to: 'armed_away'
+#  actions:
+#    # Encendido Led VERDE Tag Reader
+#    - action: light.turn_on
+#      target:
+#        entity_id: light.tagreader_led
+#      data:
+#        color_name: orange
+#        transition: 3
+#        brightness: 96
+#    # INICIALIZA EL SENSOR DEL TRIGGER
+#    - action: input_text.set_value
+#      target:
+#        entity_id: input_text.alarm_trigger
+#      data:
+#        value: " "
+#
+#    # Script Envío Sonido Alexa Alexa
+#    - action: script.alexa_secuencia
+#      data:
+#        voz: "ATENCION!. Armado Total activado."
+#        sonido: "{{ states('input_select.alarma_sonido_armado') }}"
+#        repeticion: 1
+#
+#    # Llamada a Script Apagado Casa
+#    - action: script.home_switch_off
 
     #- delay: 00:01:00
     # ARMADO PANEL ALARMA BLINK
@@ -431,35 +451,40 @@
 #
 # REGLA: ARMADO HOME COMPLETADO
 #
-- id: A3
-  alias: 'A3 Alarma Armado Home OK'
-  triggers:
-    - trigger: state
-      entity_id: alarm_control_panel.ha
-      to: 'armed_home'
-  actions:
-    # Encendido Led Azul Tag Reader
-    - action: light.turn_on
-      target:
-        entity_id: light.tagreader_led
-      data:
-        color_name: blue
-        transition: 3
-        brightness: 96
-
-    # ALMACENA EL SENSOR DEL TRIGGER
-    - action: input_text.set_value
-      target:
-        entity_id: input_text.alarm_trigger
-      data:
-        value: " "
-
-    # Script Envío Sonido Alexa Alexa
-    - action: script.alexa_secuencia
-      data:
-        voz: "ATENCION!. Armado parcial activado."
-        sonido: "{{ states('input_select.alarma_sonido_armado') }}"
-        repeticion: 1
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#- id: A3
+#  alias: 'A3 Alarma Armado Home OK'
+#  triggers:
+#    - trigger: state
+#      entity_id: alarm_control_panel.ha
+#      to: 'armed_home'
+#  actions:
+#    # Encendido Led Azul Tag Reader
+#    - action: light.turn_on
+#      target:
+#        entity_id: light.tagreader_led
+#      data:
+#        color_name: blue
+#        transition: 3
+#        brightness: 96
+#
+#    # ALMACENA EL SENSOR DEL TRIGGER
+#    - action: input_text.set_value
+#      target:
+#        entity_id: input_text.alarm_trigger
+#      data:
+#        value: " "
+#
+#    # Script Envío Sonido Alexa Alexa
+#    - action: script.alexa_secuencia
+#      data:
+#        voz: "ATENCION!. Armado parcial activado."
+#        sonido: "{{ states('input_select.alarma_sonido_armado') }}"
+#        repeticion: 1
 
     # Revisar
     # https://community.home-assistant.io/t/automation-with-is-state-trigger-to-state-on-not-working/54691/2
@@ -468,266 +493,306 @@
 #
 # REGLA: DESARMADO OK => SIRENA OFF, AVISO Y NOTIFICACION (DISARMED)
 #
-- id: A4
-  alias: 'A4 Alarma Disarmed'
-  triggers:
-    - trigger: state
-      entity_id: alarm_control_panel.ha
-      to: 'disarmed'
-  actions:
-    # SONOFF_SW1_SIRENA INTERIOR ==> OFF
-    - action: siren.turn_off
-      target:
-        entity_id: siren.sirena
-
-    # DESARMADO PANEL ALARMA BLINK
-    - action: alarm_control_panel.alarm_disarm
-      target:
-        entity_id: alarm_control_panel.blink_casa
-
-    # Apaga Luz Piloto Alarma
-    - action: light.turn_off
-      target:
-        entity_id: 
-          - light.tagreader_led
-      
-    # Script Envío Sonido Alexa Alexa
-    - action: script.alexa_secuencia
-      data:
-        voz: "ATENCION!. Alarma desactivada."
-        sonido: "{{ states('input_select.alarma_sonido_desarmado') }}"
-        repeticion: 1
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#- id: A4
+#  alias: 'A4 Alarma Disarmed'
+#  triggers:
+#    - trigger: state
+#      entity_id: alarm_control_panel.ha
+#      to: 'disarmed'
+#  actions:
+#    # SONOFF_SW1_SIRENA INTERIOR ==> OFF
+#    - action: siren.turn_off
+#      target:
+#        entity_id: siren.sirena
+#
+#    # DESARMADO PANEL ALARMA BLINK
+#    - action: alarm_control_panel.alarm_disarm
+#      target:
+#        entity_id: alarm_control_panel.blink_casa
+#
+#    # Apaga Luz Piloto Alarma
+#    - action: light.turn_off
+#      target:
+#        entity_id: 
+#          - light.tagreader_led
+#
+#    # Script Envío Sonido Alexa Alexa
+#    - action: script.alexa_secuencia
+#      data:
+#        voz: "ATENCION!. Alarma desactivada."
+#        sonido: "{{ states('input_select.alarma_sonido_desarmado') }}"
+#        repeticion: 1
 #
 # REGLA: TRIGGER SENSOR => MODO ARMADO AWAY => PENDING ==> ALARMA TRIGGERED
 #
-- id: A5
-  alias: 'A5 Alarm Trigger Armed Away'
-  triggers:
-    # MUY IMPORTANTE: EN EL ARM AWAY SE CHEQUEA GRUPO SENSORES HOME + AWAY
-    - trigger: state
-      entity_id:
-        - binary_sensor.aqara_puerta_entrada_principal           # Puerta de entrada
-        - binary_sensor.alarma_sensores_perimetro_principal      # Grupo Sensores PERIMETRO PRINCIPAL
-        - binary_sensor.alarma_sensores_perimetro_secundario     # Grupo Sensores PERIMETRO SECUNDARIO
-        - binary_sensor.alarma_sensores_presencia_interior       # Grupo Sensores Presencia INTERIOR
-        - binary_sensor.alarma_sensores_presencia_exterior       # Grupo Sensores Presencia EXTERIOR
-      to: 'on'
-    # Los sensores vibración solo saltan por trigger = platform device
-    - trigger: device
-      type: vibration
-      device_id: f23111988853a7beeb8c26078f390729 # Puerta Principal Entrada
-      entity_id: 3c418e73805f1a07820c181eb7bbe936
-      domain: binary_sensor
-    - trigger: device
-      type: vibration
-      device_id: b8cd622289394361f35ed30b303598f9 # Puerta Salón
-      entity_id: 0a5a7d3964574dd4792fa6f0925a5e3e
-      domain: binary_sensor
-  conditions:
-    condition: and
-    conditions:
-      - condition: state
-        entity_id: alarm_control_panel.ha
-        state: armed_away
-  actions:
-    # ALMACENA EL SENSOR DEL TRIGGER
-    - action: input_text.set_value
-      target:
-        entity_id: input_text.alarm_trigger
-      data:
-        value: "{{ trigger.to_state.attributes.friendly_name }}"
-    #
-    # DISPARA LA ALARMA, que pasa a estado PENDING durante 60'
-    # Si no se desactiva, pasa a triggered y se envían notificaciones y Sirena
-    - action: alarm_control_panel.alarm_trigger
-      target:
-        entity_id: alarm_control_panel.ha
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#- id: A5
+#  alias: 'A5 Alarm Trigger Armed Away'
+#  triggers:
+#    # MUY IMPORTANTE: EN EL ARM AWAY SE CHEQUEA GRUPO SENSORES HOME + AWAY
+#    - trigger: state
+#      entity_id:
+#        - binary_sensor.aqara_puerta_entrada_principal           # Puerta de entrada
+#        - binary_sensor.alarma_sensores_perimetro_principal      # Grupo Sensores PERIMETRO PRINCIPAL
+#        - binary_sensor.alarma_sensores_perimetro_secundario     # Grupo Sensores PERIMETRO SECUNDARIO
+#        - binary_sensor.alarma_sensores_presencia_interior       # Grupo Sensores Presencia INTERIOR
+#        - binary_sensor.alarma_sensores_presencia_exterior       # Grupo Sensores Presencia EXTERIOR
+#      to: 'on'
+#    # Los sensores vibración solo saltan por trigger = platform device
+#    - trigger: device
+#      type: vibration
+#      device_id: f23111988853a7beeb8c26078f390729 # Puerta Principal Entrada
+#      entity_id: 3c418e73805f1a07820c181eb7bbe936
+#      domain: binary_sensor
+#    - trigger: device
+#      type: vibration
+#      device_id: b8cd622289394361f35ed30b303598f9 # Puerta Salón
+#      entity_id: 0a5a7d3964574dd4792fa6f0925a5e3e
+#      domain: binary_sensor
+#  conditions:
+#    condition: and
+#    conditions:
+#      - condition: state
+#        entity_id: alarm_control_panel.ha
+#        state: armed_away
+#  actions:
+#    # ALMACENA EL SENSOR DEL TRIGGER
+#    - action: input_text.set_value
+#      target:
+#        entity_id: input_text.alarm_trigger
+#      data:
+#        value: "{{ trigger.to_state.attributes.friendly_name }}"
+#    #
+#    # DISPARA LA ALARMA, que pasa a estado PENDING durante 60'
+#    # Si no se desactiva, pasa a triggered y se envían notificaciones y Sirena
+#    - action: alarm_control_panel.alarm_trigger
+#      target:
+#        entity_id: alarm_control_panel.ha
 
 #
 # REGLA: TRIGGER SENSOR => MODO ARMADO HOME => PENDING ==> ALARMA TRIGGERED
 #
-- id: A6
-  alias: 'A6 Alarm Trigger Armed Home'
-  triggers:
-    - trigger: state
-      # Grupo Sensores PERIMETRO PRINCIPAL
-      entity_id: 
-        - binary_sensor.aqara_puerta_entrada_principal           # Puerta de entrada
-        - binary_sensor.alarma_sensores_perimetro_principal      # Grupo Sensores PERIMETRO PRINCIPAL
-      to: 'on'
-    # Los sensores vibración solo saltan por trigger = platform device
-    - trigger: device
-      type: vibration
-      device_id: f23111988853a7beeb8c26078f390729 # Puerta Principal Entrada
-      entity_id: 3c418e73805f1a07820c181eb7bbe936
-      domain: binary_sensor
-    - trigger: device
-      type: vibration
-      device_id: b8cd622289394361f35ed30b303598f9 # Puerta Salón
-      entity_id: 0a5a7d3964574dd4792fa6f0925a5e3e
-      domain: binary_sensor
-  conditions:
-    - condition: state
-      entity_id: alarm_control_panel.ha
-      state: armed_home
-  actions:
-    # ALMACENA EL SENSOR DEL TRIGGER
-    - action: input_text.set_value
-      target:
-        entity_id: input_text.alarm_trigger
-      data:
-        value: "{{ trigger.to_state.attributes.friendly_name }}"
-
-    # DISPARA LA ALARMA, que pasa a estado PENDING durante 60'
-    # Si no se desactiva, pasa a triggered y se envían notificaciones y Sirena
-    - action: alarm_control_panel.alarm_trigger
-      target:
-        entity_id: alarm_control_panel.ha
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#- id: A6
+#  alias: 'A6 Alarm Trigger Armed Home'
+#  triggers:
+#    - trigger: state
+#      # Grupo Sensores PERIMETRO PRINCIPAL
+#      entity_id: 
+#        - binary_sensor.aqara_puerta_entrada_principal           # Puerta de entrada
+#        - binary_sensor.alarma_sensores_perimetro_principal      # Grupo Sensores PERIMETRO PRINCIPAL
+#      to: 'on'
+#    # Los sensores vibración solo saltan por trigger = platform device
+#    - trigger: device
+#      type: vibration
+#      device_id: f23111988853a7beeb8c26078f390729 # Puerta Principal Entrada
+#      entity_id: 3c418e73805f1a07820c181eb7bbe936
+#      domain: binary_sensor
+#    - trigger: device
+#      type: vibration
+#      device_id: b8cd622289394361f35ed30b303598f9 # Puerta Salón
+#      entity_id: 0a5a7d3964574dd4792fa6f0925a5e3e
+#      domain: binary_sensor
+#  conditions:
+#    - condition: state
+#      entity_id: alarm_control_panel.ha
+#      state: armed_home
+#  actions:
+#    # ALMACENA EL SENSOR DEL TRIGGER
+#    - action: input_text.set_value
+#      target:
+#        entity_id: input_text.alarm_trigger
+#      data:
+#        value: "{{ trigger.to_state.attributes.friendly_name }}"
+#
+#    # DISPARA LA ALARMA, que pasa a estado PENDING durante 60'
+#    # Si no se desactiva, pasa a triggered y se envían notificaciones y Sirena
+#    - action: alarm_control_panel.alarm_trigger
+#      target:
+#        entity_id: alarm_control_panel.ha
 
 # REGLA: ALARMA ARMED_AWAY TRIGGERED ==> SIRENA + NOTIFICACION COMPLETA
 #
-- id: A7
-  alias: 'A7 Alarm Triggered'
-  triggers:
-    - trigger: state
-      entity_id: alarm_control_panel.ha
-      to: 'triggered'
-  actions:
-    - choose:
-        # IF entity_id: alarm_control_panel.ha == state: 'triggered'
-        - conditions:
-          - condition: template
-            value_template: "{{ states('alarm_control_panel.ha') == 'triggered' }}"
-          sequence:         
-            # Script Notificación Alarma
-            - action: script.notifica_alarma
-              data:
-                titulo: '*ALARMA HOMY*'
-                mensaje: >
-                  >>> ESTADO: ATENCION ALARMA DISPARADA
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#- id: A7
+#  alias: 'A7 Alarm Triggered'
+#  triggers:
+#    - trigger: state
+#      entity_id: alarm_control_panel.ha
+#      to: 'triggered'
+#  actions:
+#    - choose:
+#        # IF entity_id: alarm_control_panel.ha == state: 'triggered'
+#        - conditions:
+#          - condition: template
+#            value_template: "{{ states('alarm_control_panel.ha') == 'triggered' }}"
+#          sequence:         
+#            # Script Notificación Alarma
+#            - action: script.notifica_alarma
+#              data:
+#                titulo: '*ALARMA HOMY*'
+#                mensaje: >
+#                  >>> ESTADO: ATENCION ALARMA DISPARADA
+#
+#            # ALEXA SIRENAS ALARMA DISPARADA
+#            - action: script.alexa_secuencia_alarma_disparada
 
-            # ALEXA SIRENAS ALARMA DISPARADA
-            - action: script.alexa_secuencia_alarma_disparada
-
-- id: A8_alarm_armed_away_family_away
-  alias: 'A8 Alarm Armed Away Family Away'
-  triggers:
-    # Ya no hay nadie en casa
-    trigger: state
-    entity_id: binary_sensor.family_any_home
-    from: 'on'
-    to: 'off'
-  actions:
-    # Script Activación Alarma ARM AWAY
-    - action: script.homy_armado_total
-    # Delay para no bloquear notificaciones
-    - delay: 0:01
-    # Script  Apagado Total
-    - action: script.home_switch_off
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#- id: A8_alarm_armed_away_family_away
+#  alias: 'A8 Alarm Armed Away Family Away'
+#  triggers:
+#    # Ya no hay nadie en casa
+#    trigger: state
+#    entity_id: binary_sensor.family_any_home
+#    from: 'on'
+#    to: 'off'
+#  actions:
+#    # Script Activación Alarma ARM AWAY
+#    - action: script.homy_armado_total
+#    # Delay para no bloquear notificaciones
+#    - delay: 0:01
+#    # Script  Apagado Total
+#    - action: script.home_switch_off
 
 # REGLA: SCHEDULER ACTIVADO/DESACTIVADO REGLA A8 AUTOARMADO TOTAL - JUEVES LIMPIEZA CASA 07 A 15 OFF
 #
-- id: A8x_alarm_armed_away_scheduler
-  alias: 'A8X Alarm Armed Away Scheduler'
-  triggers:
-    # Trigger basado en scheduler helper que tendrá una programacion 24x7 menos los jueves de 7 a 15.
-    - trigger: state
-      entity_id: schedule.helper_alarma_auto_armado_a8
-      to: 'on'
-      id: trigger_on
-    - trigger: state
-      entity_id: schedule.helper_alarma_auto_armado_a8
-      to: 'off'
-      id: trigger_off
-  conditions: []
-  actions:
-    - choose:
-        - conditions:
-          - condition: trigger
-            id: trigger_on
-          sequence:
-            - action: automation.turn_on
-              target:
-                entity_id: automation.a8_alarm_armed_away_family_away
-        - conditions:
-          - condition: trigger
-            id: trigger_off
-          sequence:
-            - action: automation.turn_off
-              target:
-                entity_id: automation.a8_alarm_armed_away_family_away
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#- id: A8x_alarm_armed_away_scheduler
+#  alias: 'A8X Alarm Armed Away Scheduler'
+#  triggers:
+#    # Trigger basado en scheduler helper que tendrá una programacion 24x7 menos los jueves de 7 a 15.
+#    - trigger: state
+#      entity_id: schedule.helper_alarma_auto_armado_a8
+#      to: 'on'
+#      id: trigger_on
+#    - trigger: state
+#      entity_id: schedule.helper_alarma_auto_armado_a8
+#      to: 'off'
+#      id: trigger_off
+#  conditions: []
+#  actions:
+#    - choose:
+#        - conditions:
+#          - condition: trigger
+#            id: trigger_on
+#          sequence:
+#            - action: automation.turn_on
+#              target:
+#                entity_id: automation.a8_alarm_armed_away_family_away
+#        - conditions:
+#          - condition: trigger
+#            id: trigger_off
+#          sequence:
+#            - action: automation.turn_off
+#              target:
+#                entity_id: automation.a8_alarm_armed_away_family_away
 
-- id: A9_alarm_armed_home_family_home
-  alias: 'A9 Alarm Armed Home Family Home'
-  triggers:
-    # Trigger basado en scheduler helper que tendrá una programacion habitual de 23:30 a 07:00-08:30 segun verano/invierno
-    - trigger: state
-      entity_id: schedule.helper_alarma_armado_home
-      to: 'on'
-    # Trigger basado en la hora para que de 1 a 6 reintente el autoarmado cada 15'
-    - trigger: template
-      value_template: >-
-        {{  now().hour >= 1
-            and now().hour <= 6
-            and now().minute % 15 == 0
-        }}
-  conditions:
-    condition: and
-    conditions:
-      - condition: state
-        entity_id: alarm_control_panel.ha
-        state: disarmed
-      - condition: state
-        entity_id: binary_sensor.family_any_home
-        state: 'on'
-  actions:
-  - choose:
-    - conditions:
-      - condition: state
-        entity_id: binary_sensor.alarma_check_listo_para_armar
-        state: 'on'
-      sequence:
-        - action: alarm_control_panel.alarm_arm_home
-          target:
-            entity_id: alarm_control_panel.ha
-    default:
-      - action: script.alexa_anuncio
-        data:
-          alexa: 'entrada'
-          voz: Atención. Alarma no lista para armado parcial. Revise puertas y ventanas.
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#- id: A9_alarm_armed_home_family_home
+#  alias: 'A9 Alarm Armed Home Family Home'
+#  triggers:
+#    # Trigger basado en scheduler helper que tendrá una programacion habitual de 23:30 a 07:00-08:30 segun verano/invierno
+#    - trigger: state
+#      entity_id: schedule.helper_alarma_armado_home
+#      to: 'on'
+#    # Trigger basado en la hora para que de 1 a 6 reintente el autoarmado cada 15'
+#    - trigger: template
+#      value_template: >-
+#        {{  now().hour >= 1
+#            and now().hour <= 6
+#            and now().minute % 15 == 0
+#        }}
+#  conditions:
+#    condition: and
+#    conditions:
+#      - condition: state
+#        entity_id: alarm_control_panel.ha
+#        state: disarmed
+#      - condition: state
+#        entity_id: binary_sensor.family_any_home
+#        state: 'on'
+#  actions:
+#  - choose:
+#    - conditions:
+#      - condition: state
+#        entity_id: binary_sensor.alarma_check_listo_para_armar
+#        state: 'on'
+#      sequence:
+#        - action: alarm_control_panel.alarm_arm_home
+#          target:
+#            entity_id: alarm_control_panel.ha
+#    default:
+#      - action: script.alexa_anuncio
+#        data:
+#          alexa: 'entrada'
+#          voz: Atención. Alarma no lista para armado parcial. Revise puertas y ventanas.
 
 # REGLA: TRIGGER DESARMADO AUTOMATICO AL AMANECER
 #
-- id: A10_alarm_home_auto_disam
-  alias: 'A10 Alarm Home Auto Disarm'
-  triggers:
-    - trigger: state
-      entity_id: schedule.helper_alarma_armado_home
-      to: 'off'
-  conditions:
-    condition: and
-    conditions:
-      - condition: state
-        entity_id: alarm_control_panel.ha
-        state: armed_home
-      # Hay alguien en casa
-      - condition: state
-        entity_id: binary_sensor.family_any_home
-        state: 'on'
-  actions:
-    # ALMACENA EL SENSOR DEL TRIGGER
-    - action: input_text.set_value
-      target:
-        entity_id: input_text.alarm_trigger
-      data:
-        value: "A10 Alarm Home Auto Disarm"
-    # Desarmado de Alarmas
-    - action: alarm_control_panel.alarm_disarm
-      data:
-        entity_id: alarm_control_panel.ha
-        code: !secret alarm_control_code
-    # Check sensores perimetro
-    - action: script.check_sensores_magneticos_perimetro
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#- id: A10_alarm_home_auto_disam
+#  alias: 'A10 Alarm Home Auto Disarm'
+#  triggers:
+#    - trigger: state
+#      entity_id: schedule.helper_alarma_armado_home
+#      to: 'off'
+#  conditions:
+#    condition: and
+#    conditions:
+#      - condition: state
+#        entity_id: alarm_control_panel.ha
+#        state: armed_home
+#      # Hay alguien en casa
+#      - condition: state
+#        entity_id: binary_sensor.family_any_home
+#        state: 'on'
+#  actions:
+#    # ALMACENA EL SENSOR DEL TRIGGER
+#    - action: input_text.set_value
+#      target:
+#        entity_id: input_text.alarm_trigger
+#      data:
+#        value: "A10 Alarm Home Auto Disarm"
+#    # Desarmado de Alarmas
+#    - action: alarm_control_panel.alarm_disarm
+#      data:
+#        entity_id: alarm_control_panel.ha
+#        code: !secret alarm_control_code
+#    # Check sensores perimetro
+#    - action: script.check_sensores_magneticos_perimetro
     # Notifica Evento
     #- service: script.notifica_evento
     #  data:
@@ -735,37 +800,47 @@
     #    mensaje: >
     #      >>> ESTADO: Desarmado automático al amanecer.
 
-- id: A11_check_status_sensores_perimetros
-  alias: 'A11 Check Status Sensores Perimetro'
-  triggers:
-    trigger: state
-    entity_id: binary_sensor.alarma_check_listo_para_armar
-  actions:
-    - action: light.turn_on
-      target:
-        entity_id: light.tagreader_led
-      data:
-        brightness: 96
-        color_name: >
-          {% if states.binary_sensor.alarma_check_listo_para_armar.state == 'on' %}
-            green
-          {% else %}
-            red
-          {%endif%}
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#- id: A11_check_status_sensores_perimetros
+#  alias: 'A11 Check Status Sensores Perimetro'
+#  triggers:
+#    trigger: state
+#    entity_id: binary_sensor.alarma_check_listo_para_armar
+#  actions:
+#    - action: light.turn_on
+#      target:
+#        entity_id: light.tagreader_led
+#      data:
+#        brightness: 96
+#        color_name: >
+#          {% if states.binary_sensor.alarma_check_listo_para_armar.state == 'on' %}
+#            green
+#          {% else %}
+#            red
+#          {%endif%}
 
 #
 # REGLA: APAGADO BOTON PANICO
 #
-- id: A12_alarm_boton_panico_off
-  alias: 'A12 Alarm Boton Panico Off'
-  triggers:
-    trigger: state
-    entity_id: input_boolean.alarm_panic_button
-    from: 'on'
-    to: 'off'
-  actions:
-    # Llamada a script desactivado botón pánico.
-    - action: script.alarma_boton_panico_off
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#- id: A12_alarm_boton_panico_off
+#  alias: 'A12 Alarm Boton Panico Off'
+#  triggers:
+#    trigger: state
+#    entity_id: input_boolean.alarm_panic_button
+#    from: 'on'
+#    to: 'off'
+#  actions:
+#    # Llamada a script desactivado botón pánico.
+#    - action: script.alarma_boton_panico_off
 
 
 #-----------------------------------------------------------------------------#
@@ -1309,8 +1384,6 @@
               {% endif %}
           target:
             entity_id: light.luz_entrada
-        # Si Alarm.Armed_Home => Piloto ON
-        - action: script.luz_on_armed_home
     # Espera a que ningún sensor de movimiento detecte presencia (máx. 30 min por seguridad)
     - wait_template: >
         {{ not is_state('binary_sensor.aqara_movimiento_entrada', 'on')
@@ -1323,12 +1396,10 @@
           {% if now().hour >= 1 and now().hour <= 7 %} 1
           {% else %} 5
           {% endif %}
-    # Luces Entrada OFF
+    # Luces Entrada OFF (2026-10-12: el LED del tag reader lo gestiona Alarm HOMY)
     - action: light.turn_off
       target:
-        entity_id:
-          - light.luz_entrada
-          - light.tagreader_led
+        entity_id: light.luz_entrada
 
 - id: L08
   alias: 'L08 Luces On Dormitorio Según Sensor'
@@ -2765,11 +2836,6 @@
       state: 'on'
   actions:
     # Script Notificación Alarma
-    - action: input_text.set_value
-      target:
-        entity_id: input_text.alarm_trigger
-      data:
-        value: "{{ trigger.to_state.attributes.friendly_name }}"
     - action: script.notifica_alarma
       data:
         voz: 'Alarma Conexión de Red (ping)'
@@ -2777,7 +2843,7 @@
         mensaje: >
           >>> URGENTE: Fallo en conectividad de red (ping)
 
-          >>> DISPOSITIVO: {{ states('input_text.alarm_trigger') }}
+          >>> DISPOSITIVO: {{ trigger.to_state.attributes.friendly_name }}
 
 
 #-----------------------------------------------------------------------------#
@@ -2805,37 +2871,36 @@
 
 - id: t01_nfc_tags_alarm_toogle
   alias: 'NFC Tags Alarm Toogle'
+  # 2026-10-12 Alarm HOMY: desarmada → arma Ausente; cualquier otro estado → desarma.
+  mode: single
   triggers:
     - trigger: tag
       tag_id: 04-50-B6-01-25-3B-03 # AAC Blue Tag
+      id: Agustín
     - trigger: tag
       tag_id: 04-50-4F-01-B5-1D-03 # MFC Red Tag
+      id: Malen
     - trigger: tag
       tag_id: 04-50-9A-01-7D-1D-03 # AAF Black Tag
+      id: Agu
     - trigger: tag
       tag_id: 04-50-B3-01-0D-3B-03 # PAF Yellow Tag
+      id: Paloma
   actions:
-    - choose:
-      # IF Alarma Homy = Desarmada => Armado Away
-      - conditions:
+    - if:
         - condition: state
-          entity_id: alarm_control_panel.ha
+          entity_id: alarm_control_panel.alarm_homy
           state: 'disarmed'
-        sequence:
-          # Check sensores perimetro
-          - action: script.check_sensores_magneticos_perimetro
-          # Armardo Away
-          #- service: alarm_control_panel.alarm_arm_away
-          #  data:
-          #    entity_id: alarm_control_panel.ha
-          #    code: !secret alarm_control_code
-      #ELSE alarma armado home/away => Desarmado
-      default:
-        # Desarmado
-        - action: alarm_control_panel.alarm_disarm
+      then:
+        - action: script.alarm_homy_armar
           data:
-            entity_id: alarm_control_panel.ha
-            code: !secret alarm_control_code
+            modo: armed_away
+            origen: "{{ trigger.id }} (NFC)"
+      else:
+        - action: script.alarm_homy_desarmar
+          data:
+            validar: false
+            origen: "{{ trigger.id }} (NFC)"
 
 - id: t02_nfc_tags_credit_card_boton_panico
   alias: 'NFC Tags Credit Card Botón Pánico'
@@ -2843,11 +2908,11 @@
     - trigger: tag
       tag_id: 79-D5-0A-8F # Tag Credit Card
   actions:
-    # BOTON DEL PANICO: Secuencia Alexa ALARMA
-    - action: input_boolean.turn_on
-      target:
-        entity_id: input_boolean.alarm_panic_button
-    - action: script.alarma_boton_panico
+    # 2026-10-12 Alarm HOMY: pánico sonoro
+    - action: script.alarm_homy_panico
+      data:
+        tipo: panico_sonoro
+        origen: Tarjeta NFC
 
 - id: t03_nfc_tags_bigblue_alarm_armed_away'
   alias: 'NFC Tags Big Blue  - Armado Away'
@@ -2855,10 +2920,11 @@
     - trigger: tag
       tag_id: 2C-CA-F0-22
   actions:
-    - action: alarm_control_panel.alarm_arm_away
+    # 2026-10-12 Alarm HOMY
+    - action: script.alarm_homy_armar
       data:
-        entity_id: alarm_control_panel.ha
-        code: !secret alarm_control_code
+        modo: armed_away
+        origen: Big Blue (NFC)
 
 
 #-----------------------------------------------------------------------------#
@@ -2903,14 +2969,11 @@
       event_data:
         actionName: 'alarma_off'
   actions:
-    # Check sensores perimetro
-    - action: script.check_sensores_magneticos_perimetro
-
-    # Desarmado de Alarmas
-    - action: alarm_control_panel.alarm_disarm
+    # 2026-10-12 Alarm HOMY
+    - action: script.alarm_homy_desarmar
       data:
-        entity_id: alarm_control_panel.ha
-        code: !secret alarm_control_code
+        validar: false
+        origen: iOS Action
 
 
 - id: I04
@@ -2922,11 +2985,11 @@
       event_data:
         actionName: 'alarma_armado_total'
   actions:
-    # Desarmado de Alarmas
-    - action: alarm_control_panel.alarm_arm_away
+    # 2026-10-12 Alarm HOMY: armado Ausente
+    - action: script.alarm_homy_armar
       data:
-        entity_id: alarm_control_panel.ha
-        code: !secret alarm_control_code
+        modo: armed_away
+        origen: iOS Action
 
 #-----------------------------------------------------------------------------#
 #                                                                             #
@@ -2938,8 +3001,10 @@
 - id: ZHA_L1
   alias: ZHA Exterior Philips Hue Smart Button
   mode: queued
-  # Realiza un ciclo cada vez que se pulsa en el boton up/down
-  # scene.dormitorio_full, scene.dormitorio_lectura, scene.dormitorio_relax, scene.dormitorio_noche
+  # Pulsador Hue Smart Button (ROM001) de la entrada
+  #   corta  → luz exterior on/off
+  #   doble  → comprobar estado de la alarma (voz Alexa)       [Alarm HOMY]
+  #   larga  → PÁNICO SONORO                                   [Alarm HOMY]
   triggers:
     - device_id: 9b4a8d38607a9f81ccdffab704cd03e2
       domain: zha
@@ -2956,70 +3021,41 @@
     - device_id: 9b4a8d38607a9f81ccdffab704cd03e2
       domain: zha
       trigger: device
-      type: remote_button_triple_press
+      type: remote_button_long_press
       subtype: turn_on
-      id: triple_press
-    - device_id: 9b4a8d38607a9f81ccdffab704cd03e2
-      domain: zha
-      trigger: device
-      type: remote_button_quadruple_press
-      subtype: turn_on
-      id: quadruple_press
+      id: long_press
   conditions: []
   actions:
+    - action: input_text.set_value
+      target:
+        entity_id: input_text.helper_hue_smart_button_entrada
+      data:
+        value: >-
+          {{ trigger.id }} - {{ {'short_press': 'luz exterior', 'double_press': 'comprobar alarma', 'long_press': 'PANICO SONORO'}[trigger.id] }}
     - choose:
-        # IF trigger ID = short_press
+        # Corta: enciende/apaga luz exterior
         - conditions:
-          - condition: trigger
-            id: short_press
+            - condition: trigger
+              id: short_press
           sequence:
-            # Enciende/Apaga Luz Exterior
             - action: light.toggle
               target:
                 entity_id: light.luz_exterior
-            - action: input_text.set_value
-              data:
-                value: "{{ trigger.id }} - light.luz_exterior {{ states('light.luz_exterior')}}"
-              target:
-                entity_id: input_text.helper_hue_smart_button_entrada
-        # ELIF double_press
+        # Doble: estado de la alarma y si está lista para armar → Alexa
         - conditions:
-          - condition: trigger
-            id: double_press
+            - condition: trigger
+              id: double_press
           sequence:
-            # Check Sensores Magneticos Perimetro
-            - action: input_text.set_value
-              data:
-                value: "{{ trigger.id }} - check sensores perimetro"
-              target:
-                entity_id: input_text.helper_hue_smart_button_entrada
-            # Ejecuta sript de chequeo de sensores perímetro principales
-            - action: script.check_sensores_magneticos_perimetro
-        # ELIF triple_press ==> ACTIVA BOTON PANICO DURANTE 5 MINUTOS
+            - action: script.alarm_homy_comprobar
+        # Larga: pánico sonoro
         - conditions:
-          - condition: trigger
-            id: triple_press
+            - condition: trigger
+              id: long_press
           sequence:
-            - action: input_boolean.turn_on
-              target:
-                entity_id: input_boolean.alarm_panic_button
-            - action: script.alarma_boton_panico 
-            - action: input_text.set_value
+            - action: script.alarm_homy_panico
               data:
-                value: "{{ trigger.id }} - BOTON DEL PANICO"
-              target:
-                entity_id: input_text.helper_hue_smart_button_entrada
-            # Botón del pánico activado durante 5 minutos máximo
-            - delay: "00:05:00"
-            - action: input_boolean.turn_off
-              target:
-                entity_id: input_boolean.alarm_panic_button
-
-        # ELIF quadruple_press
-        #- conditions:
-        #  - condition: trigger
-        #    id: quadruple_press
-        #  sequence:
+                tipo: panico_sonoro
+                origen: Pulsador Hue entrada
 
 #  alias: ZHA Dormitorio MFC Philips HUE Dimmer
 # (2026-10-11) ZHA_L2 COMENTADA: el Hue Dimmer del dormitorio MFC ya no está emparejado en ZHA
@@ -3173,13 +3209,16 @@
 #               target:
 #                 entity_id: input_text.helper_hue_dimmer_switch_dormitorio
 
-#  alias: ZHA Cocina IKEA Rodret Dimmer
+#  alias: ZHA Entrada IKEA Rodret Alarma HOMY
 - id: ZHA_L3
-  alias: ZHA Cocina IKEA Rodret Dimmer
-  mode: queued
+  alias: ZHA Entrada IKEA Rodret Alarma HOMY
+  mode: single
+  # IKEA RODRET (sensor.ikea_dimmer_switch_alarma_homy), junto al tag reader de la entrada.
+  # (2026-10-11) Reutilizado: antes alternaba switch.esphome_pow_sw2 (lavadora, hoy riego tomates).
+  #   Botón "O" (0, command off) → Armar CASA       [Alarm HOMY]
+  #   Botón "I" (1, command on)  → Armar AUSENTE    [Alarm HOMY]
+  #   Desarmar NO se hace desde un botón físico (NFC, iPhone o código).
   triggers:
-    # trigger.id = 0 => on_press - turn_on
-    # trigger.id = 1 => off_press - turn_off
     - trigger: event
       event_type: zha_event
       event_data:
@@ -3187,7 +3226,7 @@
         command: 'off'
         cluster_id: 6
         endpoint_id: 1
-      id: press-off
+      id: armed_home
     - trigger: event
       event_type: zha_event
       event_data:
@@ -3195,28 +3234,13 @@
         command: 'on'
         cluster_id: 6
         endpoint_id: 1
-      id: press-on
+      id: armed_away
   conditions: []
   actions:
-    # value: "{{ trigger.to_state.attributes.friendly_name }}"
-    - choose:
-        # IF Trigger Short_Press - ON => TOGGLE Lavadora
-        - conditions:
-          - condition: trigger
-            id: press-on
-          sequence:
-            - action: switch.toggle
-              target:
-                entity_id: switch.esphome_pow_sw2
-        # IF Trigger Short_Press - OFF => TOGGLE Automation Warning Lavadora
-        # (2026-10-10) Comentado: la automatización S16c ya no existe y el pulsador no se usa
-        # - conditions:
-        #   - condition: trigger
-        #     id: press-off
-        #   sequence:
-        #     - action: automation.toggle
-        #       target:
-        #         entity_id: automation.s16c_sonoff_pow_lavadora_warning
+    - action: script.alarm_homy_armar
+      data:
+        modo: "{{ trigger.id }}"
+        origen: Pulsador RODRET entrada
 
 #  alias: ZHA Salon IKEA Styrbar Dimmer
 - id: ZHA_L4
@@ -3789,19 +3813,13 @@
   # DEVICE_FLIPED ==> Realiza un ciclo cada vez que se pulsa en el boton left-right
   # entity_id: scene.estudio_setup_soft, scene.estudio_setup_high, scene.estudio_azul, scene.estudio_ocre
   #
-  # type: device_shaken, subtype: turn_on   => ALARM DISARM
+  # type: device_shaken                     => (2026-10-12 eliminado: no se desarma desde botones físicos)
   # type: device_rotated,subtype: left      => Escena Estudio Setup Soft
   # type: device_rotated,subtype: right     => Escena Estudio Setup High
   # type: device_knocked,subtype: face_any  => Escena Estudio Lava Palaustre
   # type: device_flipped,subtype: face_any  => Ciclo Derecha Loop Escenas
   # type: device_slid,subtype: face_any     => 
   triggers:
-    - device_id: d37e91591c751fdbc46064847d200cbc
-      domain: zha
-      trigger: device
-      type: device_shaken
-      subtype: turn_on
-      id: shaken
     - device_id: d37e91591c751fdbc46064847d200cbc
       domain: zha
       trigger: device
@@ -3829,21 +3847,6 @@
   conditions: []
   actions:
     - choose:
-        # IF trigger.id = shaken => Alarm DISARM
-        - conditions:
-          - condition: trigger
-            id: shaken
-          sequence:
-            # Desarmado de Alarmas
-            - action: alarm_control_panel.alarm_disarm
-              data:
-                entity_id: alarm_control_panel.ha
-                code: !secret alarm_control_code
-            - action: input_text.set_value
-              data:
-                value: "ALARMA HOMY {{ states('alarm_control_panel.ha')| upper }}"
-              target:
-                entity_id: input_text.helper_ikea_dimmer_switch_estudio
         # ELIF trigger.id = rotated_right => Escena Estudio Setup SOFT
         - conditions:
           - condition: trigger
@@ -4283,3 +4286,32 @@
             - action: scene.turn_on
               target:
                 entity_id: "{{ states('input_select.helper_scene_cocina')}}"
+
+#-----------------------------------------------------------------------------#
+#                                                                             #
+# REGLAS DE AUTOMATIZACION DISPOSITIVOS MATTER (THREAD) A TRAVES DE EVENTOS   #
+#                                                                             #
+#-----------------------------------------------------------------------------#
+
+#  alias: ZMA Dormitorio IKEA BILRESA Boton Doble
+- id: ZMA_L1
+  alias: ZMA Dormitorio IKEA BILRESA Boton Doble
+  mode: single
+  # IKEA BILRESA dual button (Matter/Thread): event.bilresa_dual_button_button_1 / _2
+  # Eventos: multi_press_1, multi_press_2, long_press, long_release
+  #   larga (cualquier botón) → PÁNICO SILENCIOSO   [Alarm HOMY]
+  triggers:
+    - trigger: state
+      entity_id:
+        - event.bilresa_dual_button_button_1
+        - event.bilresa_dual_button_button_2
+  conditions:
+    - condition: template
+      value_template: >-
+        {{ trigger.from_state is not none and trigger.from_state.state not in ['unavailable', 'unknown']
+           and trigger.to_state.attributes.event_type == 'long_press' }}
+  actions:
+    - action: script.alarm_homy_panico
+      data:
+        tipo: panico_silencioso
+        origen: "BILRESA botón {{ '1' if trigger.entity_id.endswith('_1') else '2' }}"

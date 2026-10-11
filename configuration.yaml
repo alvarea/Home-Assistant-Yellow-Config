@@ -139,22 +139,27 @@ ios:
 #   TRIGGERED   <TRIGGER_TIME>                    Estado de alarma TRIGGERED durante <trigger_time> segundos
 #   ARMED_X     Permanante                        Estado anterior de alarma armada
 #
-alarm_control_panel:
-  - platform: manual
-    name: HA
-    # code: !secret alarm_control_code
-    # Pending: The time in seconds of the pending time before effecting a state change. Default is 60 seconds.
-    # Delay: The time in seconds of the pending time before triggering the alarm. Default is 0 seconds.
-    # Trigger: The time in seconds of the trigger time in which the alarm is firing. Default is 120 seconds
-    code: !secret alarm_control_code
-    code_arm_required: false
-    arming_time: 60
-    delay_time: 60
-    trigger_time: 300
-    disarmed:
-      trigger_time: 0 # the disarmed state never triggers the alarm;
-    armed_home:
-      arming_time: 0
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#alarm_control_panel:
+#  - platform: manual
+#    name: HA
+#    # code: !secret alarm_control_code
+#    # Pending: The time in seconds of the pending time before effecting a state change. Default is 60 seconds.
+#    # Delay: The time in seconds of the pending time before triggering the alarm. Default is 0 seconds.
+#    # Trigger: The time in seconds of the trigger time in which the alarm is firing. Default is 120 seconds
+#    code: !secret alarm_control_code
+#    code_arm_required: false
+#    arming_time: 60
+#    delay_time: 60
+#    trigger_time: 300
+#    disarmed:
+#      trigger_time: 0 # the disarmed state never triggers the alarm;
+#    armed_home:
+#      arming_time: 0
 
 # Timer temporizadores
 timer:
@@ -300,7 +305,7 @@ alert:
   alerta_alarma_ha:
     name: ALERTA - ALARMA HOMY ACTIVADA
     done_message: Alarma Desactivada OK
-    entity_id: alarm_control_panel.ha
+    entity_id: alarm_control_panel.alarm_homy  # 2026-10-12 (antes alarm_control_panel.ha)
     state: 'triggered'
     repeat: 1
     can_acknowledge: true

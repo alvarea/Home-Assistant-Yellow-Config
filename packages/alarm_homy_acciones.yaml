@@ -1,0 +1,660 @@
+###############################################################################
+#  ALARM HOMY · Acciones por evento (avisos, voz, pitidos, LED, sirena)
+#
+#  Matriz validada 2026-10-11:
+#    arming          voz + bip/seg (0,5 s últimos 10 s) + LED blanco
+#    armed_away/vac  iOS normal + voz "Armado total" + 3 bips cortos. VACACIONES además: arma Blink, Telegram en armado/desarmado, entrada con aviso CRÍTICO + LED naranja
+#    armed_home      voz "Armado parcial" + 2 bips + LED morado
+#    armed_night     voz "Armado Noche" + 2 bips + LED azul
+#    fallo armado    iOS + Telegram + voz con sensores + 3 bips graves + LED rojo 5 s
+#    pending         iOS urgente con botón Desarmar (Face ID) + voz + bip rápido + LED rojo
+#    triggered       iOS CRÍTICO + Telegram + sirena + Alexa en bucle + pitido + LED rojo
+#    pánico sonoro   = triggered con texto PÁNICO
+#    pánico silencio (BILRESA, pulsación larga en cualquier botón) iOS CRÍTICO + Telegram. NADA físico (ni sirena, ni voz, ni bips, ni LED)
+#  Pulsar una notificación abre el dashboard Alarma HOMY (/alarma-homy/alarma).
+#  Tags iOS: estado (armada/desarmada) · alerta (entrada/disparo/pánico; se borra al desarmar) · fallo · codigo.
+#  Echo de la voz: input_select.alarm_homy_echo_voz (entrada por defecto).
+#    desarmado       iOS normal (borra la crítica) + voz + bip largo + LED verde (lista) / amarillo (no lista)
+#    LED rojo SOLO para entrada y disparo.
+#    código erróneo  iOS + Telegram + 3 bips graves
+#  input_boolean.alarm_homy_notif_<evento>: activa/desactiva solo los AVISOS (iOS/Telegram).
+#  input_boolean.alarm_homy_modo_pruebas ON: iOS solo a AAC y MFC, sin Telegram, sin sirena ni sirena Alexa.
+#  input_boolean.alarm_homy_silenciar_sirenas ON: sin sirena ni sirena Alexa.
+###############################################################################
+
+script:
+  # ---------------------------------------------------------------------------
+  # AVISO iOS (+ Telegram opcional)
+  # ---------------------------------------------------------------------------
+  alarm_homy_notificar:
+    alias: Alarm HOMY · Notificar
+    icon: mdi:bell-ring
+    mode: queued
+    fields:
+      titulo: {selector: {text: }}
+      mensaje: {selector: {text: }}
+      nivel:
+        description: active | time-sensitive | critical
+        default: active
+        selector: {select: {options: [active, time-sensitive, critical]}}
+      telegram: {default: false, selector: {boolean: }}
+      desarmar: {description: Añade botón Desarmar (Face ID), default: false, selector: {boolean: }}
+      tag:
+        description: "Misma tag = sustituye la notificación anterior (estado | alerta | fallo | codigo)"
+        default: estado
+        selector: {text: }
+    sequence:
+      - variables:
+          pruebas: "{{ is_state('input_boolean.alarm_homy_modo_pruebas', 'on') }}"
+          nivel: "{{ nivel | default('active') }}"
+          # Modo pruebas: solo AAC y MFC (Malen). Producción: los 4 iPhone.
+          destinos: "{{ ['notify.mobile_app_iphone_aac', 'notify.mobile_app_iphone_malen'] if pruebas else ['notify.notifica_grupo_ios'] }}"
+          push: >-
+            {% if nivel == 'critical' %}{{ {'interruption-level': 'critical', 'sound': {'name': 'default', 'critical': 1, 'volume': 1.0}} }}
+            {% else %}{{ {'interruption-level': nivel} }}{% endif %}
+          acciones: >-
+            {{ [{'action': 'ALARM_HOMY_DESARMAR', 'title': 'Desarmar', 'authenticationRequired': true, 'destructive': true}] if desarmar | default(false) else [] }}
+      - repeat:
+          for_each: "{{ destinos }}"
+          sequence:
+              - action: "{{ repeat.item }}"
+                continue_on_error: true
+                data:
+                  title: "{{ (titulo ~ ' [PRUEBA]') if pruebas else titulo }}"
+                  message: "{{ mensaje }}"
+                  # Sin botones → no se envía la clave 'actions' (una lista vacía hace que iOS muestre opciones genéricas)
+                  data: >-
+                    {% set d = {'tag': 'alarm_homy_' ~ (tag | default('estado')), 'group': 'alarm_homy',
+                                'url': '/alarma-homy/alarma',
+                                'push': push} %}
+                    {{ dict(d, actions=acciones) if acciones | count > 0 else d }}
+      - if:
+          - condition: template
+            value_template: "{{ telegram | default(false) and not pruebas }}"
+        then:
+          - action: notify.telegram_alarm
+            continue_on_error: true
+            data:
+              title: "*{{ titulo }}*"
+              message: "{{ mensaje }}"
+
+  # ---------------------------------------------------------------------------
+  # PITIDOS tag reader (rtttl)
+  # ---------------------------------------------------------------------------
+  alarm_homy_pitidos:
+    alias: Alarm HOMY · Pitidos
+    icon: mdi:volume-high
+    mode: queued
+    fields:
+      patron:
+        selector: {select: {options: [bip, dos, tres, largo, error, rapido]}}
+    sequence:
+      - action: esphome.tagreader_9a0be4_play_rtttl
+        continue_on_error: true
+        data:
+          song_str: >-
+            {#- Tono ~1 kHz (o=6) elegido por Agustín; duraciones alargadas (b=120) -#}
+            {{ {'bip':    'bip:d=8,o=6,b=120:c',
+                'dos':    'dos:d=4,o=6,b=120:c,p,c',
+                'tres':   'tres:d=8,o=6,b=150:p,c,p,c,p,c',
+                'largo':  'largo:d=1,o=6,b=120:c',
+                'error':  'error:d=4,o=4,b=120:c,p,c,p,c',
+                'rapido': 'rapido:d=16,o=6,b=120:c,p,c'}[patron] }}
+
+  # ---------------------------------------------------------------------------
+  # LED tag reader según estado
+  # ---------------------------------------------------------------------------
+  alarm_homy_led:
+    alias: Alarm HOMY · LED
+    icon: mdi:led-on
+    mode: restart
+    sequence:
+      - variables:
+          estado: "{{ states('input_select.alarm_homy_estado') }}"
+          lista: "{{ is_state('binary_sensor.alarm_homy_lista_para_armar', 'on') }}"
+          cfg: >-
+            {% set m = {'arming': ['white', 128], 'armed_away': ['orange', 96], 'armed_vacation': ['orange', 96],
+                        'armed_home': ['purple', 96], 'armed_night': ['blue', 96],
+                        'pending': ['red', 255], 'triggered': ['red', 255]} %}
+            {{ m.get(estado, ['green' if lista else 'yellow', 64]) }}
+      - action: light.turn_on
+        target: {entity_id: light.tagreader_led}
+        data:
+          color_name: "{{ cfg[0] }}"
+          brightness: "{{ cfg[1] }}"
+
+  # ---------------------------------------------------------------------------
+  # VOZ Alexa entrada
+  # ---------------------------------------------------------------------------
+  alarm_homy_voz:
+    alias: Alarm HOMY · Voz
+    icon: mdi:account-voice
+    mode: queued
+    fields:
+      voz: {selector: {text: }}
+    sequence:
+      - variables:
+          # Echo de voz configurable (input_select.alarm_homy_echo_voz); por defecto la entrada
+          echo: "{{ states('input_select.alarm_homy_echo_voz') if states('input_select.alarm_homy_echo_voz') in ['entrada', 'estudio', 'dormitorio'] else 'entrada' }}"
+          previo: "{{ state_attr('media_player.echo_alexa_' ~ echo, 'volume_level') }}"
+      - action: script.alarm_homy_alexa_volumen
+        data: {echos: ["{{ echo }}"], tipo: anuncio}
+      - action: notify.alexa_media
+        continue_on_error: true
+        data:
+          target: "media_player.echo_alexa_{{ echo }}"
+          # Todos los mensajes de alarma empiezan por "Atención."
+          message: "Atención. {{ voz | regex_replace('^\\s*Atención[.,:]?\\s*', '') }}"
+          data: {type: announce}
+      - delay: 8
+      - if:
+          - condition: template
+            value_template: "{{ previo is number }}"
+        then:
+          - action: media_player.volume_set
+            continue_on_error: true
+            target: {entity_id: "media_player.echo_alexa_{{ echo }}"}
+            data: {volume_level: "{{ previo }}"}
+
+  # ---------------------------------------------------------------------------
+  # VOLUMEN Alexa según tipo (anuncio | alarma) y franja horaria (noc 0-9 h, dia 10-23 h)
+  # Usa los input_number.alexa_<echo>_volumen_<tipo>_<dia|noc> existentes.
+  # ---------------------------------------------------------------------------
+  alarm_homy_alexa_volumen:
+    alias: Alarm HOMY · Volumen Alexa
+    icon: mdi:volume-high
+    mode: parallel
+    fields:
+      echos: {description: "Lista: entrada, dormitorio", selector: {object: }}
+      tipo: {selector: {select: {options: [anuncio, alarma]}}}
+    sequence:
+      - repeat:
+          for_each: "{{ echos }}"
+          sequence:
+            - action: media_player.volume_set
+              continue_on_error: true
+              target: {entity_id: "media_player.echo_alexa_{{ repeat.item }}"}
+              data:
+                volume_level: >-
+                  {{ states('input_number.alexa_' ~ repeat.item ~ '_volumen_' ~ tipo ~ '_' ~ ('noc' if now().hour < 10 else 'dia')) | float(0.5) }}
+
+  # ---------------------------------------------------------------------------
+  # BUCLES mientras dura cada estado
+  # ---------------------------------------------------------------------------
+  alarm_homy_bucle_salida:
+    alias: Alarm HOMY · Bucle salida
+    mode: restart
+    sequence:
+      - repeat:
+          while:
+            - condition: state
+              entity_id: input_select.alarm_homy_estado
+              state: arming
+          sequence:
+            - action: script.alarm_homy_pitidos
+              data: {patron: bip}
+            - variables:
+                resto: >-
+                  {% set f = state_attr('timer.alarm_homy_salida', 'finishes_at') %}
+                  {{ (as_timestamp(f) - as_timestamp(now())) if f else 0 }}
+            - delay:
+                milliseconds: "{{ 500 if resto < 10 else 1000 }}"
+
+  alarm_homy_bucle_entrada:
+    alias: Alarm HOMY · Bucle entrada
+    mode: restart
+    sequence:
+      - repeat:
+          while:
+            - condition: state
+              entity_id: input_select.alarm_homy_estado
+              state: pending
+          sequence:
+            - action: script.alarm_homy_pitidos
+              data: {patron: rapido}
+            - delay: 1
+
+  alarm_homy_bucle_disparo:
+    alias: Alarm HOMY · Bucle disparo
+    mode: restart
+    sequence:
+      - variables:
+          sirenas: "{{ is_state('input_boolean.alarm_homy_modo_pruebas', 'off') and is_state('input_boolean.alarm_homy_silenciar_sirenas', 'off') }}"
+      - if:
+          - condition: template
+            value_template: "{{ sirenas }}"
+        then:
+          - action: script.alarm_homy_alexa_volumen
+            data: {echos: [entrada, dormitorio], tipo: alarma}
+      - repeat:
+          while:
+            - condition: state
+              entity_id: input_select.alarm_homy_estado
+              state: triggered
+          sequence:
+            - action: script.alarm_homy_pitidos
+              data: {patron: largo}
+            - if:
+                - condition: template
+                  value_template: "{{ sirenas }}"
+              then:
+                - action: media_player.play_media
+                  continue_on_error: true
+                  target:
+                    entity_id: [media_player.echo_alexa_entrada, media_player.echo_alexa_dormitorio]
+                  data:
+                    media_content_type: sound
+                    media_content_id: "{{ states('input_select.alarm_homy_sonido_alexa') }}"
+            - delay: 3
+
+  # ---------------------------------------------------------------------------
+  # COMPROBAR: estado de la alarma y si está lista para armar → voz en Alexa
+  # (pulsador Hue entrada, doble pulsación)
+  # ---------------------------------------------------------------------------
+  alarm_homy_comprobar:
+    alias: Alarm HOMY · Comprobar estado
+    icon: mdi:shield-search
+    mode: single
+    sequence:
+      - variables:
+          estado: "{{ states('input_select.alarm_homy_estado') }}"
+          modo: "{{ states('input_select.alarm_homy_modo') }}"
+          voz: >-
+            {% from 'alarm_homy.jinja' import bloqueantes, perimetro_abierto, nombres_voz, nombre_modo %}
+            {%- set excl = state_attr('sensor.alarm_homy_excluidos', 'entidades') or [] -%}
+            {%- set d_ent = state_attr('sensor.alarm_homy_disparo', 'entity_id') -%}
+            {%- if estado in ['armed_away', 'armed_home', 'armed_night', 'armed_vacation'] -%}
+              Alarma armada en modo {{ nombre_modo(modo) }}.
+              {%- if excl | count > 0 %} Excluido: {{ nombres_voz(excl) }}.{% endif %}
+            {%- elif estado == 'arming' -%}
+              Alarma armándose en modo {{ nombre_modo(modo) }}. Quedan {{ ((as_timestamp(state_attr('timer.alarm_homy_salida', 'finishes_at')) - as_timestamp(now())) | int(0)) if state_attr('timer.alarm_homy_salida', 'finishes_at') else 0 }} segundos.
+            {%- elif estado == 'pending' -%}
+              Alarma en entrada, modo {{ nombre_modo(modo) }}.{{ (' Detectado ' ~ nombres_voz([d_ent]) ~ '.') if d_ent and d_ent != 'panico' else '' }} Desarme la alarma.
+            {%- elif estado == 'triggered' -%}
+              Alarma disparada{{ (' por ' ~ nombres_voz([d_ent])) if d_ent and d_ent != 'panico' else '' }}. Desarme la alarma.
+            {%- else -%}
+              {%- set b = bloqueantes('armed_away') | from_json -%}
+              {%- set p = perimetro_abierto() | from_json -%}
+              Alarma desarmada.
+              {%- if p | count == 0 %} Lista para armar.
+              {%- else %} No está lista para armar. {{ 'Abierto el' if p | count == 1 else 'Abiertos el' }} {{ nombres_voz(p) }}.
+                {%- if b | count == 0 %} Se puede armar, pero {{ 'ese sensor quedará excluido' if p | count == 1 else 'esos sensores quedarán excluidos' }} de la vigilancia.{% else %} {{ 'Lo impide el' if b | count == 1 else 'Lo impiden el' }} {{ nombres_voz(b) }}.{% endif %}
+              {%- endif %}
+            {%- endif %}
+      - action: script.alarm_homy_led
+      - action: script.turn_on
+        target: {entity_id: script.alarm_homy_voz}
+        data:
+          variables:
+            voz: "{{ voz }}"
+
+automation:
+  # ---------------------------------------------------------------------------
+  # CAMBIOS DE ESTADO → acciones físicas y avisos
+  # ---------------------------------------------------------------------------
+  - id: alarm_homy_acciones_estado
+    alias: Alarm HOMY · Acciones por estado
+    mode: queued
+    max: 10
+    triggers:
+      - trigger: state
+        entity_id: input_select.alarm_homy_estado
+        not_to: [unknown, unavailable]
+    variables:
+        estado: "{{ trigger.to_state.state }}"
+        desde: "{{ trigger.from_state.state if trigger.from_state else 'unknown' }}"
+        modo: "{{ states('input_select.alarm_homy_modo') }}"
+        tipo: "{{ states('input_select.alarm_homy_tipo_disparo') }}"
+        silencioso: "{{ tipo == 'panico_silencioso' }}"
+        nombre: >-
+          {% from 'alarm_homy.jinja' import nombre_modo %}{{ nombre_modo(modo) }}
+        txt: >-
+          {% from 'alarm_homy.jinja' import texto_modo %}{{ texto_modo(modo) }}
+    actions:
+      # El sensor de disparo (trigger-based) se actualiza en paralelo: esperar a que tenga datos
+      - if:
+          - condition: template
+            value_template: "{{ estado in ['pending', 'triggered'] }}"
+        then:
+          - wait_template: "{{ states('sensor.alarm_homy_disparo') not in ['ninguno', 'unknown', 'unavailable'] }}"
+            timeout: 3
+      - variables:
+          d_sensor: "{{ states('sensor.alarm_homy_disparo') }}"
+          d_entidad: "{{ state_attr('sensor.alarm_homy_disparo', 'entity_id') }}"
+          d_area: "{{ state_attr('sensor.alarm_homy_disparo', 'area') }}"
+          d_hora: "{{ state_attr('sensor.alarm_homy_disparo', 'hora') or now().strftime('%H:%M:%S') }}"
+          d_lista: "{{ state_attr('sensor.alarm_homy_disparo', 'lista') or [] }}"
+          d_origen: "{{ state_attr('sensor.alarm_homy_disparo', 'origen') }}"
+      # Fin del tiempo de disparo (vuelve a armada): apagar sirena
+      - if:
+          - condition: template
+            value_template: "{{ desde == 'triggered' and estado != 'triggered' }}"
+        then:
+          - action: siren.turn_off
+            continue_on_error: true
+            target: {entity_id: siren.sirena}
+      # LED (salvo pánico silencioso)
+      - if:
+          - condition: template
+            value_template: "{{ not (silencioso and estado == 'triggered') and estado != 'disarmed' }}"
+        then:
+          - action: script.alarm_homy_led
+      - choose:
+          # ----- ARMANDO -----
+          - conditions: "{{ estado == 'arming' }}"
+            sequence:
+              - action: script.turn_on
+                target: {entity_id: script.alarm_homy_bucle_salida}
+              - action: script.turn_on
+                target: {entity_id: script.alarm_homy_voz}
+                data:
+                  variables:
+                    voz: "Armando modo {{ nombre }}. Tiene {{ states('input_number.alarm_homy_' ~ txt ~ '_salida') | int(0) }} segundos para salir."
+          # ----- ARMADA -----
+          - conditions: "{{ estado in ['armed_away', 'armed_home', 'armed_night', 'armed_vacation'] and desde in ['arming', 'disarmed'] }}"
+            sequence:
+              - if:
+                  - condition: template
+                    value_template: "{{ estado in ['armed_away', 'armed_vacation'] and is_state('input_boolean.alarm_homy_modo_pruebas', 'off') }}"
+                then:
+                  - action: script.turn_on
+                    target: {entity_id: script.home_switch_off}
+              # VACACIONES: arma también el panel independiente de Blink (todas las cámaras activas)
+              - if:
+                  - condition: template
+                    value_template: "{{ estado == 'armed_vacation' }}"
+                then:
+                  - action: alarm_control_panel.alarm_arm_away
+                    continue_on_error: true
+                    target: {entity_id: alarm_control_panel.blink_casa}
+              - action: script.alarm_homy_pitidos
+                data: {patron: tres}   # confirmación de armado: triple bip corto (convención de centrales)
+              - action: script.turn_on
+                target: {entity_id: script.alarm_homy_voz}
+                data:
+                  variables:
+                    voz: >-
+                      {{ {'armed_away': 'Armado total', 'armed_vacation': 'Armado total, modo vacaciones',
+                          'armed_home': 'Armado parcial', 'armed_night': 'Armado Noche'}[estado] }}
+              - if:
+                  - condition: template
+                    value_template: "{{ estado in ['armed_away', 'armed_vacation'] and is_state('input_boolean.alarm_homy_notif_armada', 'on') }}"
+                then:
+                  - variables:
+                      deshab: >-
+                        {% from 'alarm_homy.jinja' import deshabilitados, nombres %}{{ nombres(deshabilitados(modo) | from_json) }}
+                      excl: "{{ state_attr('sensor.alarm_homy_excluidos', 'nombres') or '' }}"
+                  - action: script.alarm_homy_notificar
+                    data:
+                      titulo: "🛡️ Alarma armada · {{ nombre }}"
+                      mensaje: >-
+                        Armado {{ nombre | lower }} a las {{ now().strftime('%H:%M') }}.
+                        {%- if excl %} Excluidos: {{ excl }}.{% endif %}
+                        {%- if deshab %} Deshabilitados: {{ deshab }}.{% endif %}
+                      nivel: active
+                      telegram: "{{ estado == 'armed_vacation' }}"
+          # ----- ENTRADA -----
+          - conditions: "{{ estado == 'pending' }}"
+            sequence:
+              - action: script.turn_on
+                target: {entity_id: script.alarm_homy_bucle_entrada}
+              - if:
+                  - condition: state
+                    entity_id: input_boolean.alarm_homy_notif_entrada
+                    state: "on"
+                then:
+                  - action: script.alarm_homy_notificar
+                    data:
+                      titulo: "⚠️ Entrada detectada"
+                      mensaje: "{{ d_sensor }}{{ ' (' ~ d_area ~ ')' if d_area else '' }} a las {{ d_hora }}. Modo {{ nombre }}. Desarme en {{ states('input_number.alarm_homy_' ~ txt ~ '_entrada') | int(0) }} s."
+                      nivel: "{{ 'critical' if modo == 'armed_vacation' else 'time-sensitive' }}"
+                      desarmar: true
+                      tag: alerta
+              - action: script.turn_on
+                target: {entity_id: script.alarm_homy_voz}
+                data:
+                  variables:
+                    voz: >-
+                      {% from 'alarm_homy.jinja' import nombres_voz %}Entrada detectada{{ (' en ' ~ nombres_voz([d_entidad])) if d_entidad else '' }}. Desarme la alarma.
+          # ----- DISPARO / PÁNICO -----
+          - conditions: "{{ estado == 'triggered' }}"
+            sequence:
+              - if:
+                  - condition: template
+                    value_template: "{{ not silencioso }}"
+                then:
+                  - if:
+                      - condition: template
+                        value_template: "{{ is_state('input_boolean.alarm_homy_modo_pruebas', 'off') and is_state('input_boolean.alarm_homy_silenciar_sirenas', 'off') }}"
+                    then:
+                      - action: siren.turn_on
+                        continue_on_error: true
+                        target: {entity_id: siren.sirena}
+                  - action: script.turn_on
+                    target: {entity_id: script.alarm_homy_bucle_disparo}
+              - if:
+                  - condition: template
+                    value_template: "{{ is_state('input_boolean.alarm_homy_notif_' ~ ('panico' if tipo != 'normal' else 'disparo'), 'on') }}"
+                then:
+                  - action: script.alarm_homy_notificar
+                    data:
+                      titulo: >-
+                        {{ {'normal': '🚨 ALARMA DISPARADA', 'panico_sonoro': '🚨 PÁNICO', 'panico_silencioso': '🚨 PÁNICO SILENCIOSO'}[tipo] }}
+                      mensaje: >-
+                        {% if tipo == 'normal' -%}
+                        {{ d_sensor }}{{ ' (' ~ d_area ~ ')' if d_area else '' }} a las {{ d_hora }}. Modo {{ nombre }}.
+                        {%- if d_lista | count > 1 %} Sensores: {{ d_lista | join(', ') }}.{% endif %}
+                        {%- else -%}
+                        Activado a las {{ d_hora }} desde {{ d_origen }}.
+                        {%- endif %}
+                      nivel: critical
+                      telegram: true
+                      desarmar: true
+                      tag: alerta
+          # ----- DESARMADA (físico; el aviso va por el evento con origen) -----
+          - conditions: "{{ estado == 'disarmed' }}"
+            sequence:
+              - action: siren.turn_off
+                continue_on_error: true
+                target: {entity_id: siren.sirena}
+              - if:
+                  - condition: template
+                    value_template: "{{ not is_state('alarm_control_panel.blink_casa', 'disarmed') }}"
+                then:
+                  - action: alarm_control_panel.alarm_disarm
+                    continue_on_error: true
+                    target: {entity_id: alarm_control_panel.blink_casa}
+              - action: script.alarm_homy_led
+              - if:
+                  - condition: template
+                    value_template: "{{ not (desde == 'triggered' and tipo == 'panico_silencioso') }}"
+                then:
+                  - action: script.alarm_homy_pitidos
+                    data: {patron: largo}
+                  - action: script.turn_on
+                    target: {entity_id: script.alarm_homy_voz}
+                    data:
+                      variables: {voz: "Alarma desactivada."}
+
+  # ---------------------------------------------------------------------------
+  # LED EN REPOSO: verde = lista para armar · amarillo = puerta/ventana abierta (solo desarmada)
+  # ---------------------------------------------------------------------------
+  - id: alarm_homy_led_reposo
+    alias: Alarm HOMY · LED en reposo
+    mode: restart
+    triggers:
+      - trigger: state
+        entity_id: binary_sensor.alarm_homy_lista_para_armar
+        not_to: [unknown, unavailable]
+      - trigger: homeassistant
+        event: start
+    conditions:
+      - condition: state
+        entity_id: input_select.alarm_homy_estado
+        state: disarmed
+    actions:
+      - action: script.alarm_homy_led
+
+  # ---------------------------------------------------------------------------
+  # AVISOS POR EVENTO (desarmado con origen, fallo al armar, código erróneo)
+  # ---------------------------------------------------------------------------
+  - id: alarm_homy_acciones_eventos
+    alias: Alarm HOMY · Avisos por evento
+    mode: queued
+    triggers:
+      - trigger: event
+        event_type: alarm_homy_desarmado
+        id: desarmado
+      - trigger: event
+        event_type: alarm_homy_fallo_armado
+        id: fallo
+      - trigger: event
+        event_type: alarm_homy_codigo_incorrecto
+        id: codigo
+    actions:
+      - choose:
+          - conditions: "{{ trigger.id == 'desarmado' }}"
+            sequence:
+              - if:
+                  - condition: template
+                    value_template: "{{ trigger.event.data.desde in ['pending', 'triggered'] }}"
+                then:
+                  - repeat:
+                      for_each: "{{ ['notify.mobile_app_iphone_aac', 'notify.mobile_app_iphone_malen'] if is_state('input_boolean.alarm_homy_modo_pruebas', 'on') else ['notify.notifica_grupo_ios'] }}"
+                      sequence:
+                        - action: "{{ repeat.item }}"
+                          continue_on_error: true
+                          data:
+                            message: clear_notification
+                            data: {tag: alarm_homy_alerta}
+              - if:
+                  - condition: state
+                    entity_id: input_boolean.alarm_homy_notif_desarmada
+                    state: "on"
+                then:
+                  - action: script.alarm_homy_notificar
+                    data:
+                      titulo: "🔓 Alarma desarmada"
+                      mensaje: "Desarmada a las {{ now().strftime('%H:%M') }} desde {{ trigger.event.data.origen }}."
+                      nivel: active
+                      telegram: "{{ trigger.event.data.desde == 'armed_vacation' }}"
+          - conditions: "{{ trigger.id == 'fallo' and 'reintento' in trigger.event.data.origen }}"
+            sequence: []   # reintento automático nocturno: silencioso (ya se avisó en el primer intento)
+          - conditions: "{{ trigger.id == 'fallo' }}"
+            sequence:
+              - action: script.alarm_homy_pitidos
+                data: {patron: error}
+              - action: light.turn_on
+                target: {entity_id: light.tagreader_led}
+                data: {color_name: yellow, brightness: 255, flash: long}
+              - action: script.turn_on
+                target: {entity_id: script.alarm_homy_voz}
+                data:
+                  variables:
+                    voz: >-
+                      {% from 'alarm_homy.jinja' import nombres_voz %}No se puede armar. Abierto: {{ nombres_voz(trigger.event.data.sensores) }}.
+              - if:
+                  - condition: state
+                    entity_id: input_boolean.alarm_homy_notif_fallo_armado
+                    state: "on"
+                then:
+                  - action: script.alarm_homy_notificar
+                    data:
+                      titulo: "❌ No se pudo armar"
+                      mensaje: "Modo {{ trigger.event.data.modo }} desde {{ trigger.event.data.origen }}. Sensores abiertos: {{ trigger.event.data.nombres }}."
+                      nivel: active
+                      telegram: true
+                      tag: fallo
+              - delay: 5
+              - action: script.alarm_homy_led
+          - conditions: "{{ trigger.id == 'codigo' }}"
+            sequence:
+              - action: script.alarm_homy_pitidos
+                data: {patron: error}
+              - action: script.alarm_homy_notificar
+                data:
+                  titulo: "🔑 Código de alarma incorrecto"
+                  mensaje: "Intento de desarmado con código incorrecto desde {{ trigger.event.data.origen }} a las {{ now().strftime('%H:%M') }}."
+                  nivel: active
+                  telegram: true
+                  tag: codigo
+
+  # ---------------------------------------------------------------------------
+  # AVERÍAS: sensor sin comunicación (> 2 min) con la alarma armada
+  #   Casa/Noche: solo aviso, nunca dispara.
+  #   Ausente/Vacaciones: aviso; si tiene etiqueta alarm_homy_unavailable y sigue
+  #   sin comunicación > 5 min, el motor lo cuenta como disparo (macro activos).
+  # ---------------------------------------------------------------------------
+  - id: alarm_homy_averias
+    alias: Alarm HOMY · Avisos de avería
+    mode: queued
+    triggers:
+      - trigger: state
+        entity_id: sensor.alarm_homy_averias
+        attribute: entidades
+        id: averia
+      - trigger: state
+        entity_id: input_select.alarm_homy_estado
+        to: [armed_away, armed_home, armed_night, armed_vacation]
+        id: armado
+    conditions:
+      - condition: state
+        entity_id: input_select.alarm_homy_estado
+        state: [armed_away, armed_home, armed_night, armed_vacation]
+      # Evita repetir el aviso al recargar plantillas / arrancar HA
+      - condition: template
+        value_template: >-
+          {{ trigger.id == 'armado' or (trigger.from_state is not none
+             and trigger.from_state.state not in ['unknown', 'unavailable']) }}
+    actions:
+      - variables:
+          modo: "{{ states('input_select.alarm_homy_modo') }}"
+          actuales: "{{ state_attr('sensor.alarm_homy_averias', 'entidades') or [] }}"
+          previas: >-
+            {{ [] if trigger.id == 'armado' or trigger.from_state is none
+               else (trigger.from_state.attributes.get('entidades') or []) }}
+          del_modo: >-
+            {% from 'alarm_homy.jinja' import sensores_modo %}{{ sensores_modo(modo) | from_json }}
+          nuevas: "{{ actuales | reject('in', previas) | select('in', del_modo) | list }}"
+          dispara: "{{ modo in ['armed_away', 'armed_vacation'] }}"
+      - condition: template
+        value_template: "{{ nuevas | count > 0 }}"
+      - action: light.turn_on
+        target: {entity_id: light.tagreader_led}
+        data: {color_name: yellow, brightness: 255, flash: long}
+      - action: script.turn_on
+        target: {entity_id: script.alarm_homy_voz}
+        data:
+          variables:
+            voz: >-
+              {% from 'alarm_homy.jinja' import nombres_voz %}Avería. Sin comunicación con el {{ nombres_voz(nuevas) }}.
+      - action: script.alarm_homy_notificar
+        data:
+          titulo: "⚠️ Alarma: avería de sensor"
+          mensaje: >-
+            {% from 'alarm_homy.jinja' import nombres, nombre_modo %}Sin comunicación: {{ nombres(nuevas) }}.
+            Modo {{ nombre_modo(modo) }}: {{ 'si no se recupera en 5 min contará como disparo' if dispara else 'no dispara; revisa pila o cobertura' }}.
+          nivel: time-sensitive
+          telegram: "{{ modo == 'armed_vacation' }}"
+          tag: averia
+      - delay: 5
+      - action: script.alarm_homy_led
+
+  # ---------------------------------------------------------------------------
+  # BOTÓN "Desarmar" de la notificación iOS (requiere Face ID en el iPhone)
+  # ---------------------------------------------------------------------------
+  - id: alarm_homy_ios_desarmar
+    alias: Alarm HOMY · Desarmar desde iOS
+    triggers:
+      - trigger: event
+        event_type: mobile_app_notification_action
+        event_data: {action: ALARM_HOMY_DESARMAR}
+    actions:
+      - action: script.alarm_homy_desarmar
+        data:
+          validar: false
+          origen: >-
+            {% set u = trigger.event.context.user_id %}
+            {{ (states.person | selectattr('attributes.user_id', 'eq', u) | map(attribute='name') | first) | default('iOS') }} (iPhone)
+
+  # Pánico con IKEA BILRESA → automations.yaml, bloque ZMA (ZMA_L1)

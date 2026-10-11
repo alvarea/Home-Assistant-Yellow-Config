@@ -24,56 +24,66 @@
 
 # ALARM WARNING BEFORE ARMED : PENDING TIME
 #
-  alarma_sonido_armado:
-    name: "Alarma Sonido Armado"
-    options:
-      - "bell_02"
-      - "buzzers_pistols_01"
-      - "amzn_sfx_church_bell_1x_02"
-      - "amzn_sfx_doorbell_01"
-      - "amzn_sfx_doorbell_chime_01"
-      - "amzn_sfx_doorbell_chime_02"
-      - "air_horn_03"
-      - "boing_01"
-      - "boing_03"
-      - "camera_01"
-      - "squeaky_12"
-      - "clock_01"
-      - "amzn_sfx_trumpet_bugle_04"
-      - "futuristic_10"
-      - "amzn_sfx_scifi_engines_on_02"
-      - "amzn_sfx_scifi_alarm_04"
-      - "amzn_sfx_scifi_sheilds_up_01"
-      - "amzn_sfx_scifi_alarm_01"
-      - "zap_01"
-    initial: 'air_horn_03'
+  # ============================================================
+  # ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+  # Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+  # Para recuperar: descomentar este bloque y recargar/reiniciar.
+  # ============================================================
+#  alarma_sonido_armado:
+#    name: "Alarma Sonido Armado"
+#    options:
+#      - "bell_02"
+#      - "buzzers_pistols_01"
+#      - "amzn_sfx_church_bell_1x_02"
+#      - "amzn_sfx_doorbell_01"
+#      - "amzn_sfx_doorbell_chime_01"
+#      - "amzn_sfx_doorbell_chime_02"
+#      - "air_horn_03"
+#      - "boing_01"
+#      - "boing_03"
+#      - "camera_01"
+#      - "squeaky_12"
+#      - "clock_01"
+#      - "amzn_sfx_trumpet_bugle_04"
+#      - "futuristic_10"
+#      - "amzn_sfx_scifi_engines_on_02"
+#      - "amzn_sfx_scifi_alarm_04"
+#      - "amzn_sfx_scifi_sheilds_up_01"
+#      - "amzn_sfx_scifi_alarm_01"
+#      - "zap_01"
+#    initial: 'air_horn_03'
 
 # ALARM WARNING DISARMED
 #
-  alarma_sonido_desarmado:
-    name: "Alarma Sonido Desarmado"
-    options:
-      - "bell_02"
-      - "buzzers_pistols_01"
-      - "amzn_sfx_church_bell_1x_02"
-      - "amzn_sfx_doorbell_01"
-      - "amzn_sfx_doorbell_chime_01"
-      - "amzn_sfx_doorbell_chime_02"
-      - "air_horn_03"
-      - "boing_01"
-      - "boing_03"
-      - "camera_01"
-      - "squeaky_12"
-      - "clock_01"
-      - "amzn_sfx_trumpet_bugle_04"
-      - "futuristic_10"
-      - "amzn_sfx_scifi_engines_on_02"
-      - "amzn_sfx_scifi_alarm_04"
-      - "amzn_sfx_scifi_sheilds_up_01"
-      - "amzn_sfx_scifi_alarm_01"
-      - "zap_01"
-    icon: mdi:music-note
-    initial: 'bell_02'
+  # ============================================================
+  # ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+  # Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+  # Para recuperar: descomentar este bloque y recargar/reiniciar.
+  # ============================================================
+#  alarma_sonido_desarmado:
+#    name: "Alarma Sonido Desarmado"
+#    options:
+#      - "bell_02"
+#      - "buzzers_pistols_01"
+#      - "amzn_sfx_church_bell_1x_02"
+#      - "amzn_sfx_doorbell_01"
+#      - "amzn_sfx_doorbell_chime_01"
+#      - "amzn_sfx_doorbell_chime_02"
+#      - "air_horn_03"
+#      - "boing_01"
+#      - "boing_03"
+#      - "camera_01"
+#      - "squeaky_12"
+#      - "clock_01"
+#      - "amzn_sfx_trumpet_bugle_04"
+#      - "futuristic_10"
+#      - "amzn_sfx_scifi_engines_on_02"
+#      - "amzn_sfx_scifi_alarm_04"
+#      - "amzn_sfx_scifi_sheilds_up_01"
+#      - "amzn_sfx_scifi_alarm_01"
+#      - "zap_01"
+#    icon: mdi:music-note
+#    initial: 'bell_02'
 
 # ALARM TRIGGERED
 #

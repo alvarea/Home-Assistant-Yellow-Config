@@ -14,6 +14,7 @@
 #    alarm_homy_set_excluidos      {entidades}
 #    alarm_homy_reset_disparo      {}
 #    alarm_homy_codigo_incorrecto  {origen}
+#    alarm_homy_desarmado          {origen, desde, tipo}
 ###############################################################################
 
 template:
@@ -61,9 +62,47 @@ template:
             {% from 'alarm_homy.jinja' import activos %}{{ activos() | from_json }}
 
   # ---------------------------------------------------------------------------
+  # LISTA PARA ARMAR: ninguna puerta/ventana de la alarma abierta (LED verde/rojo en reposo)
+  # ---------------------------------------------------------------------------
+  - binary_sensor:
+      - name: alarm_homy_lista_para_armar
+        unique_id: alarm_homy_lista_para_armar
+        icon: mdi:shield-check-outline
+        state: >-
+          {% from 'alarm_homy.jinja' import perimetro_abierto %}{{ perimetro_abierto() | from_json | count == 0 }}
+        attributes:
+          abiertos: >-
+            {% from 'alarm_homy.jinja' import perimetro_abierto, nombres %}{{ nombres(perimetro_abierto() | from_json) }}
+
+  # Inverso de "lista para armar" (para que el tile se muestre activo/ámbar cuando NO está lista)
+  - binary_sensor:
+      - name: alarm_homy_no_lista_para_armar
+        unique_id: alarm_homy_no_lista_para_armar
+        icon: mdi:shield-alert
+        state: "{{ is_state('binary_sensor.alarm_homy_lista_para_armar', 'off') }}"
+        attributes:
+          abiertos: "{{ state_attr('binary_sensor.alarm_homy_lista_para_armar', 'abiertos') }}"
+
+  # ---------------------------------------------------------------------------
+  # AVERÍAS: sensores de la alarma sin comunicación > 2 min (pila, cobertura...)
+  # ---------------------------------------------------------------------------
+  - sensor:
+      - name: alarm_homy_averias
+        unique_id: alarm_homy_averias
+        icon: mdi:access-point-network-off
+        state_class: measurement
+        state: >-
+          {% from 'alarm_homy.jinja' import averias %}{{ averias() | from_json | count }}
+        attributes:
+          entidades: >-
+            {% from 'alarm_homy.jinja' import averias %}{{ averias() | from_json }}
+          nombres: >-
+            {% from 'alarm_homy.jinja' import averias, nombres %}{{ nombres(averias() | from_json) }}
+
+  # ---------------------------------------------------------------------------
   # REGISTRO DEL DISPARO (persistente): primer sensor + lista acumulada
   # ---------------------------------------------------------------------------
-  - triggers:
+  - trigger:
       - trigger: event
         event_type: alarm_homy_registrar_disparo
         id: registrar
@@ -96,6 +135,23 @@ template:
           origen: >-
             {% if trigger.id == 'reset' %}{{ none }}
             {% else %}{{ trigger.event.data.get('origen', 'sensor') }}{% endif %}
+          # Detalle del primer sensor (estado al que pasó y hora) y de todos los del disparo
+          detalle: >-
+            {%- from 'alarm_homy.jinja' import detalle -%}
+            {% if trigger.id == 'reset' %}{{ none }}
+            {% elif this.state in ['ninguno', 'unknown', 'unavailable', '', none] %}{{ detalle(trigger.event.data.sensores[0]) }}
+            {% else %}{{ this.attributes.get('detalle') }}{% endif %}
+          detalles: >-
+            {%- from 'alarm_homy.jinja' import detalle -%}
+            {% if trigger.id == 'reset' %}{{ [] }}
+            {% else %}
+              {%- set previas = this.attributes.get('entidades') or [] -%}
+              {%- set ns = namespace(l=(this.attributes.get('detalles') or [])) -%}
+              {%- for e in trigger.event.data.sensores | unique if e not in previas -%}
+                {%- set ns.l = ns.l + [detalle(e)] -%}
+              {%- endfor -%}
+              {{ ns.l }}
+            {% endif %}
           entidades: >-
             {% if trigger.id == 'reset' %}{{ [] }}
             {% else %}{{ ((this.attributes.get('entidades') or []) + trigger.event.data.sensores) | unique | list }}{% endif %}
@@ -112,7 +168,7 @@ template:
   # ---------------------------------------------------------------------------
   # SENSORES EXCLUIDOS en la sesión de armado (auto-excluir)
   # ---------------------------------------------------------------------------
-  - triggers:
+  - trigger:
       - trigger: event
         event_type: alarm_homy_set_excluidos
     sensor:
@@ -230,12 +286,20 @@ script:
           - event: alarm_homy_codigo_incorrecto
             event_data: {origen: "{{ origen }}"}
           - stop: Código incorrecto
+      - variables:
+          desde: "{{ states('input_select.alarm_homy_estado') }}"
+          tipo_previo: "{{ states('input_select.alarm_homy_tipo_disparo') }}"
       - action: timer.cancel
         target:
           entity_id: [timer.alarm_homy_salida, timer.alarm_homy_entrada, timer.alarm_homy_disparo]
       - action: input_select.select_option
         target: {entity_id: input_select.alarm_homy_estado}
         data: {option: disarmed}
+      - event: alarm_homy_desarmado
+        event_data:
+          origen: "{{ origen }}"
+          desde: "{{ desde }}"
+          tipo: "{{ tipo_previo }}"
       - action: input_select.select_option
         target: {entity_id: input_select.alarm_homy_modo}
         data: {option: disarmed}

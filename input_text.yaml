@@ -17,10 +17,15 @@
     initial: ''
     icon: mdi:home-map-marker
 
-  alarm_trigger:
-    name: Input Text Alarma Trigger
-    initial: ''
-    icon: mdi:security-home
+  # ============================================================
+  # ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+  # Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+  # Para recuperar: descomentar este bloque y recargar/reiniciar.
+  # ============================================================
+#  alarm_trigger:
+#    name: Input Text Alarma Trigger
+#    initial: ''
+#    icon: mdi:security-home
 
   piscina_depuradora_ch0_duracion_programa:
     name: Duración Programa Activo

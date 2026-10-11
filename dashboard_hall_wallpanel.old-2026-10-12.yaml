@@ -1,0 +1,5071 @@
+###############################################################################
+#  BACKUP (OLD) · Dashboard "Wallpanel Entrada" (/hall-wallpanel) — iPad entrada
+#
+#  Copia COMPLETA antes de borrar el dashboard (12-10-2026, paso a producción
+#  de la alarma alarm_homy: el iPad pasa a usar /alarma-homy).
+#  Origen: storage .storage/lovelace.hall_wallpanel
+#  Exportado: 2026-10-12 10:50 (18 vistas: Home View, Sensores Alarma, Panel Control Alarma, Luces, Cámaras, Tracking, Media Player, Plan Riego, Riego Césped, Riego Bonsais, Calendar, Temperatura, El Tiempo, Piscina, Alexa Echo, Areas, Batery Status, Setup Alarma)
+#  Restaurar: crear un dashboard nuevo con URL hall-wallpanel → Editar →
+#             ⋮ Editor de configuración en bruto → pegar este contenido.
+###############################################################################
+kiosk_mode:
+  user_settings:
+    - users:
+        - wallpanel
+      hide_sidebar: true
+    - users:
+        - wallpanel2
+      kiosk: true
+      ignore_entity_settings: true
+title: Wallpanel Entrada
+views:
+  - badges: []
+    cards: []
+    icon: mdi:home-assistant
+    title: Home View
+    type: sections
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            icon: mdi:account-convert
+            heading: Control Presencia
+            heading_style: title
+            badges:
+              - type: entity
+                entity: binary_sensor.family_any_home
+              - type: entity
+                entity: binary_sensor.family_all_home
+              - type: entity
+                entity: sensor.family_home
+              - type: entity
+                entity: sensor.family_sleep_home
+          - cards:
+              - cards:
+                  - type: custom:mushroom-person-card
+                    entity: person.agustin
+                    icon_type: entity-picture
+                    layout: vertical
+                    fill_container: true
+                    secondary_info: last-changed
+                    primary_info: state
+                  - type: custom:mushroom-person-card
+                    entity: person.malen
+                    icon_type: entity-picture
+                    layout: vertical
+                    fill_container: true
+                    secondary_info: last-changed
+                    primary_info: state
+                  - type: custom:mushroom-person-card
+                    entity: person.agu
+                    icon_type: entity-picture
+                    layout: vertical
+                    fill_container: true
+                    secondary_info: last-changed
+                    primary_info: state
+                  - type: custom:mushroom-person-card
+                    entity: person.paloma
+                    icon_type: entity-picture
+                    layout: vertical
+                    fill_container: true
+                    secondary_info: last-changed
+                    primary_info: state
+                type: horizontal-stack
+            type: vertical-stack
+          - cards:
+              - type: horizontal-stack
+                cards:
+                  - type: custom:mushroom-alarm-control-panel-card
+                    entity: alarm_control_panel.ha
+                    states:
+                      - armed_home
+                      - armed_away
+                    fill_container: true
+            type: vertical-stack
+            grid_options:
+              columns: full
+              rows: 2
+          - cards:
+              - type: horizontal-stack
+                cards:
+                  - type: custom:mushroom-alarm-control-panel-card
+                    entity: alarm_control_panel.blink_casa
+                    states:
+                      - armed_home
+                      - armed_away
+                    fill_container: true
+                    name: Cámaras Blink
+            type: vertical-stack
+            grid_options:
+              columns: full
+              rows: 2
+          - type: tile
+            grid_options:
+              columns: 12
+              rows: auto
+            entity: sensor.v2c_house_power
+            name:
+              type: entity
+            vertical: false
+            hold_action:
+              action: more-info
+            features:
+              - type: trend-graph
+            features_position: inline
+          - features:
+              - type: toggle
+            type: tile
+            features_position: bottom
+            vertical: false
+            entity: switch.esphome_mini_sw4
+            name: Cargador WallPanel
+            state_content:
+              - state
+              - last_changed
+          - type: tile
+            features_position: bottom
+            vertical: false
+            entity: sensor.ipad_battery_level
+            name: Batería WallPanel
+            hide_state: false
+            state_content:
+              - state
+              - last_changed
+            show_entity_picture: false
+          - type: tile
+            features_position: bottom
+            vertical: false
+            entity: sensor.ipad_battery_state
+            name: Batería WallPanel
+            hide_state: false
+            state_content:
+              - state
+              - last_changed
+            show_entity_picture: false
+      - type: grid
+        cards:
+          - type: heading
+            icon: mdi:weather-cloudy-clock
+            heading: El Tiempo
+            heading_style: title
+            badges:
+              - type: entity
+                show_state: true
+                show_icon: true
+                entity: sensor.aemet_town_name
+              - type: entity
+                entity: sensor.aemet_temperature
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: entity
+                entity: sensor.sun_next_rising
+                icon_color: amber
+              - type: entity
+                entity: sensor.sun_next_setting
+                name: Puesta Sol
+                icon_color: orange
+                use_entity_picture: false
+              - type: entity
+                entity: sensor.aemet_min_temperatura_0d
+                icon: mdi:thermometer-minus
+                icon_color: blue
+                tap_action:
+                  action: more-info
+                use_entity_picture: false
+              - type: entity
+                entity: sensor.aemet_max_temperatura_0d
+                icon: mdi:thermometer-plus
+                icon_color: deep-orange
+          - type: custom:weather-chart-card
+            entity: weather.aemet
+            show_main: false
+            show_temperature: true
+            show_current_condition: true
+            show_attributes: true
+            show_time: false
+            show_time_seconds: false
+            show_day: false
+            show_date: true
+            show_humidity: true
+            show_pressure: true
+            show_wind_direction: true
+            show_wind_speed: true
+            show_sun: true
+            show_feels_like: false
+            show_dew_point: false
+            show_wind_gust_speed: true
+            show_visibility: false
+            show_last_changed: true
+            use_12hour_format: true
+            icons_size: '32'
+            animated_icons: true
+            icon_style: style1
+            autoscroll: true
+            forecast:
+              precipitation_type: rainfall
+              show_probability: false
+              labels_font_size: '11'
+              precip_bar_size: '100'
+              style: style2
+              show_wind_forecast: true
+              condition_icons: true
+              round_temp: false
+              type: daily
+              number_of_forecasts: '0'
+              disable_animation: false
+            units:
+              speed: km/h
+              pressure: mmHg
+            title: AEMET
+            time_size: '18'
+            day_date_size: '12'
+            current_temp_size: '32'
+          - type: heading
+            icon: mdi:temperature-celsius
+            heading_style: subtitle
+            badges:
+              - type: entity
+                show_state: true
+                show_icon: true
+                entity: sensor.temperatura_media_exterior
+                name: Exterior
+                color: indigo
+              - type: entity
+                show_state: true
+                show_icon: true
+                entity: sensor.temperatura_media_interior
+                name: Media Interior
+                color: orange
+            heading: Temperatura
+          - graph: line
+            type: sensor
+            detail: 2
+            entity: sensor.ly3_entrada_exterior_temperatura
+            name: Entrada
+          - graph: line
+            type: sensor
+            detail: 2
+            name: Porche
+            entity: sensor.aqara_temperatura_porche
+          - graph: line
+            type: sensor
+            detail: 1
+            name: Planta Baja
+            entity: sensor.temperatura_media_planta_baja
+          - graph: line
+            type: sensor
+            detail: 2
+            name: Planta Alta
+            entity: sensor.temperatura_media_planta_alta
+      - type: grid
+        cards:
+          - type: heading
+            icon: mdi:lightbulb-group
+            heading: Luces Plantas - Estancias
+            heading_style: title
+            badges:
+              - type: entity
+                show_state: true
+                show_icon: true
+                entity: light.luces_planta_baja
+                color: deep-orange
+              - type: entity
+                show_state: true
+                show_icon: true
+                entity: light.luces_planta_alta
+                color: blue
+              - type: entity
+                show_state: true
+                show_icon: true
+                entity: light.luces_exterior
+                name: Luces Jardín
+                icon: mdi:tree
+                color: green
+          - cards:
+              - cards:
+                  - type: custom:mushroom-entity-card
+                    fill_container: false
+                    icon_color: cyan
+                    icon: ''
+                    secondary_info: none
+                    double_tap_action:
+                      action: more-info
+                    hold_action:
+                      action: navigate
+                      navigation_path: /lovelace/salon_view
+                    tap_action:
+                      action: toggle
+                    entity: light.luces_exterior
+                    name: Exterior
+                    primary_info: name
+                  - type: custom:mushroom-entity-card
+                    fill_container: false
+                    icon_color: orange
+                    icon: ''
+                    secondary_info: none
+                    double_tap_action:
+                      action: more-info
+                    tap_action:
+                      action: toggle
+                    entity: light.luces_planta_baja
+                    name: Planta Baja
+                  - type: custom:mushroom-entity-card
+                    fill_container: false
+                    icon_color: light-blue
+                    icon: ''
+                    hold_action:
+                      action: navigate
+                      navigation_path: /lovelace/cocina_view
+                    double_tap_action:
+                      action: more-info
+                    tap_action:
+                      action: toggle
+                    entity: light.luces_planta_alta
+                    secondary_info: none
+                    name: Planta Alta
+                type: horizontal-stack
+            type: vertical-stack
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: light
+                entity: light.luz_exterior
+                content_info: name
+                name: Exterior
+                use_light_color: true
+              - type: light
+                entity: light.luz_hall
+                content_info: name
+                name: Hall
+                use_light_color: true
+              - type: light
+                entity: light.luces_salon
+                content_info: name
+                name: Salón
+                use_light_color: true
+              - type: light
+                entity: light.luces_cocina
+                content_info: name
+                name: Cocina
+              - type: light
+                entity: light.luces_dormitorios
+                name: Dormitorios
+                content_info: name
+              - type: light
+                entity: light.arbol_navidad
+                content_info: name
+                name: 'Árbol '
+          - type: heading
+            icon: mdi:fridge
+            heading_style: subtitle
+            grid_options:
+              columns: 12
+              rows: auto
+            visibility:
+              - condition: state
+                entity: light.luces_cocina
+                state: 'on'
+            heading: Cocina
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: light
+                entity: light.luz_cocina
+                content_info: name
+                name: TV Izq
+                use_light_color: true
+              - type: light
+                entity: light.luz_cocina_derecha
+                content_info: name
+                name: TV Dcha
+                use_light_color: true
+            visibility:
+              - condition: state
+                entity: light.luces_cocina
+                state: 'on'
+          - type: heading
+            icon: mdi:sofa
+            heading_style: subtitle
+            grid_options:
+              columns: 12
+              rows: auto
+            heading: Salón
+            visibility:
+              - condition: state
+                entity: light.luces_salon
+                state: 'on'
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: light
+                entity: light.arbol_navidad
+                name: Arbol
+                content_info: name
+                use_light_color: true
+              - type: light
+                entity: light.led_salon_tv
+                content_info: name
+                name: TV
+                use_light_color: true
+              - type: light
+                entity: light.luz_salon_tv
+                content_info: name
+                name: Play
+                use_light_color: true
+              - type: light
+                entity: light.luz_lectura
+                content_info: name
+                name: L
+                use_light_color: true
+              - type: light
+                entity: light.luz_cilindro
+                use_light_color: true
+                name: C
+                content_info: name
+              - type: light
+                entity: light.luz_salon_sofa
+                content_info: name
+                name: S
+                use_light_color: true
+              - type: light
+                entity: light.luz_vitrina
+                name: V
+                content_info: name
+                use_light_color: true
+            visibility:
+              - condition: state
+                entity: light.luces_salon
+                state: 'on'
+          - type: heading
+            icon: mdi:bed
+            heading_style: subtitle
+            grid_options:
+              columns: 12
+              rows: auto
+            heading: Dormitorios
+            visibility:
+              - condition: state
+                entity: light.luces_dormitorios
+                state: 'on'
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: light
+                entity: light.luz_dormitorio_agustin
+                content_info: name
+                name: AAC
+                use_light_color: true
+              - type: light
+                entity: light.luz_dormitorio_malen
+                content_info: name
+                name: MFC
+                use_light_color: true
+              - type: light
+                entity: light.luz_mesilla_aaf
+                name: AAF
+                content_info: name
+                use_light_color: true
+              - type: light
+                entity: light.luz_mesilla_paf
+                use_light_color: true
+                name: PAF
+                content_info: name
+              - type: light
+                entity: light.luz_mesa_paf
+                content_info: name
+                name: Mesa PAF
+                use_light_color: true
+              - type: light
+                entity: light.led_mesa_agu
+                content_info: name
+                name: Mesa AAF
+                use_light_color: true
+            visibility:
+              - condition: state
+                entity: light.luces_dormitorios
+                state: 'on'
+          - type: heading
+            icon: mdi:tree
+            heading_style: subtitle
+            grid_options:
+              columns: 12
+              rows: auto
+            heading: Jardín
+            visibility:
+              - condition: state
+                entity: light.luces_jardin
+                state: 'on'
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: light
+                entity: light.luz_porche_jardin
+                content_info: name
+                name: Porche
+              - type: light
+                entity: light.luz_balizas_cesped
+                name: Césped
+                content_info: name
+                use_light_color: true
+              - type: light
+                entity: light.luz_entrada_bonsais
+                name: Bonsai
+                content_info: name
+              - type: light
+                entity: light.luz_olivo_nubes
+                name: Olivo1
+                content_info: name
+              - type: light
+                entity: light.luz_olivo_grande
+                name: Olivo2
+                content_info: name
+            visibility:
+              - condition: state
+                entity: light.luces_jardin
+                state: 'on'
+          - type: heading
+            icon: mdi:tree
+            heading_style: title
+            grid_options:
+              columns: 12
+              rows: auto
+            heading: Exterior y Jardín
+          - type: tile
+            entity: binary_sensor.piscina_depuradora_ch0_status
+          - type: tile
+            entity: light.luz_piscina
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            image: /local/Riego_Bonsais_x1_900x362.jpg
+            tap_action:
+              action: more-info
+            hold_action:
+              action: toggle
+            entity: switch.esphome_pow_sw4
+            name: Pozo
+            aspect_ratio: '3'
+            grid_options:
+              columns: 6
+              rows: auto
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            image: /local/Riego_General_s0_1900x800.jpg
+            tap_action:
+              action: more-info
+            hold_action:
+              action: toggle
+            entity: input_boolean.riego_interruptor_global
+            name: Riego
+            aspect_ratio: '3'
+            grid_options:
+              columns: 6
+              rows: auto
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            entity: binary_sensor.piscina_depuradora_ch0_dia_ejecucion
+            image: /local/Piscina_Depuradora_s1_1900x800.jpg
+            name: Piscina
+            aspect_ratio: '3'
+            grid_options:
+              columns: 6
+              rows: 1
+          - show_state: false
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            tap_action:
+              action: more-info
+            hold_action:
+              action: toggle
+            entity: button.puerta_exterior_open_door
+            name: Abrir Cancela
+            grid_options:
+              columns: 6
+              rows: auto
+            camera_image: camera.blink_puerta_exterior
+            aspect_ratio: '3'
+  - title: Sensores Alarma
+    icon: mdi:motion-sensor
+    badges: []
+    cards:
+      - cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            image: /local/Home_Alarm_Security_I2.jpg
+            tap_action:
+              action: more-info
+            hold_action:
+              action: toggle
+            name: Sensores Perímetro Principal
+            aspect_ratio: '5'
+            entity: binary_sensor.alarma_sensores_perimetro_principal
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: entity
+                entity: binary_sensor.aqara_puerta_entrada_principal
+                content_info: name
+                name: Puerta Entrada
+                icon_color: accent
+              - type: entity
+                entity: binary_sensor.aqara_puerta_salon
+                content_info: name
+                name: Puerta Salón
+                icon_color: accent
+              - type: entity
+                entity: binary_sensor.aqara_ventana_dormitorio_plancha
+                content_info: name
+                name: Dormitorio Plancha
+                icon_color: accent
+              - type: entity
+                entity: binary_sensor.aqara_ventana_dormitorio_principal
+                content_info: name
+                name: Dormitorio M&D
+                icon_color: accent
+              - type: entity
+                entity: binary_sensor.aqara_ventana_dormitorio_agu
+                content_info: name
+                name: Dormitorio AAF
+                icon_color: accent
+              - type: entity
+                entity: binary_sensor.aqara_ventana_dormitorio_paloma
+                content_info: name
+                name: Dormitorio PAF
+                icon_color: accent
+              - type: entity
+                entity: binary_sensor.alarma_sensores_perimetro_principal
+                content_info: name
+                icon_color: accent
+                name: Grupo Perímetro Principal
+            alignment: center
+          - type: logbook
+            entities:
+              - binary_sensor.aqara_puerta_entrada_principal
+              - binary_sensor.aqara_puerta_salon
+              - binary_sensor.aqara_ventana_dormitorio_plancha
+              - binary_sensor.aqara_ventana_dormitorio_principal
+              - binary_sensor.aqara_ventana_dormitorio_agu
+              - binary_sensor.aqara_ventana_dormitorio_paloma
+              - binary_sensor.ikea_sensor_puerta_canceala
+            hours_to_show: 3
+        type: vertical-stack
+      - cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            image: /local/Home_Alarm_Security_I2.jpg
+            tap_action:
+              action: more-info
+            hold_action:
+              action: toggle
+            name: Sensores Perímetro Secundario
+            aspect_ratio: '5'
+            entity: binary_sensor.alarma_sensores_perimetro_secundario
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: entity
+                entity: binary_sensor.aqara_vibracion_puerta_principal
+                content_info: name
+                icon_color: accent
+                name: Puerta Vibración
+              - type: entity
+                entity: binary_sensor.aqara_ventana_estudio_izquierda
+                content_info: name
+                icon_color: accent
+                name: Estudio Izquierda
+              - type: entity
+                entity: binary_sensor.aqara_puerta_estudio_armario
+                content_info: name
+                icon_color: accent
+                name: Puerta Armario
+              - type: entity
+                entity: binary_sensor.aqara_vibracion_puerta_salon
+                content_info: name
+                name: Salón Vibración
+                icon_color: accent
+              - type: entity
+                entity: binary_sensor.aqara_ventana_estudio_derecha
+                content_info: name
+                icon_color: accent
+                name: Estudio Derecha
+              - type: entity
+                entity: binary_sensor.aqara_puerta_estudio_desvan
+                content_info: name
+                icon_color: accent
+                name: Puerta Desván
+              - type: entity
+                entity: binary_sensor.ikea_sensor_frigo_cocina
+                content_info: name
+                name: Frigo
+                icon_color: accent
+              - type: entity
+                entity: binary_sensor.ikea_sensor_frigo_bebidas
+                content_info: name
+                icon_color: accent
+                name: Frigo Bebidas
+              - type: entity
+                entity: binary_sensor.alarma_sensores_perimetro_secundario
+                content_info: name
+                icon_color: accent
+                name: Grupo Perímetro Secundario
+            alignment: center
+          - type: logbook
+            entities:
+              - binary_sensor.aqara_vibracion_puerta_principal
+              - binary_sensor.aqara_vibracion_puerta_salon
+              - binary_sensor.aqara_ventana_estudio_derecha
+              - binary_sensor.aqara_ventana_estudio_izquierda
+              - binary_sensor.aqara_puerta_estudio_armario
+              - binary_sensor.aqara_puerta_estudio_desvan
+            hours_to_show: 3
+        type: vertical-stack
+      - cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            image: /local/Home_Alarm_Security_I8.jpg
+            tap_action:
+              action: more-info
+            hold_action:
+              action: toggle
+            name: Cámaras & Sensores Presencia Interior
+            aspect_ratio: '5'
+            entity: binary_sensor.alarma_sensores_presencia_interior
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: entity
+                entity: binary_sensor.blink_hall_motion
+                name: Cámara Hall
+                content_info: name
+                icon_color: accent
+              - type: entity
+                entity: binary_sensor.blink_cocina_motion
+                name: Cámara Cocina
+                content_info: name
+                icon_color: accent
+              - type: entity
+                entity: binary_sensor.blink_estudio_motion
+                name: Cámara Estudio
+                content_info: name
+                icon_color: accent
+              - type: entity
+                entity: binary_sensor.aqara_movimiento_entrada
+                name: Movimiento Hall
+                content_info: name
+                icon_color: accent
+              - type: entity
+                entity: binary_sensor.ikea_sensor_movimiento_cocina
+                name: Movimiento Cocina
+                content_info: name
+                icon_color: accent
+              - type: entity
+                entity: binary_sensor.hue_movimiento_pasillo_presencia
+                content_info: name
+                icon_color: accent
+                name: Movimiento Pasillo
+              - type: entity
+                entity: binary_sensor.aqara_movimiento_salon
+                name: Movimiento Salón
+                content_info: name
+                icon_color: accent
+              - type: entity
+                entity: binary_sensor.aqara_movimiento_principal
+                name: Dormitorio M&D
+                content_info: name
+                icon_color: accent
+              - type: entity
+                entity: binary_sensor.aqara_movimiento_estudio
+                name: Movimiento Estudio
+                content_info: name
+                icon_color: accent
+            alignment: center
+          - type: logbook
+            entities:
+              - binary_sensor.aqara_movimiento_entrada
+              - binary_sensor.aqara_movimiento_estudio
+              - binary_sensor.aqara_movimiento_salon
+              - binary_sensor.motion_sensor_158d0002ea1d0f
+              - binary_sensor.hue_movimiento_pasillo_presencia
+              - binary_sensor.blink_cocina_motion_detected
+              - binary_sensor.blink_estudio_motion_detected
+              - binary_sensor.blink_hall_motion_detected
+            hours_to_show: 3
+        type: vertical-stack
+      - cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            image: /local/Home_Alarm_Security_I8.jpg
+            tap_action:
+              action: more-info
+            hold_action:
+              action: toggle
+            name: Cámaras & Sensores Presencia Exterior
+            aspect_ratio: '5'
+            entity: binary_sensor.alarma_sensores_presencia_exterior
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: entity
+                entity: binary_sensor.aqara_movimiento_entrada_exterior
+                name: Entrada Exterior
+                content_info: name
+                icon_color: accent
+              - type: entity
+                entity: binary_sensor.ikea_sensor_movimiento_entrada_exterior
+                name: Movimiento Cancela
+                content_info: name
+                icon_color: accent
+                icon: mdi:motion-sensor
+              - type: entity
+                entity: binary_sensor.alarma_sensor_movimiento_blink_puerta_principal
+                name: Cámara Puerta Principal
+                content_info: name
+                icon_color: accent
+                icon: mdi:cctv
+              - type: entity
+                entity: binary_sensor.alarma_sensor_movimiento_blink_puerta_garaje
+                name: Cámara Puerta Garaje
+                content_info: name
+                icon_color: accent
+                icon: mdi:cctv
+              - type: entity
+                entity: binary_sensor.alarma_sensor_movimiento_blink_piscina
+                name: Cámara Piscina
+                content_info: name
+                icon_color: accent
+                icon: mdi:cctv
+              - type: entity
+                entity: binary_sensor.alarma_sensor_movimiento_blink_porche
+                name: Cámara Porche
+                content_info: name
+                icon_color: accent
+                icon: mdi:cctv
+            alignment: center
+          - type: logbook
+            entities:
+              - binary_sensor.aqara_movimiento_entrada_exterior
+              - binary_sensor.alarma_sensor_movimiento_blink_puerta_principal
+              - binary_sensor.alarma_sensor_movimiento_blink_puerta_garaje
+              - binary_sensor.alarma_sensor_movimiento_blink_piscina
+              - binary_sensor.alarma_sensor_movimiento_blink_porche
+              - binary_sensor.alarma_sensor_movimiento_entrada_exterior
+              - binary_sensor.ikea_sensor_movimiento_entrada_exterior_opening
+            hours_to_show: 3
+        type: vertical-stack
+  - icon: mdi:shield-home
+    path: alarma_view
+    title: Panel Control Alarma
+    badges: []
+    cards:
+      - cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            image: /local/Home_Alarm_Security_I3.jpg
+            tap_action:
+              action: more-info
+            hold_action:
+              action: toggle
+            name: Sistemas Alarma Seguridad
+            aspect_ratio: '5'
+            entity: binary_sensor.alarma_estado_general
+          - type: custom:mushroom-entity-card
+            fill_container: true
+            icon_color: blue
+            double_tap_action:
+              action: call-service
+              service: script.check_sensores_magneticos_perimetro
+              target: {}
+            tap_action:
+              action: more-info
+            entity: schedule.helper_alarma_armado_home
+          - type: custom:mushroom-alarm-control-panel-card
+            entity: alarm_control_panel.ha
+            states:
+              - armed_home
+              - armed_away
+            name: Panel Control Alarma
+            fill_container: true
+            show_keypad: true
+          - type: custom:mushroom-alarm-control-panel-card
+            entity: alarm_control_panel.blink_casa
+            states:
+              - armed_away
+            name: Cámaras Blink Exterior
+            icon: mdi:cctv
+        type: vertical-stack
+      - cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            image: /local/Home_Alarm_Security_I4.jpg
+            tap_action:
+              action: more-info
+            hold_action:
+              action: toggle
+            name: Estado General Sensores
+            aspect_ratio: '5'
+            entity: binary_sensor.alarma_sensores_estado_general
+          - type: custom:mushroom-entity-card
+            name: Alarma Lista Para Armar
+            fill_container: true
+            icon_color: green
+            double_tap_action:
+              action: call-service
+              service: script.check_sensores_magneticos_perimetro
+              target: {}
+            tap_action:
+              action: more-info
+            entity: binary_sensor.alarma_check_listo_para_armar
+          - square: false
+            type: grid
+            cards:
+              - type: custom:mushroom-chips-card
+                chips:
+                  - type: entity
+                    entity: binary_sensor.alarma_sensores_perimetro_principal
+                    name: Sensores Perímetro Principal
+                    content_info: name
+                    icon_color: amber
+                    icon: mdi:motion-sensor
+              - type: custom:mushroom-chips-card
+                chips:
+                  - type: entity
+                    entity: binary_sensor.alarma_sensores_perimetro_secundario
+                    name: Sensores Perímetro Secundario
+                    content_info: name
+                    use_entity_picture: false
+                    icon_color: amber
+                    icon: mdi:motion-sensor
+            columns: 2
+          - square: false
+            type: grid
+            cards:
+              - type: custom:mushroom-chips-card
+                chips:
+                  - type: entity
+                    entity: binary_sensor.alarma_sensores_presencia_exterior
+                    name: Sensores Presencia Exterior
+                    content_info: name
+                    icon_color: orange
+                    icon: mdi:motion-sensor
+              - type: custom:mushroom-chips-card
+                chips:
+                  - type: entity
+                    entity: binary_sensor.alarma_sensores_presencia_interior
+                    name: Sensores Presencia interior
+                    content_info: name
+                    icon_color: orange
+                    icon: mdi:motion-sensor
+            columns: 2
+          - square: false
+            type: grid
+            cards:
+              - type: custom:mushroom-chips-card
+                chips:
+                  - type: entity
+                    entity: binary_sensor.aqara_humo_cocina
+                    name: Sensor Humo Cocina
+                    content_info: name
+                    icon_color: red
+              - type: custom:mushroom-chips-card
+                chips:
+                  - type: entity
+                    entity: binary_sensor.aqara_sensor_agua_arqueta
+                    name: Sensor Agua Arqueta
+                    content_info: name
+                    icon_color: blue
+            columns: 2
+          - entities:
+              - entity: schedule.helper_alarma_auto_armado_a8
+              - entity: automation.a8_alarm_armed_away_family_away
+                name: (A8) Nadie >>> Armado Total
+              - entity: automation.a9_alarm_armed_home_family_home
+                name: (A9) Alguien >>> Armado Parcial (00:30)
+              - entity: automation.a10_alarm_home_auto_disarm
+                name: (A10) Alguien >>>  Auto Disarm (07:00)
+              - entity: input_text.alarm_trigger
+                icon: mdi:security-network
+                name: Sensor
+                secondary_info: last-changed
+              - entity: input_text.alarma_check_sensores_magneticos
+            show_header_toggle: false
+            state_color: true
+            type: entities
+        type: vertical-stack
+      - type: vertical-stack
+        cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            image: /local/Home_Alarm_Security_I2.jpg
+            tap_action:
+              action: more-info
+            hold_action:
+              action: toggle
+            name: Alarm Log-book
+            aspect_ratio: '5'
+            entity: alarm_control_panel.ha
+          - type: logbook
+            entities:
+              - alarm_control_panel.ha
+              - alarm_control_panel.blink_casa
+            hours_to_show: 24
+      - cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            image: /local/Home_Alarm_Security_I7.jpg
+            tap_action:
+              action: more-info
+            hold_action:
+              action: toggle
+            name: Botón del Pánico
+            aspect_ratio: '5'
+            entity: input_boolean.alarm_panic_button
+          - type: custom:mushroom-entity-card
+            entity: siren.sirena
+            name: Sirena Alarma
+            icon_color: pink
+            tap_action:
+              action: more-info
+            hold_action:
+              action: none
+            double_tap_action:
+              action: none
+          - type: custom:mushroom-entity-card
+            entity: input_boolean.alarm_panic_button
+            name: '[1] Preparar Botón Pánico'
+            icon_color: pink
+          - type: custom:mushroom-entity-card
+            name: '[2] BOTÓN PÁNICO ON'
+            icon_color: red
+            entity: script.alarma_boton_panico
+            icon: mdi:button-pointer
+          - type: custom:mushroom-entity-card
+            name: '[3] Stop Sirenas'
+            icon_color: disabled
+            entity: script.sirena_stop_alarma
+            icon: ''
+          - entities:
+              - entity: binary_sensor.esphome_bas_sw0_status
+                name: Sensor Sirena (BAS.SW0)
+              - entity: script.sirena_alarma_micro_aviso
+                name: Micro test sirena
+            show_header_toggle: false
+            state_color: true
+            type: entities
+        type: vertical-stack
+  - badges: []
+    cards:
+      - cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            image: /local/Home_Room_Entrada_RGB.jpg
+            tap_action:
+              action: more-info
+            hold_action:
+              action: toggle
+            aspect_ratio: '4'
+            name: LUCES HALL (ENTRADA-PASILLO)
+            entity: light.luz_hall
+          - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.salon_home_cinema
+                  data:
+                    transition: 5
+                name: Full
+                icon: ''
+                icon_color: yellow
+                entity: scene.salon_home_cinema
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.salon_sunset
+                  data:
+                    transition: 5
+                name: Sunset
+                icon: ''
+                icon_color: orange
+                entity: scene.salon_sunset
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.salon_noche
+                  data:
+                    transition: 5
+                name: Noche
+                icon: mdi:weather-sunset-down
+                icon_color: indigo
+                entity: scene.salon_noche
+            type: horizontal-stack
+          - type: tile
+            entity: input_text.helper_hue_smart_button_entrada
+            name: Helper Hue Smart Switch Entrada
+          - cards:
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: true
+                show_color_temp_control: true
+                show_color_control: true
+                collapsible_controls: false
+                entity: light.luz_entrada
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: true
+                show_color_temp_control: true
+                show_color_control: true
+                collapsible_controls: false
+                entity: light.luz_pasillo
+            type: horizontal-stack
+          - cards:
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: true
+                show_color_temp_control: true
+                show_color_control: true
+                collapsible_controls: true
+                entity: light.luz_cocina
+                name: TV Cocina Izqda.
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: true
+                show_color_temp_control: false
+                show_color_control: false
+                collapsible_controls: true
+                entity: light.luz_cocina_derecha
+                name: TV Cocina Dcha.
+            type: horizontal-stack
+          - chart_type: line
+            period: hour
+            days_to_show: 1
+            type: statistics-graph
+            entities:
+              - sensor.hue_movimiento_pasillo_luminosidad
+            stat_types:
+              - max
+        type: vertical-stack
+      - cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            image: /local/Home_Room_Salon_RGB.jpg
+            tap_action:
+              action: more-info
+            hold_action:
+              action: toggle
+            entity: light.luces_salon
+            aspect_ratio: '4'
+            name: LUCES SALON
+          - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.salon_sunset
+                  data:
+                    transition: 5
+                name: Sunset
+                icon: ''
+                icon_color: orange
+                entity: scene.salon_sunset
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.salon_noche
+                  data:
+                    transition: 5
+                name: Noche
+                icon: mdi:weather-sunset-down
+                icon_color: indigo
+                entity: scene.salon_noche
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.salon_lectura
+                  data:
+                    transition: 5
+                name: Lectura
+                icon: mdi:lamps-outline
+                icon_color: amber
+                entity: scene.salon_lectura
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.salon_home_cinema
+                  data:
+                    transition: 5
+                name: Cine
+                icon: mdi:dolby
+                icon_color: blue-grey
+                entity: scene.salon_home_cinema
+            type: horizontal-stack
+          - type: tile
+            entity: input_text.helper_ikea_dimmer_switch_salon
+            name: Helper Ikea Dimmer Switch Salón
+          - cards:
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: true
+                show_color_temp_control: true
+                show_color_control: true
+                collapsible_controls: false
+                entity: light.luz_vitrina
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: true
+                show_color_temp_control: true
+                show_color_control: true
+                collapsible_controls: false
+                entity: light.led_salon_tv
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: true
+                show_color_temp_control: true
+                show_color_control: true
+                collapsible_controls: false
+                entity: light.luz_salon_tv
+            type: horizontal-stack
+          - cards:
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: false
+                show_color_temp_control: true
+                show_color_control: true
+                collapsible_controls: false
+                entity: light.luz_lectura
+                name: Lectura
+                layout: vertical
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: false
+                show_color_temp_control: true
+                show_color_control: true
+                collapsible_controls: false
+                entity: light.luz_cilindro
+                layout: vertical
+                name: Cilindro
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: false
+                show_color_temp_control: true
+                show_color_control: true
+                collapsible_controls: false
+                entity: light.luz_salon_sofa
+                layout: vertical
+                name: Mesa Sofá
+            type: horizontal-stack
+          - chart_type: line
+            period: hour
+            days_to_show: 1
+            type: statistics-graph
+            entities:
+              - sensor.aqara_movimiento_salon_luminosidad
+            stat_types:
+              - max
+        type: vertical-stack
+      - cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            image: /local/Home_Room_Dormitorio_RGB.jpg
+            tap_action:
+              action: more-info
+            hold_action:
+              action: toggle
+            aspect_ratio: '4'
+            name: LUCES DORMITORIOS
+            entity: light.luces_dormitorios
+          - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.dormitorio_noche
+                  data:
+                    transition: 5
+                name: Noche
+                icon_color: brown
+                entity: scene.dormitorio_noche
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.dormitorio_relax
+                  data:
+                    transition: 5
+                name: Relax
+                icon_color: deep-orange
+                entity: scene.dormitorio_relax
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.dormitorio_lectura
+                  data:
+                    transition: 5
+                icon_color: orange
+                entity: scene.dormitorio_lectura
+                name: Lectura
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.dormitorio_full
+                  data:
+                    transition: 5
+                name: Full
+                icon: ''
+                icon_color: amber
+                entity: scene.dormitorio_full
+            type: horizontal-stack
+          - type: tile
+            entity: input_text.helper_hue_dimmer_switch_dormitorio
+            name: Helper Hue Dimmer Switch Dormitorio
+          - cards:
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: true
+                show_color_temp_control: true
+                show_color_control: true
+                collapsible_controls: false
+                entity: light.luz_dormitorio_agustin
+              - type: custom:mushroom-entity-card
+                entity: switch.hue_sw1_cargador
+                fill_container: true
+                name: Cargador Mesilla
+                layout: vertical
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: true
+                show_color_temp_control: true
+                show_color_control: true
+                collapsible_controls: false
+                entity: light.luz_dormitorio_malen
+            type: horizontal-stack
+          - cards:
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: false
+                show_color_temp_control: false
+                show_color_control: false
+                collapsible_controls: false
+                layout: vertical
+                entity: light.luz_mesilla_aaf
+                name: Luz Agu
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: false
+                show_brightness_control: false
+                show_color_temp_control: false
+                show_color_control: false
+                collapsible_controls: false
+                entity: light.led_mesa_agu
+                layout: vertical
+                name: Led Agu
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: true
+                show_color_temp_control: false
+                show_color_control: false
+                collapsible_controls: false
+                entity: light.luz_mesa_paf
+                name: Mesa Paloma
+                layout: vertical
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: false
+                show_color_temp_control: false
+                show_color_control: false
+                collapsible_controls: false
+                layout: vertical
+                entity: light.luz_mesilla_paf
+                name: Luz Paloma
+            type: horizontal-stack
+          - chart_type: line
+            period: hour
+            days_to_show: 1
+            type: statistics-graph
+            entities:
+              - sensor.illumination_158d0002ea1d0f
+            stat_types:
+              - max
+        type: vertical-stack
+      - cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            image: /local/Home_Room_Jardin1_RGB.jpeg
+            hold_action:
+              action: toggle
+            aspect_ratio: '4'
+            name: LUCES JARDIN
+            entity: light.luces_jardin
+          - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.salon_home_cinema
+                  data:
+                    transition: 5
+                name: Full
+                icon: ''
+                icon_color: yellow
+                entity: scene.salon_home_cinema
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.salon_sunset
+                  data:
+                    transition: 5
+                name: Sunset
+                icon: ''
+                icon_color: orange
+                entity: scene.salon_sunset
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.salon_noche
+                  data:
+                    transition: 5
+                name: Noche
+                icon: mdi:weather-sunset-down
+                icon_color: indigo
+                entity: scene.salon_noche
+            type: horizontal-stack
+          - type: tile
+            entity: input_text.helper_ikea_tradfri_switch_salon
+            name: Helper Ikea Smart Switch Porche
+          - cards:
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: true
+                show_color_temp_control: true
+                show_color_control: true
+                collapsible_controls: true
+                entity: light.luz_exterior
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: true
+                show_color_temp_control: true
+                show_color_control: true
+                collapsible_controls: true
+                entity: light.luz_porche_jardin
+            type: horizontal-stack
+          - cards:
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: true
+                show_color_temp_control: false
+                show_color_control: false
+                collapsible_controls: true
+                entity: light.luz_balizas_cesped
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: true
+                show_color_temp_control: false
+                show_color_control: false
+                collapsible_controls: true
+                entity: light.luz_entrada_bonsais
+            type: horizontal-stack
+          - cards:
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: true
+                show_color_temp_control: false
+                show_color_control: false
+                collapsible_controls: true
+                entity: light.luz_olivo_nubes
+                name: Olivo 1
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: true
+                show_color_temp_control: false
+                show_color_control: false
+                collapsible_controls: true
+                entity: light.luz_olivo_grande
+                name: Olivo 2-3
+              - type: custom:mushroom-light-card
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: true
+                show_color_temp_control: false
+                show_color_control: false
+                collapsible_controls: true
+                entity: light.luz_piscina
+                name: Piscina
+            type: horizontal-stack
+          - chart_type: line
+            period: hour
+            days_to_show: 1
+            type: statistics-graph
+            entities:
+              - sensor.aqara_movimiento_exterior_luminosidad
+            stat_types:
+              - mean
+        type: vertical-stack
+    icon: mdi:lightbulb-on
+    path: luces_view
+    title: Luces
+  - badges: []
+    cards:
+      - camera_view: auto
+        entities:
+          - entity: binary_sensor.blink_puerta_exterior_camera_armed
+          - entity: binary_sensor.blink_puerta_exterior_motion
+          - entity: sensor.blink_puerta_exterior_temperature
+          - entity: sensor.blink_puerta_exterior_wifi
+          - entity: binary_sensor.blink_puerta_exterior_battery
+        hold_action:
+          action: call-service
+          service: script.trigger_blink_puerta_exterior
+        tap_action:
+          action: more-info
+        title: Puerta Exterior
+        type: picture-glance
+        entity: camera.blink_puerta_exterior
+        image_entity: camera.blink_puerta_exterior
+        camera_image: camera.blink_puerta_exterior
+      - camera_view: auto
+        camera_image: camera.blink_puerta_principal
+        entities:
+          - entity: binary_sensor.blink_puerta_principal_camera_armed
+          - entity: binary_sensor.blink_puerta_principal_motion
+          - entity: sensor.blink_puerta_principal_temperature
+          - entity: sensor.blink_puerta_principal_wifi
+          - entity: binary_sensor.blink_puerta_principal_battery
+          - entity: light.luz_exterior
+        hold_action:
+          action: call-service
+          service: script.trigger_blink_puerta_principal
+        tap_action:
+          action: more-info
+        title: Puerta Principal
+        type: picture-glance
+        entity: camera.blink_puerta_principal
+      - camera_view: auto
+        camera_image: camera.blink_hall
+        entities:
+          - entity: binary_sensor.blink_hall_camera_armed
+          - entity: binary_sensor.blink_hall_motion
+          - entity: sensor.blink_hall_temperature
+          - entity: sensor.blink_hall_wifi
+          - entity: binary_sensor.blink_hall_battery
+          - entity: light.luz_hall
+        hold_action:
+          action: call-service
+          service: script.trigger_blink_hall
+        tap_action:
+          action: more-info
+        title: Hall Entrada
+        type: picture-glance
+        entity: camera.blink_hall
+        image: /local/blink_hall.jpg
+      - camera_view: auto
+        type: picture-glance
+        title: Salón
+        entities:
+          - entity: binary_sensor.blink_salon_camera_armed
+          - entity: binary_sensor.blink_salon_motion
+          - entity: binary_sensor.blink_salon_battery
+          - entity: sensor.blink_salon_temperature
+          - entity: sensor.blink_salon_wifi
+          - entity: light.luces_salon
+        camera_image: camera.blink_salon
+        entity: camera.blink_salon
+        hold_action:
+          action: call-service
+          service: script.trigger_blink_salon
+        tap_action:
+          action: more-info
+      - camera_view: auto
+        camera_image: camera.blink_cocina
+        entities:
+          - entity: binary_sensor.blink_cocina_camera_armed
+          - entity: binary_sensor.blink_cocina_motion
+          - entity: sensor.blink_cocina_temperature
+          - entity: binary_sensor.blink_cocina_battery
+          - entity: sensor.blink_cocina_wifi
+          - entity: light.luz_cocina
+        hold_action:
+          action: call-service
+          service: script.trigger_blink_cocina
+        tap_action:
+          action: more-info
+        title: Cocina
+        type: picture-glance
+        entity: camera.blink_cocina
+        image: /local/blink_cocina.jpg
+      - camera_view: auto
+        type: picture-glance
+        title: Estudio
+        entities:
+          - entity: binary_sensor.blink_estudio_camera_armed
+          - entity: binary_sensor.blink_estudio_motion
+          - entity: binary_sensor.blink_estudio_battery
+          - entity: sensor.blink_estudio_temperature
+          - entity: sensor.blink_estudio_wifi
+          - entity: light.luces_estudio
+        camera_image: camera.blink_estudio
+        entity: camera.blink_estudio
+        hold_action:
+          action: call-service
+          service: script.trigger_blink_estudio
+        tap_action:
+          action: more-info
+      - camera_view: auto
+        camera_image: camera.blink_porche
+        entities:
+          - entity: binary_sensor.blink_porche_camera_armed
+          - entity: binary_sensor.blink_porche_motion
+          - entity: sensor.blink_porche_temperature
+          - entity: sensor.blink_porche_wifi
+          - entity: binary_sensor.blink_porche_battery
+        hold_action:
+          action: call-service
+          service: script.trigger_blink_porche
+        tap_action:
+          action: more-info
+        title: Jardín Porche
+        type: picture-glance
+        entity: camera.blink_porche
+      - camera_view: auto
+        type: picture-glance
+        title: Piscina
+        entities:
+          - entity: binary_sensor.alarma_sensor_movimiento_blink_piscina
+          - entity: sensor.blink_piscina_temperature
+          - entity: sensor.blink_piscina_wi_fi_rssi
+          - entity: light.luz_estudio
+        camera_image: camera.blink_piscina
+        entity: camera.blink_piscina
+        hold_action:
+          action: call-service
+          service: script.trigger_blink_piscina
+        tap_action:
+          action: more-info
+        image: /local/blink_piscina.jpg
+        image_entity: camera.blink_piscina
+    icon: mdi:cctv
+    path: camaras_view
+    title: Cámaras
+  - badges: []
+    cards:
+      - entities:
+          - entity: person.agustin
+            secondary_info: last-changed
+          - entity: input_boolean.family_sleep_home_aac
+          - entity: binary_sensor.family_home_aac
+            secondary_info: last-changed
+          - entity: device_tracker.c059137e_07d2_49ea_ae8b_3865a1b71619
+            secondary_info: last-changed
+          - entity: device_tracker.iphone_aac
+            secondary_info: last-changed
+          - entity: device_tracker.apple_94_ac_c4_iphone_aac
+            secondary_info: last-changed
+          - entity: sensor.iphone_aac_ssid
+            name: Red Wifi
+          - entity: sensor.baye_probability_aac
+          - entity: binary_sensor.baye_home_aac
+        show_header_toggle: false
+        title: Agustín Tracking
+        state_color: true
+        type: entities
+        header:
+          type: picture
+          image: '/local/AAC_header_col.jpg '
+          tap_action:
+            action: none
+          hold_action:
+            action: none
+      - entities:
+          - entity: person.malen
+            secondary_info: last-changed
+          - entity: input_boolean.family_sleep_home_mfc
+          - entity: binary_sensor.family_home_mfc
+            secondary_info: last-changed
+          - entity: device_tracker.mfc_geofency
+            secondary_info: last-changed
+          - entity: device_tracker.iphone_malen
+            secondary_info: last-changed
+          - entity: device_tracker.apple_87_31_3b_iphone_mfc
+          - entity: sensor.iphone_malen_ssid
+            name: Red Wifi
+          - entity: sensor.baye_probability_mfc
+          - entity: binary_sensor.baye_home_mfc
+        show_header_toggle: false
+        title: Malen Tracking
+        state_color: true
+        type: entities
+        header:
+          type: picture
+          image: /local/MFC_header_col.jpg
+          tap_action:
+            action: none
+          hold_action:
+            action: none
+      - entities:
+          - entity: person.paloma
+            secondary_info: last-changed
+          - entity: input_boolean.family_sleep_home_paf
+          - entity: binary_sensor.family_home_paf
+            secondary_info: last-changed
+          - entity: device_tracker.paf_geofency
+            secondary_info: last-changed
+          - entity: device_tracker.iphone_paf
+            secondary_info: last-changed
+          - entity: device_tracker.apple_c8_49_a6_iphone_paf
+          - entity: sensor.iphone_paf_ssid
+            name: Red Wifi
+          - entity: sensor.baye_probability_paf
+          - entity: binary_sensor.baye_home_paf
+        show_header_toggle: false
+        title: Paloma Tracking
+        state_color: true
+        type: entities
+        header:
+          type: picture
+          image: /local/PAF_header_col.jpg
+          tap_action:
+            action: none
+          hold_action:
+            action: none
+      - entities:
+          - entity: person.agu
+            secondary_info: last-changed
+          - entity: input_boolean.family_sleep_home_aaf
+          - entity: binary_sensor.family_home_aaf
+            secondary_info: last-changed
+          - entity: device_tracker.0b495ff5_94fc_4773_9644_f71df3c328ac
+            secondary_info: last-changed
+          - entity: device_tracker.a2f
+            secondary_info: last-changed
+          - entity: device_tracker.apple_89_98_36_iphone_aaf
+          - entity: sensor.iphone_a2f_ssid
+            name: Red Wifi
+          - entity: sensor.baye_probability_aaf
+          - entity: binary_sensor.baye_home_aaf
+        show_header_toggle: false
+        title: Agu Tracking
+        state_color: true
+        type: entities
+        header:
+          type: picture
+          image: /local/AAF_header_col.jpg
+          tap_action:
+            action: none
+          hold_action:
+            action: none
+    icon: mdi:map-marker
+    path: tracking_view
+    title: Tracking
+  - theme: Backend-selected
+    title: Media Player
+    icon: mdi:television-speaker
+    badges: []
+    cards: []
+    type: sections
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Nueva sección
+          - cards:
+              - entity: media_player.lg_tv_salon
+                type: media-control
+            type: vertical-stack
+          - type: custom:mushroom-media-player-card
+            entity: media_player.lg_tv_salon
+            name: TV Salon
+            use_media_info: true
+            show_volume_level: true
+            volume_controls:
+              - volume_mute
+              - volume_set
+              - volume_buttons
+            media_controls:
+              - on_off
+            collapsible_controls: true
+            layout: horizontal
+            fill_container: true
+      - type: grid
+        cards:
+          - type: heading
+            heading: Nueva sección
+          - cards:
+              - entity: media_player.firetv_cocina
+                type: media-control
+            type: vertical-stack
+          - type: custom:mushroom-media-player-card
+            use_media_info: true
+            show_volume_level: true
+            volume_controls:
+              - volume_mute
+              - volume_set
+              - volume_buttons
+            media_controls:
+              - on_off
+            collapsible_controls: true
+            layout: horizontal
+            fill_container: true
+            entity: media_player.tv_cocina
+      - type: grid
+        cards:
+          - type: heading
+            heading: Nueva sección
+          - cards:
+              - entities:
+                  - entity: media_player.firetv_estudio
+                show_header_toggle: false
+                title: FireTV Estudio
+                type: entities
+              - entity: media_player.firetv_estudio
+                type: media-control
+            type: vertical-stack
+      - type: grid
+        cards:
+          - cards:
+              - entities:
+                  - entity: media_player.apple_tv
+                  - entity: remote.apple_tv
+                show_header_toggle: false
+                title: Apple TV
+                type: entities
+              - type: media-control
+                entity: media_player.apple_tv
+            type: vertical-stack
+          - cards:
+              - entities:
+                  - entity: media_player.bravia_kdl_40ex710
+                show_header_toggle: false
+                title: SONY Bravia Salon
+                type: entities
+              - type: media-control
+                entity: media_player.bravia_kdl_40ex710
+            type: vertical-stack
+  - title: Plan Riego
+    path: planriego_view
+    icon: mdi:head-snowflake-outline
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            image: /local/Riego_General_s0_1900x800.jpg
+            tap_action:
+              action: more-info
+            hold_action:
+              action: toggle
+            entity: input_boolean.riego_interruptor_global
+            name: Interruptor General Riego
+            aspect_ratio: '5'
+          - color: blue
+            entity: binary_sensor.riego_algun_sector_activo
+            name: ¿Regando Ahora?
+            icon: mdi:sprinkler-variant
+            type: tile
+            show_entity_picture: false
+          - cards:
+              - show_name: true
+                show_icon: true
+                entity: binary_sensor.riego_cesped_ch1_dia_ejecucion
+                hold_action:
+                  action: none
+                icon: mdi:sprinkler
+                name: Césped S1
+                tap_action:
+                  action: more-info
+                type: entity-button
+              - show_name: true
+                show_icon: true
+                entity: binary_sensor.riego_cesped_ch2_dia_ejecucion
+                hold_action:
+                  action: none
+                icon: mdi:sprinkler-variant
+                name: Césped S2
+                tap_action:
+                  action: more-info
+                type: entity-button
+              - show_name: true
+                show_icon: true
+                entity: binary_sensor.riego_cesped_ch3_dia_ejecucion
+                hold_action:
+                  action: none
+                name: Goteo S3
+                tap_action:
+                  action: more-info
+                type: entity-button
+                icon: mdi:sprinkler-fire
+              - show_name: true
+                show_icon: true
+                entity: switch.esphome_4ch_sw2_relay_3
+                icon: mdi:water-pump
+                name: Fuente Zen
+                show_state: false
+                tap_action:
+                  action: more-info
+                type: entity-button
+                hold_action:
+                  action: toggle
+            type: horizontal-stack
+          - cards:
+              - show_name: true
+                show_icon: true
+                entity: binary_sensor.riego_bonsais_ch1_dia_ejecucion
+                hold_action:
+                  action: none
+                icon: mdi:leaf
+                name: Bonsais Top
+                tap_action:
+                  action: more-info
+                type: entity-button
+              - entity: binary_sensor.riego_bonsais_ch2_dia_ejecucion
+                hold_action:
+                  action: none
+                icon: mdi:flower
+                name: Plantas Entrada
+                tap_action:
+                  action: more-info
+                type: entity-button
+              - show_name: true
+                show_icon: true
+                entity: binary_sensor.riego_tomates_ch0_dia_ejecucion
+                hold_action:
+                  action: none
+                name: Tomateras
+                tap_action:
+                  action: more-info
+                type: entity-button
+                icon: mdi:sprout
+              - show_name: true
+                show_icon: true
+                entity: binary_sensor.riego_bonsais_ch0_dia_ejecucion
+                icon: mdi:tree
+                name: Bonsais Prod
+                tap_action:
+                  action: more-info
+                type: entity-button
+            type: horizontal-stack
+          - cards:
+              - show_name: true
+                show_icon: true
+                entity: sensor.riego_cesped_ch1_duracion_planificada_total
+                hold_action:
+                  action: none
+                icon: mdi:sprinkler
+                name: Césped S1
+                tap_action:
+                  action: more-info
+                type: entity-button
+                show_state: true
+              - show_name: true
+                show_icon: true
+                entity: sensor.riego_cesped_ch2_duracion_planificada_total
+                hold_action:
+                  action: none
+                icon: mdi:sprinkler-variant
+                name: Césped S2
+                tap_action:
+                  action: more-info
+                type: entity-button
+                show_state: true
+              - show_name: true
+                show_icon: true
+                entity: sensor.riego_cesped_ch3_duracion_planificada_total
+                hold_action:
+                  action: none
+                icon: mdi:sprinkler-fire
+                name: Goteo S3
+                tap_action:
+                  action: more-info
+                type: entity-button
+                show_state: true
+              - show_name: true
+                show_icon: true
+                entity: sensor.riego_cesped_ch3_duracion_planificada_total
+                hold_action:
+                  action: none
+                name: Libre
+                tap_action:
+                  action: more-info
+                type: entity-button
+                show_state: false
+            type: horizontal-stack
+          - cards:
+              - show_name: true
+                show_icon: true
+                show_state: true
+                entity: sensor.riego_bonsais_ch0_duracion_planificada_total
+                hold_action:
+                  action: none
+                icon: mdi:leaf
+                name: Bonsais Prod
+                tap_action:
+                  action: more-info
+                type: entity-button
+              - show_name: true
+                show_icon: true
+                show_state: true
+                entity: sensor.riego_bonsais_ch2_duracion_planificada_total
+                hold_action:
+                  action: none
+                icon: mdi:flower
+                name: Plantas Entrada
+                tap_action:
+                  action: more-info
+                type: entity-button
+              - show_name: true
+                show_icon: true
+                show_state: true
+                entity: sensor.riego_tomates_ch0_duracion_planificada_total
+                hold_action:
+                  action: none
+                name: Tomateras
+                tap_action:
+                  action: more-info
+                type: entity-button
+                icon: mdi:sprout
+              - show_name: true
+                show_icon: true
+                show_state: true
+                entity: sensor.riego_bonsais_ch1_duracion_planificada_total
+                icon: mdi:tree
+                name: Bonsais Top
+                tap_action:
+                  action: more-info
+                type: entity-button
+            type: horizontal-stack
+      - type: vertical-stack
+        cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            image: /local/Riego_Bonsais_x1_900x362.jpg
+            tap_action:
+              action: more-info
+            hold_action:
+              action: toggle
+            entity: switch.esphome_pow_sw4
+            name: Cuadro Control Bomba Pozo
+            aspect_ratio: '5'
+          - color: yellow
+            type: tile
+            entity: binary_sensor.riego_bomba_pozo_motor_on
+            name: Motor Bomba Pozo Activa (>100W)
+            show_entity_picture: false
+          - color: red
+            type: tile
+            entity: binary_sensor.riego_bomba_pozo_warning_consumo
+            name: Warning Consumo Motor  (>1.900W)
+          - color: pink
+            type: tile
+            entity: binary_sensor.riego_bomba_pozo_warning_motor_off
+            name: Warning Riego Bomba Apagada
+          - type: horizontal-stack
+            cards:
+              - type: gauge
+                entity: sensor.esphome_pow_sw4_voltage
+                name: Voltage
+                unit: V
+                needle: false
+              - type: gauge
+                entity: sensor.esphome_pow_sw4_current
+                name: Amperios
+                unit: A
+                needle: true
+                severity:
+                  green: 0
+                  yellow: 8
+                  red: 10
+                min: 0
+                max: 12
+              - type: gauge
+                entity: sensor.esphome_pow_sw4_power
+                name: Watios
+                unit: W
+                severity:
+                  green: 1000
+                  yellow: 1500
+                  red: 1800
+                min: 0
+                max: 2000
+                needle: true
+          - cards:
+              - entities:
+                  - entity: sensor.esphome_pow_sw4_current
+                font_size: 50
+                line_color: blue
+                line_width: 6
+                name: Consumo
+                type: custom:mini-graph-card
+              - entities:
+                  - entity: sensor.esphome_pow_sw4_power
+                font_size: 50
+                line_color: green
+                line_width: 6
+                name: Potencia
+                type: custom:mini-graph-card
+            type: horizontal-stack
+      - type: vertical-stack
+        cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            image: /local/Riego_Bonsais_x2_1600x400.jpg
+            tap_action:
+              action: more-info
+            hold_action:
+              action: toggle
+            entity: automation.s17_control_interruptor_general_riego
+            name: 'IA Control Riego según Previsión AEMET '
+            aspect_ratio: '5'
+          - color: brown
+            type: tile
+            name: S17 Regla Control Interruptor General Riego
+            entity: automation.s17_control_interruptor_general_riego
+          - color: brown
+            type: tile
+            name: S18 Control Bomba Riego Encendido
+            entity: automation.s18_control_interruptor_general_riego
+          - color: brown
+            type: tile
+            name: S18b Control Bomba Riego Apagado
+            entity: automation.s18b_control_bomba_riego
+          - color: indigo
+            type: tile
+            entity: binary_sensor.riego_interruptor_global
+            icon: mdi:water-pump
+          - color: amber
+            type: tile
+            show_entity_picture: true
+            tap_action:
+              action: more-info
+            name: Sensores IA => ¿Riego Automático Hoy?
+            entity: binary_sensor.riego_automatico_hoy
+          - type: horizontal-stack
+            cards:
+              - color: blue
+                type: tile
+                name: Hoy
+                entity: sensor.aemet_tiempo_0d
+                show_entity_picture: true
+                tap_action:
+                  action: more-info
+              - color: cyan
+                type: tile
+                name: Mañana
+                show_entity_picture: true
+                tap_action:
+                  action: more-info
+                entity: sensor.aemet_tiempo_1d
+          - type: horizontal-stack
+            cards:
+              - type: tile
+                entity: sensor.aemet_tiempo_0d
+                name: AEMET+0 Tiempo
+              - type: tile
+                entity: sensor.aemet_tiempo_1d
+                name: AEMET+1 Tiempo
+              - type: tile
+                entity: sensor.aemet_tiempo_2d
+                name: AEMET+2 Tiempo
+          - type: horizontal-stack
+            cards:
+              - type: tile
+                entity: binary_sensor.aemet_prevision_lluvia_0d
+                name: AEMET+0 Pronóstico Lluvia
+              - type: tile
+                entity: binary_sensor.aemet_prevision_lluvia_1d
+                name: AEMET+1 Pronóstico Lluvia
+              - type: tile
+                entity: binary_sensor.aemet_prevision_lluvia_2d
+                name: AEMET+2 Pronóstico Lluvia
+  - theme: Backend-selected
+    title: Riego Césped
+    path: riego_cesped_view
+    icon: mdi:sprinkler
+    badges: []
+    cards:
+      - cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            entity: binary_sensor.riego_cesped_ch1_dia_ejecucion
+            image: /local/Riego_Cesped_s1_1900x800.jpeg
+            name: 'SECTOR 1: Turbinas Cesped'
+            aspect_ratio: '5'
+          - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: more-info
+                name: Riego S1
+                entity: switch.esphome_4ch_sw3_relay_1
+                icon_color: teal
+                secondary_info: last-changed
+                hold_action:
+                  action: more-info
+                double_tap_action:
+                  action: more-info
+              - type: custom:mushroom-entity-card
+                entity: timer.riego_cesped_ch1
+                fill_container: true
+                layout: vertical
+                name: Timer
+                icon: ''
+              - type: gauge
+                entity: sensor.riego_cesped_ch1_duracion_planificada_total
+                name: Tiempo Total
+                min: 0
+                max: 20
+                unit: Min
+                needle: true
+                severity:
+                  green: 1
+                  yellow: 6
+                  red: 12
+            type: horizontal-stack
+          - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: T1
+                entity: input_boolean.riego_cesped_ch1_programador_t1
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: T2
+                entity: input_boolean.riego_cesped_ch1_programador_t2
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: T3
+                entity: input_boolean.riego_cesped_ch1_programador_t3
+            type: horizontal-stack
+          - type: entities
+            entities:
+              - entity: input_select.riego_cesped_ch1_programador_dias
+            show_header_toggle: false
+            state_color: true
+          - type: vertical-stack
+            cards:
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_cesped_ch1_duracion_planificada_t1
+                    name: TRAMO 1
+                    min: 0
+                    max: 12
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 1
+                      yellow: 6
+                      red: 10
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch1_start_time_t1
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                    second_step: 5
+                    name: ''
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch1_end_time_t1
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                    layout:
+                      embedded: true
+                    link_values: true
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_cesped_ch1_duracion_planificada_t2
+                    name: TRAMO 2
+                    min: 0
+                    max: 12
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 1
+                      yellow: 6
+                      red: 10
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch1_start_time_t2
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch1_end_time_t2
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                    layout:
+                      embedded: true
+                    link_values: true
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_cesped_ch1_duracion_planificada_t3
+                    name: TRAMO 3
+                    min: 0
+                    max: 12
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 1
+                      yellow: 6
+                      red: 10
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch1_start_time_t3
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch1_end_time_t3
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                    layout:
+                      embedded: true
+                    link_values: true
+        type: vertical-stack
+      - cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            entity: binary_sensor.riego_cesped_ch2_dia_ejecucion
+            image: /local/Riego_Cesped_s2_1991x821.jpeg
+            name: SECTOR 2:Difusores Cesped
+            aspect_ratio: '5'
+          - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: more-info
+                name: Riego S2
+                entity: switch.esphome_4ch_sw3_relay_2
+                icon_color: teal
+                hold_action:
+                  action: more-info
+                secondary_info: last-changed
+                double_tap_action:
+                  action: more-info
+              - type: custom:mushroom-entity-card
+                entity: timer.riego_cesped_ch2
+                fill_container: true
+                layout: vertical
+                name: Timer
+                icon: ''
+              - type: gauge
+                entity: sensor.riego_cesped_ch2_duracion_planificada_total
+                name: Tiempo Total
+                min: 0
+                max: 20
+                unit: Min
+                needle: true
+                severity:
+                  green: 1
+                  yellow: 6
+                  red: 12
+            type: horizontal-stack
+          - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: T1
+                entity: input_boolean.riego_cesped_ch2_programador_t1
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: T2
+                entity: input_boolean.riego_cesped_ch2_programador_t2
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: T3
+                entity: input_boolean.riego_cesped_ch2_programador_t3
+            type: horizontal-stack
+          - type: entities
+            entities:
+              - entity: input_select.riego_cesped_ch2_programador_dias
+            show_header_toggle: false
+            state_color: true
+          - type: vertical-stack
+            cards:
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_cesped_ch2_duracion_planificada_t1
+                    name: TRAMO 1
+                    min: 0
+                    max: 12
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 1
+                      yellow: 6
+                      red: 10
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch2_start_time_t1
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    name: ''
+                    hide:
+                      name: true
+                      icon: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch2_end_time_t1
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    name: ''
+                    hide:
+                      name: true
+                      icon: true
+                    layout:
+                      embedded: true
+                    link_values: true
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_cesped_ch2_duracion_planificada_t2
+                    name: TRAMO 2
+                    min: 0
+                    max: 12
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 1
+                      yellow: 6
+                      red: 10
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch2_start_time_t2
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    name: ''
+                    hide:
+                      name: true
+                      icon: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch2_end_time_t2
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    name: ''
+                    hide:
+                      name: true
+                      icon: true
+                    layout:
+                      embedded: true
+                    link_values: true
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_cesped_ch2_duracion_planificada_t3
+                    name: TRAMO 3
+                    min: 0
+                    max: 12
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 1
+                      yellow: 6
+                      red: 10
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch2_start_time_t3
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    name: ''
+                    hide:
+                      name: true
+                      icon: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch2_end_time_t3
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    name: ''
+                    hide:
+                      name: true
+                      icon: true
+                    layout:
+                      embedded: true
+                      icon: true
+                    link_values: true
+        type: vertical-stack
+      - cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            entity: binary_sensor.riego_cesped_ch3_dia_ejecucion
+            image: /local/Riego_Cesped_s3_1900x801.jpeg
+            name: 'SECTOR 3: Goteo Perímetro'
+            aspect_ratio: '5'
+          - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: more-info
+                name: Riego S3
+                entity: switch.esphome_4ch_sw3_relay_3
+                icon_color: teal
+                secondary_info: last-changed
+                hold_action:
+                  action: more-info
+                double_tap_action:
+                  action: more-info
+              - type: custom:mushroom-entity-card
+                entity: timer.riego_cesped_ch3
+                fill_container: true
+                layout: vertical
+                name: Timer
+                icon: ''
+              - type: gauge
+                entity: sensor.riego_cesped_ch3_duracion_planificada_total
+                name: Tiempo Total
+                min: 0
+                max: 12
+                unit: Min
+                needle: true
+                severity:
+                  green: 1
+                  yellow: 6
+                  red: 10
+            type: horizontal-stack
+          - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: T1
+                entity: input_boolean.riego_cesped_ch3_programador_t1
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: T2
+                entity: input_boolean.riego_cesped_ch3_programador_t2
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: T3
+                entity: input_boolean.riego_cesped_ch3_programador_t3
+            type: horizontal-stack
+          - type: entities
+            entities:
+              - entity: input_select.riego_cesped_ch3_programador_dias
+            show_header_toggle: false
+            state_color: true
+          - type: vertical-stack
+            cards:
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_cesped_ch3_duracion_planificada_t1
+                    name: TRAMO 1
+                    min: 0
+                    max: 12
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 1
+                      yellow: 6
+                      red: 10
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch3_start_time_t1
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    name: ''
+                    hide:
+                      name: true
+                      icon: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch3_end_time_t1
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    name: ''
+                    hide:
+                      name: true
+                      icon: true
+                    layout:
+                      embedded: true
+                    link_values: true
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_cesped_ch3_duracion_planificada_t2
+                    name: TRAMO 2
+                    min: 0
+                    max: 12
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 1
+                      yellow: 6
+                      red: 10
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch3_start_time_t2
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    name: ''
+                    hide:
+                      name: true
+                      icon: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch3_end_time_t2
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    name: ''
+                    hide:
+                      name: true
+                      icon: true
+                    layout:
+                      embedded: true
+                    link_values: true
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_cesped_ch3_duracion_planificada_t3
+                    name: TRAMO 2
+                    min: 0
+                    max: 12
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 1
+                      yellow: 6
+                      red: 10
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch3_start_time_t3
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    name: ''
+                    hide:
+                      name: true
+                      icon: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_cesped_ch3_end_time_t3
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    name: ''
+                    hide:
+                      name: true
+                      icon: true
+                    layout:
+                      embedded: true
+                    link_values: true
+        type: vertical-stack
+  - theme: Backend-selected
+    icon: mdi:watering-can
+    path: riego_view
+    title: Riego Bonsais
+    badges: []
+    cards:
+      - cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            entity: binary_sensor.riego_bonsais_ch0_dia_ejecucion
+            image: /local/Riego_Bonsais_s1_1536x634.jpeg
+            name: 'SECTOR 1: Bonsais Producción'
+            aspect_ratio: '3'
+          - cards:
+              - type: tile
+                entity: valve.esphome_pow_sw1
+                name: Bonsais Producción
+                vertical: true
+                hide_state: false
+                show_entity_picture: false
+                state_content:
+                  - state
+                  - last-changed
+                icon_tap_action:
+                  action: more-info
+              - type: custom:mushroom-entity-card
+                entity: timer.riego_bonsais_ch0
+                fill_container: true
+                layout: vertical
+                name: Timer
+                icon: ''
+              - type: gauge
+                entity: sensor.riego_bonsais_ch0_duracion_planificada_total
+                name: Tiempo Total
+                min: 0
+                max: 12
+                unit: Min
+                needle: true
+                severity:
+                  green: 1
+                  yellow: 6
+                  red: 10
+            type: horizontal-stack
+          - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: Bonsais Prod. T1
+                entity: input_boolean.riego_bonsais_ch0_programador_t1
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: Bonsias Prod. T2
+                entity: input_boolean.riego_bonsais_ch0_programador_t2
+            type: horizontal-stack
+          - type: entities
+            entities:
+              - entity: input_select.riego_bonsais_ch0_programador_dias
+            show_header_toggle: false
+            state_color: true
+          - type: vertical-stack
+            cards:
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_bonsais_ch0_duracion_planificada_t1
+                    name: TRAMO 1
+                    min: 0
+                    max: 12
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 1
+                      yellow: 6
+                      red: 10
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_bonsais_ch0_start_time_t1
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                      seconds: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                      thin: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_bonsais_ch0_end_time_t1
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                    layout:
+                      embedded: true
+                    link_values: true
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_bonsais_ch0_duracion_planificada_t2
+                    name: TRAMO 2
+                    min: 0
+                    max: 12
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 1
+                      yellow: 6
+                      red: 10
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_bonsais_ch0_start_time_t2
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_bonsais_ch0_end_time_t2
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                    layout:
+                      embedded: true
+                    link_values: true
+        type: vertical-stack
+      - cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            entity: binary_sensor.riego_tomates_ch0_dia_ejecucion
+            image: /local/Riego_Bonsais_s2_1024x579.jpg
+            aspect_ratio: '3'
+            name: 'SECTOR 2: Huerto Tomates'
+          - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: true
+                layout: vertical
+                tap_action:
+                  action: more-info
+                name: Tomates
+                entity: switch.esphome_bas_sw4
+                icon_color: teal
+                hold_action:
+                  action: more-info
+                secondary_info: last-changed
+              - type: custom:mushroom-entity-card
+                entity: timer.riego_tomates_ch0
+                fill_container: true
+                layout: vertical
+                name: Timer
+                icon: ''
+              - type: gauge
+                entity: sensor.riego_tomates_ch0_duracion_planificada_total
+                name: Tiempo Total
+                min: 0
+                max: 50
+                unit: Min
+                needle: true
+                severity:
+                  green: 20
+                  yellow: 30
+                  red: 40
+            type: horizontal-stack
+          - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: T1
+                entity: input_boolean.riego_tomates_ch0_programador_t1
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: T2
+                entity: input_boolean.riego_tomates_ch0_programador_t2
+            type: horizontal-stack
+          - type: entities
+            entities:
+              - entity: input_select.riego_tomates_ch0_programador_dias
+            show_header_toggle: false
+            state_color: true
+          - type: vertical-stack
+            cards:
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_tomates_ch0_duracion_planificada_t1
+                    name: TRAMO 1
+                    min: 0
+                    max: 30
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 5
+                      yellow: 15
+                      red: 20
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_tomates_ch0_start_time_t1
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                      seconds: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                      thin: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_tomates_ch0_end_time_t1
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                      seconds: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                      thin: true
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_tomates_ch0_duracion_planificada_t2
+                    name: TRAMO 2
+                    min: 0
+                    max: 30
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 5
+                      yellow: 15
+                      red: 20
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_tomates_ch0_start_time_t2
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                      seconds: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                      thin: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_tomates_ch0_end_time_t2
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                      seconds: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                      thin: true
+        type: vertical-stack
+      - cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            entity: binary_sensor.riego_bonsais_ch2_dia_ejecucion
+            image: /local/Riego_Bonsais_s4_768x434.jpg
+            name: 'SECTOR 3: Plantas Aromáticas'
+            aspect_ratio: '3'
+          - cards:
+              - type: tile
+                entity: valve.esphome_4ch_sw2_relay_2
+                name: Aromáticas
+                vertical: true
+                state_content:
+                  - state
+                  - last-changed
+                icon_tap_action:
+                  action: more-info
+              - type: custom:mushroom-entity-card
+                entity: timer.riego_bonsais_ch2
+                fill_container: true
+                layout: vertical
+                name: Timer
+                icon: ''
+              - type: gauge
+                entity: sensor.riego_bonsais_ch2_duracion_planificada_total
+                name: Tiempo Total
+                min: 0
+                max: 12
+                unit: Min
+                needle: true
+                severity:
+                  green: 1
+                  yellow: 6
+                  red: 10
+            type: horizontal-stack
+          - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: T1
+                entity: input_boolean.riego_bonsais_ch2_programador_t1
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: T2
+                entity: input_boolean.riego_bonsais_ch2_programador_t2
+            type: horizontal-stack
+          - type: entities
+            entities:
+              - entity: input_select.riego_bonsais_ch2_programador_dias
+            show_header_toggle: false
+            state_color: true
+          - type: vertical-stack
+            cards:
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_bonsais_ch2_duracion_planificada_t1
+                    name: TRAMO 1
+                    min: 0
+                    max: 12
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 1
+                      yellow: 6
+                      red: 10
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_bonsais_ch2_start_time_t1
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                      seconds: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                      thin: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_bonsais_ch2_end_time_t1
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                      seconds: true
+                    layout:
+                      embedded: true
+                    link_values: true
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_bonsais_ch2_duracion_planificada_t2
+                    name: TRAMO 2
+                    min: 0
+                    max: 12
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 1
+                      yellow: 6
+                      red: 10
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_bonsais_ch2_start_time_t2
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                      seconds: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_bonsais_ch2_end_time_t2
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                      seconds: true
+                    layout:
+                      embedded: true
+                    link_values: true
+        type: vertical-stack
+      - cards:
+          - type: horizontal-stack
+            cards:
+              - show_state: true
+                show_name: true
+                camera_view: auto
+                type: picture-entity
+                entity: binary_sensor.riego_bonsais_ch1_dia_ejecucion
+                image: /local/Riego_Bonsais_s3_1900x884.jpeg
+                name: 'SECTOR 4: Bonsais Top'
+                aspect_ratio: '3'
+          - cards:
+              - type: tile
+                entity: valve.esphome_4ch_sw2_relay_1
+                name: Bonsais Top
+                vertical: true
+                hide_state: false
+                state_content:
+                  - state
+                  - last-changed
+                icon_tap_action:
+                  action: more-info
+              - type: custom:mushroom-entity-card
+                entity: timer.riego_bonsais_ch1
+                fill_container: true
+                layout: vertical
+                name: Timer
+                icon: ''
+              - type: gauge
+                entity: sensor.riego_bonsais_ch1_duracion_planificada_total
+                name: Tiempo Total
+                min: 0
+                max: 12
+                unit: Min
+                needle: true
+                severity:
+                  green: 1
+                  yellow: 6
+                  red: 10
+            type: horizontal-stack
+          - cards:
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: Bonsais Top T1
+                entity: input_boolean.riego_bonsais_ch1_programador_t1
+              - type: custom:mushroom-entity-card
+                fill_container: false
+                layout: horizontal
+                tap_action:
+                  action: toggle
+                name: Bonsais Top T2
+                entity: input_boolean.riego_bonsais_ch1_programador_t2
+            type: horizontal-stack
+          - type: entities
+            entities:
+              - entity: input_select.riego_bonsais_ch1_programador_dias
+            show_header_toggle: false
+            state_color: true
+          - type: vertical-stack
+            cards:
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_bonsais_ch1_duracion_planificada_t1
+                    name: TRAMO 1
+                    min: 0
+                    max: 12
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 1
+                      yellow: 6
+                      red: 10
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_bonsais_ch1_start_time_t1
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                      seconds: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_bonsais_ch1_end_time_t1
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                      seconds: true
+                    layout:
+                      embedded: true
+                    link_values: true
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.riego_bonsais_ch1_duracion_planificada_t2
+                    name: TRAMO 2
+                    min: 0
+                    max: 12
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 1
+                      yellow: 6
+                      red: 10
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_bonsais_ch1_start_time_t2
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                      seconds: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.riego_bonsais_ch1_end_time_t2
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                      icon: true
+                      seconds: true
+                    layout:
+                      embedded: true
+                    link_values: true
+        type: vertical-stack
+  - theme: Backend-selected
+    title: Calendar
+    path: calendar
+    icon: mdi:calendar
+    badges: []
+    cards:
+      - type: todo-list
+        entity: todo.pizarra_super
+        title: 'Bring : Pizarra Super'
+      - type: calendar
+        entities:
+          - calendar.universidad_universidad_aaf
+          - calendar.universidad_universidad_paf
+          - calendar.family_almuerzo
+          - calendar.family_cena
+          - calendar.family_eventos
+        initial_view: dayGridMonth
+        title: CALENDARIO FAMILY
+      - type: calendar
+        entities:
+          - calendar.universidad_universidad_aaf
+          - calendar.universidad_universidad_paf
+          - calendar.family_almuerzo
+          - calendar.family_cena
+          - calendar.family_eventos
+        initial_view: listWeek
+        title: CALENDARIO FAMILY
+  - badges: []
+    cards:
+      - cards:
+          - color_thresholds:
+              - color: purple
+                value: 46
+              - color: magenta
+                value: 44
+              - color: red
+                value: 42
+              - color: vermillion
+                value: 40
+              - color: orange
+                value: 38
+              - color: amber
+                value: 35
+              - color: yellow
+                value: 30
+              - color: chartreuse
+                value: 25
+              - color: green
+                value: 20
+              - color: teal
+                value: 15
+              - color: blue
+                value: 10
+              - color: violet
+                value: 5
+              - color: black
+                value: 0
+            entities:
+              - entity: sensor.aqara_temperatura_porche
+            font_size: 120
+            line_width: 10
+            name: Porche Jardín
+            points_per_hour: 1
+            show:
+              icon: true
+              labels: true
+              state: true
+            type: custom:mini-graph-card
+          - cards:
+              - entities:
+                  - entity: sensor.aqara_temperatura_porche_humedad
+                font_size: 75
+                line_color: blue
+                line_width: 6
+                name: ' '
+                type: custom:mini-graph-card
+                show:
+                  icon: true
+                  labels: true
+                  state: true
+              - entities:
+                  - entity: sensor.aqara_temperatura_porche_presionatm
+                font_size: 75
+                line_color: green
+                line_width: 6
+                name: ' '
+                type: custom:mini-graph-card
+                show:
+                  icon: true
+                  labels: true
+                  state: true
+            type: horizontal-stack
+        type: vertical-stack
+      - cards:
+          - color_thresholds:
+              - color: purple
+                value: 46
+              - color: magenta
+                value: 44
+              - color: red
+                value: 42
+              - color: vermillion
+                value: 40
+              - color: orange
+                value: 38
+              - color: amber
+                value: 35
+              - color: yellow
+                value: 30
+              - color: chartreuse
+                value: 25
+              - color: green
+                value: 20
+              - color: teal
+                value: 15
+              - color: blue
+                value: 10
+              - color: violet
+                value: 5
+              - color: black
+                value: 0
+            entities:
+              - entity: sensor.ly3_entrada_exterior_temperatura
+            font_size: 120
+            line_width: 10
+            name: Exterior Entrada
+            points_per_hour: 1
+            show:
+              icon: true
+              labels: true
+              state: true
+            type: custom:mini-graph-card
+          - cards:
+              - entities:
+                  - entity: sensor.ly3_entrada_exterior_humedad
+                line_color: blue
+                line_width: 6
+                name: ' '
+                type: custom:mini-graph-card
+                show:
+                  icon: true
+                  labels: true
+                  state: true
+                font_size: 75
+              - entities:
+                  - entity: sensor.aqara_temperatura_porche_presionatm
+                line_color: green
+                line_width: 6
+                name: ' '
+                type: custom:mini-graph-card
+                font_size: 75
+            type: horizontal-stack
+        type: vertical-stack
+      - cards:
+          - color_thresholds:
+              - color: purple
+                value: 46
+              - color: magenta
+                value: 44
+              - color: red
+                value: 42
+              - color: vermillion
+                value: 40
+              - color: orange
+                value: 38
+              - color: amber
+                value: 35
+              - color: yellow
+                value: 30
+              - color: chartreuse
+                value: 25
+              - color: green
+                value: 20
+              - color: teal
+                value: 15
+              - color: blue
+                value: 10
+              - color: violet
+                value: 5
+              - color: black
+                value: 0
+            entities:
+              - entity: sensor.aqara_temperatura_salon
+            font_size: 120
+            line_width: 10
+            points_per_hour: 1
+            show:
+              icon: true
+              labels: true
+              state: true
+            name: Salón
+            type: custom:mini-graph-card
+          - cards:
+              - entities:
+                  - entity: sensor.aqara_temperatura_salon_humedad
+                font_size: 75
+                line_color: blue
+                line_width: 6
+                name: ' '
+                type: custom:mini-graph-card
+                show:
+                  icon: true
+                  labels: true
+                  state: true
+              - entities:
+                  - entity: sensor.aqara_temperatura_salon_presionatm
+                font_size: 75
+                line_color: green
+                line_width: 6
+                name: ' '
+                type: custom:mini-graph-card
+                show:
+                  icon: true
+                  labels: true
+                  state: true
+            type: horizontal-stack
+        type: vertical-stack
+      - cards:
+          - color_thresholds:
+              - color: purple
+                value: 46
+              - color: magenta
+                value: 44
+              - color: red
+                value: 42
+              - color: vermillion
+                value: 40
+              - color: orange
+                value: 38
+              - color: amber
+                value: 35
+              - color: yellow
+                value: 30
+              - color: chartreuse
+                value: 25
+              - color: green
+                value: 20
+              - color: teal
+                value: 15
+              - color: blue
+                value: 10
+              - color: violet
+                value: 5
+              - color: black
+                value: 0
+            entities:
+              - entity: sensor.ly1_desk_setup_temperatura
+            font_size: 120
+            line_width: 10
+            name: Estudio Desk Setup
+            points_per_hour: 1
+            show:
+              icon: true
+              labels: true
+              state: true
+            type: custom:mini-graph-card
+          - cards:
+              - entities:
+                  - entity: sensor.ly1_desk_setup_humedad
+                font_size: 75
+                line_color: blue
+                line_width: 6
+                name: ' '
+                type: custom:mini-graph-card
+                show:
+                  icon: true
+                  labels: true
+                  state: true
+              - entities:
+                  - entity: sensor.aa_estudio_room_temperature
+                font_size: 75
+                line_color: green
+                line_width: 6
+                name: ' '
+                type: custom:mini-graph-card
+            type: horizontal-stack
+        type: vertical-stack
+      - cards:
+          - color_thresholds:
+              - color: purple
+                value: 46
+              - color: magenta
+                value: 44
+              - color: red
+                value: 42
+              - color: vermillion
+                value: 40
+              - color: orange
+                value: 38
+              - color: amber
+                value: 35
+              - color: yellow
+                value: 30
+              - color: chartreuse
+                value: 25
+              - color: green
+                value: 20
+              - color: teal
+                value: 15
+              - color: blue
+                value: 10
+              - color: violet
+                value: 5
+            entities:
+              - entity: sensor.aqara_temperatura_cocina
+            font_size: 120
+            line_width: 10
+            points_per_hour: 1
+            show:
+              icon: true
+              labels: true
+              state: true
+            type: custom:mini-graph-card
+            name: Cocina
+          - cards:
+              - entities:
+                  - entity: sensor.aqara_temperatura_cocina_humedad
+                font_size: 75
+                line_color: blue
+                line_width: 6
+                name: ' '
+                type: custom:mini-graph-card
+                show:
+                  icon: true
+                  labels: true
+                  state: true
+              - entities:
+                  - entity: sensor.aqara_temperatura_cocina_presionatm
+                font_size: 75
+                line_color: green
+                line_width: 6
+                name: ' '
+                type: custom:mini-graph-card
+                show:
+                  icon: true
+                  labels: true
+                  state: true
+            type: horizontal-stack
+        type: vertical-stack
+      - cards:
+          - color_thresholds:
+              - color: purple
+                value: 46
+              - color: magenta
+                value: 44
+              - color: red
+                value: 42
+              - color: vermillion
+                value: 40
+              - color: orange
+                value: 38
+              - color: amber
+                value: 35
+              - color: yellow
+                value: 30
+              - color: chartreuse
+                value: 25
+              - color: green
+                value: 20
+              - color: teal
+                value: 15
+              - color: blue
+                value: 10
+              - color: violet
+                value: 5
+              - color: black
+                value: 0
+            entities:
+              - entity: sensor.aqara_temperatura_domitorio_principal
+            font_size: 120
+            line_width: 10
+            name: Dormitorio Principal
+            points_per_hour: 1
+            show:
+              icon: true
+              labels: true
+              state: true
+            type: custom:mini-graph-card
+          - cards:
+              - entities:
+                  - entity: sensor.aqara_temperatura_domitorio_principal_humedad
+                font_size: 75
+                line_color: blue
+                line_width: 6
+                name: ' '
+                type: custom:mini-graph-card
+                show:
+                  icon: true
+                  labels: true
+                  state: true
+              - entities:
+                  - entity: sensor.aqara_temperatura_domitorio_principal_presionatm
+                font_size: 75
+                line_color: green
+                line_width: 6
+                name: ' '
+                type: custom:mini-graph-card
+                show:
+                  icon: true
+                  labels: true
+                  state: true
+            type: horizontal-stack
+        type: vertical-stack
+      - cards:
+          - color_thresholds:
+              - color: purple
+                value: 46
+              - color: magenta
+                value: 44
+              - color: red
+                value: 42
+              - color: vermillion
+                value: 40
+              - color: orange
+                value: 38
+              - color: amber
+                value: 35
+              - color: yellow
+                value: 30
+              - color: chartreuse
+                value: 25
+              - color: green
+                value: 20
+              - color: teal
+                value: 15
+              - color: blue
+                value: 10
+              - color: violet
+                value: 5
+              - color: black
+                value: 0
+            entities:
+              - entity: sensor.aqara_temperatura_domitorio_paf
+            font_size: 120
+            line_width: 10
+            name: Dormitorio Paloma
+            points_per_hour: 1
+            show:
+              icon: true
+              labels: true
+              state: true
+            type: custom:mini-graph-card
+          - cards:
+              - entities:
+                  - entity: sensor.aqara_temperatura_domitorio_paf_humedad
+                font_size: 75
+                line_color: blue
+                line_width: 6
+                name: ' '
+                type: custom:mini-graph-card
+                show:
+                  icon: true
+                  labels: true
+                  state: true
+              - entities:
+                  - entity: sensor.aqara_temperatura_domitorio_paf_presionatm
+                font_size: 75
+                line_color: green
+                line_width: 6
+                name: ' '
+                type: custom:mini-graph-card
+                show:
+                  icon: true
+                  labels: true
+                  state: true
+            type: horizontal-stack
+        type: vertical-stack
+      - cards:
+          - color_thresholds:
+              - color: purple
+                value: 46
+              - color: magenta
+                value: 44
+              - color: red
+                value: 42
+              - color: vermillion
+                value: 40
+              - color: orange
+                value: 38
+              - color: amber
+                value: 35
+              - color: yellow
+                value: 30
+              - color: chartreuse
+                value: 25
+              - color: green
+                value: 20
+              - color: teal
+                value: 15
+              - color: blue
+                value: 10
+              - color: violet
+                value: 5
+              - color: black
+                value: 0
+            entities:
+              - entity: sensor.aqara_temperatura_domitorio_aaf
+            font_size: 120
+            line_width: 10
+            name: Dormitorio Agu
+            points_per_hour: 1
+            show:
+              icon: true
+              labels: true
+              state: true
+            type: custom:mini-graph-card
+          - cards:
+              - entities:
+                  - entity: sensor.aqara_temperatura_domitorio_aaf_humedad
+                font_size: 75
+                line_color: blue
+                line_width: 6
+                name: ' '
+                type: custom:mini-graph-card
+                show:
+                  icon: true
+                  labels: true
+                  state: true
+              - entities:
+                  - entity: sensor.aqara_temperatura_domitorio_aaf_presionatm
+                font_size: 75
+                line_color: green
+                line_width: 6
+                name: ' '
+                type: custom:mini-graph-card
+                show:
+                  icon: true
+                  labels: true
+                  state: true
+            type: horizontal-stack
+        type: vertical-stack
+      - cards:
+          - color_thresholds:
+              - color: purple
+                value: 46
+              - color: magenta
+                value: 44
+              - color: red
+                value: 42
+              - color: vermillion
+                value: 40
+              - color: orange
+                value: 38
+              - color: amber
+                value: 35
+              - color: yellow
+                value: 30
+              - color: chartreuse
+                value: 25
+              - color: green
+                value: 20
+              - color: teal
+                value: 15
+              - color: blue
+                value: 10
+              - color: violet
+                value: 5
+              - color: black
+                value: 0
+            entities:
+              - entity: sensor.hue_movimiento_pasillo_temperatura
+            font_size: 120
+            line_width: 10
+            name: Pasillo
+            points_per_hour: 1
+            show:
+              icon: true
+              labels: true
+              state: true
+            type: custom:mini-graph-card
+          - cards:
+              - entities:
+                  - entity: sensor.humidity_158d0002e97092
+                font_size: 75
+                line_color: blue
+                line_width: 6
+                name: ' '
+                type: custom:mini-graph-card
+                show:
+                  icon: true
+                  labels: true
+                  state: true
+              - entities:
+                  - entity: sensor.pressure_158d0002e97092
+                font_size: 75
+                line_color: green
+                line_width: 6
+                name: ' '
+                type: custom:mini-graph-card
+                show:
+                  icon: true
+                  labels: true
+                  state: true
+            type: horizontal-stack
+        type: vertical-stack
+      - color_thresholds:
+          - color: purple
+            value: 46
+          - color: magenta
+            value: 44
+          - color: red
+            value: 42
+          - color: vermillion
+            value: 40
+          - color: orange
+            value: 38
+          - color: amber
+            value: 35
+          - color: yellow
+            value: 30
+          - color: chartreuse
+            value: 25
+          - color: green
+            value: 20
+          - color: teal
+            value: 15
+          - color: blue
+            value: 10
+          - color: violet
+            value: 5
+          - color: black
+            value: 0
+        entities:
+          - entity: sensor.ly3_entrada_exterior_temperatura
+            name: Entrada Exterior
+          - entity: sensor.temperatura_planta_baja
+            name: Media Planta Baja
+        font_size: 120
+        line_width: 4
+        name: Temperatura Exterior/Interior
+        points_per_hour: 1
+        show:
+          icon: true
+          labels: true
+          state: true
+        type: custom:mini-graph-card
+    icon: mdi:thermometer-lines
+    path: temperatura
+    title: Temperatura
+  - badges: []
+    cards:
+      - aspect_ratio: 75%
+        title: Previsión Lluvias
+        type: iframe
+        url: https://embed.windy.com/embed2.html?lat=39.572&lon=-1.582&zoom=5&level=surface&overlay=rain&menu=&message=&marker=&calendar=&pressure=&type=map&location=coordinates&detail=&detailLat=41.650&detailLon=-0.880&metricWind=default&metricTemp=default&radarRange=-1"1
+      - entity: camera.weather_satelite
+        type: picture-entity
+      - aspect_ratio: 75%
+        title: Previsón Temperatura
+        type: iframe
+        url: https://embed.windy.com/embed2.html?lat=36.280&lon=-5.142&zoom=6&level=surface&overlay=temp&menu=&message=&marker=&calendar=&pressure=&type=map&location=coordinates&detail=&detailLat=37.353&detailLon=-5.911&metricWind=default&metricTemp=default&radarRange=-1
+      - type: vertical-stack
+        cards:
+          - type: entity
+            entity: sensor.aemet_condition
+            name: AEMET Pronóstico Hoy
+            icon: mdi:weather-cloudy
+            state_color: true
+          - cards:
+              - entity: sensor.aemet_rain
+                hold_action:
+                  action: none
+                tap_action:
+                  action: more-info
+                type: entity-button
+                show_state: true
+                show_icon: false
+                name: Cantidad Lluvia
+              - entity: sensor.aemet_snow
+                hold_action:
+                  action: none
+                tap_action:
+                  action: more-info
+                type: entity-button
+                show_state: true
+                show_icon: false
+                name: Cantidad Nieve
+            type: horizontal-stack
+          - cards:
+              - entity: sensor.aemet_rain_probability
+                hold_action:
+                  action: none
+                tap_action:
+                  action: more-info
+                type: entity-button
+                show_state: true
+                show_icon: false
+                show_name: true
+                name: '%Lluvia'
+              - entity: sensor.aemet_snow_probability
+                hold_action:
+                  action: none
+                tap_action:
+                  action: more-info
+                type: entity-button
+                show_state: true
+                show_icon: false
+                name: '%Nieve'
+            type: horizontal-stack
+          - cards:
+              - entity: sensor.aemet_humidity
+                hold_action:
+                  action: none
+                tap_action:
+                  action: more-info
+                type: entity-button
+                show_state: true
+                show_icon: false
+                show_name: true
+                name: '%Humedad'
+              - entity: sensor.aemet_storm_probability
+                hold_action:
+                  action: none
+                tap_action:
+                  action: more-info
+                type: entity-button
+                show_state: true
+                show_icon: false
+                name: '%Tormenta'
+            type: horizontal-stack
+          - type: entity
+            entity: sensor.aemet_daily_forecast_condition
+            icon: mdi:weather-cloudy
+            state_color: true
+            name: AEMET Pronóstico Mañana
+          - cards:
+              - entity: sensor.aemet_fecha_0d
+                hold_action:
+                  action: none
+                tap_action:
+                  action: more-info
+                type: entity-button
+                show_state: true
+                show_icon: false
+                name: DIA 0
+              - entity: sensor.aemet_fecha_1d
+                hold_action:
+                  action: none
+                tap_action:
+                  action: more-info
+                type: entity-button
+                show_state: true
+                show_icon: false
+                name: DIA +1
+              - entity: sensor.aemet_fecha_2d
+                hold_action:
+                  action: none
+                tap_action:
+                  action: more-info
+                type: entity-button
+                show_state: true
+                show_icon: false
+                name: DIA +2
+            type: horizontal-stack
+          - cards:
+              - entity: sensor.aemet_icono_0d
+                hold_action:
+                  action: none
+                tap_action:
+                  action: more-info
+                type: entity-button
+                show_state: true
+                show_icon: true
+                show_name: false
+              - entity: sensor.aemet_icono_1d
+                hold_action:
+                  action: none
+                tap_action:
+                  action: more-info
+                type: entity-button
+                show_state: true
+                show_icon: true
+                show_name: false
+              - entity: sensor.aemet_icono_2d
+                hold_action:
+                  action: none
+                tap_action:
+                  action: more-info
+                type: entity-button
+                show_state: true
+                show_icon: true
+                show_name: false
+            type: horizontal-stack
+          - cards:
+              - entity: sensor.aemet_lluvia_0d
+                hold_action:
+                  action: none
+                tap_action:
+                  action: more-info
+                type: entity-button
+                show_state: true
+                show_icon: false
+                name: '%Lluvia'
+              - entity: sensor.aemet_lluvia_1d
+                hold_action:
+                  action: none
+                tap_action:
+                  action: more-info
+                type: entity-button
+                show_state: true
+                show_icon: false
+                name: '%Lluvia'
+              - entity: sensor.aemet_lluvia_2d
+                hold_action:
+                  action: none
+                tap_action:
+                  action: more-info
+                type: entity-button
+                show_state: true
+                show_icon: false
+                name: '%Lluvia'
+            type: horizontal-stack
+          - cards:
+              - entity: sensor.aemet_min_temperatura_0d
+                hold_action:
+                  action: none
+                tap_action:
+                  action: more-info
+                type: entity-button
+                show_state: true
+                show_icon: false
+                name: ºMin
+              - entity: sensor.aemet_min_temperatura_1d
+                hold_action:
+                  action: none
+                tap_action:
+                  action: more-info
+                type: entity-button
+                show_state: true
+                show_icon: false
+                name: ºMin
+              - entity: sensor.aemet_min_temperatura_2d
+                hold_action:
+                  action: none
+                tap_action:
+                  action: more-info
+                type: entity-button
+                show_state: true
+                show_icon: false
+                name: ºMin
+            type: horizontal-stack
+          - cards:
+              - entity: sensor.aemet_max_temperatura_0d
+                hold_action:
+                  action: none
+                tap_action:
+                  action: more-info
+                type: entity-button
+                show_state: true
+                show_icon: false
+                name: ºMax
+              - entity: sensor.aemet_max_temperatura_1d
+                hold_action:
+                  action: none
+                tap_action:
+                  action: more-info
+                type: entity-button
+                show_state: true
+                show_icon: false
+                name: ºMax
+              - entity: sensor.aemet_max_temperatura_2d
+                hold_action:
+                  action: none
+                tap_action:
+                  action: more-info
+                type: entity-button
+                show_state: true
+                show_icon: false
+                name: ºMax
+            type: horizontal-stack
+    icon: mdi:weather-partly-cloudy
+    path: tiempo_view
+    title: El Tiempo
+  - badges: []
+    cards:
+      - cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            image: /local/Piscina_Fondo_s0_1555x800.jpg
+            tap_action:
+              action: more-info
+            hold_action:
+              action: toggle
+            entity: input_boolean.piscina_interruptor_global
+            name: Interruptor General Piscina
+            aspect_ratio: '4'
+          - type: entity
+            entity: binary_sensor.piscina_depuradora_ch0_status
+            name: Motor Depuradora Piscina
+            state_color: true
+          - type: entity
+            entity: binary_sensor.piscina_depuradora_ch0_motor_on
+            name: Motor Depuradora Encendido (>1.6W)
+            icon: mdi:flash-outline
+            state_color: true
+          - type: entity
+            entity: binary_sensor.piscina_depuradora_ch0_warning
+            state_color: true
+            name: Alerta Rango Potencia Electrica
+            icon: mdi:flash-alert
+          - type: horizontal-stack
+            cards:
+              - type: gauge
+                entity: sensor.esphome_pow_sw3_voltage
+                name: Voltage
+                unit: V
+                needle: false
+              - type: gauge
+                entity: sensor.esphome_pow_sw3_current
+                name: Amperios
+                unit: A
+                needle: true
+                severity:
+                  green: 0.05
+                  yellow: 0.3
+                  red: 0.5
+                min: 0
+                max: 1
+              - type: gauge
+                entity: sensor.esphome_pow_sw3_power
+                name: Watios
+                unit: W
+                severity:
+                  green: 2
+                  yellow: 4
+                  red: 5
+                min: 0
+                max: 10
+                needle: true
+          - cards:
+              - entities:
+                  - entity: sensor.esphome_pow_sw3_current
+                font_size: 50
+                line_color: blue
+                line_width: 6
+                name: Consumo
+                type: custom:mini-graph-card
+              - entities:
+                  - entity: sensor.esphome_pow_sw3_power
+                font_size: 50
+                line_color: green
+                line_width: 6
+                name: Potencia
+                type: custom:mini-graph-card
+            type: horizontal-stack
+        type: vertical-stack
+      - cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            entity: binary_sensor.piscina_depuradora_ch0_dia_ejecucion
+            image: /local/Piscina_Depuradora_s1_1900x800.jpg
+            name: 'PISCINA: Programa Automático Depuradora'
+            aspect_ratio: '4'
+          - type: entities
+            entities:
+              - entity: switch.esphome_pow_sw3
+                secondary_info: last-changed
+              - entity: timer.piscina_depuradora_ch0
+              - entity: sensor.piscina_depuradora_ch0_duracion_planificada_total
+              - entity: input_boolean.piscina_depuradora_ch0_programador_t1
+                name: Programador Tramo1
+              - entity: input_boolean.piscina_depuradora_ch0_programador_t2
+                name: Programador Tramo2
+              - entity: input_select.piscina_depuradora_ch0_programador_dias
+            show_header_toggle: false
+            state_color: true
+          - type: vertical-stack
+            cards:
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.piscina_depuradora_ch0_duracion_planificada_t1
+                    name: TRAMO 1
+                    min: 0
+                    max: 360
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 180
+                      yellow: 240
+                      red: 300
+                  - type: custom:time-picker-card
+                    entity: input_datetime.piscina_depuradora_ch0_start_time_t1
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.piscina_depuradora_ch0_end_time_t1
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                    layout:
+                      embedded: true
+                    link_values: true
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.piscina_depuradora_ch0_duracion_planificada_t2
+                    name: TRAMO 2
+                    min: 0
+                    max: 360
+                    unit: Min
+                    needle: true
+                    severity:
+                      green: 180
+                      yellow: 240
+                      red: 300
+                  - type: custom:time-picker-card
+                    entity: input_datetime.piscina_depuradora_ch0_start_time_t2
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                    link_values: true
+                    layout:
+                      embedded: true
+                  - type: custom:time-picker-card
+                    entity: input_datetime.piscina_depuradora_ch0_end_time_t2
+                    hour_mode: 24
+                    hour_step: 1
+                    minute_step: 1
+                    hide:
+                      name: true
+                    layout:
+                      embedded: true
+                    link_values: true
+        type: vertical-stack
+      - cards:
+          - show_state: true
+            show_name: true
+            camera_view: auto
+            type: picture-entity
+            name: 'PISCINA: Programa Manual Depuradora'
+            aspect_ratio: '4'
+            image: https://poolservicescorp.com/wp-content/uploads/2019/08/banner-9.jpg
+            entity: switch.esphome_pow_sw3
+          - type: tile
+            entity: light.luz_piscina
+            show_entity_picture: true
+            vertical: true
+            hide_state: false
+            color: primary
+            state_content:
+              - last-changed
+              - state
+              - color_mode
+          - entities:
+              - input_number.piscina_depuradora_ch0_manual_minutos
+              - script.piscina_depuradora_ch0_timer_start
+              - script.piscina_depuradora_ch0_timer_pause
+              - script.piscina_depuradora_ch0_timer_resume
+              - script.piscina_depuradora_ch0_timer_cancel
+            show_header_toggle: false
+            state_color: true
+            type: entities
+        type: vertical-stack
+    icon: mdi:swim
+    path: piscina_view
+    title: Piscina
+  - theme: Backend-selected
+    icon: mdi:cast-audio
+    path: alexa
+    title: Alexa Echo
+    badges:
+      - type: entity
+        entity: media_player.echo_alexa_entrada
+        name: Alexa Entrada
+        show_entity_picture: false
+        state_content:
+          - name
+          - volume_level
+          - state
+      - type: entity
+        show_entity_picture: false
+        state_content:
+          - name
+          - volume_level
+          - state
+        entity: media_player.echo_alexa_estudio
+        name: Alexa Estudio
+    cards:
+      - cards:
+          - entity: media_player.echo_alexa_estudio
+            type: media-control
+          - type: custom:mushroom-media-player-card
+            entity: media_player.echo_alexa_estudio
+            fill_container: true
+            volume_controls:
+              - volume_set
+              - volume_mute
+              - volume_buttons
+            media_controls:
+              - on_off
+              - play_pause_stop
+              - next
+              - previous
+              - repeat
+            use_media_info: true
+            show_volume_level: true
+            collapsible_controls: true
+          - entities:
+              - entity: switch.echo_alexa_estudio_do_not_disturb_switch
+              - type: divider
+              - entity: input_number.alexa_estudio_volumen_anterior
+                name: Vol. Anterior
+              - entity: input_number.alexa_estudio_volumen_nuevo
+                name: Vol. Nuevo
+              - entity: input_number.alexa_estudio_volumen_anuncio_dia
+                name: Vol. Anuncio Día
+              - entity: input_number.alexa_estudio_volumen_alarma_dia
+                name: Vol. Alarma Día
+              - entity: input_number.alexa_estudio_volumen_anuncio_noc
+                name: Vol. Anuncio Noche
+              - entity: input_number.alexa_estudio_volumen_alarma_noc
+                name: Vol. Alarma Noche
+            show_header_toggle: false
+            type: entities
+        type: vertical-stack
+      - cards:
+          - entity: media_player.echo_alexa_entrada
+            type: media-control
+          - type: custom:mushroom-media-player-card
+            entity: media_player.echo_alexa_entrada
+            fill_container: true
+            volume_controls:
+              - volume_set
+              - volume_mute
+              - volume_buttons
+            media_controls:
+              - on_off
+              - play_pause_stop
+              - next
+              - previous
+              - repeat
+            use_media_info: true
+            show_volume_level: true
+            collapsible_controls: true
+          - entities:
+              - entity: switch.echo_alexa_entrada_do_not_disturb_switch
+              - type: divider
+              - entity: input_number.alexa_entrada_volumen_anterior
+                name: Vol. Anterior
+              - entity: input_number.alexa_entrada_volumen_nuevo
+                name: Vol. Nuevo
+              - entity: input_number.alexa_entrada_volumen_anuncio_dia
+                name: Vol. Anuncio Día
+              - entity: input_number.alexa_entrada_volumen_alarma_dia
+                name: Vol. Alarma Día
+              - entity: input_number.alexa_entrada_volumen_anuncio_noc
+                name: Vol. Anuncio Noche
+              - entity: input_number.alexa_entrada_volumen_alarma_noc
+                name: Vol. Alarma Noche
+            show_header_toggle: false
+            type: entities
+        type: vertical-stack
+      - cards:
+          - entity: media_player.echo_alexa_dormitorio
+            type: media-control
+          - type: custom:mushroom-media-player-card
+            entity: media_player.echo_alexa_dormitorio
+            fill_container: true
+            volume_controls:
+              - volume_set
+              - volume_mute
+              - volume_buttons
+            media_controls:
+              - on_off
+              - play_pause_stop
+              - next
+              - previous
+              - repeat
+            use_media_info: true
+            show_volume_level: true
+            collapsible_controls: true
+          - entities:
+              - entity: switch.echo_alexa_dormitorio_do_not_disturb_switch
+              - type: divider
+              - entity: input_number.alexa_dormitorio_volumen_anterior
+                name: Vol. Anterior
+              - entity: input_number.alexa_dormitorio_volumen_nuevo
+                name: Vol. Nuevo
+              - entity: input_number.alexa_dormitorio_volumen_anuncio_dia
+                name: Vol. Anuncio Día
+              - entity: input_number.alexa_dormitorio_volumen_alarma_dia
+                name: Vol. Alarma Día
+              - entity: input_number.alexa_dormitorio_volumen_anuncio_noc
+                name: Vol. Anuncio Noche
+              - entity: input_number.alexa_dormitorio_volumen_alarma_noc
+                name: Vol. Alarma Noche
+            show_header_toggle: false
+            type: entities
+        type: vertical-stack
+      - cards:
+          - entity: media_player.echo_alexa_dormitorio_paf
+            type: media-control
+          - type: custom:mushroom-media-player-card
+            entity: media_player.echo_alexa_dormitorio_paf
+            fill_container: true
+            volume_controls:
+              - volume_set
+              - volume_mute
+              - volume_buttons
+            media_controls:
+              - on_off
+              - play_pause_stop
+              - next
+              - previous
+              - repeat
+            use_media_info: true
+            show_volume_level: true
+            collapsible_controls: true
+          - entities:
+              - entity: switch.echo_alexa_dormitorio_paf_do_not_disturb_switch
+              - type: divider
+              - entity: input_number.alexa_dormitorio_volumen_anterior
+                name: Vol. Anterior
+              - entity: input_number.alexa_dormitorio_volumen_nuevo
+                name: Vol. Nuevo
+              - entity: input_number.alexa_dormitorio_volumen_anuncio_dia
+                name: Vol. Anuncio Día
+              - entity: input_number.alexa_dormitorio_volumen_alarma_dia
+                name: Vol. Alarma Día
+              - entity: input_number.alexa_dormitorio_volumen_anuncio_noc
+                name: Vol. Anuncio Noche
+              - entity: input_number.alexa_dormitorio_volumen_alarma_noc
+                name: Vol. Alarma Noche
+            show_header_toggle: false
+            type: entities
+        type: vertical-stack
+  - title: Areas
+    path: areas_view
+    icon: mdi:home-floor-a
+    badges: []
+    cards:
+      - type: area
+        area: 5abc514cc0ef48dfb52c8c234d389734
+      - type: area
+        area: c87f1d973bb247848d28bbe4be4c0a95
+      - type: area
+        area: 9d6ff7118aff4fe1a55c43a4c9b9583e
+      - type: area
+        area: 6bde7ef5b92e48bc99a9a00dd70f2f0e
+      - type: area
+        area: 8e63aa03d2e54d86919f00630adbc11d
+      - type: area
+        area: dormitorio_paf
+      - type: area
+        area: dormitorio_aaf
+      - type: area
+        area: dormitorio_plancha
+      - type: area
+        area: a5adc44e5d9a4b0399782da0fc0330f5
+      - type: area
+        area: bf515e0c844045a4856df3edebd8ebfa
+  - badges: []
+    cards:
+      - show_header_toggle: false
+        title: Sensores Alarmas
+        state_color: true
+        type: entities
+        entities:
+          - type: custom:battery-entity-row
+            entity: sensor.aqara_humo_cocina_bateria
+            name: Aqara Detector Humo Cocina
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+          - type: custom:battery-entity-row
+            entity: sensor.aqara_sensor_agua_arqueta_bateria
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+          - type: custom:battery-entity-row
+            entity: sensor.aqara_cubo_estudio_battery
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+          - type: custom:battery-entity-row
+            entity: sensor.ikea_badring_humedad_lavadero_battery
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+      - show_header_toggle: false
+        title: Sensores Magneticos Puertas
+        type: entities
+        entities:
+          - type: custom:battery-entity-row
+            entity: sensor.puerta_exterior_bateria
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+          - type: custom:battery-entity-row
+            entity: sensor.aqara_puerta_entrada_principal_bateria
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+          - type: custom:battery-entity-row
+            entity: sensor.aqara_vibracion_puerta_principal_bateria
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+          - type: custom:battery-entity-row
+            entity: sensor.aqara_puerta_salon_bateria
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+          - type: custom:battery-entity-row
+            entity: sensor.aqara_vibracion_puerta_principal_bateria
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+          - type: custom:battery-entity-row
+            entity: sensor.aqara_puerta_estudio_armario_bateria
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+      - type: entities
+        show_header_toggle: false
+        title: Sensores Aqara Temperatura
+        entities:
+          - type: custom:battery-entity-row
+            entity: sensor.ly3_entrada_exterior_bateria
+            attribute: battery_percent
+            unit: '%'
+            name: Temperatura Entrada Exterior
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+          - type: custom:battery-entity-row
+            entity: sensor.aqara_temperatura_porche_bateria
+            attribute: battery_percent
+            unit: '%'
+            name: Temperatura Porche Jardín
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+          - type: custom:battery-entity-row
+            entity: sensor.ly1_desk_setup_bateria
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            name: Temperatura Estudio Desk Setup
+            warning: 40
+            critical: 20
+            charging: true
+          - type: custom:battery-entity-row
+            entity: sensor.ly2_estudio_sala_bateria
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            name: Temperatura Estudio Sala
+            warning: 40
+            critical: 20
+            charging: true
+          - type: custom:battery-entity-row
+            entity: sensor.aqara_temperatura_salon_bateria
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            name: Aqara Temperatura Salón
+            warning: 40
+            critical: 20
+            charging: true
+          - type: custom:battery-entity-row
+            entity: sensor.aqara_temperatura_cocina_bateria
+            attribute: battery_percent
+            name: Aqara Temperatura Cocina
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+          - type: custom:battery-entity-row
+            entity: sensor.aqara_temperatura_domitorio_principal_bateria
+            attribute: battery_percent
+            name: Temperatura Mom&Dad
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+          - type: custom:battery-entity-row
+            entity: sensor.aqara_temperatura_domitorio_paf_bateria
+            attribute: battery_percent
+            name: Temperatura PAF
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+          - type: custom:battery-entity-row
+            entity: sensor.aqara_temperatura_domitorio_aaf_bateria
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            name: Temperatura AAF
+            warning: 40
+            critical: 20
+            charging: true
+      - type: entities
+        show_header_toggle: false
+        title: Sensores Movimiento Interior
+        entities:
+          - type: custom:battery-entity-row
+            entity: sensor.aqara_movimiento_entrada_bateria
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+          - type: custom:battery-entity-row
+            entity: sensor.aqara_movimiento_salon_bateria
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+          - type: custom:battery-entity-row
+            entity: sensor.aqara_movimiento_estudio_bateria
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+          - type: custom:battery-entity-row
+            entity: sensor.aqara_movimiento_dormitorio_bateria
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+          - type: custom:battery-entity-row
+            entity: sensor.hue_movimiento_pasillo_bateria
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+          - type: custom:battery-entity-row
+            entity: sensor.ikea_sensor_movimiento_cocina_battery
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+      - entities:
+          - type: custom:battery-entity-row
+            entity: sensor.aqara_puerta_estudio_armario_bateria
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+          - type: custom:battery-entity-row
+            entity: sensor.aqara_puerta_estudio_desvan_bateria
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+          - type: custom:battery-entity-row
+            entity: sensor.ikea_sensor_frigo_cocina_bateria
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+          - type: custom:battery-entity-row
+            entity: sensor.ikea_sensor_frigo_bebidas_bateria
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+        title: Sensores Magnéticos Interior
+        state_color: true
+        type: entities
+      - type: entities
+        show_header_toggle: false
+        title: Sensores Movimiento Exterior
+        entities:
+          - type: custom:battery-entity-row
+            entity: sensor.aqara_movimiento_exterior_bateria
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+          - type: custom:battery-entity-row
+            entity: sensor.ikea_sensor_movimiento_entrada_exterior_battery
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+      - show_header_toggle: false
+        title: Sensores Magneticos Ventanas
+        type: entities
+        entities:
+          - type: custom:battery-entity-row
+            entity: sensor.aqara_ventana_estudio_izquierda_bateria
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+          - type: custom:battery-entity-row
+            entity: sensor.aqara_ventana_estudio_derecha_bateria
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+          - type: custom:battery-entity-row
+            entity: sensor.aqara_ventana_dormitorio_principal_bateria
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+          - type: custom:battery-entity-row
+            entity: sensor.aqara_ventana_dormitorio_agu_bateria
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+          - type: custom:battery-entity-row
+            entity: sensor.aqara_ventana_dormitorio_paloma_bateria
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+          - type: custom:battery-entity-row
+            entity: sensor.aqara_ventana_dormitorio_plancha_bateria
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+      - entities:
+          - entity: binary_sensor.blink_hall_battery
+          - entity: binary_sensor.blink_puerta_principal_battery
+          - entity: binary_sensor.blink_puerta_exterior_battery
+          - entity: binary_sensor.blink_porche_battery
+        title: Baterías Cámaras Blink
+        type: entities
+      - type: entities
+        show_header_toggle: false
+        title: Sensores Pulsadores Planta Baja
+        entities:
+          - type: custom:battery-entity-row
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+            entity: sensor.ikea_remote_control_salon_battery
+          - type: custom:battery-entity-row
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+            entity: sensor.ikea_tradfri_switch_dormitorio_mfc_battery
+          - type: custom:battery-entity-row
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+            entity: sensor.ikea_tradfri_switch_dormitorio_paf_battery
+          - type: custom:battery-entity-row
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+            entity: sensor.ikea_tradfri_switch_dormitorio_aaf_battery
+          - type: custom:battery-entity-row
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+            entity: sensor.ikea_tradfri_switch_porche_battery
+      - type: entities
+        show_header_toggle: false
+        title: Sensores Pulsadores Planta Alta
+        entities:
+          - type: custom:battery-entity-row
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+            entity: sensor.ikea_remote_control_estudio_battery
+          - type: custom:battery-entity-row
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+            entity: sensor.ikea_tradfri_switch_setup_battery
+          - type: custom:battery-entity-row
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+            entity: sensor.hue_dimmer_switch_battery
+    icon: mdi:battery-50
+    path: batery_view
+    title: Batery Status
+  - title: Setup Alarma
+    path: /view/setup-alarma
+    icon: mdi:shield-lock-outline
+    badges: []
+    cards: []

@@ -1,0 +1,101 @@
+###############################################################################
+#  ALARM HOMY · Automatismos de armado/desarmado (sustituyen a A8, A8X, A9, A10)
+#
+#  Interruptor general: input_boolean.alarm_homy_automatismos (UI).
+#    OFF mientras el motor nuevo convive con la alarma antigua (evita dobles avisos).
+#  Horarios (helpers schedule en UI, copiados de los antiguos):
+#    schedule.alarm_homy_auto_ausente  → ventana en la que se arma Ausente al quedar la casa vacía
+#    schedule.alarm_homy_auto_noche    → franja nocturna: arma Noche al empezar y desarma al terminar
+###############################################################################
+
+automation:
+  # ---------------------------------------------------------------------------
+  # AUTO ARMADO AUSENTE: la familia sale de casa (antes A8 + A8X)
+  # ---------------------------------------------------------------------------
+  - id: alarm_homy_auto_ausente
+    alias: Alarm HOMY · Auto armado Ausente
+    mode: single
+    triggers:
+      - trigger: state
+        entity_id: binary_sensor.family_any_home
+        from: "on"
+        to: "off"
+        for: {minutes: 2}
+    conditions:
+      - condition: state
+        entity_id: input_boolean.alarm_homy_automatismos
+        state: "on"
+      - condition: state
+        entity_id: schedule.alarm_homy_auto_ausente
+        state: "on"
+      - condition: state
+        entity_id: input_select.alarm_homy_estado
+        state: disarmed
+    actions:
+      - action: script.alarm_homy_armar
+        data:
+          modo: armed_away
+          origen: auto (casa vacía)
+
+  # ---------------------------------------------------------------------------
+  # AUTO ARMADO NOCHE: inicio de la franja + reintentos cada 15 min (1-6 h) (antes A9)
+  # ---------------------------------------------------------------------------
+  - id: alarm_homy_auto_noche
+    alias: Alarm HOMY · Auto armado Noche
+    mode: single
+    triggers:
+      - trigger: state
+        entity_id: schedule.alarm_homy_auto_noche
+        to: "on"
+        id: inicio
+      - trigger: time_pattern
+        minutes: "/15"
+        id: reintento
+    conditions:
+      - condition: state
+        entity_id: input_boolean.alarm_homy_automatismos
+        state: "on"
+      - condition: state
+        entity_id: schedule.alarm_homy_auto_noche
+        state: "on"
+      - condition: state
+        entity_id: input_select.alarm_homy_estado
+        state: disarmed
+      - condition: state
+        entity_id: binary_sensor.family_any_home
+        state: "on"
+      - condition: template
+        value_template: "{{ trigger.id == 'inicio' or 1 <= now().hour <= 6 }}"
+    actions:
+      - action: script.alarm_homy_armar
+        data:
+          modo: armed_night
+          origen: "{{ 'auto noche' if trigger.id == 'inicio' else 'auto noche (reintento)' }}"
+
+  # ---------------------------------------------------------------------------
+  # AUTO DESARMADO al terminar la franja nocturna (antes A10)
+  # ---------------------------------------------------------------------------
+  - id: alarm_homy_auto_desarmado_noche
+    alias: Alarm HOMY · Auto desarmado fin de noche
+    mode: single
+    triggers:
+      - trigger: state
+        entity_id: schedule.alarm_homy_auto_noche
+        to: "off"
+    conditions:
+      - condition: state
+        entity_id: input_boolean.alarm_homy_automatismos
+        state: "on"
+      - condition: state
+        entity_id: input_select.alarm_homy_estado
+        state: armed_night
+      - condition: state
+        entity_id: binary_sensor.family_any_home
+        state: "on"
+    actions:
+      - action: script.alarm_homy_desarmar
+        data:
+          validar: false
+          origen: auto (fin de noche)
+      - action: script.alarm_homy_comprobar
+        continue_on_error: true

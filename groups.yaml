@@ -1,10 +1,15 @@
-alarma_status_grp:
-  name: Estado Alarma
-  entities:
-    - alarm_control_panel.ha
-    - sensor.alarm_zone
-    - script.homy_armado_parcial
-    - script.homy_armado_total
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#alarma_status_grp:
+#  name: Estado Alarma
+#  entities:
+#    - alarm_control_panel.ha
+#    - sensor.alarm_zone
+#    - script.homy_armado_parcial
+#    - script.homy_armado_total
 
 #
 # GRUPOS LUCES - AREAS PARA ALEXA

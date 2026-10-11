@@ -1,14 +1,29 @@
 #
 # PANEL CONTROL ALARMA
 #
-alarm_control_panel.ha:
-  friendly_name: Panel Control Alarma
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#alarm_control_panel.ha:
+#  friendly_name: Panel Control Alarma
 input_select.home_last_change:
   friendly_name: Último Tracking
-input_boolean.alarm_panic_button:
-  icon: mdi:key-variant
-script.alarma_boton_panico:
-  icon: mdi:arrow-collapse-down
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#input_boolean.alarm_panic_button:
+#  icon: mdi:key-variant
+# ============================================================
+# ALARMA ANTIGUA (panel manual "HA") — COMENTADO 2026-10-12
+# Sustituido por el motor alarm_homy (packages/alarm_homy*.yaml).
+# Para recuperar: descomentar este bloque y recargar/reiniciar.
+# ============================================================
+#script.alarma_boton_panico:
+#  icon: mdi:arrow-collapse-down
 # (2026-10-10) Scripts inexistentes
 # script.boton_panico_off:
 #   icon: mdi:volume-off

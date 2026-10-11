@@ -7,7 +7,9 @@
       alarm_homy_inmediato     -> dispara sin retardo de entrada
       alarm_homy_armar_abierto -> permite armar abierto (se ignora hasta que cierre)
       alarm_homy_auto_excluir  -> si está abierto al armar, se excluye esa sesión
-      alarm_homy_unavailable   -> unavailable > 60 s cuenta como disparo
+      alarm_homy_unavailable   -> unavailable > 5 min cuenta como disparo SOLO en Ausente/Vacaciones
+    Sin comunicación (unavailable/unknown > 2 min) con la alarma armada = AVERÍA:
+      aviso (sensor.alarm_homy_averias), nunca impide armar. En Casa/Noche no dispara.
     Habilitado = input_boolean.alarm_homy_sensor_<object_id del sensor> != off
    ========================================================================== -#}
 
@@ -31,13 +33,14 @@
 {{ ns.l | to_json }}
 {%- endmacro -%}
 
-{#- Abiertos (o unavailable si tienen la etiqueta) que IMPIDEN armar en el modo -#}
+{#- Abiertos que IMPIDEN armar en el modo. Movimiento y vibración nunca bloquean. Unavailable = avería, no bloquea -#}
 {%- macro bloqueantes(modo) -%}
 {%- set ns = namespace(l=[]) -%}
 {%- set permitidos = label_entities('alarm_homy_armar_abierto') + label_entities('alarm_homy_auto_excluir') -%}
 {%- set unav = label_entities('alarm_homy_unavailable') -%}
-{%- for e in sensores_modo(modo) | from_json if e not in permitidos -%}
-{%- if is_state(e, 'on') or (e in unav and states(e) in ['unavailable', 'unknown']) -%}
+{%- for e in sensores_modo(modo) | from_json if e not in permitidos
+      and state_attr(e, 'device_class') not in ['motion', 'occupancy', 'presence', 'vibration', 'moving'] -%}
+{%- if is_state(e, 'on') -%}
 {%- set ns.l = ns.l + [e] -%}
 {%- endif -%}
 {%- endfor -%}
@@ -50,7 +53,8 @@
 {{ sensores_modo(modo) | from_json | select('in', ex) | select('is_state', 'on') | list | to_json }}
 {%- endmacro -%}
 
-{#- Sensores que han pasado a on (o unavailable > 60 s) DESPUÉS del último cambio de estado de la alarma -#}
+{#- Sensores que han pasado a on DESPUÉS del último cambio de estado de la alarma.
+    Unavailable > 5 min con etiqueta alarm_homy_unavailable: solo en Ausente/Vacaciones -#}
 {%- macro activos() -%}
 {%- set ns = namespace(l=[]) -%}
 {%- set estado = states('input_select.alarm_homy_estado') -%}
@@ -64,7 +68,7 @@
 {%- set tc = as_timestamp(s.last_changed) -%}
 {%- if s.state == 'on' and tc >= t0 -%}
 {%- set ns.l = ns.l + [e] -%}
-{%- elif e in unav and s.state in ['unavailable','unknown'] and tc >= t0 and (as_timestamp(now()) - tc) > 60 -%}
+{%- elif modo in ['armed_away','armed_vacation'] and e in unav and s.state in ['unavailable','unknown'] and tc >= t0 and (as_timestamp(now()) - tc) > 300 -%}
 {%- set ns.l = ns.l + [e] -%}
 {%- endif -%}
 {%- endfor -%}
@@ -81,3 +85,71 @@
 {%- endfor -%}
 {{ ns.l | join(', ') }}
 {%- endmacro -%}
+
+{#- Sensores del modo con su interruptor alarm_homy_sensor_* en OFF -#}
+{%- macro deshabilitados(modo) -%}
+{%- set ns = namespace(l=[]) -%}
+{%- set lab = etiqueta_modo(modo) -%}
+{%- if lab -%}
+{%- for e in label_entities(lab) if e.startswith('binary_sensor.') and is_state('input_boolean.alarm_homy_sensor_' ~ e.split('.')[1], 'off') -%}
+{%- set ns.l = ns.l + [e] -%}
+{%- endfor -%}
+{%- endif -%}
+{{ ns.l | to_json }}
+{%- endmacro -%}
+
+{%- macro nombre_modo(modo) -%}
+{{ {'armed_away':'Ausente','armed_home':'Casa','armed_night':'Noche','armed_vacation':'Vacaciones','disarmed':'Desarmada'}.get(modo, modo) }}
+{%- endmacro -%}
+
+{%- macro nombres_voz(lista) -%}
+{#- Para voz: solo el nombre del sensor (sin área) -#}
+{%- set ns = namespace(l=[]) -%}
+{%- for e in lista if e -%}
+{%- set ns.l = ns.l + ['sensor ' ~ (state_attr(e, 'friendly_name') or e)] -%}
+{%- endfor -%}
+{{ (ns.l[:-1] | join(', ') ~ ' y ' ~ ns.l[-1]) if ns.l | count > 1 else (ns.l | join('')) }}
+{%- endmacro -%}
+
+{#- Perímetro (puertas/ventanas habilitadas del modo Ausente) abierto. Unavailable = avería (macro averias) -#}
+{%- macro perimetro_abierto() -%}
+{%- set ns = namespace(l=[]) -%}
+{%- set unav = label_entities('alarm_homy_unavailable') -%}
+{%- for e in sensores_modo('armed_away') | from_json
+      if state_attr(e, 'device_class') in ['door', 'window', 'opening', 'garage_door'] -%}
+{%- if is_state(e, 'on') -%}
+{%- set ns.l = ns.l + [e] -%}
+{%- endif -%}
+{%- endfor -%}
+{{ ns.l | to_json }}
+{%- endmacro -%}
+
+{#- AVERÍAS: sensores habilitados de cualquier modo sin comunicación (unavailable/unknown) > 2 min -#}
+{%- macro averias() -%}
+{%- set ns = namespace(l=[]) -%}
+{%- set todos = (label_entities('alarm_homy_ausente') + label_entities('alarm_homy_casa')
+      + label_entities('alarm_homy_noche') + label_entities('alarm_homy_vacaciones')) | unique | sort -%}
+{%- for e in todos if e.startswith('binary_sensor.') and states[e] is not none
+      and states('input_boolean.alarm_homy_sensor_' ~ e.split('.')[1]) != 'off' -%}
+{%- if states[e].state in ['unavailable', 'unknown'] and (as_timestamp(now()) - as_timestamp(states[e].last_changed)) > 120 -%}
+{%- set ns.l = ns.l + [e] -%}
+{%- endif -%}
+{%- endfor -%}
+{{ ns.l | to_json }}
+{%- endmacro -%}
+
+{#- DETALLE de un sensor para el registro del disparo: "Nombre: abierta (on) desde las HH:MM:SS" -#}
+{%- macro detalle(e) -%}
+{%- if e == 'panico' -%}Pánico activado
+{%- elif states[e] is none -%}{{ e }}: sin datos
+{%- else -%}
+{%- set s = states[e] -%}
+{%- set dc = s.attributes.get('device_class') -%}
+{%- set txt = 'sin comunicación (pila o cobertura)' if s.state in ['unavailable', 'unknown']
+      else ({'door': 'abierta', 'window': 'abierta', 'opening': 'abierto', 'garage_door': 'abierta',
+             'motion': 'movimiento detectado', 'moving': 'movimiento detectado', 'occupancy': 'presencia detectada',
+             'presence': 'presencia detectada', 'vibration': 'vibración detectada'}.get(dc, 'activado') if s.state == 'on' else s.state) -%}
+{{ s.name }}: {{ txt }} ({{ s.state }}) desde las {{ as_local(s.last_changed).strftime('%H:%M:%S') }}
+{%- endif -%}
+{%- endmacro -%}
+
