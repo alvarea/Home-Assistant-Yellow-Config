@@ -2,7 +2,7 @@
 #  ALARM HOMY · Dashboard "Alarma HOMY" (/alarma-homy)
 #
 #  Copia del dashboard en modo UI (storage: .storage/lovelace.alarma_homy).
-#  Exportado: 2026-10-12 20:40 (vistas: Alarma, Estado Sensores Alarma, Cámaras, Configuración Alarma, Configuración Sensores Habilitados)
+#  Exportado: 2026-10-12 22:00 (vistas: Alarma, Estado Sensores Alarma, Cámaras, Configuración Alarma, Configuración Sensores Habilitados)
 #  Restaurar: Ajustes → Paneles → Alarma HOMY → Editar → ⋮ Editor de configuración
 #             en bruto → pegar este contenido (las líneas de comentario se ignoran).
 #  Imágenes: /local/Home_Alarm_Security_I*.jpg|webp (www/, fuera de git).
@@ -73,6 +73,18 @@ views:
                     secondary_info: last-changed
                 type: horizontal-stack
             type: vertical-stack
+          - type: heading
+            icon: mdi:security
+            heading: ALARMA PRINCIPAL HOMY
+            heading_style: title
+            badges:
+              - type: entity
+                show_state: true
+                show_icon: true
+                entity: alarm_control_panel.alarm_homy
+            grid_options:
+              rows: 1
+              columns: full
           - features:
               - type: alarm-modes
                 modes:
@@ -82,15 +94,29 @@ views:
             entity: alarm_control_panel.alarm_homy
             grid_options:
               columns: 12
-            primary: '{% set e = states(''alarm_control_panel.alarm_homy'') %}{% set m = {''disarmed'':''Desarmada'',''arming'':''Armando…'',''armed_home'':''Armada Casa'',''armed_night'':''Armada Noche'',''armed_away'':''Armada Ausente'',''armed_vacation'':''Armada Vacaciones'',''pending'':''¡Entrada detectada!'',''triggered'':''¡ALARMA DISPARADA!''} %}Alarma HOMY · {{ m.get(e, e) | upper }}'
+            primary: '{% set e = states(''alarm_control_panel.alarm_homy'') %}{% set m = {''disarmed'':''Desarmada'',''arming'':''Armando…'',''armed_home'':''Armada Casa'',''armed_night'':''Armada Noche'',''armed_away'':''Armada Ausente'',''armed_vacation'':''Armada Vacaciones'',''pending'':''¡Entrada detectada!'',''triggered'':''¡ALARMA DISPARADA!''} %}{{ m.get(e, e) | upper }}'
             secondary: '{% set e = states(''alarm_control_panel.alarm_homy'') %}{% set modo = {''armed_home'':''Casa'',''armed_night'':''Noche'',''armed_away'':''Ausente'',''armed_vacation'':''Vacaciones''}.get(states(''input_select.alarm_homy_modo''), '''') %}{% if e in [''pending'',''triggered'',''arming''] and modo %}{{ modo }} · {% endif %}desde {{ as_local(states.alarm_control_panel.alarm_homy.last_changed).strftime(''%H:%M'') }}'
             icon: '{% set e = states(''alarm_control_panel.alarm_homy'') %}{{ {''disarmed'':''mdi:shield-off'',''arming'':''mdi:shield-sync'',''armed_home'':''mdi:home-account'',''armed_night'':''mdi:weather-night'',''armed_away'':''mdi:home-export-outline'',''armed_vacation'':''mdi:airplane'',''pending'':''mdi:shield-alert'',''triggered'':''mdi:alarm-light''}.get(e,''mdi:shield'') }}'
             tap_action:
               action: more-info
-            color: '{% set e = states(''alarm_control_panel.alarm_homy'') %}{{ {''disarmed'':''blue-grey'',''arming'':''grey'',''armed_home'':''purple'',''armed_night'':''blue'',''armed_away'':''orange'',''armed_vacation'':''deep-orange'',''pending'':''red'',''triggered'':''red''}.get(e,''grey'') }}'
+            color: '{% set e = states(''alarm_control_panel.alarm_homy'') %}{{ {''disarmed'':''green'',''arming'':''amber'',''armed_home'':''purple'',''armed_night'':''blue'',''armed_away'':''orange'',''armed_vacation'':''deep-orange'',''pending'':''red'',''triggered'':''red''}.get(e,''grey'') }}'
             features_position: bottom
             area: 9d6ff7118aff4fe1a55c43a4c9b9583e
             multiline_secondary: true
+            badge_icon: mdi:home-lock
+            badge_color: green
+          - type: heading
+            icon: mdi:cctv
+            heading: ALARMA CAMARAS BLINK
+            heading_style: title
+            badges:
+              - type: entity
+                show_state: true
+                show_icon: true
+                entity: alarm_control_panel.blink_casa
+            grid_options:
+              rows: 1
+              columns: full
           - features:
               - type: alarm-modes
                 modes:
@@ -100,27 +126,17 @@ views:
             entity: alarm_control_panel.blink_casa
             grid_options:
               columns: 12
-            primary: '{% set e = states(''alarm_control_panel.blink_casa'') %}{% set m = {''disarmed'':''Desarmada'',''arming'':''Armando…'',''armed_home'':''Armada Casa'',''armed_night'':''Armada Noche'',''armed_away'':''Armada Ausente'',''armed_vacation'':''Armada Vacaciones'',''pending'':''¡Entrada detectada!'',''triggered'':''¡ALARMA DISPARADA!''} %}Alarma Blink · {{ m.get(e, e) | upper }}'
-            secondary: Cámaras Blink · desde {{ as_local(states.alarm_control_panel.blink_casa.last_changed).strftime('%H:%M') }}
+            primary: '{% set e = states(''alarm_control_panel.blink_casa'') %}{% set m = {''disarmed'':''Desarmada'',''arming'':''Armando…'',''armed_home'':''Armada Casa'',''armed_night'':''Armada Noche'',''armed_away'':''Armada Ausente'',''armed_vacation'':''Armada Vacaciones'',''pending'':''¡Entrada detectada!'',''triggered'':''¡ALARMA DISPARADA!''} %}{{ m.get(e, e) | upper }}'
+            secondary: desde {{ as_local(states.alarm_control_panel.blink_casa.last_changed).strftime('%H:%M') }}
             icon: '{% set e = states(''alarm_control_panel.blink_casa'') %}{{ {''disarmed'':''mdi:shield-off'',''arming'':''mdi:shield-sync'',''armed_home'':''mdi:home-account'',''armed_night'':''mdi:weather-night'',''armed_away'':''mdi:home-export-outline'',''armed_vacation'':''mdi:airplane'',''pending'':''mdi:shield-alert'',''triggered'':''mdi:alarm-light''}.get(e,''mdi:shield'') }}'
             tap_action:
               action: more-info
-            color: '{% set e = states(''alarm_control_panel.blink_casa'') %}{{ {''disarmed'':''blue-grey'',''arming'':''grey'',''armed_home'':''purple'',''armed_night'':''blue'',''armed_away'':''orange'',''armed_vacation'':''deep-orange'',''pending'':''red'',''triggered'':''red''}.get(e,''grey'') }}'
+            color: '{% set e = states(''alarm_control_panel.blink_casa'') %}{{ {''disarmed'':''cyan'',''arming'':''amber'',''armed_away'':''indigo'',''armed_home'':''indigo'',''armed_night'':''indigo'',''pending'':''red'',''triggered'':''red''}.get(e,''grey'') }}'
             features_position: bottom
             area: 9d6ff7118aff4fe1a55c43a4c9b9583e
             multiline_secondary: true
-          - type: tile
-            grid_options:
-              columns: 12
-            entity: sensor.alarm_homy_averias
-            name: Sensores con averías (sin comunicación)
-            icon: mdi:access-point-network-off
-            color: amber
-            state_content:
-              - state
-              - nombres
-            vertical: false
-            features_position: bottom
+            badge_icon: mdi:cctv
+            badge_color: cyan
           - type: tile
             entity: timer.alarm_homy_salida
             name: Salida
@@ -193,6 +209,18 @@ views:
               - condition: state
                 entity: binary_sensor.alarm_homy_lista_para_armar
                 state: 'off'
+          - type: tile
+            grid_options:
+              columns: 12
+            entity: sensor.alarm_homy_averias
+            name: Sensores con averías (sin comunicación)
+            icon: mdi:access-point-network-off
+            color: amber
+            state_content:
+              - state
+              - nombres
+            vertical: false
+            features_position: bottom
           - type: custom:mushroom-template-card
             entity: alarm_control_panel.alarm_homy
             primary: Desarmar (con código)
@@ -328,7 +356,7 @@ views:
               action: none
             grid_options:
               columns: 12
-            aspect_ratio: '4'
+            aspect_ratio: '3'
           - type: tile
             entity: sensor.alarm_homy_disparo
             name: Sensor
@@ -388,7 +416,7 @@ views:
               action: none
             grid_options:
               columns: 12
-            aspect_ratio: '4'
+            aspect_ratio: '3'
           - type: logbook
             hours_to_show: 72
             target:
