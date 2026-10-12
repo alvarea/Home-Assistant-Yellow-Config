@@ -7,6 +7,7 @@
 #    armed_home      voz "Armado parcial" + 2 bips + LED morado
 #    armed_night     voz "Armado Noche" + 2 bips + LED azul
 #    fallo armado    iOS + Telegram + voz con sensores + 3 bips graves + LED rojo 5 s
+#                    (auto armado Noche: iOS solo a quien esté en casa en ese momento)
 #    pending         iOS urgente con botón Desarmar (Face ID) + voz + bip rápido + LED rojo
 #    triggered       iOS CRÍTICO + Telegram + sirena + Alexa en bucle + pitido + LED rojo
 #    pánico sonoro   = triggered con texto PÁNICO
@@ -570,8 +571,16 @@ automation:
                     entity_id: input_boolean.alarm_homy_notif_fallo_armado
                     state: "on"
                 then:
+                  # AUTO ARMADO NOCHE (2026-10-12): solo a los iPhone de quien esté en casa en ese momento
+                  - variables:
+                      solo_a: >-
+                        {%- set m = {'person.agustin': 'notify.mobile_app_iphone_aac', 'person.paloma': 'notify.mobile_app_iphone_paf',
+                                     'person.agu': 'notify.mobile_app_a2f', 'person.malen': 'notify.mobile_app_iphone_malen'} -%}
+                        {{ (m.items() | selectattr('0', 'is_state', 'home') | map(attribute='1') | list)
+                           if 'auto noche' in (trigger.event.data.origen | default('')) else none }}
                   - action: script.alarm_homy_notificar
                     data:
+                      solo_a: "{{ solo_a }}"
                       titulo: "❌ No se pudo armar"
                       mensaje: "Modo {{ trigger.event.data.modo }} desde {{ trigger.event.data.origen }}. Sensores abiertos: {{ trigger.event.data.nombres }}."
                       nivel: active
