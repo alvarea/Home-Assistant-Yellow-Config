@@ -6,7 +6,7 @@
       alarm_homy_ausente/casa/noche/vacaciones  -> modos en que está activo
       alarm_homy_inmediato     -> dispara sin retardo de entrada
       alarm_homy_armar_abierto -> permite armar abierto (se ignora hasta que cierre)
-      alarm_homy_auto_excluir  -> si está abierto al armar, se excluye esa sesión
+      alarm_homy_auto_excluir  -> SIN EFECTO desde 2026-10-12: puertas y ventanas abiertas siempre bloquean el armado
       alarm_homy_unavailable   -> unavailable > 5 min cuenta como disparo SOLO en Ausente/Vacaciones
     Sin comunicación (unavailable/unknown > 2 min) con la alarma armada = AVERÍA:
       aviso (sensor.alarm_homy_averias), nunca impide armar. En Casa/Noche no dispara.
@@ -33,10 +33,11 @@
 {{ ns.l | to_json }}
 {%- endmacro -%}
 
-{#- Abiertos que IMPIDEN armar en el modo. Movimiento y vibración nunca bloquean. Unavailable = avería, no bloquea -#}
+{#- Abiertos que IMPIDEN armar en el modo: TODAS las puertas y ventanas (2026-10-12, también las de auto_excluir).
+    Solo se salta la etiqueta alarm_homy_armar_abierto. Movimiento y vibración nunca bloquean. Unavailable = avería, no bloquea -#}
 {%- macro bloqueantes(modo) -%}
 {%- set ns = namespace(l=[]) -%}
-{%- set permitidos = label_entities('alarm_homy_armar_abierto') + label_entities('alarm_homy_auto_excluir') -%}
+{%- set permitidos = label_entities('alarm_homy_armar_abierto') -%}
 {%- set unav = label_entities('alarm_homy_unavailable') -%}
 {%- for e in sensores_modo(modo) | from_json if e not in permitidos
       and state_attr(e, 'device_class') not in ['motion', 'occupancy', 'presence', 'vibration', 'moving'] -%}
@@ -103,10 +104,11 @@
 {%- endmacro -%}
 
 {%- macro nombres_voz(lista) -%}
-{#- Para voz: solo el nombre del sensor (sin área) -#}
+{#- Para voz: "sensor <nombre>" sin área, sin marca (Aqara, IKEA, Hue, Blink) y sin repetir "sensor" -#}
 {%- set ns = namespace(l=[]) -%}
 {%- for e in lista if e -%}
-{%- set ns.l = ns.l + ['sensor ' ~ (state_attr(e, 'friendly_name') or e)] -%}
+{%- set n = (state_attr(e, 'friendly_name') or e) | regex_replace('(?i)^((aqara|ikea|hue|blink|sensor)\\s+)+', '') -%}
+{%- set ns.l = ns.l + ['sensor ' ~ n] -%}
 {%- endfor -%}
 {{ (ns.l[:-1] | join(', ') ~ ' y ' ~ ns.l[-1]) if ns.l | count > 1 else (ns.l | join('')) }}
 {%- endmacro -%}
@@ -153,3 +155,16 @@
 {%- endif -%}
 {%- endmacro -%}
 
+
+{#- NOCHE: servicios notify de las personas que han llegado a casa en los últimos <minutos> (sensor.alarm_homy_llegadas).
+    Lista vacía = no se ha localizado a nadie → no se avisa a ningún iPhone (para no despertar a los que duermen) -#}
+{%- macro notify_llegados(minutos=20) -%}
+{%- set m = {'person.agustin': 'notify.mobile_app_iphone_aac', 'person.paloma': 'notify.mobile_app_iphone_paf',
+             'person.agu': 'notify.mobile_app_a2f', 'person.malen': 'notify.mobile_app_iphone_malen'} -%}
+{%- set ll = state_attr('sensor.alarm_homy_llegadas', 'llegadas') or {} -%}
+{%- set ns = namespace(l=[]) -%}
+{%- for p, t in ll.items() if p in m and is_state(p, 'home') and (as_timestamp(now()) - as_timestamp(t, 0)) <= minutos * 60 -%}
+{%- set ns.l = ns.l + [m[p]] -%}
+{%- endfor -%}
+{{ ns.l | to_json }}
+{%- endmacro -%}

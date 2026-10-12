@@ -13,24 +13,24 @@
 # ALEXA ENTRADA
 #
 # Volumen Anterior Alexa Entrada
-  alexa_entrada_volumen_anterior:
-    name: Anterior Alexa Entrada
-    mode: slider
-    #initial: 0.1
-    min: 0
-    max: 1
-    step: 0.1
-    icon: mdi:volume-source
+#  alexa_entrada_volumen_anterior:   # COMENTADO 2026-10-12: sin uso tras script.alexa_decir
+#    name: Anterior Alexa Entrada
+#    mode: slider
+#    #initial: 0.1
+#    min: 0
+#    max: 1
+#    step: 0.1
+#    icon: mdi:volume-source
 
 # Volumen Nuevo Alexa Entrada
-  alexa_entrada_volumen_nuevo:
-    name: Nuevo Alexa Entrada
-    mode: slider
-    #initial: 0.1
-    min: 0
-    max: 1
-    step: 0.1
-    icon: mdi:volume-source
+#  alexa_entrada_volumen_nuevo:   # COMENTADO 2026-10-12: sin uso tras script.alexa_decir
+#    name: Nuevo Alexa Entrada
+#    mode: slider
+#    #initial: 0.1
+#    min: 0
+#    max: 1
+#    step: 0.1
+#    icon: mdi:volume-source
 
 # Volumen Anuncios Normales Alexa Entrada de Día
   alexa_entrada_volumen_anuncio_dia:
@@ -76,24 +76,24 @@
 # ALEXA DORMITORIO MFC
 #
 # Volumen Nuevo Alexa Dormitorio
-  alexa_dormitorio_volumen_nuevo:
-    name: Nuevo Alexa Dormitorio
-    mode: slider
-    #initial: 0.1
-    min: 0
-    max: 1
-    step: 0.1
-    icon: mdi:volume-source
+#  alexa_dormitorio_volumen_nuevo:   # COMENTADO 2026-10-12: sin uso tras script.alexa_decir
+#    name: Nuevo Alexa Dormitorio
+#    mode: slider
+#    #initial: 0.1
+#    min: 0
+#    max: 1
+#    step: 0.1
+#    icon: mdi:volume-source
 
 # Volumen Anterior Alexa Dormitorio
-  alexa_dormitorio_volumen_anterior:
-    name: Anterior Alexa Dormitorio
-    mode: slider
-    #initial: 0.1
-    min: 0
-    max: 1
-    step: 0.1
-    icon: mdi:volume-source
+#  alexa_dormitorio_volumen_anterior:   # COMENTADO 2026-10-12: sin uso tras script.alexa_decir
+#    name: Anterior Alexa Dormitorio
+#    mode: slider
+#    #initial: 0.1
+#    min: 0
+#    max: 1
+#    step: 0.1
+#    icon: mdi:volume-source
 
 # Volumen Anuncios Normales Alexa Dormitorio de Día
   alexa_dormitorio_volumen_anuncio_dia:
@@ -139,86 +139,86 @@
 # ALEXA DORMITORIO AAC
 #
 # Volumen Nuevo Alexa Dormitorio
-  alexa_dormitorio_aac_volumen_nuevo:
-    name: Nuevo Alexa Dormitorio AAC
-    mode: slider
-    #initial: 0.1
-    min: 0
-    max: 1
-    step: 0.1
-    icon: mdi:volume-source
+#  alexa_dormitorio_aac_volumen_nuevo:   # COMENTADO 2026-10-12: sin uso tras script.alexa_decir
+#    name: Nuevo Alexa Dormitorio AAC
+#    mode: slider
+#    #initial: 0.1
+#    min: 0
+#    max: 1
+#    step: 0.1
+#    icon: mdi:volume-source
 
 # Volumen Anterior Alexa Dormitorio
-  alexa_dormitorio_aac_volumen_anterior:
-    name: Anterior Alexa Dormitorio AAC
-    mode: slider
-    #initial: 0.1
-    min: 0
-    max: 1
-    step: 0.1
-    icon: mdi:volume-source
+#  alexa_dormitorio_aac_volumen_anterior:   # COMENTADO 2026-10-12: sin uso tras script.alexa_decir
+#    name: Anterior Alexa Dormitorio AAC
+#    mode: slider
+#    #initial: 0.1
+#    min: 0
+#    max: 1
+#    step: 0.1
+#    icon: mdi:volume-source
 
 # Volumen Anuncios Normales Alexa Dormitorio de Día
-  alexa_dormitorio_aac_volumen_anuncio_dia:
-    name: Anuncio Día Dormitorio AAC
-    mode: slider
-    #initial: 0.4
-    min: 0
-    max: 1
-    step: 0.1
-    icon: mdi:volume-low
+#  alexa_dormitorio_aac_volumen_anuncio_dia:   # COMENTADO 2026-10-12: sin uso tras script.alexa_decir
+#    name: Anuncio Día Dormitorio AAC
+#    mode: slider
+#    #initial: 0.4
+#    min: 0
+#    max: 1
+#    step: 0.1
+#    icon: mdi:volume-low
 
 # Volumen Anuncios ALARMA Alexa Dormitorio de Día
-  alexa_dormitorio_aac_volumen_alarma_dia:
-    name: Alarma Día Dormitorio AAC
-    mode: slider
-    #initial: 0.9
-    min: 0
-    max: 1
-    step: 0.1
-    icon: mdi:volume-vibrate
+#  alexa_dormitorio_aac_volumen_alarma_dia:   # COMENTADO 2026-10-12: sin uso tras script.alexa_decir
+#    name: Alarma Día Dormitorio AAC
+#    mode: slider
+#    #initial: 0.9
+#    min: 0
+#    max: 1
+#    step: 0.1
+#    icon: mdi:volume-vibrate
 
 # Volumen Anuncios Normales Alexa Dormitorio
-  alexa_dormitorio_aac_volumen_anuncio_noc:
-    name: Anuncio Noche Dormitorio AAC
-    mode: slider
-    #initial: 0.1
-    min: 0
-    max: 1
-    step: 0.1
-    icon: mdi:volume-low
+#  alexa_dormitorio_aac_volumen_anuncio_noc:   # COMENTADO 2026-10-12: sin uso tras script.alexa_decir
+#    name: Anuncio Noche Dormitorio AAC
+#    mode: slider
+#    #initial: 0.1
+#    min: 0
+#    max: 1
+#    step: 0.1
+#    icon: mdi:volume-low
 
 # Volumen Anuncios ALARMA Alexa Dormitorio
-  alexa_dormitorio_aac_volumen_alarma_noc:
-    name: Alarma Noche Dormitorio AAC
-    mode: slider
-    #initial: 0.1
-    min: 0
-    max: 1
-    step: 0.1
-    icon: mdi:volume-vibrate
+#  alexa_dormitorio_aac_volumen_alarma_noc:   # COMENTADO 2026-10-12: sin uso tras script.alexa_decir
+#    name: Alarma Noche Dormitorio AAC
+#    mode: slider
+#    #initial: 0.1
+#    min: 0
+#    max: 1
+#    step: 0.1
+#    icon: mdi:volume-vibrate
 #
 # ALEXA ESTUDIO
 #
 # Volumen Anterior Alexa Estudio
-  alexa_estudio_volumen_anterior:
-    name: Anterior Alexa Estudio
-    mode: slider
-    #initial: 0.1
-    min: 0
-    max: 1
-    step: 0.1
-    icon: mdi:volume-source
+#  alexa_estudio_volumen_anterior:   # COMENTADO 2026-10-12: sin uso tras script.alexa_decir
+#    name: Anterior Alexa Estudio
+#    mode: slider
+#    #initial: 0.1
+#    min: 0
+#    max: 1
+#    step: 0.1
+#    icon: mdi:volume-source
 
 # Volumen Nuevo Alexa Estudio
-  alexa_estudio_volumen_nuevo:
-    name: Nuevo Alexa Estudio
-    mode: slider
-    #initial: 0.1
-    min: 0
-    max: 1
-    step: 0.1
-    icon: mdi:volume-source
+#  alexa_estudio_volumen_nuevo:   # COMENTADO 2026-10-12: sin uso tras script.alexa_decir
+#    name: Nuevo Alexa Estudio
+#    mode: slider
+#    #initial: 0.1
+#    min: 0
+#    max: 1
+#    step: 0.1
+#    icon: mdi:volume-source
 
 # Volumen Anuncios Normales Alexa Estudio de Día
   alexa_estudio_volumen_anuncio_dia:
@@ -272,3 +272,35 @@
     max: 240
     step: 15
     icon: mdi:timelapse
+
+#
+# ALEXA DORMITORIO PAF (2026-10-12: tabla propia; antes compartía la del dormitorio M&D)
+#
+  alexa_dormitorio_paf_volumen_anuncio_dia:
+    name: Anuncio Día Dormitorio PAF
+    mode: slider
+    min: 0
+    max: 1
+    step: 0.05
+    icon: mdi:volume-low
+  alexa_dormitorio_paf_volumen_anuncio_noc:
+    name: Anuncio Noche Dormitorio PAF
+    mode: slider
+    min: 0
+    max: 1
+    step: 0.05
+    icon: mdi:volume-low
+  alexa_dormitorio_paf_volumen_alarma_dia:
+    name: Alarma Día Dormitorio PAF
+    mode: slider
+    min: 0
+    max: 1
+    step: 0.05
+    icon: mdi:volume-vibrate
+  alexa_dormitorio_paf_volumen_alarma_noc:
+    name: Alarma Noche Dormitorio PAF
+    mode: slider
+    min: 0
+    max: 1
+    step: 0.05
+    icon: mdi:volume-vibrate

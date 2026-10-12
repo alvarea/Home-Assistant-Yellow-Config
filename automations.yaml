@@ -65,10 +65,16 @@
         - '09:00:00'
         - '22:30:00'
   actions:
-    # Establece Volumnen Alexa Entrada/Estudio/Dormitorio según hora del día/noche
-    - action: script.alexa_entrada_set_volumen
-    - action: script.alexa_estudio_set_volumen
-    - action: script.alexa_dormitorio_set_volumen
+    # Volumen base de cada Echo = su volumen de "anuncio" de día (09:00) o de noche (22:30)
+    # (2026-10-12: sustituye a script.alexa_<echo>_set_volumen; tablas en input_number.alexa_<echo>_volumen_*)
+    - repeat:
+        for_each: [entrada, estudio, dormitorio, dormitorio_paf]
+        sequence:
+          - action: media_player.volume_set
+            continue_on_error: true
+            target: {entity_id: "media_player.echo_alexa_{{ repeat.item }}"}
+            data:
+              volume_level: "{{ states('input_number.alexa_' ~ repeat.item ~ '_volumen_anuncio_' ~ ('dia' if now().hour < 12 else 'noc')) | float(0.3) }}"
 
 - id: hass_clock_notify
   alias: 'HASS Clock Notify'
@@ -81,22 +87,20 @@
         - '21:30:00'
         - '22:00:00'
   actions:
-    # Script Envío Sonido Alexa Alexa
-    - action: script.alexa_secuencia
+    # Voz + campanilla en el Echo de la entrada (2026-10-12: script.alexa_decir)
+    - action: script.alexa_decir
       data:
-        sonido: 'clock_01'
-        repeticion: 1
-        voz: >
-          {% if now().hour == 13 and now().minute == 00 %}
-            "Buenos días. Son las {{ now().hour }}, es la hora de un aperitivo."
-          {% elif now().hour == 13 and now().minute == 45 %}
-            "Buenas tardes. Son las {{ now().hour }} y {{ now().minute }}, es la hora de preparar la comida."
-          {% elif now().hour == 14 and now().minute == 30 %}
-            "Buenas tardes. Son las {{ now().hour }} y {{ now().minute }}, es la hora del almuerzo."
-          {% elif now().hour == 21 %}
-            "Buenas noches. Son las {{ now().hour }} y {{ now().minute }}, es la hora de preparar la cena."
-          {% elif now().hour == 22 %}
-            "Buenas noches. Son las {{ now().hour }}, bajo volumen de la entrada a modo noche."
+        echos: [entrada]
+        sonido: clock_01
+        repeticiones: 1
+        tipo: anuncio
+        mensaje: >-
+          {% set h, m = now().hour, now().minute %}
+          {% if h == 13 and m == 0 %}Buenos días. Son las {{ h }}, es la hora de un aperitivo.
+          {% elif h == 13 and m == 45 %}Buenas tardes. Son las {{ h }} y {{ m }}, es la hora de preparar la comida.
+          {% elif h == 14 and m == 30 %}Buenas tardes. Son las {{ h }} y {{ m }}, es la hora del almuerzo.
+          {% elif h == 21 %}Buenas noches. Son las {{ h }} y {{ m }}, es la hora de preparar la cena.
+          {% elif h == 22 %}Buenas noches. Son las {{ h }}, bajo volumen de la entrada a modo noche.
           {% endif %}
 
 - id: hass_blink_update
@@ -204,20 +208,26 @@
     # Micro Aviso Sirena Interior
     - action: script.sirena_alarma_micro_aviso
 
-    # Script Envío Sonido Alexa Alexa
-    - action: script.alexa_secuencia
-      data:
-        sonido: "{{ states('input_select.alarma_sonido_disparado') }}"
-        repeticion: 1
-        voz: 'ATENCION! ¡ALARMA HUMO COCINA!. Sensor Humo Cocina. ¡ATENCION! ¡ALARMA!'
-
-    # Script Notificaciones Alarma
-    - action: script.notifica_alarma
+    # Voz + sonido en el Echo de la entrada (2026-10-12: script.alexa_decir, volumen de alarma)
+    - action: script.turn_on        # sin esperar: el aviso iOS sale a la vez
+      target: {entity_id: script.alexa_decir}
       data:
         variables:
-          titulo: '*ATENCION ALARMA HUMO*'
-          mensaje: >
-            >>> URGENTE: SENSOR HUMO COCINA
+          echos: [entrada]
+          mensaje: 'ATENCION! ¡ALARMA HUMO COCINA!. Sensor Humo Cocina. ¡ATENCION! ¡ALARMA!'
+          sonido: "{{ states('input_select.alarma_sonido_disparado') }}"
+          repeticiones: 1
+          tipo: alarma
+
+    # Aviso (2026-10-12: script.notifica; corrige el antiguo data.variables que llegaba vacío)
+    - action: script.notifica
+      data:
+        titulo: '*ATENCION ALARMA HUMO*'
+        mensaje: '>>> URGENTE: SENSOR HUMO COCINA'
+        nivel: critico
+        destinos: todos
+        telegram: alarm
+        persistente: true
 #
 # ALARMA AUTOMATICA SENSOR AGUA ARQUETA
 #
@@ -232,20 +242,26 @@
     # Micro Aviso Sirena Interior
     - action: script.sirena_alarma_micro_aviso
 
-    # Script Envío Sonido Alexa Alexa
-    - action: script.alexa_secuencia
-      data:
-        sonido: "{{ states('input_select.alarma_sonido_disparado') }}"
-        repeticion: 1
-        voz: 'ATENCION! ¡ALARMA AGUA ARQUETA!. Sensor Agua Arqueta. ¡ATENCION! ¡ALARMA!'
-
-    # Script Notificación Alarma
-    - action: script.notifica_alarma
+    # Voz + sonido en el Echo de la entrada (2026-10-12: script.alexa_decir, volumen de alarma)
+    - action: script.turn_on        # sin esperar: el aviso iOS sale a la vez
+      target: {entity_id: script.alexa_decir}
       data:
         variables:
-          titulo: '*ATENCION ALARMA AGUA*'
-          mensaje: >
-            >>> URGENTE: SENSOR AGUA ARQUETA BAÑO
+          echos: [entrada]
+          mensaje: 'ATENCION! ¡ALARMA AGUA ARQUETA!. Sensor Agua Arqueta. ¡ATENCION! ¡ALARMA!'
+          sonido: "{{ states('input_select.alarma_sonido_disparado') }}"
+          repeticiones: 1
+          tipo: alarma
+
+    # Aviso (2026-10-12: script.notifica; corrige el antiguo data.variables que llegaba vacío)
+    - action: script.notifica
+      data:
+        titulo: '*ATENCION ALARMA AGUA*'
+        mensaje: '>>> URGENTE: SENSOR AGUA ARQUETA BAÑO'
+        nivel: critico
+        destinos: todos
+        telegram: alarm
+        persistente: true
 #
 # ALARMA AUTOMATICA SENSOR PUERTA FRIGORIFICO COCINA ABIERTA
 #
@@ -261,20 +277,26 @@
     # Micro Aviso Sirena Interior
     - action: script.sirena_alarma_micro_aviso
 
-    # Script Envío Sonido Alexa Alexa
-    - action: script.alexa_secuencia
-      data:
-        sonido: "{{ states('input_select.alarma_sonido_disparado') }}"
-        repeticion: 1
-        voz: 'ATENCION. frigorífico cocina abierto más de 3 minutos'
-
-    # Script Notificación Alarma
-    - action: script.notifica_alarma
+    # Voz + sonido en el Echo de la entrada (2026-10-12: script.alexa_decir, volumen de anuncio)
+    - action: script.turn_on        # sin esperar: el aviso iOS sale a la vez
+      target: {entity_id: script.alexa_decir}
       data:
         variables:
-          titulo: '*ATENCION ALARMA FRIGORIFICO COCINA*'
-          mensaje: >
-            >>> URGENTE: FRIGORIFICO COCINA ABIERTO
+          echos: [entrada]
+          mensaje: 'ATENCION. frigorífico cocina abierto más de 3 minutos'
+          sonido: "{{ states('input_select.alarma_sonido_disparado') }}"
+          repeticiones: 1
+          tipo: anuncio
+
+    # Aviso (2026-10-12: script.notifica; corrige el antiguo data.variables que llegaba vacío)
+    - action: script.notifica
+      data:
+        titulo: '*ATENCION ALARMA FRIGORIFICO COCINA*'
+        mensaje: '>>> URGENTE: FRIGORIFICO COCINA ABIERTO'
+        nivel: aviso
+        destinos: presentes
+        telegram: notif
+        persistente: true
 #
 # ALARMA AUTOMATICA SENSOR PUERTA FRIGORIFICO BEBIDAS ABIERTA
 #
@@ -290,20 +312,26 @@
     # Micro Aviso Sirena Interior
     - action: script.sirena_alarma_micro_aviso
 
-    # Script Envío Sonido Alexa Alexa
-    - action: script.alexa_secuencia
-      data:
-        sonido: "{{ states('input_select.alarma_sonido_disparado') }}"
-        repeticion: 1
-        voz: 'ATENCION. frigorífico bebidas abierto más de 3 minutos'
-
-    # Script Notificación Alarma
-    - action: script.notifica_alarma
+    # Voz + sonido en el Echo de la entrada (2026-10-12: script.alexa_decir, volumen de anuncio)
+    - action: script.turn_on        # sin esperar: el aviso iOS sale a la vez
+      target: {entity_id: script.alexa_decir}
       data:
         variables:
-          titulo: '*ATENCION ALARMA FRIGORIFICO BEBIDAS*'
-          mensaje: >
-            >>> URGENTE: FRIGORIFICO BEBIDAS ABIERTO
+          echos: [entrada]
+          mensaje: 'ATENCION. frigorífico bebidas abierto más de 3 minutos'
+          sonido: "{{ states('input_select.alarma_sonido_disparado') }}"
+          repeticiones: 1
+          tipo: anuncio
+
+    # Aviso (2026-10-12: script.notifica; corrige el antiguo data.variables que llegaba vacío)
+    - action: script.notifica
+      data:
+        titulo: '*ATENCION ALARMA FRIGORIFICO BEBIDAS*'
+        mensaje: '>>> URGENTE: FRIGORIFICO BEBIDAS ABIERTO'
+        nivel: aviso
+        destinos: presentes
+        telegram: notif
+        persistente: true
 #
 # ALARMA AUTOMATICA SENSOR HUMEDAD FREGADERO.
 #
@@ -312,25 +340,31 @@
   triggers:
     - trigger: state
       entity_id: binary_sensor.ikea_badring_humedad_fregadero
-      to: 'moist'
+      to: 'on'   # 2026-10-12: antes 'moist' (un binary_sensor solo vale on/off → nunca saltaba)
   actions:
     # Micro Aviso Sirena Interior
     - action: script.sirena_alarma_micro_aviso
 
-    # Script Envío Sonido Alexa Alexa
-    - action: script.alexa_secuencia
-      data:
-        sonido: "{{ states('input_select.alarma_sonido_disparado') }}"
-        repeticion: 1
-        voz: 'ATENCION. Sensor Humedad Fregadero Activado'
-
-    # Script Notificación Alarma
-    - action: script.notifica_alarma
+    # Voz + sonido en el Echo de la entrada (2026-10-12: script.alexa_decir, volumen de alarma)
+    - action: script.turn_on        # sin esperar: el aviso iOS sale a la vez
+      target: {entity_id: script.alexa_decir}
       data:
         variables:
-          titulo: '*ATENCION ALARMA AGUA FREGADERO*'
-          mensaje: >
-            >>> URGENTE: SENSOR HUMEDAD FREGADERO
+          echos: [entrada]
+          mensaje: 'ATENCION. Sensor Humedad Fregadero Activado'
+          sonido: "{{ states('input_select.alarma_sonido_disparado') }}"
+          repeticiones: 1
+          tipo: alarma
+
+    # Aviso (2026-10-12: script.notifica; corrige el antiguo data.variables que llegaba vacío)
+    - action: script.notifica
+      data:
+        titulo: '*ATENCION ALARMA AGUA FREGADERO*'
+        mensaje: '>>> URGENTE: SENSOR HUMEDAD FREGADERO'
+        nivel: critico
+        destinos: todos
+        telegram: alarm
+        persistente: true
 
 #
 # REGLA: ALARMA DISARMED A <ARMING>
@@ -2717,8 +2751,12 @@
   actions:
     - action: script.jardin_riego_off
     # Notifica a Familia
-    - action: script.notifica_alarma
+    - action: script.notifica
       data:
+        nivel: aviso
+        destinos: admin
+        telegram: alarm
+        persistente: true
         titulo: '*JARDIN: SOBRERIEGO DETECTADO*'
         mensaje: >
           >>> EVENTO: Control Riego encendidas > 10'
@@ -2743,8 +2781,12 @@
   actions:
     - action: script.piscina_depuradora_off
     # Notifica a Familia
-    - action: script.notifica_alarma
+    - action: script.notifica
       data:
+        nivel: aviso
+        destinos: admin
+        telegram: alarm
+        persistente: true
         titulo: '*PISCINA: SOBRE-DEPURACION DETECTADO*'
         mensaje: >
           >>> EVENTO: Control Motor Depuradora Piscina > 5h'
@@ -2772,10 +2814,12 @@
       entity_id: input_boolean.alarm_ping_conectivity
       state: 'on'
   actions:
-    # Script Notificación Alarma
-    - action: script.notifica_alarma
+    # Aviso técnico: solo admin, sin despertar a nadie (2026-10-12: script.notifica)
+    - action: script.notifica
       data:
-        voz: 'Alarma Conexión de Red (ping)'
+        nivel: aviso
+        destinos: admin
+        telegram: alarm
         titulo: '*AVISO CONECTIVIDAD PING*'
         mensaje: >
           >>> URGENTE: Fallo en conectividad de red (ping)
@@ -2797,10 +2841,12 @@
       entity_id: input_boolean.alarm_ping_conectivity
       state: 'on'
   actions:
-    # Script Notificación Alarma
-    - action: script.notifica_alarma
+    # Aviso técnico: solo admin, sin despertar a nadie (2026-10-12: script.notifica)
+    - action: script.notifica
       data:
-        voz: 'Alarma Conexión de Red (ping)'
+        nivel: aviso
+        destinos: admin
+        telegram: alarm
         titulo: '*AVISO CONECTIVIDAD PING*'
         mensaje: >
           >>> URGENTE: Fallo en conectividad de red (ping)
@@ -2835,10 +2881,12 @@
       entity_id: input_boolean.alarm_ping_conectivity
       state: 'on'
   actions:
-    # Script Notificación Alarma
-    - action: script.notifica_alarma
+    # Aviso técnico: solo admin, sin despertar a nadie (2026-10-12: script.notifica)
+    - action: script.notifica
       data:
-        voz: 'Alarma Conexión de Red (ping)'
+        nivel: aviso
+        destinos: admin
+        telegram: alarm
         titulo: '*AVISO CONECTIVIDAD PING*'
         mensaje: >
           >>> URGENTE: Fallo en conectividad de red (ping)
@@ -3031,7 +3079,7 @@
         entity_id: input_text.helper_hue_smart_button_entrada
       data:
         value: >-
-          {{ trigger.id }} - {{ {'short_press': 'luz exterior', 'double_press': 'comprobar alarma', 'long_press': 'PANICO SONORO'}[trigger.id] }}
+          {{ trigger.id }} - {{ {'short_press': 'luz exterior', 'double_press': 'comprobar alarma', 'long_press': 'PANICO SILENCIOSO'}[trigger.id] }}
     - choose:
         # Corta: enciende/apaga luz exterior
         - conditions:
@@ -3047,14 +3095,14 @@
               id: double_press
           sequence:
             - action: script.alarm_homy_comprobar
-        # Larga: pánico sonoro
+        # Larga: pánico SILENCIOSO (2026-10-12: por si hay coacción al entrar; antes sonoro)
         - conditions:
             - condition: trigger
               id: long_press
           sequence:
             - action: script.alarm_homy_panico
               data:
-                tipo: panico_sonoro
+                tipo: panico_silencioso
                 origen: Pulsador Hue entrada
 
 #  alias: ZHA Dormitorio MFC Philips HUE Dimmer
@@ -3900,11 +3948,10 @@
             - action: light.turn_off
               target:
                 entity_id: light.luz_estudio_izquierda
-            - action: script.alexa_estudio_secuencia
+            - action: script.turn_on
+              target: {entity_id: script.alexa_decir}
               data:
-                sonido: 'clock_01'
-                repeticion: 1
-                voz: "OK"
+                variables: {echos: [estudio], sonido: clock_01, mensaje: "OK"}
             - action: scene.turn_on
               target:
                 entity_id: scene.estudio_lava_palaustre
@@ -3918,11 +3965,10 @@
                 value: "scene.estudio_lava_palaustre ON"
               target:
                 entity_id: input_text.helper_ikea_dimmer_switch_estudio
-            - action: script.alexa_estudio_secuencia
+            - action: script.turn_on
+              target: {entity_id: script.alexa_decir}
               data:
-                sonido: 'clock_01'
-                repeticion: 1
-                voz: "Vale, Activo Lavando Palaustre. Que descanses."
+                variables: {echos: [estudio], sonido: clock_01, mensaje: "Vale, Activo Lavando Palaustre. Que descanses."}
 
 #  alias: ZHA Dormitorio PAF IKEA Tradfri
 - id: ZHA_L10
@@ -4299,7 +4345,8 @@
   mode: single
   # IKEA BILRESA dual button (Matter/Thread): event.bilresa_dual_button_button_1 / _2
   # Eventos: multi_press_1, multi_press_2, long_press, long_release
-  #   larga (cualquier botón) → PÁNICO SILENCIOSO   [Alarm HOMY]
+  #   larga (cualquier botón) → PÁNICO SONORO   [Alarm HOMY] (2026-10-12: antes silencioso)
+  #   Al enrolar los BILRESA #2 y #3 (MAT-03): añadir aquí sus event.*_button_1/_2 (misma regla)
   triggers:
     - trigger: state
       entity_id:
@@ -4313,5 +4360,5 @@
   actions:
     - action: script.alarm_homy_panico
       data:
-        tipo: panico_silencioso
+        tipo: panico_sonoro
         origen: "BILRESA botón {{ '1' if trigger.entity_id.endswith('_1') else '2' }}"

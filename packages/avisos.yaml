@@ -1,0 +1,190 @@
+###############################################################################
+#  AVISOS · Voz Alexa y notificaciones (2026-10-12, sustituye a los scripts heredados)
+#
+#  script.alexa_decir          → voz y/o sonido en uno o varios Echo, con volumen según tipo y franja,
+#                                y restauración del volumen previo al terminar.
+#  script.notifica             → aviso iOS / Telegram / persistente con nivel y destinos.
+#
+#  Volúmenes (input_number.yaml): input_number.alexa_<echo>_volumen_<anuncio|alarma>_<dia|noc>
+#    echos: entrada · dormitorio (M&D) · dormitorio_paf · estudio
+#  Franja de noche para el volumen: input_datetime.alexa_noche_desde / _hasta → binary_sensor.alexa_franja_noche
+#  Propuesta y migración: doc del proyecto claude/propuesta-alexa-notificaciones-2026-10-12.md
+###############################################################################
+
+input_datetime:
+  alexa_noche_desde:
+    name: Alexa volumen noche · desde
+    icon: mdi:weather-night
+    has_date: false
+    has_time: true
+  alexa_noche_hasta:
+    name: Alexa volumen noche · hasta
+    icon: mdi:weather-sunset-up
+    has_date: false
+    has_time: true
+
+template:
+  - binary_sensor:
+      - name: alexa_franja_noche
+        unique_id: alexa_franja_noche
+        icon: mdi:weather-night
+        state: >-
+          {%- set t = now().strftime('%H:%M:%S') -%}
+          {%- set d = states('input_datetime.alexa_noche_desde') -%}
+          {%- set h = states('input_datetime.alexa_noche_hasta') -%}
+          {{ (d <= t < h) if d <= h else (t >= d or t < h) }}
+        availability: "{{ has_value('input_datetime.alexa_noche_desde') and has_value('input_datetime.alexa_noche_hasta') }}"
+
+script:
+  # ---------------------------------------------------------------------------
+  # VOZ ALEXA. mode queued: los mensajes no se pisan y el volumen previo siempre es el real.
+  # Quien no quiera esperar a que termine: script.turn_on + variables.
+  # ---------------------------------------------------------------------------
+  alexa_decir:
+    alias: Alexa · Decir
+    icon: mdi:account-voice
+    mode: queued
+    max: 10
+    fields:
+      echos:
+        description: "Uno o varios: entrada, dormitorio, dormitorio_paf, estudio"
+        example: "[entrada]"
+        selector: {object: }
+      mensaje:
+        description: Texto a anunciar (opcional)
+        selector: {text: {multiline: true}}
+      sonido:
+        description: Sonido de Amazon (opcional), p. ej. clock_01, amzn_sfx_scifi_alarm_04
+        selector: {text: }
+      repeticiones:
+        description: Veces que suena el sonido
+        default: 1
+        selector: {number: {min: 1, max: 10}}
+      tipo:
+        description: "anuncio (normal) | alarma (humo, agua, disparo…)"
+        default: anuncio
+        selector: {select: {options: [anuncio, alarma]}}
+    sequence:
+      - variables:
+          franja: "{{ 'noc' if is_state('binary_sensor.alexa_franja_noche', 'on') else 'dia' }}"
+          t: "{{ tipo | default('anuncio') }}"
+          reps: "{{ repeticiones | default(1) | int(1) }}"
+          txt: "{{ mensaje | default('') | string | trim }}"
+          snd: "{{ sonido | default('') | string | trim }}"
+          lista: >-
+            {%- set l = [echos] if echos is string else (echos | list) -%}
+            {{ l | map('lower') | map('trim') | select('in', ['entrada', 'dormitorio', 'dormitorio_paf', 'estudio']) | list }}
+          # Volumen previo de cada Echo; si Alexa Media no lo publica, se vuelve al de "anuncio" de la franja
+          previos: >-
+            {%- set ns = namespace(d={}) -%}
+            {%- for e in lista -%}
+              {%- set v = state_attr('media_player.echo_alexa_' ~ e, 'volume_level') -%}
+              {%- set ns.d = dict(ns.d, **{e: (v if v is number else states('input_number.alexa_' ~ e ~ '_volumen_anuncio_' ~ franja) | float(0.3))}) -%}
+            {%- endfor -%}
+            {{ ns.d }}
+          # Duración: ~13 caracteres/s de TTS + 3 s de campanilla/margen + 3 s por sonido
+          espera: "{{ [4, (txt | length / 13 + 3 + (reps * 3 if snd else 0)) | round(0) | int] | max }}"
+      - condition: template
+        value_template: "{{ lista | count > 0 and (txt != '' or snd != '') }}"
+      - repeat:
+          for_each: "{{ lista }}"
+          sequence:
+            - action: media_player.volume_set
+              continue_on_error: true
+              target: {entity_id: "media_player.echo_alexa_{{ repeat.item }}"}
+              data:
+                volume_level: "{{ states('input_number.alexa_' ~ repeat.item ~ '_volumen_' ~ t ~ '_' ~ franja) | float(0.4) }}"
+      - if: "{{ txt != '' }}"
+        then:
+          - action: notify.alexa_media
+            continue_on_error: true
+            data:
+              target: "{{ lista | map('regex_replace', '^', 'media_player.echo_alexa_') | list }}"
+              message: "{{ txt }}"
+              data: {type: announce}
+      - if: "{{ snd != '' }}"
+        then:
+          - repeat:
+              count: "{{ reps }}"
+              sequence:
+                - action: media_player.play_media
+                  continue_on_error: true
+                  target: {entity_id: "{{ lista | map('regex_replace', '^', 'media_player.echo_alexa_') | list }}"}
+                  data: {media_content_type: sound, media_content_id: "{{ snd }}"}
+      - delay: {seconds: "{{ espera }}"}
+      - repeat:
+          for_each: "{{ lista }}"
+          sequence:
+            - action: media_player.volume_set
+              continue_on_error: true
+              target: {entity_id: "media_player.echo_alexa_{{ repeat.item }}"}
+              data: {volume_level: "{{ previos[repeat.item] }}"}
+
+  # ---------------------------------------------------------------------------
+  # NOTIFICACIÓN (iOS + Telegram + persistente)
+  # ---------------------------------------------------------------------------
+  notifica:
+    alias: Notifica
+    icon: mdi:bell-ring
+    mode: queued
+    max: 20
+    fields:
+      titulo: {selector: {text: }}
+      mensaje: {selector: {text: {multiline: true}}}
+      nivel:
+        description: "info (normal) | aviso (time-sensitive) | critico (suena aunque esté en silencio; solo alarmas reales)"
+        default: info
+        selector: {select: {options: [info, aviso, critico]}}
+      destinos:
+        description: "todos | admin (AAC) | presentes (personas en casa) | ninguno | lista de servicios notify"
+        default: todos
+        selector: {text: }
+      telegram:
+        description: "alarm (canal alarma) | notif (canal notificaciones) | none"
+        default: none
+        selector: {select: {options: [alarm, notif, none]}}
+      persistente: {default: false, selector: {boolean: }}
+      tag: {description: Misma tag = sustituye la anterior, selector: {text: }}
+    sequence:
+      - variables:
+          n: "{{ nivel | default('info') }}"
+          d: "{{ destinos | default('todos') }}"
+          tg: "{{ telegram | default('none') }}"
+          personas: {person.agustin: notify.mobile_app_iphone_aac, person.paloma: notify.mobile_app_iphone_paf, person.agu: notify.mobile_app_a2f, person.malen: notify.mobile_app_iphone_malen}
+          servicios: >-
+            {%- if d is not string -%}{{ d | list }}
+            {%- elif d == 'todos' -%}{{ ['notify.notifica_grupo_ios'] }}
+            {%- elif d == 'admin' -%}{{ ['notify.mobile_app_iphone_aac'] }}
+            {%- elif d == 'presentes' -%}{{ personas.items() | selectattr('0', 'is_state', 'home') | map(attribute='1') | list }}
+            {%- elif d == 'ninguno' -%}{{ [] }}
+            {%- else -%}{{ d.split(',') | map('trim') | list }}{%- endif -%}
+          # iOS sin el formato de Telegram
+          tit_ios: "{{ titulo | default('') | replace('*', '') | trim }}"
+          msg_ios: "{{ mensaje | default('') | replace('>>> ', '') | replace('*', '') | trim }}"
+          push: >-
+            {%- if n == 'critico' -%}{{ {'interruption-level': 'critical', 'sound': {'name': 'default', 'critical': 1, 'volume': 1.0}} }}
+            {%- elif n == 'aviso' -%}{{ {'interruption-level': 'time-sensitive'} }}
+            {%- else -%}{{ {'interruption-level': 'active'} }}{%- endif -%}
+      - repeat:
+          for_each: "{{ servicios }}"
+          sequence:
+            - action: "{{ repeat.item }}"
+              continue_on_error: true
+              data:
+                title: "{{ tit_ios }}"
+                message: "{{ msg_ios }}"
+                data: >-
+                  {{ dict({'push': push}, **({'tag': tag} if tag is defined and tag else {})) }}
+      - if: "{{ tg in ['alarm', 'notif'] }}"
+        then:
+          - action: "notify.telegram_{{ tg }}"
+            continue_on_error: true
+            data:
+              title: "{{ titulo | default('') }}"
+              message: "{{ mensaje | default('') }}"
+      - if: "{{ persistente | default(false) }}"
+        then:
+          - action: persistent_notification.create
+            data:
+              title: "{{ tit_ios }}"
+              message: "{{ msg_ios }}"

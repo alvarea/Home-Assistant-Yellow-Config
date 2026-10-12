@@ -10,7 +10,8 @@
 #    pending         iOS urgente con botón Desarmar (Face ID) + voz + bip rápido + LED rojo
 #    triggered       iOS CRÍTICO + Telegram + sirena + Alexa en bucle + pitido + LED rojo
 #    pánico sonoro   = triggered con texto PÁNICO
-#    pánico silencio (BILRESA, pulsación larga en cualquier botón) iOS CRÍTICO + Telegram. NADA físico (ni sirena, ni voz, ni bips, ni LED)
+#    pánico silencio (pulsador Hue entrada, pulsación larga: coacción) iOS CRÍTICO + Telegram. NADA físico (ni sirena, ni voz, ni bips, ni LED)
+#    pánico sonoro: BILRESA (larga, cualquier botón) y tarjeta NFC del banco
 #  Pulsar una notificación abre el dashboard Alarma HOMY (/alarma-homy/alarma).
 #  Tags iOS: estado (armada/desarmada) · alerta (entrada/disparo/pánico; se borra al desarmar) · fallo · codigo.
 #  Echo de la voz: input_select.alarm_homy_echo_voz (entrada por defecto).
@@ -19,6 +20,9 @@
 #    código erróneo  iOS + Telegram + 3 bips graves
 #  input_boolean.alarm_homy_notif_<evento>: activa/desactiva solo los AVISOS (iOS/Telegram).
 #  input_boolean.alarm_homy_modo_pruebas ON: iOS solo a AAC y MFC, sin Telegram, sin sirena ni sirena Alexa.
+#  MODO NOCHE (2026-10-12): entrada y desarmado manual avisan SOLO al iPhone de quien ha llegado a casa en los
+#    últimos 20 min (sensor.alarm_homy_llegadas + macro notify_llegados). Si no se localiza a nadie, ningún iPhone.
+#    El disparo (triggered) y el pánico siguen avisando a todos.
 #  input_boolean.alarm_homy_silenciar_sirenas ON: sin sirena ni sirena Alexa.
 ###############################################################################
 
@@ -38,6 +42,9 @@ script:
         default: active
         selector: {select: {options: [active, time-sensitive, critical]}}
       telegram: {default: false, selector: {boolean: }}
+      solo_a:
+        description: "Lista de servicios notify que sustituye a los destinos por defecto. [] = ningún iPhone (modo Noche sin nadie localizado)"
+        selector: {object: }
       desarmar: {description: Añade botón Desarmar (Face ID), default: false, selector: {boolean: }}
       tag:
         description: "Misma tag = sustituye la notificación anterior (estado | alerta | fallo | codigo)"
@@ -47,8 +54,10 @@ script:
       - variables:
           pruebas: "{{ is_state('input_boolean.alarm_homy_modo_pruebas', 'on') }}"
           nivel: "{{ nivel | default('active') }}"
-          # Modo pruebas: solo AAC y MFC (Malen). Producción: los 4 iPhone.
-          destinos: "{{ ['notify.mobile_app_iphone_aac', 'notify.mobile_app_iphone_malen'] if pruebas else ['notify.notifica_grupo_ios'] }}"
+          # solo_a (si viene) manda. Si no: modo pruebas → AAC y MFC (Malen); producción → los 4 iPhone.
+          destinos: >-
+            {{ solo_a if (solo_a is defined and solo_a is not none) else
+               (['notify.mobile_app_iphone_aac', 'notify.mobile_app_iphone_malen'] if pruebas else ['notify.notifica_grupo_ios']) }}
           push: >-
             {% if nivel == 'critical' %}{{ {'interruption-level': 'critical', 'sound': {'name': 'default', 'critical': 1, 'volume': 1.0}} }}
             {% else %}{{ {'interruption-level': nivel} }}{% endif %}
@@ -136,28 +145,16 @@ script:
       - variables:
           # Echo de voz configurable (input_select.alarm_homy_echo_voz); por defecto la entrada
           echo: "{{ states('input_select.alarm_homy_echo_voz') if states('input_select.alarm_homy_echo_voz') in ['entrada', 'estudio', 'dormitorio'] else 'entrada' }}"
-          previo: "{{ state_attr('media_player.echo_alexa_' ~ echo, 'volume_level') }}"
-      - action: script.alarm_homy_alexa_volumen
-        data: {echos: ["{{ echo }}"], tipo: anuncio}
-      - action: notify.alexa_media
-        continue_on_error: true
+      # 2026-10-12: delega en script.alexa_decir (volumen de anuncio según franja y restauración)
+      - action: script.alexa_decir
         data:
-          target: "media_player.echo_alexa_{{ echo }}"
+          echos: ["{{ echo }}"]
+          tipo: anuncio
           # Todos los mensajes de alarma empiezan por "Atención."
-          message: "Atención. {{ voz | regex_replace('^\\s*Atención[.,:]?\\s*', '') }}"
-          data: {type: announce}
-      - delay: 8
-      - if:
-          - condition: template
-            value_template: "{{ previo is number }}"
-        then:
-          - action: media_player.volume_set
-            continue_on_error: true
-            target: {entity_id: "media_player.echo_alexa_{{ echo }}"}
-            data: {volume_level: "{{ previo }}"}
+          mensaje: "Atención. {{ voz | regex_replace('^\\s*Atención[.,:]?\\s*', '') }}"
 
   # ---------------------------------------------------------------------------
-  # VOLUMEN Alexa según tipo (anuncio | alarma) y franja horaria (noc 0-9 h, dia 10-23 h)
+  # VOLUMEN Alexa según tipo (anuncio | alarma) y franja (binary_sensor.alexa_franja_noche, packages/avisos.yaml)
   # Usa los input_number.alexa_<echo>_volumen_<tipo>_<dia|noc> existentes.
   # ---------------------------------------------------------------------------
   alarm_homy_alexa_volumen:
@@ -176,7 +173,7 @@ script:
               target: {entity_id: "media_player.echo_alexa_{{ repeat.item }}"}
               data:
                 volume_level: >-
-                  {{ states('input_number.alexa_' ~ repeat.item ~ '_volumen_' ~ tipo ~ '_' ~ ('noc' if now().hour < 10 else 'dia')) | float(0.5) }}
+                  {{ states('input_number.alexa_' ~ repeat.item ~ '_volumen_' ~ tipo ~ '_' ~ ('noc' if is_state('binary_sensor.alexa_franja_noche', 'on') else 'dia')) | float(0.5) }}
 
   # ---------------------------------------------------------------------------
   # BUCLES mientras dura cada estado
@@ -278,7 +275,10 @@ script:
               Alarma desarmada.
               {%- if p | count == 0 %} Lista para armar.
               {%- else %} No está lista para armar. {{ 'Abierto el' if p | count == 1 else 'Abiertos el' }} {{ nombres_voz(p) }}.
-                {%- if b | count == 0 %} Se puede armar, pero {{ 'ese sensor quedará excluido' if p | count == 1 else 'esos sensores quedarán excluidos' }} de la vigilancia.{% else %} {{ 'Lo impide el' if b | count == 1 else 'Lo impiden el' }} {{ nombres_voz(b) }}.{% endif %}
+                {#- Cada sensor se nombra una sola vez: solo se mencionan aparte los abiertos que NO impiden armar -#}
+                {%- set nb = p | reject('in', b) | list -%}
+                {%- if b | count == 0 %} Se puede armar, pero {{ 'ese sensor quedará excluido' if p | count == 1 else 'esos sensores quedarán excluidos' }} de la vigilancia.
+                {%- elif nb | count > 0 %} El {{ nombres_voz(nb) }} no {{ 'impide' if nb | count == 1 else 'impiden' }} armar.{% endif %}
               {%- endif %}
             {%- endif %}
       - action: script.alarm_homy_led
@@ -403,8 +403,13 @@ automation:
                     entity_id: input_boolean.alarm_homy_notif_entrada
                     state: "on"
                 then:
+                  # NOCHE: solo al iPhone del que acaba de llegar; si no se localiza a nadie, a ninguno
+                  - variables:
+                      solo_a: >-
+                        {% from 'alarm_homy.jinja' import notify_llegados %}{{ (notify_llegados() | from_json) if modo == 'armed_night' else none }}
                   - action: script.alarm_homy_notificar
                     data:
+                      solo_a: "{{ solo_a }}"
                       titulo: "⚠️ Entrada detectada"
                       mensaje: "{{ d_sensor }}{{ ' (' ~ d_area ~ ')' if d_area else '' }} a las {{ d_hora }}. Modo {{ nombre }}. Desarme en {{ states('input_number.alarm_homy_' ~ txt ~ '_entrada') | int(0) }} s."
                       nivel: "{{ 'critical' if modo == 'armed_vacation' else 'time-sensitive' }}"
@@ -532,8 +537,15 @@ automation:
                     entity_id: input_boolean.alarm_homy_notif_desarmada
                     state: "on"
                 then:
+                  # NOCHE (desarmado manual de modo Noche): solo al iPhone del que acaba de llegar; si nadie, a ninguno
+                  - variables:
+                      solo_a: >-
+                        {%- from 'alarm_homy.jinja' import notify_llegados -%}
+                        {{ (notify_llegados() | from_json) if trigger.event.data.modo | default('') == 'armed_night'
+                           and not (trigger.event.data.origen | default('')).startswith('auto') else none }}
                   - action: script.alarm_homy_notificar
                     data:
+                      solo_a: "{{ solo_a }}"
                       titulo: "🔓 Alarma desarmada"
                       mensaje: "Desarmada a las {{ now().strftime('%H:%M') }} desde {{ trigger.event.data.origen }}."
                       nivel: active

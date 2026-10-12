@@ -3,10 +3,80 @@
 #
 #  Interruptor general: input_boolean.alarm_homy_automatismos (UI).
 #    OFF mientras el motor nuevo convive con la alarma antigua (evita dobles avisos).
-#  Horarios (helpers schedule en UI, copiados de los antiguos):
-#    schedule.alarm_homy_auto_ausente  → ventana en la que se arma Ausente al quedar la casa vacía
-#    schedule.alarm_homy_auto_noche    → franja nocturna: arma Noche al empezar y desarma al terminar
+#  Horarios editables desde el dashboard (2026-10-12, sustituyen a los helpers schedule.alarm_homy_auto_*):
+#    Noche: inicio/fin para las madrugadas de lunes a viernes y para las de sábado y domingo.
+#      binary_sensor.alarm_homy_franja_noche → on dentro de la franja: arma Noche al empezar y desarma al terminar.
+#      Si inicio > fin (p. ej. 23:30 → 07:00) la franja empieza la noche anterior.
+#    Ausente: el auto armado al quedar la casa vacía está permitido SIEMPRE salvo en una excepción semanal
+#      (día + desde/hasta; p. ej. jueves 06:30-15:00). binary_sensor.alarm_homy_franja_ausente → on = permitido.
 ###############################################################################
+
+input_datetime:
+  alarm_homy_noche_inicio_laborable:
+    name: Noche L-V · inicio
+    icon: mdi:weather-night
+    has_date: false
+    has_time: true
+  alarm_homy_noche_fin_laborable:
+    name: Noche L-V · fin
+    icon: mdi:weather-sunset-up
+    has_date: false
+    has_time: true
+  alarm_homy_noche_inicio_finde:
+    name: Noche S-D · inicio
+    icon: mdi:weather-night
+    has_date: false
+    has_time: true
+  alarm_homy_noche_fin_finde:
+    name: Noche S-D · fin
+    icon: mdi:weather-sunset-up
+    has_date: false
+    has_time: true
+  alarm_homy_ausente_excepcion_desde:
+    name: Excepción Ausente · desde
+    icon: mdi:clock-start
+    has_date: false
+    has_time: true
+  alarm_homy_ausente_excepcion_hasta:
+    name: Excepción Ausente · hasta
+    icon: mdi:clock-end
+    has_date: false
+    has_time: true
+
+input_select:
+  alarm_homy_ausente_excepcion_dia:
+    name: Excepción Ausente · día
+    icon: mdi:calendar-remove
+    options: [Ninguno, Lunes, Martes, Miércoles, Jueves, Viernes, Sábado, Domingo]
+
+template:
+  - binary_sensor:
+      - name: alarm_homy_franja_noche
+        unique_id: alarm_homy_franja_noche
+        icon: mdi:weather-night
+        # Madrugada de sábado y domingo = config "finde"; de lunes a viernes = "laborable"
+        state: >-
+          {%- set t = now().strftime('%H:%M:%S') -%}
+          {%- set fh = 'finde' if now().isoweekday() >= 6 else 'laborable' -%}
+          {%- set fm = 'finde' if (now() + timedelta(days=1)).isoweekday() >= 6 else 'laborable' -%}
+          {%- set ih = states('input_datetime.alarm_homy_noche_inicio_' ~ fh) -%}
+          {%- set fnh = states('input_datetime.alarm_homy_noche_fin_' ~ fh) -%}
+          {%- set im = states('input_datetime.alarm_homy_noche_inicio_' ~ fm) -%}
+          {%- set fnm = states('input_datetime.alarm_homy_noche_fin_' ~ fm) -%}
+          {{ (ih <= fnh and ih <= t < fnh) or (ih > fnh and t < fnh) or (im > fnm and t >= im) }}
+        availability: >-
+          {{ ['inicio_laborable', 'fin_laborable', 'inicio_finde', 'fin_finde']
+             | map('regex_replace', '^', 'input_datetime.alarm_homy_noche_') | select('has_value') | list | count == 4 }}
+      - name: alarm_homy_franja_ausente
+        unique_id: alarm_homy_franja_ausente
+        icon: mdi:home-export-outline
+        # on = auto armado Ausente permitido (fuera de la excepción semanal)
+        state: >-
+          {%- set dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'] -%}
+          {%- set t = now().strftime('%H:%M:%S') -%}
+          {%- set excepcion = states('input_select.alarm_homy_ausente_excepcion_dia') == dias[now().weekday()]
+                and states('input_datetime.alarm_homy_ausente_excepcion_desde') <= t < states('input_datetime.alarm_homy_ausente_excepcion_hasta') -%}
+          {{ not excepcion }}
 
 automation:
   # ---------------------------------------------------------------------------
@@ -26,7 +96,7 @@ automation:
         entity_id: input_boolean.alarm_homy_automatismos
         state: "on"
       - condition: state
-        entity_id: schedule.alarm_homy_auto_ausente
+        entity_id: binary_sensor.alarm_homy_franja_ausente
         state: "on"
       - condition: state
         entity_id: input_select.alarm_homy_estado
@@ -45,7 +115,7 @@ automation:
     mode: single
     triggers:
       - trigger: state
-        entity_id: schedule.alarm_homy_auto_noche
+        entity_id: binary_sensor.alarm_homy_franja_noche
         to: "on"
         id: inicio
       - trigger: time_pattern
@@ -56,7 +126,7 @@ automation:
         entity_id: input_boolean.alarm_homy_automatismos
         state: "on"
       - condition: state
-        entity_id: schedule.alarm_homy_auto_noche
+        entity_id: binary_sensor.alarm_homy_franja_noche
         state: "on"
       - condition: state
         entity_id: input_select.alarm_homy_estado
@@ -80,7 +150,7 @@ automation:
     mode: single
     triggers:
       - trigger: state
-        entity_id: schedule.alarm_homy_auto_noche
+        entity_id: binary_sensor.alarm_homy_franja_noche
         to: "off"
     conditions:
       - condition: state

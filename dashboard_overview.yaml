@@ -1,6 +1,6 @@
 ###############################################################################
 #  Dashboard principal "Overview" (/lovelace) — copia del storage .storage/lovelace.lovelace
-#  Exportado: 2026-10-12 11:55 (22 vistas). Sin vistas de la alarma antigua;
+#  Exportado: 2026-10-12 21:00 (22 vistas). Sin vistas de la alarma antigua;
 #  la alarma está en /alarma-homy (dashboard_alarma_homy.yaml).
 #  Versión previa completa: dashboard_overview.old-2026-10-12.yaml
 #  Restaurar: Ajustes → Paneles → Overview → Editar → ⋮ Editor de configuración
@@ -4932,68 +4932,58 @@ views:
     icon: mdi:swim
     path: piscina_view
     title: Piscina
-  - theme: Backend-selected
-    icon: mdi:cast-audio
+  - title: Alexa Echo
     path: alexa
-    title: Alexa Echo
-    badges:
-      - type: entity
-        entity: media_player.echo_alexa_entrada
-        name: Alexa Entrada
-        show_entity_picture: false
-        state_content:
-          - name
-          - volume_level
-          - state
-      - type: entity
-        show_entity_picture: false
-        state_content:
-          - name
-          - volume_level
-          - state
-        entity: media_player.echo_alexa_estudio
-        name: Alexa Estudio
-    cards:
-      - cards:
-          - entity: media_player.echo_alexa_estudio
-            type: media-control
-          - type: custom:mushroom-media-player-card
-            entity: media_player.echo_alexa_estudio
-            fill_container: true
-            volume_controls:
-              - volume_set
-              - volume_mute
-              - volume_buttons
-            media_controls:
-              - on_off
-              - play_pause_stop
-              - next
-              - previous
-              - repeat
-            use_media_info: true
-            show_volume_level: true
-            collapsible_controls: true
-          - entities:
-              - entity: switch.echo_alexa_estudio_do_not_disturb_switch
-              - type: divider
-              - entity: input_number.alexa_estudio_volumen_anterior
-                name: Vol. Anterior
-              - entity: input_number.alexa_estudio_volumen_nuevo
-                name: Vol. Nuevo
-              - entity: input_number.alexa_estudio_volumen_anuncio_dia
-                name: Vol. Anuncio Día
-              - entity: input_number.alexa_estudio_volumen_alarma_dia
-                name: Vol. Alarma Día
-              - entity: input_number.alexa_estudio_volumen_anuncio_noc
-                name: Vol. Anuncio Noche
-              - entity: input_number.alexa_estudio_volumen_alarma_noc
-                name: Vol. Alarma Noche
-            show_header_toggle: false
-            type: entities
-        type: vertical-stack
-      - cards:
-          - entity: media_player.echo_alexa_entrada
-            type: media-control
+    icon: mdi:cast-audio
+    type: sections
+    max_columns: 4
+    badges: []
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Franja de noche (volumen)
+            heading_style: title
+            icon: mdi:weather-night
+          - type: tile
+            entity: binary_sensor.alexa_franja_noche
+            name: Ahora
+            grid_options:
+              columns: 12
+            tap_action: &id001
+              action: more-info
+            icon_tap_action: *id001
+          - type: tile
+            entity: input_datetime.alexa_noche_desde
+            name: Noche desde
+            grid_options:
+              columns: 6
+            tap_action: *id001
+            icon_tap_action: *id001
+          - type: tile
+            entity: input_datetime.alexa_noche_hasta
+            name: Noche hasta
+            grid_options:
+              columns: 6
+            tap_action: *id001
+            icon_tap_action: *id001
+          - type: markdown
+            grid_options:
+              columns: 12
+            content: Todos los avisos de voz (`script.alexa_decir`) usan el volumen **anuncio** o **alarma** de cada Echo según esta franja y lo restauran al terminar.
+      - type: grid
+        cards:
+          - type: heading
+            heading: Entrada
+            heading_style: title
+            icon: mdi:amazon-alexa
+            badges:
+              - type: entity
+                entity: media_player.echo_alexa_entrada
+                show_state: true
+                state_content:
+                  - volume_level
+                  - state
           - type: custom:mushroom-media-player-card
             entity: media_player.echo_alexa_entrada
             fill_container: true
@@ -5006,31 +4996,232 @@ views:
               - play_pause_stop
               - next
               - previous
-              - repeat
             use_media_info: true
             show_volume_level: true
             collapsible_controls: true
-          - entities:
-              - entity: switch.echo_alexa_entrada_do_not_disturb_switch
-              - type: divider
-              - entity: input_number.alexa_entrada_volumen_anterior
-                name: Vol. Anterior
-              - entity: input_number.alexa_entrada_volumen_nuevo
-                name: Vol. Nuevo
-              - entity: input_number.alexa_entrada_volumen_anuncio_dia
-                name: Vol. Anuncio Día
-              - entity: input_number.alexa_entrada_volumen_alarma_dia
-                name: Vol. Alarma Día
-              - entity: input_number.alexa_entrada_volumen_anuncio_noc
-                name: Vol. Anuncio Noche
-              - entity: input_number.alexa_entrada_volumen_alarma_noc
-                name: Vol. Alarma Noche
-            show_header_toggle: false
-            type: entities
-        type: vertical-stack
-      - cards:
-          - entity: media_player.echo_alexa_dormitorio
-            type: media-control
+            grid_options:
+              columns: 12
+          - type: tile
+            entity: switch.echo_alexa_entrada_do_not_disturb_switch
+            name: No molestar
+            grid_options:
+              columns: 12
+            tap_action: *id001
+            icon_tap_action: *id001
+          - type: heading
+            heading: Volumen de los avisos
+            heading_style: subtitle
+            icon: mdi:volume-high
+          - type: tile
+            entity: input_number.alexa_entrada_volumen_anuncio_dia
+            name: Anuncio · día
+            grid_options:
+              columns: 6
+            features:
+              - type: numeric-input
+                style: slider
+            features_position: bottom
+            tap_action: *id001
+            icon_tap_action: *id001
+          - type: tile
+            entity: input_number.alexa_entrada_volumen_anuncio_noc
+            name: Anuncio · noche
+            grid_options:
+              columns: 6
+            features:
+              - type: numeric-input
+                style: slider
+            features_position: bottom
+            tap_action: *id001
+            icon_tap_action: *id001
+          - type: tile
+            entity: input_number.alexa_entrada_volumen_alarma_dia
+            name: Alarma · día
+            grid_options:
+              columns: 6
+            features:
+              - type: numeric-input
+                style: slider
+            features_position: bottom
+            tap_action: *id001
+            icon_tap_action: *id001
+          - type: tile
+            entity: input_number.alexa_entrada_volumen_alarma_noc
+            name: Alarma · noche
+            grid_options:
+              columns: 6
+            features:
+              - type: numeric-input
+                style: slider
+            features_position: bottom
+            tap_action: *id001
+            icon_tap_action: *id001
+          - type: custom:mushroom-template-card
+            primary: Probar anuncio
+            secondary: '{{ ''Noche'' if is_state(''binary_sensor.alexa_franja_noche'',''on'') else ''Día'' }} · volumen {{ (states(''input_number.alexa_entrada_volumen_anuncio_'' ~ (''noc'' if is_state(''binary_sensor.alexa_franja_noche'',''on'') else ''dia'')) | float(0) * 100) | int }} %'
+            icon: mdi:play-circle
+            color: blue
+            grid_options:
+              columns: 6
+            tap_action:
+              action: perform-action
+              perform_action: script.alexa_decir
+              data:
+                echos:
+                  - entrada
+                mensaje: Prueba de anuncio en Entrada
+                tipo: anuncio
+              confirmation:
+                text: ¿Probar anuncio en Entrada?
+          - type: custom:mushroom-template-card
+            primary: Probar alarma
+            secondary: volumen {{ (states('input_number.alexa_entrada_volumen_alarma_' ~ ('noc' if is_state('binary_sensor.alexa_franja_noche','on') else 'dia')) | float(0) * 100) | int }} %
+            icon: mdi:alarm-light
+            color: red
+            grid_options:
+              columns: 6
+            tap_action:
+              action: perform-action
+              perform_action: script.alexa_decir
+              data:
+                echos:
+                  - entrada
+                mensaje: Prueba de volumen de alarma
+                tipo: alarma
+              confirmation:
+                text: ¿Probar volumen de ALARMA en Entrada?
+      - type: grid
+        cards:
+          - type: heading
+            heading: Estudio
+            heading_style: title
+            icon: mdi:amazon-alexa
+            badges:
+              - type: entity
+                entity: media_player.echo_alexa_estudio
+                show_state: true
+                state_content:
+                  - volume_level
+                  - state
+          - type: custom:mushroom-media-player-card
+            entity: media_player.echo_alexa_estudio
+            fill_container: true
+            volume_controls:
+              - volume_set
+              - volume_mute
+              - volume_buttons
+            media_controls:
+              - on_off
+              - play_pause_stop
+              - next
+              - previous
+            use_media_info: true
+            show_volume_level: true
+            collapsible_controls: true
+            grid_options:
+              columns: 12
+          - type: tile
+            entity: switch.echo_alexa_estudio_do_not_disturb_switch
+            name: No molestar
+            grid_options:
+              columns: 12
+            tap_action: *id001
+            icon_tap_action: *id001
+          - type: heading
+            heading: Volumen de los avisos
+            heading_style: subtitle
+            icon: mdi:volume-high
+          - type: tile
+            entity: input_number.alexa_estudio_volumen_anuncio_dia
+            name: Anuncio · día
+            grid_options:
+              columns: 6
+            features:
+              - type: numeric-input
+                style: slider
+            features_position: bottom
+            tap_action: *id001
+            icon_tap_action: *id001
+          - type: tile
+            entity: input_number.alexa_estudio_volumen_anuncio_noc
+            name: Anuncio · noche
+            grid_options:
+              columns: 6
+            features:
+              - type: numeric-input
+                style: slider
+            features_position: bottom
+            tap_action: *id001
+            icon_tap_action: *id001
+          - type: tile
+            entity: input_number.alexa_estudio_volumen_alarma_dia
+            name: Alarma · día
+            grid_options:
+              columns: 6
+            features:
+              - type: numeric-input
+                style: slider
+            features_position: bottom
+            tap_action: *id001
+            icon_tap_action: *id001
+          - type: tile
+            entity: input_number.alexa_estudio_volumen_alarma_noc
+            name: Alarma · noche
+            grid_options:
+              columns: 6
+            features:
+              - type: numeric-input
+                style: slider
+            features_position: bottom
+            tap_action: *id001
+            icon_tap_action: *id001
+          - type: custom:mushroom-template-card
+            primary: Probar anuncio
+            secondary: '{{ ''Noche'' if is_state(''binary_sensor.alexa_franja_noche'',''on'') else ''Día'' }} · volumen {{ (states(''input_number.alexa_estudio_volumen_anuncio_'' ~ (''noc'' if is_state(''binary_sensor.alexa_franja_noche'',''on'') else ''dia'')) | float(0) * 100) | int }} %'
+            icon: mdi:play-circle
+            color: blue
+            grid_options:
+              columns: 6
+            tap_action:
+              action: perform-action
+              perform_action: script.alexa_decir
+              data:
+                echos:
+                  - estudio
+                mensaje: Prueba de anuncio en Estudio
+                tipo: anuncio
+              confirmation:
+                text: ¿Probar anuncio en Estudio?
+          - type: custom:mushroom-template-card
+            primary: Probar alarma
+            secondary: volumen {{ (states('input_number.alexa_estudio_volumen_alarma_' ~ ('noc' if is_state('binary_sensor.alexa_franja_noche','on') else 'dia')) | float(0) * 100) | int }} %
+            icon: mdi:alarm-light
+            color: red
+            grid_options:
+              columns: 6
+            tap_action:
+              action: perform-action
+              perform_action: script.alexa_decir
+              data:
+                echos:
+                  - estudio
+                mensaje: Prueba de volumen de alarma
+                tipo: alarma
+              confirmation:
+                text: ¿Probar volumen de ALARMA en Estudio?
+      - type: grid
+        cards:
+          - type: heading
+            heading: Dormitorio M&D
+            heading_style: title
+            icon: mdi:amazon-alexa
+            badges:
+              - type: entity
+                entity: media_player.echo_alexa_dormitorio
+                show_state: true
+                state_content:
+                  - volume_level
+                  - state
           - type: custom:mushroom-media-player-card
             entity: media_player.echo_alexa_dormitorio
             fill_container: true
@@ -5043,31 +5234,113 @@ views:
               - play_pause_stop
               - next
               - previous
-              - repeat
             use_media_info: true
             show_volume_level: true
             collapsible_controls: true
-          - entities:
-              - entity: switch.echo_alexa_dormitorio_do_not_disturb_switch
-              - type: divider
-              - entity: input_number.alexa_dormitorio_volumen_anterior
-                name: Vol. Anterior
-              - entity: input_number.alexa_dormitorio_volumen_nuevo
-                name: Vol. Nuevo
-              - entity: input_number.alexa_dormitorio_volumen_anuncio_dia
-                name: Vol. Anuncio Día
-              - entity: input_number.alexa_dormitorio_volumen_alarma_dia
-                name: Vol. Alarma Día
-              - entity: input_number.alexa_dormitorio_volumen_anuncio_noc
-                name: Vol. Anuncio Noche
-              - entity: input_number.alexa_dormitorio_volumen_alarma_noc
-                name: Vol. Alarma Noche
-            show_header_toggle: false
-            type: entities
-        type: vertical-stack
-      - cards:
-          - entity: media_player.echo_alexa_dormitorio_paf
-            type: media-control
+            grid_options:
+              columns: 12
+          - type: tile
+            entity: switch.echo_alexa_dormitorio_do_not_disturb_switch
+            name: No molestar
+            grid_options:
+              columns: 12
+            tap_action: *id001
+            icon_tap_action: *id001
+          - type: heading
+            heading: Volumen de los avisos
+            heading_style: subtitle
+            icon: mdi:volume-high
+          - type: tile
+            entity: input_number.alexa_dormitorio_volumen_anuncio_dia
+            name: Anuncio · día
+            grid_options:
+              columns: 6
+            features:
+              - type: numeric-input
+                style: slider
+            features_position: bottom
+            tap_action: *id001
+            icon_tap_action: *id001
+          - type: tile
+            entity: input_number.alexa_dormitorio_volumen_anuncio_noc
+            name: Anuncio · noche
+            grid_options:
+              columns: 6
+            features:
+              - type: numeric-input
+                style: slider
+            features_position: bottom
+            tap_action: *id001
+            icon_tap_action: *id001
+          - type: tile
+            entity: input_number.alexa_dormitorio_volumen_alarma_dia
+            name: Alarma · día
+            grid_options:
+              columns: 6
+            features:
+              - type: numeric-input
+                style: slider
+            features_position: bottom
+            tap_action: *id001
+            icon_tap_action: *id001
+          - type: tile
+            entity: input_number.alexa_dormitorio_volumen_alarma_noc
+            name: Alarma · noche
+            grid_options:
+              columns: 6
+            features:
+              - type: numeric-input
+                style: slider
+            features_position: bottom
+            tap_action: *id001
+            icon_tap_action: *id001
+          - type: custom:mushroom-template-card
+            primary: Probar anuncio
+            secondary: '{{ ''Noche'' if is_state(''binary_sensor.alexa_franja_noche'',''on'') else ''Día'' }} · volumen {{ (states(''input_number.alexa_dormitorio_volumen_anuncio_'' ~ (''noc'' if is_state(''binary_sensor.alexa_franja_noche'',''on'') else ''dia'')) | float(0) * 100) | int }} %'
+            icon: mdi:play-circle
+            color: blue
+            grid_options:
+              columns: 6
+            tap_action:
+              action: perform-action
+              perform_action: script.alexa_decir
+              data:
+                echos:
+                  - dormitorio
+                mensaje: Prueba de anuncio en Dormitorio M&D
+                tipo: anuncio
+              confirmation:
+                text: ¿Probar anuncio en Dormitorio M&D?
+          - type: custom:mushroom-template-card
+            primary: Probar alarma
+            secondary: volumen {{ (states('input_number.alexa_dormitorio_volumen_alarma_' ~ ('noc' if is_state('binary_sensor.alexa_franja_noche','on') else 'dia')) | float(0) * 100) | int }} %
+            icon: mdi:alarm-light
+            color: red
+            grid_options:
+              columns: 6
+            tap_action:
+              action: perform-action
+              perform_action: script.alexa_decir
+              data:
+                echos:
+                  - dormitorio
+                mensaje: Prueba de volumen de alarma
+                tipo: alarma
+              confirmation:
+                text: ¿Probar volumen de ALARMA en Dormitorio M&D?
+      - type: grid
+        cards:
+          - type: heading
+            heading: Dormitorio Paloma
+            heading_style: title
+            icon: mdi:amazon-alexa
+            badges:
+              - type: entity
+                entity: media_player.echo_alexa_dormitorio_paf
+                show_state: true
+                state_content:
+                  - volume_level
+                  - state
           - type: custom:mushroom-media-player-card
             entity: media_player.echo_alexa_dormitorio_paf
             fill_container: true
@@ -5080,28 +5353,101 @@ views:
               - play_pause_stop
               - next
               - previous
-              - repeat
             use_media_info: true
             show_volume_level: true
             collapsible_controls: true
-          - entities:
-              - entity: switch.echo_alexa_dormitorio_paf_do_not_disturb_switch
-              - type: divider
-              - entity: input_number.alexa_dormitorio_volumen_anterior
-                name: Vol. Anterior
-              - entity: input_number.alexa_dormitorio_volumen_nuevo
-                name: Vol. Nuevo
-              - entity: input_number.alexa_dormitorio_volumen_anuncio_dia
-                name: Vol. Anuncio Día
-              - entity: input_number.alexa_dormitorio_volumen_alarma_dia
-                name: Vol. Alarma Día
-              - entity: input_number.alexa_dormitorio_volumen_anuncio_noc
-                name: Vol. Anuncio Noche
-              - entity: input_number.alexa_dormitorio_volumen_alarma_noc
-                name: Vol. Alarma Noche
-            show_header_toggle: false
-            type: entities
-        type: vertical-stack
+            grid_options:
+              columns: 12
+          - type: tile
+            entity: switch.echo_alexa_dormitorio_paf_do_not_disturb_switch
+            name: No molestar
+            grid_options:
+              columns: 12
+            tap_action: *id001
+            icon_tap_action: *id001
+          - type: heading
+            heading: Volumen de los avisos
+            heading_style: subtitle
+            icon: mdi:volume-high
+          - type: tile
+            entity: input_number.alexa_dormitorio_paf_volumen_anuncio_dia
+            name: Anuncio · día
+            grid_options:
+              columns: 6
+            features:
+              - type: numeric-input
+                style: slider
+            features_position: bottom
+            tap_action: *id001
+            icon_tap_action: *id001
+          - type: tile
+            entity: input_number.alexa_dormitorio_paf_volumen_anuncio_noc
+            name: Anuncio · noche
+            grid_options:
+              columns: 6
+            features:
+              - type: numeric-input
+                style: slider
+            features_position: bottom
+            tap_action: *id001
+            icon_tap_action: *id001
+          - type: tile
+            entity: input_number.alexa_dormitorio_paf_volumen_alarma_dia
+            name: Alarma · día
+            grid_options:
+              columns: 6
+            features:
+              - type: numeric-input
+                style: slider
+            features_position: bottom
+            tap_action: *id001
+            icon_tap_action: *id001
+          - type: tile
+            entity: input_number.alexa_dormitorio_paf_volumen_alarma_noc
+            name: Alarma · noche
+            grid_options:
+              columns: 6
+            features:
+              - type: numeric-input
+                style: slider
+            features_position: bottom
+            tap_action: *id001
+            icon_tap_action: *id001
+          - type: custom:mushroom-template-card
+            primary: Probar anuncio
+            secondary: '{{ ''Noche'' if is_state(''binary_sensor.alexa_franja_noche'',''on'') else ''Día'' }} · volumen {{ (states(''input_number.alexa_dormitorio_paf_volumen_anuncio_'' ~ (''noc'' if is_state(''binary_sensor.alexa_franja_noche'',''on'') else ''dia'')) | float(0) * 100) | int }} %'
+            icon: mdi:play-circle
+            color: blue
+            grid_options:
+              columns: 6
+            tap_action:
+              action: perform-action
+              perform_action: script.alexa_decir
+              data:
+                echos:
+                  - dormitorio_paf
+                mensaje: Prueba de anuncio en Dormitorio Paloma
+                tipo: anuncio
+              confirmation:
+                text: ¿Probar anuncio en Dormitorio Paloma?
+          - type: custom:mushroom-template-card
+            primary: Probar alarma
+            secondary: volumen {{ (states('input_number.alexa_dormitorio_paf_volumen_alarma_' ~ ('noc' if is_state('binary_sensor.alexa_franja_noche','on') else 'dia')) | float(0) * 100) | int }} %
+            icon: mdi:alarm-light
+            color: red
+            grid_options:
+              columns: 6
+            tap_action:
+              action: perform-action
+              perform_action: script.alexa_decir
+              data:
+                echos:
+                  - dormitorio_paf
+                mensaje: Prueba de volumen de alarma
+                tipo: alarma
+              confirmation:
+                text: ¿Probar volumen de ALARMA en Dormitorio Paloma?
+    theme: Backend-selected
   - theme: Backend-selected
     title: Media Player
     icon: mdi:television-speaker
