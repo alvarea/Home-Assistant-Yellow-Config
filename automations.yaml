@@ -137,36 +137,51 @@
 
  
 - id: wallpanel_ipad_battery
-  alias: 'IPAD Battery Check' 
-  mode: single
-  triggers: 
-    - trigger: numeric_state
-      entity_id: sensor.ipad_battery_level
-      below: 10
-      id: battery_low
-    - trigger: numeric_state
-      entity_id: sensor.ipad_battery_level
-      below: 99
-      id: battery_full
-  conditions: []
+  alias: 'IPAD Battery Check'
+  description: >-
+    Cargador iPad WallPanel (switch.esphome_mini_sw4). Carga si <= 25 %, nivel desconocido
+    o > 6 h sin reportar con < 60 %. Corta a 95 %, Full o Not Charging >= 80 %.
+    Evalua el estado completo (no cruces de umbral): cambios del iPad, cada 15 min,
+    arranque de HA y vuelta del ESP tras reinicio. Revisado 2026-10-13.
+  mode: queued
+  max: 3
+  triggers:
+    - trigger: state
+      entity_id:
+        - sensor.ipad_battery_level
+        - sensor.ipad_battery_state
+    - trigger: state
+      entity_id: switch.esphome_mini_sw4
+      from: unavailable
+    - trigger: time_pattern
+      minutes: /15
+    - trigger: homeassistant
+      event: start
+  variables:
+    nivel: "{{ states('sensor.ipad_battery_level') | int(-1) }}"
+    estado: "{{ states('sensor.ipad_battery_state') }}"
+    horas_sin_dato: >-
+      {% set s = states.sensor.ipad_battery_level %}
+      {{ ((now() - s.last_reported).total_seconds() / 3600) | round(1) if s else 99 }}
+    cargar: "{{ nivel < 0 or nivel <= 25 or (horas_sin_dato > 6 and nivel < 60) }}"
+    parar: >-
+      {{ not cargar and (nivel >= 95 or estado == 'Full'
+         or (estado == 'Not Charging' and nivel >= 80)) }}
+  conditions:
+    - condition: template
+      value_template: "{{ states('switch.esphome_mini_sw4') in ['on', 'off'] }}"
   actions:
-  - choose:
-      # IF on_short_press
-      - conditions:
-        - condition: trigger
-          id: battery_low
-        sequence:
-          - action: switch.turn_on
-            target:
-              entity_id: switch.esphome_mini_sw4
-      # ELIF off_short_press 
-      - conditions:
-        - condition: trigger
-          id: battery_full
-        sequence:
-          - action: switch.turn_off
-            target:
-              entity_id: switch.esphome_mini_sw4
+    - choose:
+        - conditions: "{{ cargar and is_state('switch.esphome_mini_sw4', 'off') }}"
+          sequence:
+            - action: switch.turn_on
+              target:
+                entity_id: switch.esphome_mini_sw4
+        - conditions: "{{ parar and is_state('switch.esphome_mini_sw4', 'on') }}"
+          sequence:
+            - action: switch.turn_off
+              target:
+                entity_id: switch.esphome_mini_sw4
 
 
 
