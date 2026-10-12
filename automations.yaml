@@ -2024,69 +2024,6 @@
 #          >>> URGENTE: SAI RACK COMUNICACIONES SIN CORRIENTE
 
 #
-# ESPHOME POW R2 SW2 - LAVADORA
-#
-#- id: S16
-#  alias: 'S16 Sonoff POW Lavadora Boton Switch on'
-#  trigger:
-#    platform: state
-#    entity_id: binary_sensor.esphome_pow_sw2_boton
-#    from: 'off'
-#    to: 'on'
-#    for: '00:00:02'
-#  action:
-#    - service: switch.toggle
-#      entity_id: switch.esphome_pow_sw2
-#
-#- id: S16b
-#  alias: 'S16b Sonoff POW Lavadora Led'
-#  trigger:
-#    - platform: state
-#      entity_id: binary_sensor.esphome_pow_sw2_lavadora_lavando
-#  action:
-#    - service: light.toggle
-#      target:
-#        entity_id: light.esphome_pow_sw2_led
-#
-#- id: S16c
-#  alias: 'Auto-Apagado Warning Lavadora (S16c)'
-#  trigger:
-#    - platform: state
-#      entity_id: binary_sensor.esphome_pow_sw2_lavadora_warning
-#      from: 'off'
-#      to: 'on'
-#      for: '00:00:15'
-#  condition:
-#    - condition: template
-#      value_template: '{{ (as_timestamp(states.binary_sensor.esphome_pow_sw2_lavadora_warning.last_changed) | timestamp_custom("%H:%M:%S"))
-#                          > (states.input_datetime.lavadora_inicio_lavado.attributes.timestamp | timestamp_custom("%H:%M:%S"))
-#                      }}'
-#  action:
-#    - service: input_datetime.set_datetime
-#      entity_id: input_datetime.lavadora_fin_lavado
-#      data:
-#        time: '{{ now().strftime("%H:%M:%S") }}'
-#    # Llama al script de apagado de Sonoof POW si viene de un lavado
-#    - service: script.lavadora_switch_off
-#
-#- id: S16d
-#  alias: 'S16d Lavadora Hora Inicio'
-#  trigger:
-#    - platform: state
-#      entity_id: binary_sensor.esphome_pow_sw2_lavadora_lavando
-#      from: 'off'
-#      to: 'on'
-#  action:
-#    - service: input_datetime.set_datetime
-#      entity_id: input_datetime.lavadora_inicio_lavado
-#      data:
-#        time: '{{ now().strftime("%H:%M") }}'
-#    - service: input_datetime.set_datetime
-#      entity_id: input_datetime.lavadora_fin_lavado
-#      data:
-#        time: '00:00'
-
-#
 # ESPHOME 4CH-R2 SW2 RIEGO BONSAIS
 #
 # https://community.home-assistant.io/t/timer-execute-and-action-from-lovelace-ui/123512

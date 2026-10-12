@@ -241,16 +241,3 @@
     name: Hora Final Planificado Tramo3
     has_date: false
     has_time: true
-
-  #
-  # CONTROL LAVADORA
-  #
-  lavadora_inicio_lavado:
-    name: Lavadora Inicio Lavado
-    has_date: false
-    has_time: true
-
-  lavadora_fin_lavado:
-    name: Lavadora Fin Lavado
-    has_date: false
-    has_time: true

@@ -1,6 +1,6 @@
 ###############################################################################
 #  Dashboard principal "Overview" (/lovelace) — copia del storage .storage/lovelace.lovelace
-#  Exportado: 2026-10-12 21:00 (22 vistas). Sin vistas de la alarma antigua;
+#  Exportado: 2026-10-13 00:40 (23 vistas, + Lavadora). Sin vistas de la alarma antigua;
 #  la alarma está en /alarma-homy (dashboard_alarma_homy.yaml).
 #  Versión previa completa: dashboard_overview.old-2026-10-12.yaml
 #  Restaurar: Ajustes → Paneles → Overview → Editar → ⋮ Editor de configuración
@@ -4242,264 +4242,276 @@ views:
     icon: mdi:thermometer-lines
     path: temperatura
     title: Temperatura
-  - theme: Backend-selected
-    icon: mdi:leaf
-    path: bonsais_view
-    title: Bonsais
-    badges: []
-    cards:
-      - cards:
-          - entity: plant.mp_01
-            type: plant-status
-            name: Ficus Tigerbark
-          - color_thresholds:
-              - color: magenta
-                value: 0
-              - color: red
-                value: 10
-              - color: yellow
-                value: 20
-              - color: green
-                value: 30
-              - color: teal
-                value: 40
-              - color: blue
-                value: 50
-              - color: violet
-                value: 90
+  - title: Lavadora
+    path: lavadora
+    icon: mdi:washing-machine
+    type: sections
+    max_columns: 4
+    sections:
+      - type: grid
+        cards:
+          - type: picture-entity
+            entity: sensor.lavadora_estado
+            name: Lavadora
+            image:
+              media_content_id: /local/lavadora_i0.jpg
+            show_state: false
+            show_name: true
+            camera_view: auto
+            fit_mode: cover
+            aspect_ratio: '3'
+            tap_action:
+              action: none
+            hold_action:
+              action: none
+            grid_options:
+              columns: 12
+          - type: heading
+            heading: Estado
+            icon: mdi:washing-machine
+            heading_style: title
+            badges:
+              - type: entity
+                entity: sensor.lavadora_estado
+                show_state: true
+                show_icon: true
+          - type: custom:mushroom-template-card
+            entity: sensor.lavadora_estado
+            grid_options:
+              columns: 12
+            multiline_secondary: true
+            tap_action:
+              action: more-info
+            icon: '{{ state_attr(''sensor.lavadora_estado'',''icon'') }}'
+            color: '{% set e = states(''sensor.lavadora_estado'') %}{{ {''lavando'':''blue'',''terminada'':''green''}.get(e, ''amber'' if is_state(''switch.grillplats_lavadora'',''on'') else ''grey'') }}'
+            primary: '{% set a = states.sensor.lavadora_estado.attributes %}{% set e = states(''sensor.lavadora_estado'') %}{% if e == ''lavando'' and a.inicio %}{% set p = ((now() - as_datetime(a.inicio)).total_seconds() / 60 / (a.duracion_estimada | int(63)) * 100) | round(0) | int %}Lavando · {{ [p, 99] | min }} %{% elif e == ''lavando'' %}Lavando{% elif e == ''terminada'' %}Lavado terminado{% elif is_state(''switch.grillplats_lavadora'',''on'') %}Lista para lavar{% else %}Apagada{% endif %}'
+            secondary: '{% set a = states.sensor.lavadora_estado.attributes %}{% set e = states(''sensor.lavadora_estado'') %}{% if e == ''lavando'' and a.inicio and a.fin_estimado %}{% set f = as_datetime(a.fin_estimado) %}Desde las {{ as_local(as_datetime(a.inicio)).strftime(''%H:%M'') }} · fin ≈ {{ as_local(f).strftime(''%H:%M'') }} (quedan {{ [((f - now()).total_seconds() / 60) | round(0) | int, 0] | max }} min){% elif e == ''terminada'' and a.ultimo_fin %}Terminó a las {{ as_local(as_datetime(a.ultimo_fin)).strftime(''%H:%M'') }} · {{ {''fuera'':''tender fuera'',''secadora'':''usar la secadora'',''desconocido'':''sin previsión''}.get(a.destino, '''') }}{{ '' ('' ~ a.tendido_cuando ~ '')'' if a.tendido_cuando in [''mañana'',''por la mañana''] else '''' }}{% elif is_state(''switch.grillplats_lavadora'',''on'') %}Enchufe encendido · gira el mando y elige programa{% else %}Sin corriente · pulsa el botón del enchufe (mando en off){% endif %}'
+          - type: tile
+            entity: switch.lavadora
+            name: Lavadora (protegida)
+            vertical: false
+            features_position: bottom
+            grid_options:
+              columns: 12
+          - type: heading
+            heading: Último lavado
+            icon: mdi:history
+            heading_style: title
+          - type: tile
+            entity: sensor.grillplats_lavadora_power
+            name: Potencia
+            grid_options:
+              columns: 6
+          - type: tile
+            entity: sensor.grillplats_lavadora_active_current
+            name: Corriente
+            grid_options:
+              columns: 6
+          - type: custom:mushroom-template-card
+            entity: sensor.lavadora_estado
+            icon: mdi:clock-outline
+            primary: '{% set a = states.sensor.lavadora_estado.attributes %}{{ as_local(as_datetime(a.ultimo_inicio)).strftime(''%H:%M'') if a.ultimo_inicio else ''—'' }} → {{ as_local(as_datetime(a.ultimo_fin)).strftime(''%H:%M'') if a.ultimo_fin else ''—'' }}'
+            secondary: '{% set a = states.sensor.lavadora_estado.attributes %}{{ as_local(as_datetime(a.ultimo_fin)).strftime(''%d/%m/%Y'') if a.ultimo_fin else ''Sin datos'' }}'
+            color: blue
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 6
+            multiline_secondary: true
+          - type: custom:mushroom-template-card
+            entity: sensor.lavadora_estado
+            icon: mdi:lightning-bolt
+            primary: '{% set a = states.sensor.lavadora_estado.attributes %}{{ ''%.2f'' | format(a.ultimo_kwh) ~ '' kWh'' if a.ultimo_kwh is number else ''—'' }}'
+            secondary: Energía del lavado
+            color: amber
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 6
+            multiline_secondary: true
+          - type: tile
+            entity: counter.lavadora_lavados_mes
+            name: Lavados este mes
+            grid_options:
+              columns: 12
+          - type: custom:mushroom-template-card
+            entity: sensor.lavadora_estado
+            icon: '{% set a = states.sensor.lavadora_estado.attributes %}{{ {''fuera'':''mdi:hanger'',''secadora'':''mdi:tumble-dryer''}.get(a.destino, ''mdi:help-circle-outline'') }}'
+            primary: '{% set a = states.sensor.lavadora_estado.attributes %}{{ {''fuera'':''Tender fuera'',''secadora'':''Secadora'',''desconocido'':''Sin previsión''}.get(a.destino, ''—'') }}'
+            secondary: '{% set a = states.sensor.lavadora_estado.attributes %}{{ ''Lluvia máx. '' ~ a.prob_lluvia ~ '' %'' if a.prob_lluvia is not none else ''Previsión AEMET'' }}{{ '' · '' ~ a.tendido_cuando if a.tendido_cuando else '''' }}'
+            color: '{% set a = states.sensor.lavadora_estado.attributes %}{{ ''green'' if a.destino == ''fuera'' else (''orange'' if a.destino == ''secadora'' else ''grey'') }}'
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 6
+            multiline_secondary: true
+          - type: custom:mushroom-template-card
+            entity: sensor.lavadora_estado
+            icon: mdi:timer-outline
+            primary: '{% set a = states.sensor.lavadora_estado.attributes %}{{ a.ultimo_duracion_min ~ '' min'' if a.ultimo_duracion_min else ''—'' }}'
+            secondary: '{% set a = states.sensor.lavadora_estado.attributes %}Duración · típica {{ a.duracion_estimada }} min'
+            color: purple
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 6
+            multiline_secondary: true
+      - type: grid
+        cards:
+          - show_state: false
+            show_name: true
+            camera_view: auto
+            fit_mode: cover
+            type: picture-entity
+            entity: sensor.lavadora_estado
+            name: LogBook Lavadora
+            image:
+              media_content_id: /local/lavadora_i1.jpg
+            aspect_ratio: '3'
+            tap_action:
+              action: none
+            hold_action:
+              action: none
+            grid_options:
+              columns: 12
+          - type: heading
+            heading: Registro
+            icon: mdi:format-list-bulleted
+            heading_style: title
+          - type: logbook
             entities:
-              - entity: sensor.humedad_plant_monitor_pm01
-            font_size: 50
-            line_width: 3
-            show:
-              icon: true
-              labels: true
-              state: true
-            name: Humedad
-            type: custom:mini-graph-card
-          - color_thresholds:
-              - color: purple
-                value: 46
-              - color: magenta
-                value: 44
-              - color: red
-                value: 42
-              - color: vermillion
-                value: 40
-              - color: orange
-                value: 38
-              - color: amber
-                value: 35
-              - color: yellow
-                value: 30
-              - color: chartreuse
-                value: 25
-              - color: green
-                value: 20
-              - color: teal
-                value: 15
-              - color: blue
-                value: 10
-              - color: violet
-                value: 5
-              - color: black
-                value: 0
+              - sensor.lavadora_estado
+              - switch.grillplats_lavadora
+            hours_to_show: 168
+            grid_options:
+              columns: 12
+      - type: grid
+        cards:
+          - type: picture-entity
+            entity: sensor.lavadora_estado
+            name: Consumo
+            image:
+              media_content_id: /local/lavadora_i2.jpg
+            show_state: false
+            show_name: true
+            camera_view: auto
+            fit_mode: cover
+            aspect_ratio: '3'
+            tap_action:
+              action: none
+            hold_action:
+              action: none
+            grid_options:
+              columns: 12
+          - type: heading
+            heading: Consumo
+            icon: mdi:lightning-bolt
+            heading_style: title
+          - type: statistic
+            entity: sensor.grillplats_lavadora_energy
+            name: Hoy
+            stat_type: change
+            period:
+              calendar:
+                period: day
+            grid_options:
+              columns: 6
+          - type: statistic
+            entity: sensor.grillplats_lavadora_energy
+            name: Este mes
+            stat_type: change
+            period:
+              calendar:
+                period: month
+            grid_options:
+              columns: 6
+          - type: statistics-graph
+            title: Energía diaria (14 días)
             entities:
-              - entity: sensor.temperatura_plant_monitor_pm01
-            font_size: 50
-            name: Temperatura
-            line_width: 3
-            points_per_hour: 4
-            show:
-              icon: true
-              labels: true
-              state: true
-            type: custom:mini-graph-card
-          - cards:
-              - entities:
-                  - entity: sensor.fertilidad_plant_monitor_pm01
-                font_size: 50
-                line_color: blue
-                line_width: 6
-                name: Fertilidad
-                type: custom:mini-graph-card
-              - entities:
-                  - entity: sensor.luminosidad_plant_monitor_pm01
-                font_size: 50
-                line_color: green
-                line_width: 6
-                name: Luminosidad
-                type: custom:mini-graph-card
-            type: horizontal-stack
-        type: vertical-stack
-      - cards:
-          - entity: plant.mp_02
-            name: Juniperus Proc. Nana
-            type: plant-status
-          - color_thresholds:
-              - color: magenta
-                value: 0
-              - color: red
-                value: 10
-              - color: yellow
-                value: 20
-              - color: green
-                value: 30
-              - color: teal
-                value: 40
-              - color: blue
-                value: 50
-              - color: violet
-                value: 90
+              - sensor.grillplats_lavadora_energy
+            chart_type: bar
+            period: day
+            days_to_show: 14
+            stat_types:
+              - change
+            hide_legend: true
+            grid_options:
+              columns: 12
+              rows: 3
+          - type: statistics-graph
+            title: Energía mensual
             entities:
-              - entity: sensor.humedad_plant_monitor_pm02
-            font_size: 50
-            line_width: 3
-            show:
-              icon: true
-              labels: true
-              state: true
-            name: Humedad
-            type: custom:mini-graph-card
-          - color_thresholds:
-              - color: purple
-                value: 46
-              - color: magenta
-                value: 44
-              - color: red
-                value: 42
-              - color: vermillion
-                value: 40
-              - color: orange
-                value: 38
-              - color: amber
-                value: 35
-              - color: yellow
-                value: 30
-              - color: chartreuse
-                value: 25
-              - color: green
-                value: 20
-              - color: teal
-                value: 15
-              - color: blue
-                value: 10
-              - color: violet
-                value: 5
-              - color: black
-                value: 0
-            entities:
-              - entity: sensor.temperatura_plant_monitor_pm02
-            font_size: 50
-            line_width: 3
-            points_per_hour: 4
-            name: Temperatura
-            show:
-              icon: true
-              labels: true
-              state: true
-            type: custom:mini-graph-card
-          - cards:
-              - entities:
-                  - entity: sensor.fertilidad_plant_monitor_pm02
-                font_size: 50
-                line_color: blue
-                line_width: 6
-                name: Fertilidad
-                type: custom:mini-graph-card
-              - entities:
-                  - entity: sensor.luminosidad_plant_monitor_pm02
-                font_size: 50
-                line_color: green
-                line_width: 6
-                name: Luminosidad
-                type: custom:mini-graph-card
-            type: horizontal-stack
-        type: vertical-stack
-      - cards:
-          - entity: plant.mp_03
-            name: Buganvilla
-            type: plant-status
-          - color_thresholds:
-              - color: magenta
-                value: 0
-              - color: red
-                value: 10
-              - color: yellow
-                value: 20
-              - color: green
-                value: 30
-              - color: teal
-                value: 40
-              - color: blue
-                value: 50
-              - color: violet
-                value: 90
-            entities:
-              - entity: sensor.humedad_plant_monitor_pm03
-            font_size: 50
-            line_width: 3
-            name: Humedad
-            show:
-              icon: true
-              labels: true
-              state: true
-            type: custom:mini-graph-card
-          - color_thresholds:
-              - color: purple
-                value: 46
-              - color: magenta
-                value: 44
-              - color: red
-                value: 42
-              - color: vermillion
-                value: 40
-              - color: orange
-                value: 38
-              - color: amber
-                value: 35
-              - color: yellow
-                value: 30
-              - color: chartreuse
-                value: 25
-              - color: green
-                value: 20
-              - color: teal
-                value: 15
-              - color: blue
-                value: 10
-              - color: violet
-                value: 5
-              - color: black
-                value: 0
-            entities:
-              - entity: sensor.temperatura_plant_monitor_pm03
-            font_size: 50
-            line_width: 3
-            points_per_hour: 4
-            name: Temperatura
-            show:
-              icon: true
-              labels: true
-              state: true
-            type: custom:mini-graph-card
-          - cards:
-              - entities:
-                  - entity: sensor.fertilidad_plant_monitor_pm03
-                font_size: 50
-                line_color: blue
-                line_width: 6
-                name: Fertilidad
-                type: custom:mini-graph-card
-              - entities:
-                  - entity: sensor.luminosidad_plant_monitor_pm03
-                font_size: 50
-                line_color: green
-                line_width: 6
-                name: Luminosidad
-                type: custom:mini-graph-card
-            type: horizontal-stack
-        type: vertical-stack
+              - sensor.grillplats_lavadora_energy
+            chart_type: bar
+            period: month
+            days_to_show: 365
+            stat_types:
+              - change
+            hide_legend: true
+            grid_options:
+              columns: 12
+              rows: 3
+      - type: grid
+        cards:
+          - type: picture-entity
+            entity: sensor.lavadora_estado
+            name: Tendido
+            image:
+              media_content_id: /local/lavadora_i3.jpg
+            show_state: false
+            show_name: true
+            camera_view: auto
+            fit_mode: cover
+            aspect_ratio: '3'
+            tap_action:
+              action: none
+            hold_action:
+              action: none
+            grid_options:
+              columns: 12
+          - type: heading
+            heading: Tiempo para tender
+            icon: mdi:weather-partly-cloudy
+            heading_style: title
+          - type: custom:mushroom-template-card
+            entity: sun.sun
+            icon: mdi:weather-sunset
+            color: orange
+            primary: Puesta de sol {{ as_local(as_datetime(state_attr('sun.sun','next_setting'))).strftime('%H:%M') }}
+            secondary: Salida {{ as_local(as_datetime(state_attr('sun.sun','next_rising'))).strftime('%H:%M') }} · secadora si lluvia > 50 %
+            grid_options:
+              columns: 12
+          - type: weather-forecast
+            entity: weather.aemet
+            forecast_type: hourly
+            show_current: true
+            show_forecast: true
+            grid_options:
+              columns: 12
+          - type: heading
+            heading: Técnico
+            icon: mdi:cog
+            heading_style: title
+          - type: tile
+            entity: switch.grillplats_lavadora
+            name: Enchufe (real)
+            grid_options:
+              columns: 6
+          - type: tile
+            entity: sensor.grillplats_lavadora_voltage
+            name: Tensión
+            grid_options:
+              columns: 6
+          - type: tile
+            entity: automation.lavadora_fin_de_lavado_cortar_y_avisar
+            name: Fin de lavado
+            grid_options:
+              columns: 6
+          - type: tile
+            entity: automation.lavadora_no_cortar_durante_un_lavado
+            name: Protección
+            grid_options:
+              columns: 6
   - badges: []
     cards:
       - aspect_ratio: 75%
@@ -5738,114 +5750,15 @@ views:
         type: vertical-stack
   - badges: []
     cards:
-      - cards:
-          - show_state: true
-            show_name: true
-            camera_view: auto
-            type: picture-entity
-            name: Lavadora
-            image: /local/Lavadora_Banner_s1_1200x600.jpg
-            aspect_ratio: '4'
-            entity: binary_sensor.esphome_pow_sw2_lavadora_lavando
-            hold_action:
-              action: call-service
-              service: switch.turn_off
-              service_data:
-                entity_id: switch.esphome_pow_sw2
-            tap_action:
-              action: call-service
-              service: switch.turn_on
-              service_data:
-                entity_id: switch.esphome_pow_sw2
-          - entities:
-              - entity: automation.s16c_sonoff_pow_lavadora_warning
-              - entity: switch.esphome_pow_sw2
-                secondary_info: last-changed
-              - entity: binary_sensor.esphome_pow_sw2_blue_led
-                icon: mdi:lightbulb-on
-                name: LED Lavado Activo
-                secondary_info: last-changed
-              - entity: binary_sensor.esphome_pow_sw2_lavadora_lavando
-                name: Lavado en Marcha (A>0.5)
-                secondary_info: last-changed
-              - entity: binary_sensor.esphome_pow_sw2_lavadora_warning
-                name: Warning Aviso Lavadora (A<0.5)
-                secondary_info: last-changed
-              - entity: sensor.lavadora_inicio_lavado
-                name: Hora Inicio Lavado
-                secondary_info: last-changed
-              - entity: sensor.lavadora_fin_lavado
-                name: Hora Final Lavado
-                secondary_info: last-changed
-              - entity: sensor.lavadora_duracion_lavado
-                name: Duración Lavado
-                secondary_info: last-changed
-            show_header_toggle: false
-            state_color: true
-            type: entities
-        type: vertical-stack
-      - cards:
-          - type: horizontal-stack
-            cards:
-              - type: gauge
-                entity: sensor.esphome_pow_sw2_voltage
-                name: Voltage
-                unit: V
-                needle: false
-              - type: gauge
-                entity: sensor.esphome_pow_sw2_current
-                name: Amperios
-                unit: A
-                needle: true
-                severity:
-                  green: 0
-                  yellow: 8
-                  red: 10
-                min: 0
-                max: 12
-              - type: gauge
-                entity: sensor.esphome_pow_sw2_power
-                name: Watios
-                unit: W
-                severity:
-                  green: 1000
-                  yellow: 1500
-                  red: 1800
-                min: 0
-                max: 2000
-                needle: true
-          - cards:
-              - entities:
-                  - sensor.esphome_pow_sw2_current
-                font_size: 50
-                line_color: blue
-                line_width: 6
-                type: custom:mini-graph-card
-              - entities:
-                  - sensor.esphome_pow_sw2_power
-                font_size: 50
-                line_color: green
-                line_width: 6
-                type: custom:mini-graph-card
-            type: horizontal-stack
-          - type: custom:mushroom-entity-card
-            fill_container: true
-            layout: vertical
-            entity: switch.esphome_pow_sw2
-            name: Lavadora
-            secondary_info: last-changed
-            tap_action:
-              action: toggle
-            icon: mdi:washing-machine
-          - type: custom:mushroom-entity-card
-            fill_container: true
-            layout: vertical
-            icon_color: indigo
-            name: Humedad Lavadero
-            secondary_info: last-changed
-            icon: ''
-            entity: binary_sensor.ikea_badring_humedad_fregadero
-        type: vertical-stack
+      - type: custom:mushroom-template-card
+        entity: sensor.lavadora_estado
+        icon: '{{ state_attr(''sensor.lavadora_estado'',''icon'') }}'
+        color: '{{ {''lavando'':''blue'',''terminada'':''green''}.get(states(''sensor.lavadora_estado''), ''grey'') }}'
+        primary: Lavadora
+        secondary: '{{ {''lavando'':''Lavando'',''terminada'':''Terminada'',''apagada'':''Apagada''}.get(states(''sensor.lavadora_estado'')) }} · ver panel'
+        tap_action:
+          action: navigate
+          navigation_path: /lovelace/lavadora
       - cards:
           - color_thresholds:
               - color: black
@@ -6159,6 +6072,264 @@ views:
         type: vertical-stack
     icon: mdi:help-circle
     title: Ayuda
+  - theme: Backend-selected
+    icon: mdi:leaf
+    path: bonsais_view
+    title: Bonsais
+    badges: []
+    cards:
+      - cards:
+          - entity: plant.mp_01
+            type: plant-status
+            name: Ficus Tigerbark
+          - color_thresholds:
+              - color: magenta
+                value: 0
+              - color: red
+                value: 10
+              - color: yellow
+                value: 20
+              - color: green
+                value: 30
+              - color: teal
+                value: 40
+              - color: blue
+                value: 50
+              - color: violet
+                value: 90
+            entities:
+              - entity: sensor.humedad_plant_monitor_pm01
+            font_size: 50
+            line_width: 3
+            show:
+              icon: true
+              labels: true
+              state: true
+            name: Humedad
+            type: custom:mini-graph-card
+          - color_thresholds:
+              - color: purple
+                value: 46
+              - color: magenta
+                value: 44
+              - color: red
+                value: 42
+              - color: vermillion
+                value: 40
+              - color: orange
+                value: 38
+              - color: amber
+                value: 35
+              - color: yellow
+                value: 30
+              - color: chartreuse
+                value: 25
+              - color: green
+                value: 20
+              - color: teal
+                value: 15
+              - color: blue
+                value: 10
+              - color: violet
+                value: 5
+              - color: black
+                value: 0
+            entities:
+              - entity: sensor.temperatura_plant_monitor_pm01
+            font_size: 50
+            name: Temperatura
+            line_width: 3
+            points_per_hour: 4
+            show:
+              icon: true
+              labels: true
+              state: true
+            type: custom:mini-graph-card
+          - cards:
+              - entities:
+                  - entity: sensor.fertilidad_plant_monitor_pm01
+                font_size: 50
+                line_color: blue
+                line_width: 6
+                name: Fertilidad
+                type: custom:mini-graph-card
+              - entities:
+                  - entity: sensor.luminosidad_plant_monitor_pm01
+                font_size: 50
+                line_color: green
+                line_width: 6
+                name: Luminosidad
+                type: custom:mini-graph-card
+            type: horizontal-stack
+        type: vertical-stack
+      - cards:
+          - entity: plant.mp_02
+            name: Juniperus Proc. Nana
+            type: plant-status
+          - color_thresholds:
+              - color: magenta
+                value: 0
+              - color: red
+                value: 10
+              - color: yellow
+                value: 20
+              - color: green
+                value: 30
+              - color: teal
+                value: 40
+              - color: blue
+                value: 50
+              - color: violet
+                value: 90
+            entities:
+              - entity: sensor.humedad_plant_monitor_pm02
+            font_size: 50
+            line_width: 3
+            show:
+              icon: true
+              labels: true
+              state: true
+            name: Humedad
+            type: custom:mini-graph-card
+          - color_thresholds:
+              - color: purple
+                value: 46
+              - color: magenta
+                value: 44
+              - color: red
+                value: 42
+              - color: vermillion
+                value: 40
+              - color: orange
+                value: 38
+              - color: amber
+                value: 35
+              - color: yellow
+                value: 30
+              - color: chartreuse
+                value: 25
+              - color: green
+                value: 20
+              - color: teal
+                value: 15
+              - color: blue
+                value: 10
+              - color: violet
+                value: 5
+              - color: black
+                value: 0
+            entities:
+              - entity: sensor.temperatura_plant_monitor_pm02
+            font_size: 50
+            line_width: 3
+            points_per_hour: 4
+            name: Temperatura
+            show:
+              icon: true
+              labels: true
+              state: true
+            type: custom:mini-graph-card
+          - cards:
+              - entities:
+                  - entity: sensor.fertilidad_plant_monitor_pm02
+                font_size: 50
+                line_color: blue
+                line_width: 6
+                name: Fertilidad
+                type: custom:mini-graph-card
+              - entities:
+                  - entity: sensor.luminosidad_plant_monitor_pm02
+                font_size: 50
+                line_color: green
+                line_width: 6
+                name: Luminosidad
+                type: custom:mini-graph-card
+            type: horizontal-stack
+        type: vertical-stack
+      - cards:
+          - entity: plant.mp_03
+            name: Buganvilla
+            type: plant-status
+          - color_thresholds:
+              - color: magenta
+                value: 0
+              - color: red
+                value: 10
+              - color: yellow
+                value: 20
+              - color: green
+                value: 30
+              - color: teal
+                value: 40
+              - color: blue
+                value: 50
+              - color: violet
+                value: 90
+            entities:
+              - entity: sensor.humedad_plant_monitor_pm03
+            font_size: 50
+            line_width: 3
+            name: Humedad
+            show:
+              icon: true
+              labels: true
+              state: true
+            type: custom:mini-graph-card
+          - color_thresholds:
+              - color: purple
+                value: 46
+              - color: magenta
+                value: 44
+              - color: red
+                value: 42
+              - color: vermillion
+                value: 40
+              - color: orange
+                value: 38
+              - color: amber
+                value: 35
+              - color: yellow
+                value: 30
+              - color: chartreuse
+                value: 25
+              - color: green
+                value: 20
+              - color: teal
+                value: 15
+              - color: blue
+                value: 10
+              - color: violet
+                value: 5
+              - color: black
+                value: 0
+            entities:
+              - entity: sensor.temperatura_plant_monitor_pm03
+            font_size: 50
+            line_width: 3
+            points_per_hour: 4
+            name: Temperatura
+            show:
+              icon: true
+              labels: true
+              state: true
+            type: custom:mini-graph-card
+          - cards:
+              - entities:
+                  - entity: sensor.fertilidad_plant_monitor_pm03
+                font_size: 50
+                line_color: blue
+                line_width: 6
+                name: Fertilidad
+                type: custom:mini-graph-card
+              - entities:
+                  - entity: sensor.luminosidad_plant_monitor_pm03
+                font_size: 50
+                line_color: green
+                line_width: 6
+                name: Luminosidad
+                type: custom:mini-graph-card
+            type: horizontal-stack
+        type: vertical-stack
   - icon: mdi:cog
     path: config_view
     title: Configuración

@@ -1,0 +1,280 @@
+###############################################################################
+#  LAVADORA BOSCH · Apagado automático al terminar y aviso de tendido (2026-10-12)
+#
+#  Enchufe Matter IKEA GRILLPLATS en el lavadero (área Cocina), encima de la lavadora.
+#  La Bosch pita al terminar hasta que se gira el mando; HA corta el enchufe ~90 s
+#  después del fin. NUNCA se re-enciende solo: al volver la corriente con el mando
+#  en un programa la Bosch vuelve a pitar. Re-encendido: botón físico del enchufe
+#  o "Alexa, enciende la lavadora" (con el mando en off).
+#
+#  Entidades del enchufe (renombradas de grillplats_plug_* a grillplats_lavadora_*):
+#    switch.grillplats_lavadora · sensor.grillplats_lavadora_power · _energy · _active_current …
+#  switch.lavadora     → interruptor protegido expuesto a Alexa: no apaga durante un lavado.
+#  sensor.lavadora_estado → apagada | lavando | terminada (+ atributos del lavado).
+#
+#  Detección (análisis del 11/12-10): calentamiento ~2,2 kW, lavado/aclarado a
+#  impulsos 170-300 W con pausas < 8 W de 29 s como máximo; terminado = 1,9-2,7 W
+#  (pitido); 0 W = mando girado.
+#    lavando:   > 20 W durante 30 s
+#    terminada: tras >= 20 min lavando, < 5 W durante 90 s
+#  Tendido: previsión horaria AEMET; ventana desde el fin hasta la puesta de sol
+#  (si ya es de noche: de la salida a la puesta de mañana). Secadora si alguna
+#  hora > 50 % de probabilidad de lluvia.
+#  Spec y backlog de mejoras: doc del proyecto claude/lavadora-bosch-2026-10-12.md
+###############################################################################
+
+# counter.lavadora_lavados_mes: helper de UI (counter.reload no disponible → evita reinicio)
+
+template:
+  # ---------------------------------------------------------------------------
+  # ESTADO DEL LAVADO (trigger-based: se restaura tras reinicio)
+  # ---------------------------------------------------------------------------
+  - triggers:
+      - trigger: numeric_state
+        entity_id: sensor.grillplats_lavadora_power
+        above: 20
+        for: "00:00:30"
+        id: inicio
+      - trigger: numeric_state
+        entity_id: sensor.grillplats_lavadora_power
+        below: 5
+        for: "00:01:30"
+        id: fin
+      - trigger: numeric_state
+        entity_id: sensor.grillplats_lavadora_power
+        below: 0.5
+        for: "00:00:30"
+        id: mando_off
+      - trigger: state
+        entity_id: switch.grillplats_lavadora
+        to: "off"
+        for: "00:02:00"
+        id: enchufe_off
+      - trigger: state
+        entity_id: switch.grillplats_lavadora
+        from: "off"
+        to: "on"
+        id: enchufe_on
+      # Inicialización tras arranque o recarga de plantillas (deja 'apagada' si no hay estado)
+      - trigger: homeassistant
+        event: start
+        id: init
+      - trigger: event
+        event_type: event_template_reloaded
+        id: init
+    actions:
+      - action: weather.get_forecasts
+        target: {entity_id: weather.aemet}
+        data: {type: hourly}
+        response_variable: prevision
+        continue_on_error: true
+      - variables:
+          ent: sensor.lavadora_estado
+          e: "{{ states(ent) if states(ent) in ['apagada', 'lavando', 'terminada'] else 'apagada' }}"
+          t: "{{ trigger.id }}"
+          ini: "{{ state_attr(ent, 'inicio') }}"
+          seg: "{{ (now() - as_datetime(ini)).total_seconds() if ini else 0 }}"
+          energia: "{{ states('sensor.grillplats_lavadora_energy') | float(0) }}"
+          nuevo: >-
+            {%- if t == 'inicio' -%}lavando
+            {%- elif t == 'fin' and e == 'lavando' and seg >= 1200 -%}terminada
+            {%- elif t == 'mando_off' and e == 'lavando' and is_state('switch.grillplats_lavadora', 'on') -%}apagada
+            {%- elif t == 'enchufe_off' and e == 'lavando' -%}apagada
+            {%- elif t == 'enchufe_on' and e == 'terminada' -%}apagada
+            {%- else -%}{{ e }}{%- endif -%}
+          empieza: "{{ nuevo == 'lavando' and e != 'lavando' }}"
+          termina: "{{ nuevo == 'terminada' and e == 'lavando' }}"
+          # Duraciones (min) de los últimos 5 lavados completos; la estimación usa la mediana
+          dur_prev: "{{ state_attr(ent, 'duraciones') or [63] }}"
+          duraciones: "{{ (dur_prev + [(seg / 60) | round(0) | int])[-5:] if termina else dur_prev }}"
+          dur_est: >-
+            {%- set l = duraciones | sort -%}
+            {{ l[(l | count) // 2] }}
+          # Ventana de tendido: de día, hasta la puesta; de noche, el día siguiente
+          de_dia: "{{ is_state('sun.sun', 'above_horizon') }}"
+          v_ini: "{{ now().timestamp() if de_dia else as_timestamp(state_attr('sun.sun', 'next_rising')) }}"
+          v_fin: "{{ as_timestamp(state_attr('sun.sun', 'next_setting')) }}"
+          probs: >-
+            {%- set f = prevision['weather.aemet'].forecast if prevision is defined and 'weather.aemet' in prevision else [] -%}
+            {%- set ns = namespace(l=[]) -%}
+            {%- for h in f -%}
+              {%- set ts = as_timestamp(h.datetime, 0) -%}
+              {%- if ts + 3600 > v_ini and ts < v_fin -%}
+                {%- set ns.l = ns.l + [h.precipitation_probability | int(0)] -%}
+              {%- endif -%}
+            {%- endfor -%}
+            {{ ns.l }}
+          prob: "{{ probs | max if probs | count > 0 else -1 }}"
+          cuando: >-
+            {%- if de_dia -%}hoy
+            {%- elif as_local(as_datetime(state_attr('sun.sun', 'next_rising'))).date() > now().date() -%}mañana
+            {%- else -%}por la mañana{%- endif -%}
+    sensor:
+      - name: lavadora_estado
+        unique_id: lavadora_estado
+        icon: >-
+          {{ {'lavando': 'mdi:washing-machine', 'terminada': 'mdi:tshirt-crew'}.get(nuevo, 'mdi:washing-machine-off') }}
+        state: "{{ nuevo }}"
+        attributes:
+          # Lavado en curso
+          inicio: "{{ now().isoformat() if empieza else ini }}"
+          kwh_inicio: "{{ energia if empieza else state_attr(ent, 'kwh_inicio') }}"
+          duraciones: "{{ duraciones }}"
+          duracion_estimada: "{{ dur_est }}"
+          fin_estimado: >-
+            {%- set i = now() if empieza else (as_datetime(ini) if ini else none) -%}
+            {{ (i + timedelta(minutes=dur_est | int(63))).isoformat() if i else none }}
+          # Último lavado completo
+          ultimo_inicio: "{{ ini if termina else state_attr(ent, 'ultimo_inicio') }}"
+          ultimo_fin: "{{ now().isoformat() if termina else state_attr(ent, 'ultimo_fin') }}"
+          ultimo_duracion_min: "{{ (seg / 60) | round(0) | int if termina else state_attr(ent, 'ultimo_duracion_min') }}"
+          ultimo_kwh: >-
+            {{ (energia - state_attr(ent, 'kwh_inicio') | float(energia)) | round(3) if termina else state_attr(ent, 'ultimo_kwh') }}
+          destino: >-
+            {%- if termina -%}{{ 'desconocido' if prob < 0 else ('secadora' if prob > 50 else 'fuera') }}
+            {%- else -%}{{ state_attr(ent, 'destino') }}{%- endif -%}
+          prob_lluvia: "{{ (prob if prob >= 0 else none) if termina else state_attr(ent, 'prob_lluvia') }}"
+          tendido_cuando: "{{ cuando if termina else state_attr(ent, 'tendido_cuando') }}"
+
+  # ---------------------------------------------------------------------------
+  # INTERRUPTOR PROTEGIDO (expuesto a Alexa como "Lavadora")
+  # Apagar durante un lavado no corta: responde por el Echo al que se habló.
+  # ---------------------------------------------------------------------------
+  - switch:
+      - name: lavadora
+        unique_id: lavadora_switch_protegido
+        icon: mdi:washing-machine
+        state: "{{ is_state('switch.grillplats_lavadora', 'on') }}"
+        availability: "{{ has_value('switch.grillplats_lavadora') }}"
+        turn_on:
+          - action: switch.turn_on
+            target: {entity_id: switch.grillplats_lavadora}
+        turn_off:
+          - if: "{{ is_state('sensor.lavadora_estado', 'lavando') }}"
+            then:
+              # Alexa Media actualiza last_called unos segundos después de la orden
+              - delay: "00:00:03"
+              - variables:
+                  echo: >-
+                    {%- set ns = namespace(e='entrada', ts=0) -%}
+                    {%- for k in ['entrada', 'estudio', 'dormitorio', 'dormitorio_paf'] -%}
+                      {%- set ts = state_attr('media_player.echo_alexa_' ~ k, 'last_called_timestamp') | int(0) -%}
+                      {%- if ts > ns.ts and now().timestamp() * 1000 - ts < 60000 -%}
+                        {%- set ns.e = k -%}{%- set ns.ts = ts -%}
+                      {%- endif -%}
+                    {%- endfor -%}
+                    {{ ns.e }}
+              - action: script.turn_on
+                target: {entity_id: script.alexa_decir}
+                data:
+                  variables:
+                    echos: ["{{ echo }}"]
+                    tipo: anuncio
+                    mensaje: "La lavadora está lavando, no la apago."
+            else:
+              - action: switch.turn_off
+                target: {entity_id: switch.grillplats_lavadora}
+
+automation:
+  # ---------------------------------------------------------------------------
+  # FIN DEL LAVADO: cortar (para el pitido) y avisar dónde tender
+  # ---------------------------------------------------------------------------
+  - id: lavadora_fin_lavado
+    alias: Lavadora · Fin de lavado (cortar y avisar)
+    description: Corta el enchufe al terminar y avisa por Alexa (8-23 h) e iOS (Agustín y Malen en casa) dónde tender.
+    mode: single
+    triggers:
+      - trigger: state
+        entity_id: sensor.lavadora_estado
+        from: lavando
+        to: terminada
+    actions:
+      - action: counter.increment
+        target: {entity_id: counter.lavadora_lavados_mes}
+      # Mando ya girado (0 W): no pita, no se corta ni se avisa
+      - if: "{{ states('sensor.grillplats_lavadora_power') | float(0) < 0.5 }}"
+        then:
+          - stop: Mando ya girado
+      - action: switch.turn_off
+        target: {entity_id: switch.grillplats_lavadora}
+      - variables:
+          a: sensor.lavadora_estado
+          destino: "{{ state_attr(a, 'destino') }}"
+          cuando: "{{ state_attr(a, 'tendido_cuando') }}"
+          mensaje: >-
+            {%- if destino == 'desconocido' -%}El lavado ha terminado. No tengo la previsión del tiempo.
+            {%- elif cuando == 'hoy' -%}
+              {{ 'El lavado ha terminado, se puede tender la ropa fuera.' if destino == 'fuera'
+                 else 'El lavado ha terminado, mejor usar la secadora: se esperan lluvias.' }}
+            {%- else -%}
+              {%- set c = cuando[0] | upper ~ cuando[1:] -%}
+              {{ 'El lavado ha terminado. ' ~ c ~ (' se podrá tender la ropa fuera.' if destino == 'fuera'
+                 else ' se esperan lluvias, mejor usar la secadora.') }}
+            {%- endif -%}
+          silencio: "{{ now().hour >= 23 or now().hour < 8 }}"
+          destinos: >-
+            {%- set p = {'person.agustin': 'notify.mobile_app_iphone_aac', 'person.malen': 'notify.mobile_app_iphone_malen'} -%}
+            {{ p.items() | selectattr('0', 'is_state', 'home') | map(attribute='1') | list }}
+      - if: "{{ not silencio }}"
+        then:
+          - action: script.turn_on
+            target: {entity_id: script.alexa_decir}
+            data:
+              variables:
+                echos: [entrada]
+                tipo: anuncio
+                mensaje: "{{ mensaje }}"
+      - if: "{{ destinos | count > 0 }}"
+        then:
+          - action: script.notifica
+            data:
+              titulo: Lavadora
+              mensaje: >-
+                {{ mensaje }}{% if state_attr(a, 'prob_lluvia') is not none %} (lluvia máx. {{ state_attr(a, 'prob_lluvia') }} %){% endif %}
+              nivel: info
+              destinos: "{{ destinos }}"
+              telegram: none
+              tag: lavadora
+
+  # ---------------------------------------------------------------------------
+  # PROTECCIÓN: si se corta el enchufe durante un lavado (botón, dashboard), se reactiva
+  # ---------------------------------------------------------------------------
+  - id: lavadora_proteccion_enchufe
+    alias: Lavadora · No cortar durante un lavado
+    description: Si el enchufe se apaga con la lavadora lavando, lo vuelve a encender y lo dice por la entrada.
+    mode: single
+    triggers:
+      - trigger: state
+        entity_id: switch.grillplats_lavadora
+        from: "on"
+        to: "off"
+    conditions:
+      - condition: state
+        entity_id: sensor.lavadora_estado
+        state: lavando
+    actions:
+      - delay: "00:00:02"
+      - action: switch.turn_on
+        target: {entity_id: switch.grillplats_lavadora}
+      - action: script.turn_on
+        target: {entity_id: script.alexa_decir}
+        data:
+          variables:
+            echos: [entrada]
+            tipo: anuncio
+            mensaje: "La lavadora está lavando, he vuelto a encender el enchufe. Para pararla, gira el mando."
+
+  # ---------------------------------------------------------------------------
+  # Contador mensual
+  # ---------------------------------------------------------------------------
+  - id: lavadora_reset_contador_mes
+    alias: Lavadora · Reset contador mensual
+    mode: single
+    triggers:
+      - trigger: time
+        at: "00:00:05"
+    conditions:
+      - "{{ now().day == 1 }}"
+    actions:
+      - action: counter.reset
+        target: {entity_id: counter.lavadora_lavados_mes}

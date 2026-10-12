@@ -169,18 +169,6 @@ binary_sensor.esphome_pow_sw2_voltage:
   friendly_name: 220V Corriente Lavado (V)
   icon: mdi:power-plug
 
-# Binary sensor calculado Cuando Power > 2.5W and Voltage > 200V
-# Sensor Read-Only para mostrar en front-end
-binary_sensor.esphome_pow_sw2_lavadora_lavando:
-  friendly_name: Lavado Activo (W>2.5)
-  icon: mdi:washing-machine
-
-# Binary sensor calculado Cuando Power > 2.5W and Voltage > 200V
-# Sensor Read-Only para mostrar en front-end
-binary_sensor.esphome_pow_sw2_lavadora_warning:
-  friendly_name: Lavado Warning (W<2.5)
-  icon: mdi:washing-machine
-
 #
 # UPS APC
 sensor.ups_status:

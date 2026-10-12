@@ -1329,64 +1329,6 @@ piscina_depuradora_off:
 #      entity_id: switch.esphome_s20_sw1
 
 
-# SONOFF POW R2 - LAVADORA
-#
-#lavadora_switch_off:
-#  alias: Lavadora Switch Off
-#  sequence:
-#    - delay: 00:00:02
-
-#    - service: switch.turn_off
-#      entity_id: switch.esphome_pow_sw2
-#    
-#    - service: script.alexa_secuencia
-#      data_template:
-#        sonido: "{{ states('input_select.alarma_sonido_armado') }}"
-#        repeticion: 1
-#        voz: >
-#          {% if states.sensor.aemet_condition.state | string == 'sunny' 
-#            %}
-#            "Lavado terminado. El tiempo está soleado, se puede tender."
-#          {% elif (states.sensor.aemet_condition.state | string == 'rainy' ) 
-#            %}
-#            "Lavado terminado. Hay previsión de lluvia."
-#          {% elif (states.sensor.aemet_condition.state | string == 'partlycloudy'
-#                or states.sensor.aemet_condition.state | string == 'cloudy')
-#            %}
-#            "Lavado terminado. Está nublado,revisa el tiempo."
-#          {% else  %}
-#            "Lavado terminado. Revisa la previsión del tiempo antes de tender."
-#          {% endif %}
-
-
-    # Si la diferencia de hora ultimo cambio entre Warning y Lavando < 5' => TRUE => CONTINUA
-    #
-    # WARNING:
-    #  2019-05-26 10:21:08.137265+00:00
-    #  1558866068.137265
-    #
-    # LAVANDO:
-    #  2019-05-26 10:20:52.612011+00:00
-    #  1558866052.612011
-    #
-    # DIF:
-    #  15.525254011154175
-    #  TRUE
-
-    # WARNING:
-    # {{ states.binary_sensor.esphome_pow_sw2_lavadora_warning.last_changed }}
-    # {{ as_timestamp(states.binary_sensor.esphome_pow_sw2_lavadora_warning.last_changed) }}
-    #
-    # LAVANDO:
-    # {{ states.binary_sensor.esphome_pow_sw2_lavadora_lavando.last_changed }}
-    # {{ as_timestamp(states.binary_sensor.esphome_pow_sw2_lavadora_lavando.last_changed) }}
-    #
-    # DIF:
-    # {{ as_timestamp(states.binary_sensor.esphome_pow_sw2_lavadora_warning.last_changed) - as_timestamp(states.binary_sensor.esphome_pow_sw2_lavadora_lavando.last_changed) }}
-    #
-    # {{ as_timestamp(states.binary_sensor.esphome_pow_sw2_lavadora_warning.last_changed) - as_timestamp(states.binary_sensor.esphome_pow_sw2_lavadora_lavando.last_changed) < 300 }}
-
-
 #-----------------------------------------------------------------------------#
 #                                                                             #
 # SCRIPTS DE ARRANQUE DEL SISTEMA                                             #

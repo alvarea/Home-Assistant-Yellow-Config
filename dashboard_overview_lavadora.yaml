@@ -1,0 +1,277 @@
+###############################################################################
+#  Vista "Lavadora" del dashboard Overview (/lovelace/lavadora)
+#  Exportado: 2026-10-13 00:40 desde el storage (ajustes de Agustín incluidos).
+#  Package: packages/lavadora.yaml · Doc: claude/lavadora-bosch-2026-10-12.md
+#  Restaurar: Overview → Editar → ⋮ Editor de configuración en bruto → pegar
+#             como un elemento más de "views:" (después de Temperatura).
+###############################################################################
+title: Lavadora
+path: lavadora
+icon: mdi:washing-machine
+type: sections
+max_columns: 4
+sections:
+  - type: grid
+    cards:
+      - type: picture-entity
+        entity: sensor.lavadora_estado
+        name: Lavadora
+        image:
+          media_content_id: /local/lavadora_i0.jpg
+        show_state: false
+        show_name: true
+        camera_view: auto
+        fit_mode: cover
+        aspect_ratio: '3'
+        tap_action:
+          action: none
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Estado
+        icon: mdi:washing-machine
+        heading_style: title
+        badges:
+          - type: entity
+            entity: sensor.lavadora_estado
+            show_state: true
+            show_icon: true
+      - type: custom:mushroom-template-card
+        entity: sensor.lavadora_estado
+        grid_options:
+          columns: 12
+        multiline_secondary: true
+        tap_action:
+          action: more-info
+        icon: '{{ state_attr(''sensor.lavadora_estado'',''icon'') }}'
+        color: '{% set e = states(''sensor.lavadora_estado'') %}{{ {''lavando'':''blue'',''terminada'':''green''}.get(e, ''amber'' if is_state(''switch.grillplats_lavadora'',''on'') else ''grey'') }}'
+        primary: '{% set a = states.sensor.lavadora_estado.attributes %}{% set e = states(''sensor.lavadora_estado'') %}{% if e == ''lavando'' and a.inicio %}{% set p = ((now() - as_datetime(a.inicio)).total_seconds() / 60 / (a.duracion_estimada | int(63)) * 100) | round(0) | int %}Lavando · {{ [p, 99] | min }} %{% elif e == ''lavando'' %}Lavando{% elif e == ''terminada'' %}Lavado terminado{% elif is_state(''switch.grillplats_lavadora'',''on'') %}Lista para lavar{% else %}Apagada{% endif %}'
+        secondary: '{% set a = states.sensor.lavadora_estado.attributes %}{% set e = states(''sensor.lavadora_estado'') %}{% if e == ''lavando'' and a.inicio and a.fin_estimado %}{% set f = as_datetime(a.fin_estimado) %}Desde las {{ as_local(as_datetime(a.inicio)).strftime(''%H:%M'') }} · fin ≈ {{ as_local(f).strftime(''%H:%M'') }} (quedan {{ [((f - now()).total_seconds() / 60) | round(0) | int, 0] | max }} min){% elif e == ''terminada'' and a.ultimo_fin %}Terminó a las {{ as_local(as_datetime(a.ultimo_fin)).strftime(''%H:%M'') }} · {{ {''fuera'':''tender fuera'',''secadora'':''usar la secadora'',''desconocido'':''sin previsión''}.get(a.destino, '''') }}{{ '' ('' ~ a.tendido_cuando ~ '')'' if a.tendido_cuando in [''mañana'',''por la mañana''] else '''' }}{% elif is_state(''switch.grillplats_lavadora'',''on'') %}Enchufe encendido · gira el mando y elige programa{% else %}Sin corriente · pulsa el botón del enchufe (mando en off){% endif %}'
+      - type: tile
+        entity: switch.lavadora
+        name: Lavadora (protegida)
+        vertical: false
+        features_position: bottom
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Último lavado
+        icon: mdi:history
+        heading_style: title
+      - type: tile
+        entity: sensor.grillplats_lavadora_power
+        name: Potencia
+        grid_options:
+          columns: 6
+      - type: tile
+        entity: sensor.grillplats_lavadora_active_current
+        name: Corriente
+        grid_options:
+          columns: 6
+      - type: custom:mushroom-template-card
+        entity: sensor.lavadora_estado
+        icon: mdi:clock-outline
+        primary: '{% set a = states.sensor.lavadora_estado.attributes %}{{ as_local(as_datetime(a.ultimo_inicio)).strftime(''%H:%M'') if a.ultimo_inicio else ''—'' }} → {{ as_local(as_datetime(a.ultimo_fin)).strftime(''%H:%M'') if a.ultimo_fin else ''—'' }}'
+        secondary: '{% set a = states.sensor.lavadora_estado.attributes %}{{ as_local(as_datetime(a.ultimo_fin)).strftime(''%d/%m/%Y'') if a.ultimo_fin else ''Sin datos'' }}'
+        color: blue
+        tap_action:
+          action: more-info
+        grid_options:
+          columns: 6
+        multiline_secondary: true
+      - type: custom:mushroom-template-card
+        entity: sensor.lavadora_estado
+        icon: mdi:lightning-bolt
+        primary: '{% set a = states.sensor.lavadora_estado.attributes %}{{ ''%.2f'' | format(a.ultimo_kwh) ~ '' kWh'' if a.ultimo_kwh is number else ''—'' }}'
+        secondary: Energía del lavado
+        color: amber
+        tap_action:
+          action: more-info
+        grid_options:
+          columns: 6
+        multiline_secondary: true
+      - type: tile
+        entity: counter.lavadora_lavados_mes
+        name: Lavados este mes
+        grid_options:
+          columns: 12
+      - type: custom:mushroom-template-card
+        entity: sensor.lavadora_estado
+        icon: '{% set a = states.sensor.lavadora_estado.attributes %}{{ {''fuera'':''mdi:hanger'',''secadora'':''mdi:tumble-dryer''}.get(a.destino, ''mdi:help-circle-outline'') }}'
+        primary: '{% set a = states.sensor.lavadora_estado.attributes %}{{ {''fuera'':''Tender fuera'',''secadora'':''Secadora'',''desconocido'':''Sin previsión''}.get(a.destino, ''—'') }}'
+        secondary: '{% set a = states.sensor.lavadora_estado.attributes %}{{ ''Lluvia máx. '' ~ a.prob_lluvia ~ '' %'' if a.prob_lluvia is not none else ''Previsión AEMET'' }}{{ '' · '' ~ a.tendido_cuando if a.tendido_cuando else '''' }}'
+        color: '{% set a = states.sensor.lavadora_estado.attributes %}{{ ''green'' if a.destino == ''fuera'' else (''orange'' if a.destino == ''secadora'' else ''grey'') }}'
+        tap_action:
+          action: more-info
+        grid_options:
+          columns: 6
+        multiline_secondary: true
+      - type: custom:mushroom-template-card
+        entity: sensor.lavadora_estado
+        icon: mdi:timer-outline
+        primary: '{% set a = states.sensor.lavadora_estado.attributes %}{{ a.ultimo_duracion_min ~ '' min'' if a.ultimo_duracion_min else ''—'' }}'
+        secondary: '{% set a = states.sensor.lavadora_estado.attributes %}Duración · típica {{ a.duracion_estimada }} min'
+        color: purple
+        tap_action:
+          action: more-info
+        grid_options:
+          columns: 6
+        multiline_secondary: true
+  - type: grid
+    cards:
+      - show_state: false
+        show_name: true
+        camera_view: auto
+        fit_mode: cover
+        type: picture-entity
+        entity: sensor.lavadora_estado
+        name: LogBook Lavadora
+        image:
+          media_content_id: /local/lavadora_i1.jpg
+        aspect_ratio: '3'
+        tap_action:
+          action: none
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Registro
+        icon: mdi:format-list-bulleted
+        heading_style: title
+      - type: logbook
+        entities:
+          - sensor.lavadora_estado
+          - switch.grillplats_lavadora
+        hours_to_show: 168
+        grid_options:
+          columns: 12
+  - type: grid
+    cards:
+      - type: picture-entity
+        entity: sensor.lavadora_estado
+        name: Consumo
+        image:
+          media_content_id: /local/lavadora_i2.jpg
+        show_state: false
+        show_name: true
+        camera_view: auto
+        fit_mode: cover
+        aspect_ratio: '3'
+        tap_action:
+          action: none
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Consumo
+        icon: mdi:lightning-bolt
+        heading_style: title
+      - type: statistic
+        entity: sensor.grillplats_lavadora_energy
+        name: Hoy
+        stat_type: change
+        period:
+          calendar:
+            period: day
+        grid_options:
+          columns: 6
+      - type: statistic
+        entity: sensor.grillplats_lavadora_energy
+        name: Este mes
+        stat_type: change
+        period:
+          calendar:
+            period: month
+        grid_options:
+          columns: 6
+      - type: statistics-graph
+        title: Energía diaria (14 días)
+        entities:
+          - sensor.grillplats_lavadora_energy
+        chart_type: bar
+        period: day
+        days_to_show: 14
+        stat_types:
+          - change
+        hide_legend: true
+        grid_options:
+          columns: 12
+          rows: 3
+      - type: statistics-graph
+        title: Energía mensual
+        entities:
+          - sensor.grillplats_lavadora_energy
+        chart_type: bar
+        period: month
+        days_to_show: 365
+        stat_types:
+          - change
+        hide_legend: true
+        grid_options:
+          columns: 12
+          rows: 3
+  - type: grid
+    cards:
+      - type: picture-entity
+        entity: sensor.lavadora_estado
+        name: Tendido
+        image:
+          media_content_id: /local/lavadora_i3.jpg
+        show_state: false
+        show_name: true
+        camera_view: auto
+        fit_mode: cover
+        aspect_ratio: '3'
+        tap_action:
+          action: none
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Tiempo para tender
+        icon: mdi:weather-partly-cloudy
+        heading_style: title
+      - type: custom:mushroom-template-card
+        entity: sun.sun
+        icon: mdi:weather-sunset
+        color: orange
+        primary: Puesta de sol {{ as_local(as_datetime(state_attr('sun.sun','next_setting'))).strftime('%H:%M') }}
+        secondary: Salida {{ as_local(as_datetime(state_attr('sun.sun','next_rising'))).strftime('%H:%M') }} · secadora si lluvia > 50 %
+        grid_options:
+          columns: 12
+      - type: weather-forecast
+        entity: weather.aemet
+        forecast_type: hourly
+        show_current: true
+        show_forecast: true
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Técnico
+        icon: mdi:cog
+        heading_style: title
+      - type: tile
+        entity: switch.grillplats_lavadora
+        name: Enchufe (real)
+        grid_options:
+          columns: 6
+      - type: tile
+        entity: sensor.grillplats_lavadora_voltage
+        name: Tensión
+        grid_options:
+          columns: 6
+      - type: tile
+        entity: automation.lavadora_fin_de_lavado_cortar_y_avisar
+        name: Fin de lavado
+        grid_options:
+          columns: 6
+      - type: tile
+        entity: automation.lavadora_no_cortar_durante_un_lavado
+        name: Protección
+        grid_options:
+          columns: 6
