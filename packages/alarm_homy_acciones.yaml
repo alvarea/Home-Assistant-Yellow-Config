@@ -123,10 +123,12 @@ script:
           estado: "{{ states('input_select.alarm_homy_estado') }}"
           lista: "{{ is_state('binary_sensor.alarm_homy_lista_para_armar', 'on') }}"
           cfg: >-
-            {% set m = {'arming': ['white', 128], 'armed_away': ['orange', 96], 'armed_vacation': ['orange', 96],
-                        'armed_home': ['purple', 96], 'armed_night': ['blue', 96],
+            {#- 2026-10-13: brillo uniforme 128; amarillo "no lista" a 255 para que no se confunda con el verde;
+                rojo de entrada/disparo a 255 (alerta) -#}
+            {% set m = {'arming': ['white', 128], 'armed_away': ['orange', 128], 'armed_vacation': ['orange', 128],
+                        'armed_home': ['purple', 128], 'armed_night': ['blue', 128],
                         'pending': ['red', 255], 'triggered': ['red', 255]} %}
-            {{ m.get(estado, ['green' if lista else 'yellow', 64]) }}
+            {{ m.get(estado, ['green', 128] if lista else ['yellow', 255]) }}
       - action: light.turn_on
         target: {entity_id: light.tagreader_led}
         data:
