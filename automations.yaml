@@ -263,41 +263,6 @@
         telegram: alarm
         persistente: true
 #
-# ALARMA AUTOMATICA SENSOR PUERTA FRIGORIFICO COCINA ABIERTA
-#
-- id: X3_alarma_frigo_cocina_abierto
-  alias: 'X3 Alarma Frigorifico Cocina Abierto'
-  triggers:
-    - trigger: state
-      entity_id: binary_sensor.ikea_sensor_frigo_cocina
-      from: 'off'
-      to: 'on'
-      for: '00:03:00'
-  actions:
-    # Micro Aviso Sirena Interior
-    - action: script.sirena_alarma_micro_aviso
-
-    # Voz + sonido en el Echo de la entrada (2026-10-12: script.alexa_decir, volumen de anuncio)
-    - action: script.turn_on        # sin esperar: el aviso iOS sale a la vez
-      target: {entity_id: script.alexa_decir}
-      data:
-        variables:
-          echos: [entrada]
-          mensaje: 'ATENCION. frigorífico cocina abierto más de 3 minutos'
-          sonido: "{{ states('input_select.alarma_sonido_disparado') }}"
-          repeticiones: 1
-          tipo: anuncio
-
-    # Aviso (2026-10-12: script.notifica; corrige el antiguo data.variables que llegaba vacío)
-    - action: script.notifica
-      data:
-        titulo: '*ATENCION ALARMA FRIGORIFICO COCINA*'
-        mensaje: '>>> URGENTE: FRIGORIFICO COCINA ABIERTO'
-        nivel: aviso
-        destinos: presentes
-        telegram: notif
-        persistente: true
-#
 # ALARMA AUTOMATICA SENSOR PUERTA FRIGORIFICO BEBIDAS ABIERTA
 #
 - id: X4_alarma_frigorifico_bebidas_abierto
@@ -2929,7 +2894,7 @@
     # Salon
     - action: light.toggle
       target:
-        entity_id: light.salon
+        entity_id: light.luces_salon
 
 - id: I02
   alias: 'IOS Action Luz Estudio'
@@ -2943,7 +2908,7 @@
     # Estudio
     - action: light.toggle
       target:
-        entity_id: light.luces_estudio
+        entity_id: light.luz_estudio
 
 - id: I03
   alias: 'IOS Action Alarma Off'
@@ -4045,21 +4010,7 @@
               target:
                 entity_id: light.luz_dormitorio_malen
         # ELIF b2_short_press
-        - conditions:
-          - condition: trigger
-            id: b2_short_press
-          sequence:
-            - action: switch.toggle
-              target:
-                entity_id: switch.hue_sw1_cargador
         # ELIF b2_double_press
-        - conditions:
-          - condition: trigger
-            id: b2_double_press
-          sequence:
-            - action: switch.turn_off
-              target:
-                entity_id: switch.hue_sw1_cargador
         # ELIF b1_long_press
         - conditions:
           - condition: trigger
