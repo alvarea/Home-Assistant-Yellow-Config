@@ -7,6 +7,10 @@
       alarm_homy_inmediato     -> dispara sin retardo de entrada
       alarm_homy_armar_abierto -> permite armar abierto (se ignora hasta que cierre)
       alarm_homy_auto_excluir  -> SIN EFECTO desde 2026-10-12: puertas y ventanas abiertas siempre bloquean el armado
+      alarm_homy_excluir_si_activo -> (2026-10-14) movimiento de una zona en uso de noche (estudio):
+                                  al armar NOCHE se excluye si ha visto movimiento en los últimos 10 min y se
+                                  reincorpora sola tras 20 min sin movimiento. Además bloquea el auto armado Noche
+                                  (binary_sensor.alarm_homy_actividad_estudio)
       alarm_homy_unavailable   -> unavailable > 5 min cuenta como disparo SOLO en Ausente/Vacaciones
     Sin comunicación (unavailable/unknown > 2 min) con la alarma armada = AVERÍA:
       aviso (sensor.alarm_homy_averias), nunca impide armar. En Casa/Noche no dispara.
@@ -48,10 +52,31 @@
 {{ ns.l | to_json }}
 {%- endmacro -%}
 
-{#- Abiertos con auto-excluir: se excluyen durante la sesión de armado -#}
-{%- macro excluibles(modo) -%}
-{%- set ex = label_entities('alarm_homy_auto_excluir') -%}
-{{ sensores_modo(modo) | from_json | select('in', ex) | select('is_state', 'on') | list | to_json }}
+{#- EXCLUIBLES al armar (2026-10-14): solo en NOCHE, sensores con etiqueta alarm_homy_excluir_si_activo
+    con movimiento ahora o en los últimos <minutos> (last_changed del paso a off) -#}
+{%- macro excluibles(modo, minutos=10) -%}
+{%- set ns = namespace(l=[]) -%}
+{%- if modo == 'armed_night' -%}
+{%- set ex = label_entities('alarm_homy_excluir_si_activo') -%}
+{%- for e in sensores_modo(modo) | from_json if e in ex and states[e] is not none -%}
+{%- if is_state(e, 'on') or (as_timestamp(now()) - as_timestamp(states[e].last_changed)) < minutos * 60 -%}
+{%- set ns.l = ns.l + [e] -%}
+{%- endif -%}
+{%- endfor -%}
+{%- endif -%}
+{{ ns.l | to_json }}
+{%- endmacro -%}
+
+{#- REINCORPORABLES (2026-10-14): excluidos con etiqueta excluir_si_activo sin movimiento desde hace <minutos> -#}
+{%- macro reincorporables(minutos=20) -%}
+{%- set ns = namespace(l=[]) -%}
+{%- set ex = label_entities('alarm_homy_excluir_si_activo') -%}
+{%- for e in state_attr('sensor.alarm_homy_excluidos', 'entidades') or [] if e in ex and states[e] is not none -%}
+{%- if is_state(e, 'off') and (as_timestamp(now()) - as_timestamp(states[e].last_changed)) >= minutos * 60 -%}
+{%- set ns.l = ns.l + [e] -%}
+{%- endif -%}
+{%- endfor -%}
+{{ ns.l | to_json }}
 {%- endmacro -%}
 
 {#- Sensores que han pasado a on DESPUÉS del último cambio de estado de la alarma.
@@ -156,15 +181,10 @@
 {%- endmacro -%}
 
 
-{#- NOCHE: servicios notify de las personas que han llegado a casa en los últimos <minutos> (sensor.alarm_homy_llegadas).
-    Lista vacía = no se ha localizado a nadie → no se avisa a ningún iPhone (para no despertar a los que duermen) -#}
-{%- macro notify_llegados(minutos=20) -%}
-{%- set m = {'person.agustin': 'notify.mobile_app_iphone_aac', 'person.paloma': 'notify.mobile_app_iphone_paf',
-             'person.agu': 'notify.mobile_app_a2f', 'person.malen': 'notify.mobile_app_iphone_malen'} -%}
-{%- set ll = state_attr('sensor.alarm_homy_llegadas', 'llegadas') or {} -%}
-{%- set ns = namespace(l=[]) -%}
-{%- for p, t in ll.items() if p in m and is_state(p, 'home') and (as_timestamp(now()) - as_timestamp(t, 0)) <= minutos * 60 -%}
-{%- set ns.l = ns.l + [m[p]] -%}
-{%- endfor -%}
-{{ ns.l | to_json }}
+{#- PRESENTES (2026-10-14): servicios notify de quien está en casa según binary_sensor.family_home_<x>
+    (input_boolean.family_home_<x> AND person.<x> == home) -#}
+{%- macro notify_presentes() -%}
+{%- set m = {'binary_sensor.family_home_aac': 'notify.mobile_app_iphone_aac', 'binary_sensor.family_home_paf': 'notify.mobile_app_iphone_paf',
+             'binary_sensor.family_home_aaf': 'notify.mobile_app_a2f', 'binary_sensor.family_home_mfc': 'notify.mobile_app_iphone_malen'} -%}
+{{ m.items() | selectattr('0', 'is_state', 'on') | map(attribute='1') | list | to_json }}
 {%- endmacro -%}

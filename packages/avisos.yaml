@@ -150,12 +150,13 @@ script:
           n: "{{ nivel | default('info') }}"
           d: "{{ destinos | default('todos') }}"
           tg: "{{ telegram | default('none') }}"
-          personas: {person.agustin: notify.mobile_app_iphone_aac, person.paloma: notify.mobile_app_iphone_paf, person.agu: notify.mobile_app_a2f, person.malen: notify.mobile_app_iphone_malen}
+          # 2026-10-14: presentes = binary_sensor.family_home_<x> (input_boolean AND person), no person.*
+          personas: {binary_sensor.family_home_aac: notify.mobile_app_iphone_aac, binary_sensor.family_home_paf: notify.mobile_app_iphone_paf, binary_sensor.family_home_aaf: notify.mobile_app_a2f, binary_sensor.family_home_mfc: notify.mobile_app_iphone_malen}
           servicios: >-
             {%- if d is not string -%}{{ d | list }}
             {%- elif d == 'todos' -%}{{ ['notify.notifica_grupo_ios'] }}
             {%- elif d == 'admin' -%}{{ ['notify.mobile_app_iphone_aac'] }}
-            {%- elif d == 'presentes' -%}{{ personas.items() | selectattr('0', 'is_state', 'home') | map(attribute='1') | list }}
+            {%- elif d == 'presentes' -%}{{ personas.items() | selectattr('0', 'is_state', 'on') | map(attribute='1') | list }}
             {%- elif d == 'ninguno' -%}{{ [] }}
             {%- else -%}{{ d.split(',') | map('trim') | list }}{%- endif -%}
           # iOS sin el formato de Telegram

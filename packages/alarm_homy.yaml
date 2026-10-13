@@ -100,25 +100,6 @@ template:
             {% from 'alarm_homy.jinja' import averias, nombres %}{{ nombres(averias() | from_json) }}
 
   # ---------------------------------------------------------------------------
-  # LLEGADAS: hora de la última llegada a casa de cada persona (persistente, inmune a reinicios).
-  # Lo usa el modo Noche para avisar SOLO al iPhone del que acaba de llegar (macro notify_llegados).
-  # ---------------------------------------------------------------------------
-  - trigger:
-      - trigger: state
-        entity_id: [person.agustin, person.paloma, person.agu, person.malen]
-        to: home
-        not_from: [home, unknown, unavailable]
-    sensor:
-      - name: alarm_homy_llegadas
-        unique_id: alarm_homy_llegadas
-        icon: mdi:home-import-outline
-        state: "{{ trigger.entity_id }}"
-        attributes:
-          llegadas: >-
-            {% set prev = (this.attributes.llegadas if this is defined and this.attributes is defined and this.attributes.llegadas is mapping else {}) %}
-            {{ dict((prev.items() | list) + [(trigger.entity_id, now().isoformat())]) }}
-
-  # ---------------------------------------------------------------------------
   # REGISTRO DEL DISPARO (persistente): primer sensor + lista acumulada
   # ---------------------------------------------------------------------------
   - trigger:
@@ -185,7 +166,7 @@ template:
             {% endif %}
 
   # ---------------------------------------------------------------------------
-  # SENSORES EXCLUIDOS en la sesión de armado (auto-excluir)
+  # SENSORES EXCLUIDOS en la sesión de armado (Noche: etiqueta alarm_homy_excluir_si_activo)
   # ---------------------------------------------------------------------------
   - trigger:
       - trigger: event

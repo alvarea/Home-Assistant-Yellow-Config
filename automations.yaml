@@ -2715,61 +2715,6 @@
 #                                                                             #
 #-----------------------------------------------------------------------------#
 
-#
-# ping_01_router_fibra_movistar:
-#
-- id: P01
-  alias: 'P01_Test_Conectividad_Ping_Router'
-  triggers:
-    - trigger: state
-      entity_id: binary_sensor.ping_00_wan_internet_google
-      from: 'on'
-      to: 'off'
-      for: '00:01:00'
-  conditions:
-    - condition: state
-      entity_id: input_boolean.alarm_ping_conectivity
-      state: 'on'
-  actions:
-    # Aviso técnico: solo admin, sin despertar a nadie (2026-10-12: script.notifica)
-    - action: script.notifica
-      data:
-        nivel: aviso
-        destinos: admin
-        telegram: alarm
-        titulo: '*AVISO CONECTIVIDAD PING*'
-        mensaje: >
-          >>> URGENTE: Fallo en conectividad de red (ping)
-
-          >>> DISPOSITIVO: WAN ROUTER MOVISTAR
-#
-#ping_05_router_wifi_tplink:
-#
-- id: P02
-  alias: 'P02_Test_Conectividad_Ping_WIFI_TPlink'
-  triggers:
-    - trigger: state
-      entity_id: binary_sensor.ping_05_router_wifi_tplink
-      from: 'on'
-      to: 'off'
-      for: '00:05:00'
-  conditions:
-    - condition: state
-      entity_id: input_boolean.alarm_ping_conectivity
-      state: 'on'
-  actions:
-    # Aviso técnico: solo admin, sin despertar a nadie (2026-10-12: script.notifica)
-    - action: script.notifica
-      data:
-        nivel: aviso
-        destinos: admin
-        telegram: alarm
-        titulo: '*AVISO CONECTIVIDAD PING*'
-        mensaje: >
-          >>> URGENTE: Fallo en conectividad de red (ping)
-
-          >>> DISPOSITIVO: AP WIFI TPLINK
-
 - id: P03
   alias: 'P03_Test_Conectividad_Ping_Sonoff_4CH_Status'
   triggers:
@@ -3763,13 +3708,6 @@
               target:
                 entity_id: light.led_mesa_agu
         # ELIF dim_down
-        - conditions:
-          - condition: trigger
-            id: dim_down
-          sequence:
-            - action: fan.turn_off
-              target:
-                entity_id: fan.aire_acondicionado_agu
 
 #  alias: ZHA Estudio Aqara Cube
 - id: ZHA_L9

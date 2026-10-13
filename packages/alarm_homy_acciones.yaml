@@ -6,9 +6,10 @@
 #    armed_away/vac  iOS normal + voz "Armado total" + 3 bips cortos. VACACIONES además: arma Blink, Telegram en armado/desarmado, entrada con aviso CRÍTICO + LED naranja
 #    armed_home      voz "Armado parcial" + 2 bips + LED morado
 #    armed_night     voz "Armado Noche" + 2 bips + LED azul
-#    fallo armado    iOS + Telegram + voz con sensores + 3 bips graves + LED rojo 5 s
-#                    (auto armado Noche: iOS solo a quien esté en casa en ese momento)
-#    pending         iOS urgente con botón Desarmar (Face ID) + voz + bip rápido + LED rojo
+#    fallo armado    iOS + Telegram + voz con sensores + 3 bips graves + LED amarillo parpadeando 5 s
+#                    (auto armado Noche: iOS solo a quien esté en casa = binary_sensor.family_home_<x>)
+#    pending         iOS urgente (Vacaciones: CRÍTICO) a los 4 con botón Desarmar (Face ID) + voz + bip rápido + LED rojo
+#                    (si lo provoca un sensor del estudio, la voz suena también en el Echo del estudio)
 #    triggered       iOS CRÍTICO + Telegram + sirena + Alexa en bucle + pitido + LED rojo
 #    pánico sonoro   = triggered con texto PÁNICO
 #    pánico silencio (pulsador Hue entrada, pulsación larga: coacción) iOS CRÍTICO + Telegram. NADA físico (ni sirena, ni voz, ni bips, ni LED)
@@ -21,11 +22,31 @@
 #    código erróneo  iOS + Telegram + 3 bips graves
 #  input_boolean.alarm_homy_notif_<evento>: activa/desactiva solo los AVISOS (iOS/Telegram).
 #  input_boolean.alarm_homy_modo_pruebas ON: iOS solo a AAC y MFC, sin Telegram, sin sirena ni sirena Alexa.
-#  MODO NOCHE (2026-10-12): entrada y desarmado manual avisan SOLO al iPhone de quien ha llegado a casa en los
-#    últimos 20 min (sensor.alarm_homy_llegadas + macro notify_llegados). Si no se localiza a nadie, ningún iPhone.
-#    El disparo (triggered) y el pánico siguen avisando a todos.
+#  MODO NOCHE (2026-10-14): se retira el "solo al que llega" del 12-10. Entrada = urgente (no crítico) a los 4:
+#    no suena con el iPhone en silencio; el disparo y el pánico son CRÍTICOS a los 4.
+#    Exclusión del estudio: ver alarm_homy_reincorporar y la etiqueta alarm_homy_excluir_si_activo.
+#  LED (2026-10-14): apagado salvo binary_sensor.alarm_homy_led_visible (presencia en la entrada, armando,
+#    entrada o disparo). Brillo uniforme 128; solo el rojo de entrada/disparo a 255.
 #  input_boolean.alarm_homy_silenciar_sirenas ON: sin sirena ni sirena Alexa.
 ###############################################################################
+
+template:
+  # ---------------------------------------------------------------------------
+  # LED VISIBLE (2026-10-14): el LED del tag reader solo se enciende con presencia en la entrada
+  # (movimiento hall/pasillo o puerta principal abierta, +60 s), armando, entrada o disparo (no pánico silencioso).
+  # Fuera de eso, apagado para no desgastarlo.
+  # ---------------------------------------------------------------------------
+  - binary_sensor:
+      - name: alarm_homy_led_visible
+        unique_id: alarm_homy_led_visible
+        icon: mdi:led-on
+        delay_off: {seconds: 60}
+        state: >-
+          {%- set estado = states('input_select.alarm_homy_estado') -%}
+          {{ estado in ['arming', 'pending']
+             or (estado == 'triggered' and not is_state('input_select.alarm_homy_tipo_disparo', 'panico_silencioso'))
+             or ['binary_sensor.aqara_movimiento_entrada', 'binary_sensor.ikea_movimiento_entrada',
+                 'binary_sensor.aqara_puerta_entrada_principal'] | select('is_state', 'on') | list | count > 0 }}
 
 script:
   # ---------------------------------------------------------------------------
@@ -118,22 +139,39 @@ script:
     alias: Alarm HOMY · LED
     icon: mdi:led-on
     mode: restart
+    fields:
+      parpadeo: {description: "Amarillo parpadeando (fallo de armado / avería) si el LED está visible", default: false, selector: {boolean: }}
     sequence:
       - variables:
           estado: "{{ states('input_select.alarm_homy_estado') }}"
+          # Pánico silencioso: el LED no delata nada (muestra el color del modo)
+          estado_led: >-
+            {{ states('input_select.alarm_homy_modo') if estado == 'triggered'
+               and is_state('input_select.alarm_homy_tipo_disparo', 'panico_silencioso') else estado }}
           lista: "{{ is_state('binary_sensor.alarm_homy_lista_para_armar', 'on') }}"
+          visible: "{{ not is_state('binary_sensor.alarm_homy_led_visible', 'off') }}"
           cfg: >-
-            {#- 2026-10-13: brillo uniforme 128; amarillo "no lista" a 255 para que no se confunda con el verde;
-                rojo de entrada/disparo a 255 (alerta) -#}
+            {#- 2026-10-14: brillo uniforme 128 (también el amarillo "no lista"); rojo de entrada/disparo a 255 -#}
             {% set m = {'arming': ['white', 128], 'armed_away': ['orange', 128], 'armed_vacation': ['orange', 128],
                         'armed_home': ['purple', 128], 'armed_night': ['blue', 128],
                         'pending': ['red', 255], 'triggered': ['red', 255]} %}
-            {{ m.get(estado, ['green', 128] if lista else ['yellow', 255]) }}
-      - action: light.turn_on
-        target: {entity_id: light.tagreader_led}
-        data:
-          color_name: "{{ cfg[0] }}"
-          brightness: "{{ cfg[1] }}"
+            {{ m.get(estado_led, ['green', 128] if lista else ['yellow', 128]) }}
+      - choose:
+          - conditions: "{{ not visible }}"
+            sequence:
+              - action: light.turn_off
+                target: {entity_id: light.tagreader_led}
+          - conditions: "{{ parpadeo | default(false) }}"
+            sequence:
+              - action: light.turn_on
+                target: {entity_id: light.tagreader_led}
+                data: {color_name: yellow, brightness: 128, flash: long}
+        default:
+          - action: light.turn_on
+            target: {entity_id: light.tagreader_led}
+            data:
+              color_name: "{{ cfg[0] }}"
+              brightness: "{{ cfg[1] }}"
 
   # ---------------------------------------------------------------------------
   # VOZ Alexa entrada
@@ -144,14 +182,16 @@ script:
     mode: queued
     fields:
       voz: {selector: {text: }}
+      extra: {description: "Echos adicionales (p. ej. [estudio])", selector: {object: }}
     sequence:
       - variables:
           # Echo de voz configurable (input_select.alarm_homy_echo_voz); por defecto la entrada
           echo: "{{ states('input_select.alarm_homy_echo_voz') if states('input_select.alarm_homy_echo_voz') in ['entrada', 'estudio', 'dormitorio'] else 'entrada' }}"
+          echos: "{{ ([echo] + (extra if extra is defined and extra is list else [])) | unique | list }}"
       # 2026-10-12: delega en script.alexa_decir (volumen de anuncio según franja y restauración)
       - action: script.alexa_decir
         data:
-          echos: ["{{ echo }}"]
+          echos: "{{ echos }}"
           tipo: anuncio
           # Todos los mensajes de alarma empiezan por "Atención."
           mensaje: "Atención. {{ voz | regex_replace('^\\s*Atención[.,:]?\\s*', '') }}"
@@ -372,13 +412,19 @@ automation:
                     target: {entity_id: alarm_control_panel.blink_casa}
               - action: script.alarm_homy_pitidos
                 data: {patron: tres}   # confirmación de armado: triple bip corto (convención de centrales)
+              - variables:
+                  excl_ent: "{{ state_attr('sensor.alarm_homy_excluidos', 'entidades') or [] }}"
               - action: script.turn_on
                 target: {entity_id: script.alarm_homy_voz}
                 data:
                   variables:
+                    # Noche con sensores del estudio excluidos: se anuncia también en el Echo del estudio
+                    extra: "{{ ['estudio'] if excl_ent | count > 0 else [] }}"
                     voz: >-
-                      {{ {'armed_away': 'Armado total', 'armed_vacation': 'Armado total, modo vacaciones',
-                          'armed_home': 'Armado parcial', 'armed_night': 'Armado Noche'}[estado] }}
+                      {% from 'alarm_homy.jinja' import nombres_voz %}
+                      {{- {'armed_away': 'Armado total', 'armed_vacation': 'Armado total, modo vacaciones',
+                          'armed_home': 'Armado parcial', 'armed_night': 'Armado Noche'}[estado] -}}
+                      {%- if excl_ent | count > 0 %}. Excluido {{ nombres_voz(excl_ent) }} por actividad; se reincorporará tras 20 minutos sin movimiento.{% endif %}
               - if:
                   - condition: template
                     value_template: "{{ estado in ['armed_away', 'armed_vacation'] and is_state('input_boolean.alarm_homy_notif_armada', 'on') }}"
@@ -406,13 +452,8 @@ automation:
                     entity_id: input_boolean.alarm_homy_notif_entrada
                     state: "on"
                 then:
-                  # NOCHE: solo al iPhone del que acaba de llegar; si no se localiza a nadie, a ninguno
-                  - variables:
-                      solo_a: >-
-                        {% from 'alarm_homy.jinja' import notify_llegados %}{{ (notify_llegados() | from_json) if modo == 'armed_night' else none }}
                   - action: script.alarm_homy_notificar
                     data:
-                      solo_a: "{{ solo_a }}"
                       titulo: "⚠️ Entrada detectada"
                       mensaje: "{{ d_sensor }}{{ ' (' ~ d_area ~ ')' if d_area else '' }} a las {{ d_hora }}. Modo {{ nombre }}. Desarme en {{ states('input_number.alarm_homy_' ~ txt ~ '_entrada') | int(0) }} s."
                       nivel: "{{ 'critical' if modo == 'armed_vacation' else 'time-sensitive' }}"
@@ -422,6 +463,7 @@ automation:
                 target: {entity_id: script.alarm_homy_voz}
                 data:
                   variables:
+                    extra: "{{ ['estudio'] if d_entidad in label_entities('alarm_homy_excluir_si_activo') else [] }}"
                     voz: >-
                       {% from 'alarm_homy.jinja' import nombres_voz %}Entrada detectada{{ (' en ' ~ nombres_voz([d_entidad])) if d_entidad else '' }}. Desarme la alarma.
           # ----- DISPARO / PÁNICO -----
@@ -486,6 +528,7 @@ automation:
 
   # ---------------------------------------------------------------------------
   # LED EN REPOSO: verde = lista para armar · amarillo = puerta/ventana abierta (solo desarmada)
+  # 2026-10-14: también al encender/apagar binary_sensor.alarm_homy_led_visible (cualquier estado)
   # ---------------------------------------------------------------------------
   - id: alarm_homy_led_reposo
     alias: Alarm HOMY · LED en reposo
@@ -494,14 +537,52 @@ automation:
       - trigger: state
         entity_id: binary_sensor.alarm_homy_lista_para_armar
         not_to: [unknown, unavailable]
+        id: lista
+      - trigger: state
+        entity_id: binary_sensor.alarm_homy_led_visible
+        not_to: [unknown, unavailable]
+        id: visible
       - trigger: homeassistant
         event: start
+        id: inicio
     conditions:
-      - condition: state
-        entity_id: input_select.alarm_homy_estado
-        state: disarmed
+      - condition: template
+        value_template: "{{ trigger.id != 'lista' or is_state('input_select.alarm_homy_estado', 'disarmed') }}"
     actions:
       - action: script.alarm_homy_led
+
+  # ---------------------------------------------------------------------------
+  # REINCORPORAR (2026-10-14): sensores del estudio excluidos al armar Noche vuelven a vigilar
+  # tras 20 min sin movimiento (sin voz: es de noche). Queda en el registro.
+  # ---------------------------------------------------------------------------
+  - id: alarm_homy_reincorporar
+    alias: Alarm HOMY · Reincorporar excluidos
+    mode: single
+    triggers:
+      - trigger: time_pattern
+        minutes: "/1"
+    conditions:
+      - condition: template
+        value_template: "{{ (state_attr('sensor.alarm_homy_excluidos', 'entidades') or []) | count > 0 }}"
+      - condition: state
+        entity_id: input_select.alarm_homy_estado
+        state: [armed_away, armed_home, armed_night, armed_vacation]
+    actions:
+      - variables:
+          volver: >-
+            {% from 'alarm_homy.jinja' import reincorporables %}{{ reincorporables(20) | from_json }}
+          excl: "{{ state_attr('sensor.alarm_homy_excluidos', 'entidades') or [] }}"
+      - condition: template
+        value_template: "{{ volver | count > 0 }}"
+      - event: alarm_homy_set_excluidos
+        event_data:
+          entidades: "{{ excl | reject('in', volver) | list }}"
+      - action: logbook.log
+        data:
+          name: Alarm HOMY
+          message: >-
+            {% from 'alarm_homy.jinja' import nombres %}reincorpora a la vigilancia: {{ nombres(volver) }} (20 min sin movimiento)
+          entity_id: alarm_control_panel.alarm_homy
 
   # ---------------------------------------------------------------------------
   # AVISOS POR EVENTO (desarmado con origen, fallo al armar, código erróneo)
@@ -540,15 +621,8 @@ automation:
                     entity_id: input_boolean.alarm_homy_notif_desarmada
                     state: "on"
                 then:
-                  # NOCHE (desarmado manual de modo Noche): solo al iPhone del que acaba de llegar; si nadie, a ninguno
-                  - variables:
-                      solo_a: >-
-                        {%- from 'alarm_homy.jinja' import notify_llegados -%}
-                        {{ (notify_llegados() | from_json) if trigger.event.data.modo | default('') == 'armed_night'
-                           and not (trigger.event.data.origen | default('')).startswith('auto') else none }}
                   - action: script.alarm_homy_notificar
                     data:
-                      solo_a: "{{ solo_a }}"
                       titulo: "🔓 Alarma desarmada"
                       mensaje: "Desarmada a las {{ now().strftime('%H:%M') }} desde {{ trigger.event.data.origen }}."
                       nivel: active
@@ -559,9 +633,8 @@ automation:
             sequence:
               - action: script.alarm_homy_pitidos
                 data: {patron: error}
-              - action: light.turn_on
-                target: {entity_id: light.tagreader_led}
-                data: {color_name: yellow, brightness: 255, flash: long}
+              - action: script.alarm_homy_led
+                data: {parpadeo: true}
               - action: script.turn_on
                 target: {entity_id: script.alarm_homy_voz}
                 data:
@@ -573,13 +646,11 @@ automation:
                     entity_id: input_boolean.alarm_homy_notif_fallo_armado
                     state: "on"
                 then:
-                  # AUTO ARMADO NOCHE (2026-10-12): solo a los iPhone de quien esté en casa en ese momento
+                  # AUTO ARMADO NOCHE: solo a los iPhone de quien esté en casa (binary_sensor.family_home_<x>)
                   - variables:
                       solo_a: >-
-                        {%- set m = {'person.agustin': 'notify.mobile_app_iphone_aac', 'person.paloma': 'notify.mobile_app_iphone_paf',
-                                     'person.agu': 'notify.mobile_app_a2f', 'person.malen': 'notify.mobile_app_iphone_malen'} -%}
-                        {{ (m.items() | selectattr('0', 'is_state', 'home') | map(attribute='1') | list)
-                           if 'auto noche' in (trigger.event.data.origen | default('')) else none }}
+                        {%- from 'alarm_homy.jinja' import notify_presentes -%}
+                        {{ (notify_presentes() | from_json) if 'auto noche' in (trigger.event.data.origen | default('')) else none }}
                   - action: script.alarm_homy_notificar
                     data:
                       solo_a: "{{ solo_a }}"
@@ -642,9 +713,8 @@ automation:
           dispara: "{{ modo in ['armed_away', 'armed_vacation'] }}"
       - condition: template
         value_template: "{{ nuevas | count > 0 }}"
-      - action: light.turn_on
-        target: {entity_id: light.tagreader_led}
-        data: {color_name: yellow, brightness: 255, flash: long}
+      - action: script.alarm_homy_led
+        data: {parpadeo: true}
       - action: script.turn_on
         target: {entity_id: script.alarm_homy_voz}
         data:

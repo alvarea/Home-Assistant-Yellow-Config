@@ -221,6 +221,16 @@ views:
               - nombres
             vertical: false
             features_position: bottom
+          - type: tile
+            entity: binary_sensor.alarm_homy_actividad_estudio
+            name: Actividad en el estudio (aplaza el auto Noche)
+            icon: mdi:desk
+            color: blue
+            state_content:
+              - state
+              - motivo
+            grid_options:
+              columns: 12
           - type: custom:mushroom-template-card
             entity: alarm_control_panel.alarm_homy
             primary: Desarmar (con código)
