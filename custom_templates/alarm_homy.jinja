@@ -7,10 +7,9 @@
       alarm_homy_inmediato     -> dispara sin retardo de entrada
       alarm_homy_armar_abierto -> permite armar abierto (se ignora hasta que cierre)
       alarm_homy_auto_excluir  -> SIN EFECTO desde 2026-10-12: puertas y ventanas abiertas siempre bloquean el armado
-      alarm_homy_excluir_si_activo -> (2026-10-14) movimiento de una zona en uso de noche (estudio):
-                                  al armar NOCHE se excluye si ha visto movimiento en los últimos 10 min y se
-                                  reincorpora sola tras 20 min sin movimiento. Además bloquea el auto armado Noche
-                                  (binary_sensor.alarm_homy_actividad_estudio)
+      alarm_homy_excluir_si_activo -> (2026-10-16) movimiento de una zona en uso de noche (estudio):
+                                  al armar NOCHE con binary_sensor.alarm_homy_actividad_estudio en on se excluye;
+                                  se reincorpora cuando la actividad termina (luz apagada) y lleva 20 min sin movimiento
       alarm_homy_unavailable   -> unavailable > 5 min cuenta como disparo SOLO en Ausente/Vacaciones
     Sin comunicación (unavailable/unknown > 2 min) con la alarma armada = AVERÍA:
       aviso (sensor.alarm_homy_averias), nunca impide armar. En Casa/Noche no dispara.
@@ -52,26 +51,27 @@
 {{ ns.l | to_json }}
 {%- endmacro -%}
 
-{#- EXCLUIBLES al armar (2026-10-14): solo en NOCHE, sensores con etiqueta alarm_homy_excluir_si_activo
-    con movimiento ahora o en los últimos <minutos> (last_changed del paso a off) -#}
-{%- macro excluibles(modo, minutos=10) -%}
+{#- EXCLUIBLES al armar (2026-10-16): solo en NOCHE y con actividad en el estudio
+    (binary_sensor.alarm_homy_actividad_estudio: movimiento en 15 min o luz del estudio encendida)
+    → todos los sensores del modo con etiqueta alarm_homy_excluir_si_activo -#}
+{%- macro excluibles(modo) -%}
 {%- set ns = namespace(l=[]) -%}
-{%- if modo == 'armed_night' -%}
+{%- if modo == 'armed_night' and is_state('binary_sensor.alarm_homy_actividad_estudio', 'on') -%}
 {%- set ex = label_entities('alarm_homy_excluir_si_activo') -%}
-{%- for e in sensores_modo(modo) | from_json if e in ex and states[e] is not none -%}
-{%- if is_state(e, 'on') or (as_timestamp(now()) - as_timestamp(states[e].last_changed)) < minutos * 60 -%}
+{%- for e in sensores_modo(modo) | from_json if e in ex -%}
 {%- set ns.l = ns.l + [e] -%}
-{%- endif -%}
 {%- endfor -%}
 {%- endif -%}
 {{ ns.l | to_json }}
 {%- endmacro -%}
 
-{#- REINCORPORABLES (2026-10-14): excluidos con etiqueta excluir_si_activo sin movimiento desde hace <minutos> -#}
+{#- REINCORPORABLES (2026-10-16): excluidos con etiqueta excluir_si_activo, sin actividad en el estudio
+    (luz apagada) y sin movimiento desde hace <minutos> -#}
 {%- macro reincorporables(minutos=20) -%}
 {%- set ns = namespace(l=[]) -%}
 {%- set ex = label_entities('alarm_homy_excluir_si_activo') -%}
-{%- for e in state_attr('sensor.alarm_homy_excluidos', 'entidades') or [] if e in ex and states[e] is not none -%}
+{%- for e in state_attr('sensor.alarm_homy_excluidos', 'entidades') or [] if e in ex and states[e] is not none
+      and is_state('binary_sensor.alarm_homy_actividad_estudio', 'off') -%}
 {%- if is_state(e, 'off') and (as_timestamp(now()) - as_timestamp(states[e].last_changed)) >= minutos * 60 -%}
 {%- set ns.l = ns.l + [e] -%}
 {%- endif -%}

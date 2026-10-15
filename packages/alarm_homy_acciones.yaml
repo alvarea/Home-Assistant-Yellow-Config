@@ -424,7 +424,7 @@ automation:
                       {% from 'alarm_homy.jinja' import nombres_voz %}
                       {{- {'armed_away': 'Armado total', 'armed_vacation': 'Armado total, modo vacaciones',
                           'armed_home': 'Armado parcial', 'armed_night': 'Armado Noche'}[estado] -}}
-                      {%- if excl_ent | count > 0 %}. Excluido {{ nombres_voz(excl_ent) }} por actividad; se reincorporará tras 20 minutos sin movimiento.{% endif %}
+                      {%- if excl_ent | count > 0 %}. Hay actividad en el estudio: queda excluido el {{ nombres_voz(excl_ent) }} hasta que se apague la luz y pasen 20 minutos sin movimiento.{% endif %}
               - if:
                   - condition: template
                     value_template: "{{ estado in ['armed_away', 'armed_vacation'] and is_state('input_boolean.alarm_homy_notif_armada', 'on') }}"
@@ -552,8 +552,8 @@ automation:
       - action: script.alarm_homy_led
 
   # ---------------------------------------------------------------------------
-  # REINCORPORAR (2026-10-14): sensores del estudio excluidos al armar Noche vuelven a vigilar
-  # tras 20 min sin movimiento (sin voz: es de noche). Queda en el registro.
+  # REINCORPORAR (2026-10-16): sensores del estudio excluidos al armar Noche vuelven a vigilar
+  # con la luz del estudio apagada y 20 min sin movimiento (sin voz: es de noche). Queda en el registro.
   # ---------------------------------------------------------------------------
   - id: alarm_homy_reincorporar
     alias: Alarm HOMY · Reincorporar excluidos
@@ -581,7 +581,7 @@ automation:
         data:
           name: Alarm HOMY
           message: >-
-            {% from 'alarm_homy.jinja' import nombres %}reincorpora a la vigilancia: {{ nombres(volver) }} (20 min sin movimiento)
+            {% from 'alarm_homy.jinja' import nombres %}reincorpora a la vigilancia: {{ nombres(volver) }} (luz del estudio apagada y 20 min sin movimiento)
           entity_id: alarm_control_panel.alarm_homy
 
   # ---------------------------------------------------------------------------

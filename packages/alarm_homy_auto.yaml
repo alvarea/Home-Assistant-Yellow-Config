@@ -9,8 +9,10 @@
 #      Si inicio > fin (p. ej. 23:30 → 07:00) la franja empieza la noche anterior.
 #    Ausente: el auto armado al quedar la casa vacía está permitido SIEMPRE salvo en una excepción semanal
 #      (día + desde/hasta; p. ej. jueves 06:30-15:00). binary_sensor.alarm_homy_franja_ausente → on = permitido.
-#  Actividad en el estudio (2026-10-14): binary_sensor.alarm_homy_actividad_estudio aplaza el auto armado Noche
-#    (al inicio de la franja avisa por voz en el Echo del estudio; los reintentos cada 15 min son silenciosos).
+#  Actividad en el estudio (2026-10-16): binary_sensor.alarm_homy_actividad_estudio (movimiento en 15 min o
+#    light.estudio encendida). Ya NO aplaza el auto Noche (16-10 01:30 armó con Agustín en la mesa): arma igual y
+#    excluye los sensores del estudio (voz en Echo entrada + estudio); vuelven con luz apagada + 20 min sin movimiento.
+#    El MacBook no sirve como señal: su ping WiFi sigue en on con el portátil apagado.
 #  Presencia (2026-10-14): binary_sensor.family_any_home ← sensor.family_home (python_script countpeople)
 #    ← binary_sensor.family_home_<x> = helpers de plantilla de la UI:
 #       {{ is_state('input_boolean.family_home_<x>', 'on') and is_state('person.<x>', 'home') }}
@@ -73,30 +75,26 @@ template:
         availability: >-
           {{ ['inicio_laborable', 'fin_laborable', 'inicio_finde', 'fin_finde']
              | map('regex_replace', '^', 'input_datetime.alarm_homy_noche_') | select('has_value') | list | count == 4 }}
-      # Actividad en el estudio: movimiento (etiqueta alarm_homy_excluir_si_activo) en los últimos 15 min,
-      # o luz del estudio encendida con movimiento en la última hora (sentado y quieto no hay movimiento).
+      # Actividad en el estudio (2026-10-16): movimiento (etiqueta alarm_homy_excluir_si_activo) en los últimos
+      # 15 min, o luz del estudio encendida (sentado en la mesa el Aqara de la escalera no ve movimiento).
       - name: alarm_homy_actividad_estudio
         unique_id: alarm_homy_actividad_estudio
         icon: mdi:desk
         device_class: occupancy
         state: >-
-          {%- set ns = namespace(m15=false, m60=false) -%}
+          {%- set ns = namespace(m15=false) -%}
           {%- for e in label_entities('alarm_homy_excluir_si_activo') if states[e] is not none -%}
-            {%- set edad = as_timestamp(now()) - as_timestamp(states[e].last_changed) -%}
-            {%- if is_state(e, 'on') or edad < 900 %}{% set ns.m15 = true %}{% endif -%}
-            {%- if is_state(e, 'on') or edad < 3600 %}{% set ns.m60 = true %}{% endif -%}
+            {%- if is_state(e, 'on') or (as_timestamp(now()) - as_timestamp(states[e].last_changed)) < 900 %}{% set ns.m15 = true %}{% endif -%}
           {%- endfor -%}
-          {{ ns.m15 or (ns.m60 and is_state('light.estudio', 'on')) }}
+          {{ ns.m15 or is_state('light.estudio', 'on') }}
         attributes:
           motivo: >-
-            {%- set ns = namespace(m15=false, m60=false) -%}
+            {%- set ns = namespace(m15=false) -%}
             {%- for e in label_entities('alarm_homy_excluir_si_activo') if states[e] is not none -%}
-              {%- set edad = as_timestamp(now()) - as_timestamp(states[e].last_changed) -%}
-              {%- if is_state(e, 'on') or edad < 900 %}{% set ns.m15 = true %}{% endif -%}
-              {%- if is_state(e, 'on') or edad < 3600 %}{% set ns.m60 = true %}{% endif -%}
+              {%- if is_state(e, 'on') or (as_timestamp(now()) - as_timestamp(states[e].last_changed)) < 900 %}{% set ns.m15 = true %}{% endif -%}
             {%- endfor -%}
-            {{ 'movimiento en los últimos 15 minutos' if ns.m15 else ('luz encendida y movimiento en la última hora'
-               if ns.m60 and is_state('light.estudio', 'on') else 'ninguno') }}
+            {%- set l = (['movimiento en los últimos 15 minutos'] if ns.m15 else []) + (['luz encendida'] if is_state('light.estudio', 'on') else []) -%}
+            {{ l | join(' y ') if l else 'ninguno' }}
       - name: alarm_homy_franja_ausente
         unique_id: alarm_homy_franja_ausente
         icon: mdi:home-export-outline
@@ -146,6 +144,7 @@ automation:
     triggers:
       - trigger: state
         entity_id: binary_sensor.alarm_homy_franja_noche
+        from: "off"   # 2026-10-16: no desde unavailable (al recargar plantillas re-armaba Noche)
         to: "on"
         id: inicio
       - trigger: time_pattern
@@ -167,24 +166,7 @@ automation:
       - condition: template
         value_template: "{{ trigger.id == 'inicio' or 1 <= now().hour <= 6 }}"
     actions:
-      # Actividad en el estudio: aplazar (aviso de voz solo al inicio de la franja)
-      - if:
-          - condition: state
-            entity_id: binary_sensor.alarm_homy_actividad_estudio
-            state: "on"
-        then:
-          - if:
-              - condition: template
-                value_template: "{{ trigger.id == 'inicio' }}"
-            then:
-              - action: script.turn_on
-                target: {entity_id: script.alexa_decir}
-                data:
-                  variables:
-                    echos: [estudio]
-                    tipo: anuncio
-                    mensaje: "Atención. Armado Noche aplazado porque hay actividad en el estudio. Se armará cuando pasen 15 minutos sin movimiento."
-          - stop: Actividad en el estudio
+      # Con actividad en el estudio arma igual: script.alarm_homy_armar excluye sus sensores (macro excluibles)
       - action: script.alarm_homy_armar
         data:
           modo: armed_night
@@ -199,6 +181,7 @@ automation:
     triggers:
       - trigger: state
         entity_id: binary_sensor.alarm_homy_franja_noche
+        from: "on"
         to: "off"
     conditions:
       - condition: state
