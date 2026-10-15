@@ -1615,50 +1615,36 @@
 
 - id: L12
   alias: 'L12 Luces On Cocina Según Sensor'
+  description: >-
+    Enciende la cocina al 50 % con movimiento desde 30 min antes de la puesta de sol
+    hasta 30 min después del amanecer (cruza medianoche). Apaga a los 2 min (1-7 h)
+    o 10 min. 2026-10-16: corregido sun 'after: sunset' (falso tras las 00:00) y
+    quitado el template de horas (bloqueaba 17:30-19:00 en invierno).
   mode: restart
   triggers:
-    #- device_id: 4c8afd437bce2dcbf656d22ed1e47134
-    #  entity_id: 68988e370d1feb2c5fc8eb6b54e6a7a1
-    #  domain: binary_sensor
-    #  platform: device
-    #  type: motion
-    #  id: motion
     - trigger: state
       entity_id: binary_sensor.ikea_sensor_movimiento_cocina
       to: 'on'
   conditions:
-    condition: and
-    conditions:
-      #  # after_offset: "-02:00:00"  ==> Horario Invierno GMT+1, en el amanecer -2h
-      #  # after_offset: "-00:30:00" ==> Horario Verano GMT+2, el amanecer -30m
-      - condition: sun
-        after: sunset
-        after_offset: "-00:30:00"
-      - condition: template
-        value_template: "{{ (now().hour >= 0 and now().hour < 9) or (now().hour > 18 and now().hour <= 23) }}"
-      - condition: state
-        entity_id: light.luces_cocina
-        state: 'off'
+    - condition: sun
+      after: sunset
+      after_offset: "-00:30:00"
+      before: sunrise
+      before_offset: "00:30:00"
+    - condition: state
+      entity_id: light.luces_cocina
+      state: 'off'
   actions:
     - action: light.turn_on
       data:
-        brightness_pct: >
-          {% if now().hour >= 0 and now().hour <= 7 %} 50
-          {% else %} 50
-          {% endif %}
+        brightness_pct: 50
       target:
         entity_id: light.luces_cocina
-    # Espera de 5'
     - delay:
-        minutes: >
-          {% if now().hour >= 1 and now().hour <= 7 %} 2
-          {% else %} 10
-          {% endif %}
-    # Luces Off + Led
+        minutes: "{{ 2 if 1 <= now().hour <= 7 else 10 }}"
     - action: light.turn_off
       target:
-        entity_id: 
-          - light.luces_cocina
+        entity_id: light.luces_cocina
 
 
 #-----------------------------------------------------------------------------#
