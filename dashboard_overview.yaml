@@ -1,6 +1,6 @@
 ###############################################################################
 #  Dashboard principal "Overview" (/lovelace) — copia del storage .storage/lovelace.lovelace
-#  Exportado: 2026-10-13 00:40 (23 vistas, + Lavadora). Sin vistas de la alarma antigua;
+#  Exportado: 2026-10-13 00:40 (23 vistas); vista Lavadora actualizada 2026-10-16 00:45. Sin vistas de la alarma antigua;
 #  la alarma está en /alarma-homy (dashboard_alarma_homy.yaml).
 #  Versión previa completa: dashboard_overview.old-2026-10-12.yaml
 #  Restaurar: Ajustes → Paneles → Overview → Editar → ⋮ Editor de configuración
@@ -4329,6 +4329,25 @@ views:
             grid_options:
               columns: 6
             multiline_secondary: true
+          - type: custom:mushroom-template-card
+            entity: sensor.lavadora_estado
+            icon: mdi:currency-eur
+            color: green
+            primary: '{% set a = states.sensor.lavadora_estado.attributes %}{{ (''%.2f'' | format(a.ultimo_coste) | replace(''.'', '','')) ~ '' €'' if a.ultimo_coste is number else ''—'' }}'
+            secondary: '{% set a = states.sensor.lavadora_estado.attributes %}{% if states(''sensor.lavadora_estado'') == ''lavando'' and a.coste is number %}En curso: {{ ''%.2f'' | format(a.coste) | replace(''.'', '','') }} €{% else %}Coste del lavado{% endif %}'
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 6
+            multiline_secondary: true
+          - type: tile
+            entity: sensor.precio_luz_actual
+            name: Precio luz ahora
+            state_content:
+              - state
+              - periodo
+            grid_options:
+              columns: 6
           - type: tile
             entity: counter.lavadora_lavados_mes
             name: Lavados este mes

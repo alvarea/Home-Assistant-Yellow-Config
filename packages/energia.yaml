@@ -1,0 +1,36 @@
+###############################################################################
+#  ENERGÍA · Precio actual de la luz (2026-10-15)
+#
+#  Tarifa Octopus Go (2.0TD), precio fijo. Doc: claude/tarifa-octopus.md
+#    Valle (P3): 0,067 €/kWh  → 00:00-08:00 laborables y 24 h sábados, domingos
+#                              y festivos nacionales.
+#    Punta/llano (P1=P2): 0,211 €/kWh → resto.
+#  Impuestos: impuesto eléctrico 5,11 % + IVA 21 % → factor 1,0511 × 1,21 = 1,2719.
+#  Festivos: binary_sensor.workday_sensor (integración Workday, país ES, sin
+#  provincia → solo festivos nacionales). Si no está disponible, solo fines de semana.
+#  Contrato hasta 29-01-2027: revisar precios entonces.
+###############################################################################
+
+template:
+  - sensor:
+      - name: precio_luz_actual
+        unique_id: precio_luz_actual
+        unit_of_measurement: "EUR/kWh"
+        state_class: measurement
+        icon: mdi:cash-clock
+        state: >-
+          {%- set valle, resto, impuestos = 0.067, 0.211, 1.0511 * 1.21 -%}
+          {%- set wd = states('binary_sensor.workday_sensor') -%}
+          {%- set laborable = (wd == 'on') if wd in ['on', 'off'] else (now().isoweekday() <= 5) -%}
+          {%- set es_valle = (not laborable) or now().hour < 8 -%}
+          {{ ((valle if es_valle else resto) * impuestos) | round(4) }}
+        attributes:
+          periodo: >-
+            {%- set wd = states('binary_sensor.workday_sensor') -%}
+            {%- set laborable = (wd == 'on') if wd in ['on', 'off'] else (now().isoweekday() <= 5) -%}
+            {{ 'valle' if (not laborable) or now().hour < 8 else 'punta_llano' }}
+          precio_sin_impuestos: >-
+            {%- set wd = states('binary_sensor.workday_sensor') -%}
+            {%- set laborable = (wd == 'on') if wd in ['on', 'off'] else (now().isoweekday() <= 5) -%}
+            {{ 0.067 if (not laborable) or now().hour < 8 else 0.211 }}
+          tarifa: Octopus Go

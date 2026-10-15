@@ -16,9 +16,10 @@
 #  impulsos 170-300 W con pausas < 8 W de 29 s como máximo; terminado = 1,9-2,7 W
 #  (pitido); 0 W = mando girado.
 #    lavando:   > 20 W durante 30 s
-#    terminada: tras >= 20 min lavando, < 5 W durante 90 s
-#  Tendido: previsión horaria AEMET; ventana desde el fin hasta la puesta de sol
-#  (si ya es de noche: de la salida a la puesta de mañana). Secadora si alguna
+#    terminada: tras >= 20 min lavando, < 5 W durante 45 s (15-10: con 90 s la
+#               Bosch ya pitaba; pita ~20 s después del último pulso de desagüe)
+#  Tendido: previsión horaria AEMET; ventana desde el fin hasta la próxima puesta
+#  de sol (de noche incluye la noche y el día siguiente). Secadora si alguna
 #  hora > 50 % de probabilidad de lluvia.
 #  Spec y backlog de mejoras: doc del proyecto claude/lavadora-bosch-2026-10-12.md
 ###############################################################################
@@ -38,7 +39,7 @@ template:
       - trigger: numeric_state
         entity_id: sensor.grillplats_lavadora_power
         below: 5
-        for: "00:01:30"
+        for: "00:00:45"
         id: fin
       - trigger: numeric_state
         entity_id: sensor.grillplats_lavadora_power
@@ -55,6 +56,10 @@ template:
         from: "off"
         to: "on"
         id: enchufe_on
+      # Coste acumulado: cada incremento de energía al precio vigente (packages/energia.yaml)
+      - trigger: state
+        entity_id: sensor.grillplats_lavadora_energy
+        id: energia
       # Inicialización tras arranque o recarga de plantillas (deja 'apagada' si no hay estado)
       - trigger: homeassistant
         event: start
@@ -83,6 +88,13 @@ template:
             {%- elif t == 'enchufe_on' and e == 'terminada' -%}apagada
             {%- else -%}{{ e }}{%- endif -%}
           empieza: "{{ nuevo == 'lavando' and e != 'lavando' }}"
+          delta_kwh: >-
+            {%- if t == 'energia' and e == 'lavando' and trigger.from_state is not none -%}
+              {{ [trigger.to_state.state | float(0) - trigger.from_state.state | float(0), 0] | max }}
+            {%- else -%}0{%- endif -%}
+          coste: >-
+            {%- set base = 0 if empieza else state_attr(ent, 'coste') | float(0) -%}
+            {{ (base + delta_kwh * states('sensor.precio_luz_actual') | float(0.2684)) | round(4) }}
           termina: "{{ nuevo == 'terminada' and e == 'lavando' }}"
           # Duraciones (min) de los últimos 5 lavados completos; la estimación usa la mediana
           dur_prev: "{{ state_attr(ent, 'duraciones') or [63] }}"
@@ -90,9 +102,10 @@ template:
           dur_est: >-
             {%- set l = duraciones | sort -%}
             {{ l[(l | count) // 2] }}
-          # Ventana de tendido: de día, hasta la puesta; de noche, el día siguiente
+          # Ventana de tendido: desde ahora hasta la próxima puesta de sol (de noche cubre
+          # la noche y el día siguiente: se puede tender ya por la noche, 15-10)
           de_dia: "{{ is_state('sun.sun', 'above_horizon') }}"
-          v_ini: "{{ now().timestamp() if de_dia else as_timestamp(state_attr('sun.sun', 'next_rising')) }}"
+          v_ini: "{{ now().timestamp() }}"
           v_fin: "{{ as_timestamp(state_attr('sun.sun', 'next_setting')) }}"
           probs: >-
             {%- set f = prevision['weather.aemet'].forecast if prevision is defined and 'weather.aemet' in prevision else [] -%}
@@ -135,6 +148,9 @@ template:
             {%- else -%}{{ state_attr(ent, 'destino') }}{%- endif -%}
           prob_lluvia: "{{ (prob if prob >= 0 else none) if termina else state_attr(ent, 'prob_lluvia') }}"
           tendido_cuando: "{{ cuando if termina else state_attr(ent, 'tendido_cuando') }}"
+          # Coste (€ con impuestos) del lavado en curso y del último completo
+          coste: "{{ coste }}"
+          ultimo_coste: "{{ coste if termina else state_attr(ent, 'ultimo_coste') }}"
 
   # ---------------------------------------------------------------------------
   # INTERRUPTOR PROTEGIDO (expuesto a Alexa como "Lavadora")
@@ -191,25 +207,29 @@ automation:
     actions:
       - action: counter.increment
         target: {entity_id: counter.lavadora_lavados_mes}
-      # Mando ya girado (0 W): no pita, no se corta ni se avisa
-      - if: "{{ states('sensor.grillplats_lavadora_power') | float(0) < 0.5 }}"
+      # Mando ya girado (0 W con el enchufe encendido): no pita, no se corta ni se avisa.
+      # Si el enchufe ya está apagado (corte manual) se avisa igualmente.
+      - if: "{{ is_state('switch.grillplats_lavadora', 'on') and states('sensor.grillplats_lavadora_power') | float(0) < 0.5 }}"
         then:
           - stop: Mando ya girado
-      - action: switch.turn_off
-        target: {entity_id: switch.grillplats_lavadora}
+      - if: "{{ is_state('switch.grillplats_lavadora', 'on') }}"
+        then:
+          - action: switch.turn_off
+            target: {entity_id: switch.grillplats_lavadora}
       - variables:
           a: sensor.lavadora_estado
           destino: "{{ state_attr(a, 'destino') }}"
           cuando: "{{ state_attr(a, 'tendido_cuando') }}"
           mensaje: >-
             {%- if destino == 'desconocido' -%}El lavado ha terminado. No tengo la previsión del tiempo.
-            {%- elif cuando == 'hoy' -%}
-              {{ 'El lavado ha terminado, se puede tender la ropa fuera.' if destino == 'fuera'
-                 else 'El lavado ha terminado, mejor usar la secadora: se esperan lluvias.' }}
-            {%- else -%}
-              {%- set c = cuando[0] | upper ~ cuando[1:] -%}
-              {{ 'El lavado ha terminado. ' ~ c ~ (' se podrá tender la ropa fuera.' if destino == 'fuera'
-                 else ' se esperan lluvias, mejor usar la secadora.') }}
+            {%- elif destino == 'fuera' -%}El lavado ha terminado, se puede tender la ropa fuera.
+            {%- else -%}El lavado ha terminado, mejor usar la secadora: se esperan lluvias.
+            {%- endif -%}
+            {%- set dur = state_attr(a, 'ultimo_duracion_min') | int(0) -%}
+            {%- set kwh = state_attr(a, 'ultimo_kwh') | float(0) -%}
+            {%- set eur = state_attr(a, 'ultimo_coste') | float(0) -%}
+            {%- if dur > 0 %} Ha durado {{ dur }} minutos, ha consumido {{ ('%.2f' | format(kwh)) | replace('.', ',') }} kilovatios hora
+              {%- if eur > 0 %} y ha costado {% if eur < 1 %}unos {{ (eur * 100) | round(0) | int }} céntimos{% else %}{{ ('%.2f' | format(eur)) | replace('.', ',') }} euros{% endif %}{% endif %}.
             {%- endif -%}
           silencio: "{{ now().hour >= 23 or now().hour < 8 }}"
           destinos: >-

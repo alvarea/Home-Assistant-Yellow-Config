@@ -1,6 +1,6 @@
 ###############################################################################
 #  Vista "Lavadora" del dashboard Overview (/lovelace/lavadora)
-#  Exportado: 2026-10-13 00:40 desde el storage (ajustes de Agustín incluidos).
+#  Exportado: 2026-10-16 00:45 desde el storage (+ coste del lavado y precio de la luz).
 #  Package: packages/lavadora.yaml · Doc: claude/lavadora-bosch-2026-10-12.md
 #  Restaurar: Overview → Editar → ⋮ Editor de configuración en bruto → pegar
 #             como un elemento más de "views:" (después de Temperatura).
@@ -92,6 +92,25 @@ sections:
         grid_options:
           columns: 6
         multiline_secondary: true
+      - type: custom:mushroom-template-card
+        entity: sensor.lavadora_estado
+        icon: mdi:currency-eur
+        color: green
+        primary: '{% set a = states.sensor.lavadora_estado.attributes %}{{ (''%.2f'' | format(a.ultimo_coste) | replace(''.'', '','')) ~ '' €'' if a.ultimo_coste is number else ''—'' }}'
+        secondary: '{% set a = states.sensor.lavadora_estado.attributes %}{% if states(''sensor.lavadora_estado'') == ''lavando'' and a.coste is number %}En curso: {{ ''%.2f'' | format(a.coste) | replace(''.'', '','') }} €{% else %}Coste del lavado{% endif %}'
+        tap_action:
+          action: more-info
+        grid_options:
+          columns: 6
+        multiline_secondary: true
+      - type: tile
+        entity: sensor.precio_luz_actual
+        name: Precio luz ahora
+        state_content:
+          - state
+          - periodo
+        grid_options:
+          columns: 6
       - type: tile
         entity: counter.lavadora_lavados_mes
         name: Lavados este mes
