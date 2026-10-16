@@ -25,6 +25,10 @@
 #  MODO NOCHE (2026-10-14): se retira el "solo al que llega" del 12-10. Entrada = urgente (no crítico) a los 4:
 #    no suena con el iPhone en silencio; el disparo y el pánico son CRÍTICOS a los 4.
 #    Exclusión del estudio: ver alarm_homy_reincorporar y la etiqueta alarm_homy_excluir_si_activo.
+#  BLINK (2026-10-16, ALA-25 fase 1): al armar Ausente/Vacaciones se activa la detección de las cámaras de
+#    blink_camaras(modo) (macro), se apaga en el resto y se arma alarm_control_panel.blink_casa; al desarmar, se
+#    desarma y las 9 vuelven a ON. Mientras Blink está armado, sondeo cada minuto (solo nube, no despierta cámaras).
+#    Movimiento de una cámara activa que no sea sensor del modo → aviso urgente con la imagen (no dispara).
 #  LED (2026-10-14): apagado salvo binary_sensor.alarm_homy_led_visible (presencia en la entrada, armando,
 #    entrada o disparo). Brillo uniforme 128; solo el rojo de entrada/disparo a 255.
 #  input_boolean.alarm_homy_silenciar_sirenas ON: sin sirena ni sirena Alexa.
@@ -68,6 +72,7 @@ script:
         description: "Lista de servicios notify que sustituye a los destinos por defecto. [] = ningún iPhone (modo Noche sin nadie localizado)"
         selector: {object: }
       desarmar: {description: Añade botón Desarmar (Face ID), default: false, selector: {boolean: }}
+      camara: {description: "camera.* que se adjunta a la notificación iOS (opcional)", selector: {entity: {domain: camera}}}
       tag:
         description: "Misma tag = sustituye la notificación anterior (estado | alerta | fallo | codigo)"
         default: estado
@@ -98,6 +103,7 @@ script:
                     {% set d = {'tag': 'alarm_homy_' ~ (tag | default('estado')), 'group': 'alarm_homy',
                                 'url': '/alarma-homy/alarma',
                                 'push': push} %}
+                    {%- set d = dict(d, entity_id=camara) if camara is defined and camara else d -%}
                     {{ dict(d, actions=acciones) if acciones | count > 0 else d }}
       - if:
           - condition: template
@@ -402,11 +408,29 @@ automation:
                 then:
                   - action: script.turn_on
                     target: {entity_id: script.home_switch_off}
-              # VACACIONES: arma también el panel independiente de Blink (todas las cámaras activas)
+              # BLINK (ALA-25): Ausente/Vacaciones → detección solo en las cámaras del modo y panel Blink armado
+              - variables:
+                  blink_on: >-
+                    {% from 'alarm_homy.jinja' import blink_camaras %}{{ blink_camaras(estado) | from_json }}
+                  blink_off: >-
+                    {% from 'alarm_homy.jinja' import blink_todas %}{{ blink_todas() | from_json | reject('in', blink_on) | list }}
               - if:
                   - condition: template
-                    value_template: "{{ estado == 'armed_vacation' }}"
+                    value_template: "{{ blink_on | count > 0 }}"
                 then:
+                  - action: switch.turn_on
+                    continue_on_error: true
+                    target:
+                      entity_id: "{{ blink_on | map('regex_replace', '^', 'switch.blink_') | map('regex_replace', '$', '_camera_motion_detection') | list }}"
+                  - if:
+                      - condition: template
+                        value_template: "{{ blink_off | count > 0 }}"
+                    then:
+                      - action: switch.turn_off
+                        continue_on_error: true
+                        target:
+                          entity_id: "{{ blink_off | map('regex_replace', '^', 'switch.blink_') | map('regex_replace', '$', '_camera_motion_detection') | list }}"
+                  - delay: 2
                   - action: alarm_control_panel.alarm_arm_away
                     continue_on_error: true
                     target: {entity_id: alarm_control_panel.blink_casa}
@@ -514,6 +538,12 @@ automation:
                   - action: alarm_control_panel.alarm_disarm
                     continue_on_error: true
                     target: {entity_id: alarm_control_panel.blink_casa}
+              # BLINK (ALA-25): las 9 cámaras vuelven a tener la detección activa (estado neutro de la app Blink)
+              - action: switch.turn_on
+                continue_on_error: true
+                target:
+                  entity_id: >-
+                    {% from 'alarm_homy.jinja' import blink_todas %}{{ blink_todas() | from_json | map('regex_replace', '^', 'switch.blink_') | map('regex_replace', '$', '_camera_motion_detection') | list }}
               - action: script.alarm_homy_led
               - if:
                   - condition: template
@@ -751,3 +781,68 @@ automation:
             {{ (states.person | selectattr('attributes.user_id', 'eq', u) | map(attribute='name') | first) | default('iOS') }} (iPhone)
 
   # Pánico con IKEA BILRESA → automations.yaml, bloque ZMA (ZMA_L1)
+
+  # ---------------------------------------------------------------------------
+  # BLINK · SONDEO (ALA-25): con el sistema Blink armado, refresca la integración cada minuto
+  # (consulta a la nube; no despierta las cámaras ni gasta pila)
+  # ---------------------------------------------------------------------------
+  - id: alarm_homy_blink_sondeo
+    alias: Alarm HOMY · Blink sondeo armado
+    mode: single
+    triggers:
+      - trigger: time_pattern
+        minutes: "/1"
+    conditions:
+      - condition: state
+        entity_id: alarm_control_panel.blink_casa
+        state: [armed_away, armed_home, armed_night, armed_custom_bypass]
+    actions:
+      - action: homeassistant.update_entity
+        continue_on_error: true
+        target: {entity_id: alarm_control_panel.blink_casa}
+
+  # ---------------------------------------------------------------------------
+  # BLINK · AVISO DE MOVIMIENTO (ALA-25 fase 1): cámara activa del modo que no es sensor de la alarma
+  # en ese modo → aviso urgente a los 4 con la imagen. No dispara. Máx. 1 aviso por cámara cada 2 min.
+  # ---------------------------------------------------------------------------
+  - id: alarm_homy_blink_movimiento
+    alias: Alarm HOMY · Blink aviso de movimiento
+    mode: queued
+    max: 10
+    triggers:
+      - trigger: state
+        entity_id:
+          - binary_sensor.blink_puerta_principal_motion
+          - binary_sensor.blink_hall_motion
+          - binary_sensor.blink_piscina_motion
+          - binary_sensor.blink_cancela_left_motion
+          - binary_sensor.blink_cancela_right_motion
+          - binary_sensor.blink_porche_motion
+          - binary_sensor.blink_estudio_motion
+          - binary_sensor.blink_cocina_motion
+          - binary_sensor.blink_salon_motion
+        from: "off"
+        to: "on"
+    variables:
+      cam: "{{ trigger.entity_id | replace('binary_sensor.blink_', '') | replace('_motion', '') }}"
+      modo: "{{ states('input_select.alarm_homy_modo') }}"
+    conditions:
+      - condition: state
+        entity_id: input_select.alarm_homy_estado
+        state: [armed_away, armed_vacation, pending]
+      - condition: template
+        value_template: >-
+          {% from 'alarm_homy.jinja' import blink_camaras, sensores_modo %}
+          {{ cam in (blink_camaras(modo) | from_json) and trigger.entity_id not in (sensores_modo(modo) | from_json) }}
+      - condition: template
+        value_template: "{{ (now() - trigger.from_state.last_changed).total_seconds() > 120 }}"
+    actions:
+      - action: script.alarm_homy_notificar
+        data:
+          titulo: >-
+            {% from 'alarm_homy.jinja' import blink_nombre %}📹 Movimiento · {{ blink_nombre(cam) }}
+          mensaje: >-
+            {% from 'alarm_homy.jinja' import nombre_modo %}Cámara {{ cam | replace('_', ' ') }} a las {{ now().strftime('%H:%M:%S') }}. Alarma en modo {{ nombre_modo(modo) }} (solo aviso, no dispara).
+          nivel: time-sensitive
+          tag: "blink_{{ cam }}"
+          camara: "camera.blink_{{ cam }}"

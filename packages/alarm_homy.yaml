@@ -17,7 +17,118 @@
 #    alarm_homy_desarmado          {origen, desde, tipo}
 ###############################################################################
 
+input_select:
+  # Vista "Sensores Activos" del dashboard: modo que se previsualiza con la alarma desarmada (2026-10-16)
+  alarm_homy_modo_vista:
+    name: Alarma · modo a previsualizar
+    icon: mdi:eye
+    options: [Casa, Noche, Ausente, Vacaciones]
+    initial: Ausente
+
 template:
+  # ---------------------------------------------------------------------------
+  # CUENTA ATRÁS de los timers en m:ss (para mostrarla en grande en el dashboard; 2026-10-16).
+  # Solo se actualiza cada segundo mientras algún timer de la alarma está activo.
+  # ---------------------------------------------------------------------------
+  - trigger:
+      - trigger: time_pattern
+        seconds: "/1"
+      - trigger: state
+        entity_id: [timer.alarm_homy_salida, timer.alarm_homy_entrada, timer.alarm_homy_disparo]
+    conditions:
+      - condition: template
+        value_template: >-
+          {{ trigger.platform == 'state' or
+             ['timer.alarm_homy_salida', 'timer.alarm_homy_entrada', 'timer.alarm_homy_disparo'] | select('is_state', 'active') | list | count > 0 }}
+    sensor:
+      - name: alarm_homy_restante_salida
+        unique_id: alarm_homy_restante_salida
+        icon: mdi:timer-sand
+        state: >-
+          {%- set f = state_attr('timer.alarm_homy_salida', 'finishes_at') -%}
+          {%- set r = ([0, (as_timestamp(f) - as_timestamp(now())) | round(0, 'ceil') | int] | max) if is_state('timer.alarm_homy_salida', 'active') and f else 0 -%}
+          {{ '%d:%02d' | format(r // 60, r % 60) }}
+      - name: alarm_homy_restante_entrada
+        unique_id: alarm_homy_restante_entrada
+        icon: mdi:timer-alert-outline
+        state: >-
+          {%- set f = state_attr('timer.alarm_homy_entrada', 'finishes_at') -%}
+          {%- set r = ([0, (as_timestamp(f) - as_timestamp(now())) | round(0, 'ceil') | int] | max) if is_state('timer.alarm_homy_entrada', 'active') and f else 0 -%}
+          {{ '%d:%02d' | format(r // 60, r % 60) }}
+      - name: alarm_homy_restante_disparo
+        unique_id: alarm_homy_restante_disparo
+        icon: mdi:alarm-light
+        state: >-
+          {%- set f = state_attr('timer.alarm_homy_disparo', 'finishes_at') -%}
+          {%- set r = ([0, (as_timestamp(f) - as_timestamp(now())) | round(0, 'ceil') | int] | max) if is_state('timer.alarm_homy_disparo', 'active') and f else 0 -%}
+          {{ '%d:%02d' | format(r // 60, r % 60) }}
+
+  # ---------------------------------------------------------------------------
+  # BOTONES DE ARMADO del dashboard (2026-10-16): tile + feature "button" (sin confirmación).
+  # Nombre e icono indican el modo activo; atributo "info" = descripción o estado del modo.
+  # ---------------------------------------------------------------------------
+  - button:
+      - name: "{{ '● Casa · ACTIVO' if (states('input_select.alarm_homy_modo') == 'armed_home' and states('input_select.alarm_homy_estado') != 'disarmed') else 'Casa' }}"
+        unique_id: alarm_homy_boton_casa
+        default_entity_id: button.alarm_homy_armar_casa
+        icon: "{{ 'mdi:check-circle' if (states('input_select.alarm_homy_modo') == 'armed_home' and states('input_select.alarm_homy_estado') != 'disarmed') else 'mdi:home-account' }}"
+        attributes:
+          info: >-
+            {%- set e = states('input_select.alarm_homy_estado') -%}
+            {%- if (states('input_select.alarm_homy_modo') == 'armed_home' and states('input_select.alarm_homy_estado') != 'disarmed') -%}
+              {{ 'Armando… ' ~ states('sensor.alarm_homy_restante_salida') if e == 'arming' else ('Desde las ' ~ as_local(states.input_select.alarm_homy_estado.last_changed).strftime('%H:%M') if e == 'armed_home' else '¡Entrada o disparo!') }}
+            {%- else -%}Planta baja · entrada {{ states('input_number.alarm_homy_casa_entrada') | int }} s{%- endif -%}
+        press:
+          - condition: template
+            value_template: "{{ not (states('input_select.alarm_homy_modo') == 'armed_home' and states('input_select.alarm_homy_estado') != 'disarmed') }}"
+          - action: script.alarm_homy_armar
+            data: {modo: armed_home, origen: dashboard}
+      - name: "{{ '● Noche · ACTIVO' if (states('input_select.alarm_homy_modo') == 'armed_night' and states('input_select.alarm_homy_estado') != 'disarmed') else 'Noche' }}"
+        unique_id: alarm_homy_boton_noche
+        default_entity_id: button.alarm_homy_armar_noche
+        icon: "{{ 'mdi:check-circle' if (states('input_select.alarm_homy_modo') == 'armed_night' and states('input_select.alarm_homy_estado') != 'disarmed') else 'mdi:weather-night' }}"
+        attributes:
+          info: >-
+            {%- set e = states('input_select.alarm_homy_estado') -%}
+            {%- if (states('input_select.alarm_homy_modo') == 'armed_night' and states('input_select.alarm_homy_estado') != 'disarmed') -%}
+              {{ 'Armando… ' ~ states('sensor.alarm_homy_restante_salida') if e == 'arming' else ('Desde las ' ~ as_local(states.input_select.alarm_homy_estado.last_changed).strftime('%H:%M') if e == 'armed_night' else '¡Entrada o disparo!') }}
+            {%- else -%}Perímetro + planta alta · entrada {{ states('input_number.alarm_homy_noche_entrada') | int }} s{%- endif -%}
+        press:
+          - condition: template
+            value_template: "{{ not (states('input_select.alarm_homy_modo') == 'armed_night' and states('input_select.alarm_homy_estado') != 'disarmed') }}"
+          - action: script.alarm_homy_armar
+            data: {modo: armed_night, origen: dashboard}
+      - name: "{{ '● Ausente · ACTIVO' if (states('input_select.alarm_homy_modo') == 'armed_away' and states('input_select.alarm_homy_estado') != 'disarmed') else 'Ausente' }}"
+        unique_id: alarm_homy_boton_ausente
+        default_entity_id: button.alarm_homy_armar_ausente
+        icon: "{{ 'mdi:check-circle' if (states('input_select.alarm_homy_modo') == 'armed_away' and states('input_select.alarm_homy_estado') != 'disarmed') else 'mdi:home-export-outline' }}"
+        attributes:
+          info: >-
+            {%- set e = states('input_select.alarm_homy_estado') -%}
+            {%- if (states('input_select.alarm_homy_modo') == 'armed_away' and states('input_select.alarm_homy_estado') != 'disarmed') -%}
+              {{ 'Armando… ' ~ states('sensor.alarm_homy_restante_salida') if e == 'arming' else ('Desde las ' ~ as_local(states.input_select.alarm_homy_estado.last_changed).strftime('%H:%M') if e == 'armed_away' else '¡Entrada o disparo!') }}
+            {%- else -%}Todo + Blink · salida {{ states('input_number.alarm_homy_ausente_salida') | int }} s · entrada {{ states('input_number.alarm_homy_ausente_entrada') | int }} s{%- endif -%}
+        press:
+          - condition: template
+            value_template: "{{ not (states('input_select.alarm_homy_modo') == 'armed_away' and states('input_select.alarm_homy_estado') != 'disarmed') }}"
+          - action: script.alarm_homy_armar
+            data: {modo: armed_away, origen: dashboard}
+      - name: "{{ '● Vacaciones · ACTIVO' if (states('input_select.alarm_homy_modo') == 'armed_vacation' and states('input_select.alarm_homy_estado') != 'disarmed') else 'Vacaciones' }}"
+        unique_id: alarm_homy_boton_vacaciones
+        default_entity_id: button.alarm_homy_armar_vacaciones
+        icon: "{{ 'mdi:check-circle' if (states('input_select.alarm_homy_modo') == 'armed_vacation' and states('input_select.alarm_homy_estado') != 'disarmed') else 'mdi:airplane' }}"
+        attributes:
+          info: >-
+            {%- set e = states('input_select.alarm_homy_estado') -%}
+            {%- if (states('input_select.alarm_homy_modo') == 'armed_vacation' and states('input_select.alarm_homy_estado') != 'disarmed') -%}
+              {{ 'Armando… ' ~ states('sensor.alarm_homy_restante_salida') if e == 'arming' else ('Desde las ' ~ as_local(states.input_select.alarm_homy_estado.last_changed).strftime('%H:%M') if e == 'armed_vacation' else '¡Entrada o disparo!') }}
+            {%- else -%}Todo + Blink completo · salida {{ states('input_number.alarm_homy_vacaciones_salida') | int }} s{%- endif -%}
+        press:
+          - condition: template
+            value_template: "{{ not (states('input_select.alarm_homy_modo') == 'armed_vacation' and states('input_select.alarm_homy_estado') != 'disarmed') }}"
+          - action: script.alarm_homy_armar
+            data: {modo: armed_vacation, origen: dashboard}
+
   # ---------------------------------------------------------------------------
   # PANEL
   # ---------------------------------------------------------------------------

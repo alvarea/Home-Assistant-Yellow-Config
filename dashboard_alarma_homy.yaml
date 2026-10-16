@@ -2,7 +2,7 @@
 #  ALARM HOMY · Dashboard "Alarma HOMY" (/alarma-homy)
 #
 #  Copia del dashboard en modo UI (storage: .storage/lovelace.alarma_homy).
-#  Exportado: 2026-10-12 22:00 (vistas: Alarma, Estado Sensores Alarma, Cámaras, Configuración Alarma, Configuración Sensores Habilitados)
+#  Exportado: 2026-10-16 23:10 (vistas: Alarma, Sensores Activos, Estado Sensores Alarma, Cámaras, Configuración Alarma, Configuración Sensores Habilitados)
 #  Restaurar: Ajustes → Paneles → Alarma HOMY → Editar → ⋮ Editor de configuración
 #             en bruto → pegar este contenido (las líneas de comentario se ignoran).
 #  Imágenes: /local/Home_Alarm_Security_I*.jpg|webp (www/, fuera de git).
@@ -15,429 +15,1014 @@ views:
     type: sections
     max_columns: 4
     sections:
-      - type: grid
-        cards:
-          - show_state: false
-            show_name: true
-            camera_view: auto
-            fit_mode: cover
-            type: picture-entity
-            entity: alarm_control_panel.alarm_homy
-            name: Estado
-            image:
-              media_content_id: /local/Home_Alarm_Security_I3.jpg
-            tap_action:
-              action: none
-            hold_action:
-              action: none
-            grid_options:
-              columns: 12
-            aspect_ratio: '3'
-          - type: heading
-            icon: mdi:account-convert
-            heading: Presencia
-            heading_style: title
-            badges:
-              - type: entity
-                entity: binary_sensor.family_any_home
-              - type: entity
-                entity: binary_sensor.family_all_home
-              - type: entity
-                entity: sensor.family_home
-              - type: entity
-                entity: sensor.family_sleep_home
-          - cards:
-              - cards:
-                  - type: tile
-                    entity: person.agustin
-                    show_entity_picture: true
-                    vertical: true
-                    state_content: last_changed
-                  - type: custom:mushroom-person-card
-                    entity: person.malen
-                    icon_type: entity-picture
-                    layout: vertical
-                    fill_container: true
-                    secondary_info: last-changed
-                  - type: custom:mushroom-person-card
-                    entity: person.agu
-                    icon_type: entity-picture
-                    layout: vertical
-                    fill_container: true
-                    secondary_info: last-changed
-                  - type: custom:mushroom-person-card
-                    entity: person.paloma
-                    icon_type: entity-picture
-                    layout: vertical
-                    fill_container: true
-                    secondary_info: last-changed
-                type: horizontal-stack
-            type: vertical-stack
-          - type: heading
-            icon: mdi:security
-            heading: ALARMA PRINCIPAL HOMY
-            heading_style: title
-            badges:
-              - type: entity
-                show_state: true
-                show_icon: true
-                entity: alarm_control_panel.alarm_homy
-            grid_options:
-              rows: 1
-              columns: full
-          - features:
-              - type: alarm-modes
-                modes:
-                  - disarmed
-                  - armed_away
-            type: custom:mushroom-template-card
-            entity: alarm_control_panel.alarm_homy
-            grid_options:
-              columns: 12
-            primary: '{% set e = states(''alarm_control_panel.alarm_homy'') %}{% set m = {''disarmed'':''Desarmada'',''arming'':''Armando…'',''armed_home'':''Armada Casa'',''armed_night'':''Armada Noche'',''armed_away'':''Armada Ausente'',''armed_vacation'':''Armada Vacaciones'',''pending'':''¡Entrada detectada!'',''triggered'':''¡ALARMA DISPARADA!''} %}{{ m.get(e, e) | upper }}'
-            secondary: '{% set e = states(''alarm_control_panel.alarm_homy'') %}{% set modo = {''armed_home'':''Casa'',''armed_night'':''Noche'',''armed_away'':''Ausente'',''armed_vacation'':''Vacaciones''}.get(states(''input_select.alarm_homy_modo''), '''') %}{% if e in [''pending'',''triggered'',''arming''] and modo %}{{ modo }} · {% endif %}desde {{ as_local(states.alarm_control_panel.alarm_homy.last_changed).strftime(''%H:%M'') }}'
-            icon: '{% set e = states(''alarm_control_panel.alarm_homy'') %}{{ {''disarmed'':''mdi:shield-off'',''arming'':''mdi:shield-sync'',''armed_home'':''mdi:home-account'',''armed_night'':''mdi:weather-night'',''armed_away'':''mdi:home-export-outline'',''armed_vacation'':''mdi:airplane'',''pending'':''mdi:shield-alert'',''triggered'':''mdi:alarm-light''}.get(e,''mdi:shield'') }}'
-            tap_action:
-              action: more-info
-            color: '{% set e = states(''alarm_control_panel.alarm_homy'') %}{{ {''disarmed'':''green'',''arming'':''amber'',''armed_home'':''purple'',''armed_night'':''blue'',''armed_away'':''orange'',''armed_vacation'':''deep-orange'',''pending'':''red'',''triggered'':''red''}.get(e,''grey'') }}'
-            features_position: bottom
-            area: 9d6ff7118aff4fe1a55c43a4c9b9583e
-            multiline_secondary: true
-            badge_icon: mdi:home-lock
-            badge_color: green
-          - type: heading
-            icon: mdi:cctv
-            heading: ALARMA CAMARAS BLINK
-            heading_style: title
-            badges:
-              - type: entity
-                show_state: true
-                show_icon: true
-                entity: alarm_control_panel.blink_casa
-            grid_options:
-              rows: 1
-              columns: full
-          - features:
-              - type: alarm-modes
-                modes:
-                  - disarmed
-                  - armed_away
-            type: custom:mushroom-template-card
-            entity: alarm_control_panel.blink_casa
-            grid_options:
-              columns: 12
-            primary: '{% set e = states(''alarm_control_panel.blink_casa'') %}{% set m = {''disarmed'':''Desarmada'',''arming'':''Armando…'',''armed_home'':''Armada Casa'',''armed_night'':''Armada Noche'',''armed_away'':''Armada Ausente'',''armed_vacation'':''Armada Vacaciones'',''pending'':''¡Entrada detectada!'',''triggered'':''¡ALARMA DISPARADA!''} %}{{ m.get(e, e) | upper }}'
-            secondary: desde {{ as_local(states.alarm_control_panel.blink_casa.last_changed).strftime('%H:%M') }}
-            icon: '{% set e = states(''alarm_control_panel.blink_casa'') %}{{ {''disarmed'':''mdi:shield-off'',''arming'':''mdi:shield-sync'',''armed_home'':''mdi:home-account'',''armed_night'':''mdi:weather-night'',''armed_away'':''mdi:home-export-outline'',''armed_vacation'':''mdi:airplane'',''pending'':''mdi:shield-alert'',''triggered'':''mdi:alarm-light''}.get(e,''mdi:shield'') }}'
-            tap_action:
-              action: more-info
-            color: '{% set e = states(''alarm_control_panel.blink_casa'') %}{{ {''disarmed'':''cyan'',''arming'':''amber'',''armed_away'':''indigo'',''armed_home'':''indigo'',''armed_night'':''indigo'',''pending'':''red'',''triggered'':''red''}.get(e,''grey'') }}'
-            features_position: bottom
-            area: 9d6ff7118aff4fe1a55c43a4c9b9583e
-            multiline_secondary: true
-            badge_icon: mdi:cctv
-            badge_color: cyan
+    - type: grid
+      cards:
+      - show_state: false
+        show_name: true
+        camera_view: auto
+        fit_mode: cover
+        type: picture-entity
+        entity: alarm_control_panel.alarm_homy
+        name: Estado
+        image:
+          media_content_id: /local/Home_Alarm_Security_I3.jpg
+        tap_action:
+          action: none
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+        aspect_ratio: '3'
+      - type: heading
+        icon: mdi:account-convert
+        heading: Presencia
+        heading_style: title
+        badges:
+        - type: entity
+          entity: binary_sensor.family_any_home
+        - type: entity
+          entity: binary_sensor.family_all_home
+        - type: entity
+          entity: sensor.family_home
+        - type: entity
+          entity: sensor.family_sleep_home
+      - cards:
+        - cards:
           - type: tile
-            entity: timer.alarm_homy_salida
-            name: Salida
-            grid_options:
-              columns: 12
-            visibility:
-              - condition: state
-                entity: timer.alarm_homy_salida
-                state: active
-          - type: tile
-            entity: timer.alarm_homy_entrada
-            name: Entrada
-            grid_options:
-              columns: 12
-            visibility:
-              - condition: state
-                entity: timer.alarm_homy_entrada
-                state: active
-          - type: tile
-            entity: timer.alarm_homy_disparo
-            name: Disparo
-            grid_options:
-              columns: 12
-            visibility:
-              - condition: state
-                entity: timer.alarm_homy_disparo
-                state: active
-      - type: grid
-        cards:
-          - show_state: false
-            show_name: true
-            camera_view: auto
-            fit_mode: cover
-            type: picture-entity
-            entity: alarm_control_panel.alarm_homy
-            name: Armado
-            image:
-              media_content_id: /local/Home_Alarm_Security_I4.jpg
-            tap_action:
-              action: none
-            hold_action:
-              action: none
-            grid_options:
-              columns: 12
-            aspect_ratio: '3'
-          - type: tile
-            entity: binary_sensor.alarm_homy_lista_para_armar
-            name: Lista para armar
-            state_content:
-              - state
-              - abiertos
-            grid_options:
-              columns: 12
-            color: green
-            icon: mdi:shield-check
-            visibility:
-              - condition: state
-                entity: binary_sensor.alarm_homy_lista_para_armar
-                state: 'on'
-          - type: tile
-            entity: binary_sensor.alarm_homy_no_lista_para_armar
-            name: No lista para armar
-            state_content:
-              - abiertos
-            grid_options:
-              columns: 12
-            color: amber
-            icon: mdi:shield-alert
-            visibility:
-              - condition: state
-                entity: binary_sensor.alarm_homy_lista_para_armar
-                state: 'off'
-          - type: tile
-            grid_options:
-              columns: 12
-            entity: sensor.alarm_homy_averias
-            name: Sensores con averías (sin comunicación)
-            icon: mdi:access-point-network-off
-            color: amber
-            state_content:
-              - state
-              - nombres
-            vertical: false
-            features_position: bottom
-          - type: tile
-            entity: binary_sensor.alarm_homy_actividad_estudio
-            name: Actividad en el estudio (aplaza el auto Noche)
-            icon: mdi:desk
-            color: blue
-            state_content:
-              - state
-              - motivo
-            grid_options:
-              columns: 12
-          - type: custom:mushroom-template-card
-            entity: alarm_control_panel.alarm_homy
-            primary: Desarmar (con código)
-            secondary: '{{ ''Desarmada'' if is_state(''alarm_control_panel.alarm_homy'',''disarmed'') else '''' }}'
-            icon: mdi:shield-off
-            color: green
-            tap_action:
-              action: more-info
-            icon_tap_action:
-              action: more-info
-            hold_action:
-              action: none
-            grid_options:
-              columns: 12
-          - type: custom:mushroom-template-card
-            entity: alarm_control_panel.alarm_homy
-            primary: Armar Casa
-            secondary: '{{ ''Activa ahora'' if is_state(''alarm_control_panel.alarm_homy'',''armed_home'') else '''' }}'
-            icon: mdi:home-account
-            color: purple
-            tap_action:
-              action: perform-action
-              perform_action: script.alarm_homy_armar
-              data:
-                modo: armed_home
-                origen: dashboard
-              confirmation:
-                text: Armar Casa?
-            icon_tap_action:
-              action: perform-action
-              perform_action: script.alarm_homy_armar
-              data:
-                modo: armed_home
-                origen: dashboard
-              confirmation:
-                text: Armar Casa?
-            hold_action:
-              action: none
-            grid_options:
-              columns: 12
-          - type: custom:mushroom-template-card
-            entity: alarm_control_panel.alarm_homy
-            primary: Armar Noche
-            secondary: '{{ ''Activa ahora'' if is_state(''alarm_control_panel.alarm_homy'',''armed_night'') else '''' }}'
-            icon: mdi:weather-night
-            color: blue
-            tap_action:
-              action: perform-action
-              perform_action: script.alarm_homy_armar
-              data:
-                modo: armed_night
-                origen: dashboard
-              confirmation:
-                text: Armar Noche?
-            icon_tap_action:
-              action: perform-action
-              perform_action: script.alarm_homy_armar
-              data:
-                modo: armed_night
-                origen: dashboard
-              confirmation:
-                text: Armar Noche?
-            hold_action:
-              action: none
-            grid_options:
-              columns: 12
-          - type: custom:mushroom-template-card
-            entity: alarm_control_panel.alarm_homy
-            primary: Armar Ausente
-            secondary: '{{ ''Activa ahora'' if is_state(''alarm_control_panel.alarm_homy'',''armed_away'') else '''' }}'
-            icon: mdi:home-export-outline
-            color: orange
-            tap_action:
-              action: perform-action
-              perform_action: script.alarm_homy_armar
-              data:
-                modo: armed_away
-                origen: dashboard
-              confirmation:
-                text: Armar Ausente?
-            icon_tap_action:
-              action: perform-action
-              perform_action: script.alarm_homy_armar
-              data:
-                modo: armed_away
-                origen: dashboard
-              confirmation:
-                text: Armar Ausente?
-            hold_action:
-              action: none
-            grid_options:
-              columns: 12
-          - type: custom:mushroom-template-card
-            entity: alarm_control_panel.alarm_homy
-            primary: Armar Vacaciones
-            secondary: '{{ ''Activa ahora'' if is_state(''alarm_control_panel.alarm_homy'',''armed_vacation'') else '''' }}'
-            icon: mdi:airplane
-            color: deep-orange
-            tap_action:
-              action: perform-action
-              perform_action: script.alarm_homy_armar
-              data:
-                modo: armed_vacation
-                origen: dashboard
-              confirmation:
-                text: Armar Vacaciones?
-            icon_tap_action:
-              action: perform-action
-              perform_action: script.alarm_homy_armar
-              data:
-                modo: armed_vacation
-                origen: dashboard
-              confirmation:
-                text: Armar Vacaciones?
-            hold_action:
-              action: none
-            grid_options:
-              columns: 12
-      - type: grid
-        cards:
-          - show_state: false
-            show_name: true
-            camera_view: auto
-            fit_mode: cover
-            type: picture-entity
-            entity: sensor.alarm_homy_disparo
-            name: Último disparo
-            image:
-              media_content_id: /local/Home_Alarm_Security_I7.jpg
-            tap_action:
-              action: none
-            hold_action:
-              action: none
-            grid_options:
-              columns: 12
-            aspect_ratio: '3'
-          - type: tile
-            entity: sensor.alarm_homy_disparo
-            name: Sensor
-            icon: mdi:alarm-light
-            state_content:
-              - state
-              - area
-              - hora
-            grid_options:
-              columns: 12
-          - type: markdown
-            title: Detalle
-            grid_options:
-              columns: 12
-            content: |-
-              {% set d = state_attr('sensor.alarm_homy_disparo','detalles') or [] %}{% if d %}{% for x in d %}- {{ x }}
-              {% endfor %}{% else %}Sin disparos desde el último armado.{% endif %}
-          - type: tile
-            entity: sensor.alarm_homy_disparo
-            name: Origen
-            icon: mdi:source-branch
-            state_content:
-              - origen
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: sensor.alarm_homy_disparo
-            name: Sensores del disparo
-            icon: mdi:format-list-bulleted
-            state_content:
-              - lista
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: sensor.alarm_homy_excluidos
-            name: Excluidos
-            icon: mdi:shield-off-outline
-            state_content:
-              - state
-              - nombres
-            grid_options:
-              columns: 12
-      - type: grid
-        cards:
-          - show_state: false
-            show_name: true
-            camera_view: auto
-            fit_mode: cover
-            type: picture-entity
-            entity: alarm_control_panel.alarm_homy
-            name: Registro
-            image:
-              media_content_id: /local/Home_Alarm_Security_I2.jpg
-            tap_action:
-              action: none
-            hold_action:
-              action: none
-            grid_options:
-              columns: 12
-            aspect_ratio: '3'
-          - type: logbook
-            hours_to_show: 72
-            target:
-              entity_id:
-                - alarm_control_panel.alarm_homy
-                - sensor.alarm_homy_disparo
-                - binary_sensor.alarm_homy_lista_para_armar
-                - sensor.alarm_homy_excluidos
-            grid_options:
-              columns: 12
-              rows: 8
+            entity: person.agustin
+            show_entity_picture: true
+            vertical: true
+            state_content: last_changed
+          - type: custom:mushroom-person-card
+            entity: person.malen
+            icon_type: entity-picture
+            layout: vertical
+            fill_container: true
+            secondary_info: last-changed
+          - type: custom:mushroom-person-card
+            entity: person.agu
+            icon_type: entity-picture
+            layout: vertical
+            fill_container: true
+            secondary_info: last-changed
+          - type: custom:mushroom-person-card
+            entity: person.paloma
+            icon_type: entity-picture
+            layout: vertical
+            fill_container: true
+            secondary_info: last-changed
+          type: horizontal-stack
+        type: vertical-stack
+      - type: heading
+        icon: mdi:security
+        heading: ALARMA PRINCIPAL HOMY
+        heading_style: title
+        badges:
+        - type: entity
+          show_state: true
+          show_icon: true
+          entity: alarm_control_panel.alarm_homy
+        grid_options:
+          rows: 1
+          columns: full
+      - features:
+        - type: alarm-modes
+          modes:
+          - disarmed
+          - armed_away
+        type: custom:mushroom-template-card
+        entity: alarm_control_panel.alarm_homy
+        grid_options:
+          columns: 12
+        primary: '{% set e = states(''alarm_control_panel.alarm_homy'') %}{% set m = {''disarmed'':''Desarmada'',''arming'':''Armando…'',''armed_home'':''Armada Casa'',''armed_night'':''Armada Noche'',''armed_away'':''Armada Ausente'',''armed_vacation'':''Armada Vacaciones'',''pending'':''¡Entrada detectada!'',''triggered'':''¡ALARMA DISPARADA!''} %}{{ m.get(e, e) | upper }}'
+        secondary: '{% set e = states(''alarm_control_panel.alarm_homy'') %}{% set modo = {''armed_home'':''Casa'',''armed_night'':''Noche'',''armed_away'':''Ausente'',''armed_vacation'':''Vacaciones''}.get(states(''input_select.alarm_homy_modo''), '''') %}{% if e in [''pending'',''triggered'',''arming''] and modo %}{{ modo }} · {% endif %}desde {{ as_local(states.alarm_control_panel.alarm_homy.last_changed).strftime(''%H:%M'') }}'
+        icon: '{% set e = states(''alarm_control_panel.alarm_homy'') %}{{ {''disarmed'':''mdi:shield-off'',''arming'':''mdi:shield-sync'',''armed_home'':''mdi:home-account'',''armed_night'':''mdi:weather-night'',''armed_away'':''mdi:home-export-outline'',''armed_vacation'':''mdi:airplane'',''pending'':''mdi:shield-alert'',''triggered'':''mdi:alarm-light''}.get(e,''mdi:shield'') }}'
+        tap_action:
+          action: more-info
+        color: '{% set e = states(''alarm_control_panel.alarm_homy'') %}{{ {''disarmed'':''green'',''arming'':''amber'',''armed_home'':''purple'',''armed_night'':''blue'',''armed_away'':''orange'',''armed_vacation'':''deep-orange'',''pending'':''red'',''triggered'':''red''}.get(e,''grey'') }}'
+        features_position: bottom
+        area: 9d6ff7118aff4fe1a55c43a4c9b9583e
+        multiline_secondary: true
+        badge_icon: mdi:home-lock
+        badge_color: green
+      - type: entity
+        entity: sensor.alarm_homy_restante_salida
+        name: Salida · tiempo para salir
+        icon: mdi:timer-sand
+        grid_options:
+          columns: 12
+        visibility:
+        - condition: state
+          entity: timer.alarm_homy_salida
+          state: active
+        tap_action:
+          action: more-info
+      - type: entity
+        entity: sensor.alarm_homy_restante_entrada
+        name: Entrada · tiempo para desarmar
+        icon: mdi:timer-alert-outline
+        grid_options:
+          columns: 12
+        visibility:
+        - condition: state
+          entity: timer.alarm_homy_entrada
+          state: active
+        tap_action:
+          action: more-info
+      - type: entity
+        entity: sensor.alarm_homy_restante_disparo
+        name: Disparo · sirena
+        icon: mdi:alarm-light
+        grid_options:
+          columns: 12
+        visibility:
+        - condition: state
+          entity: timer.alarm_homy_disparo
+          state: active
+        tap_action:
+          action: more-info
+      - type: heading
+        icon: mdi:cctv
+        heading: ALARMA CAMARAS BLINK
+        heading_style: title
+        badges:
+        - type: entity
+          show_state: true
+          show_icon: true
+          entity: alarm_control_panel.blink_casa
+        grid_options:
+          rows: 1
+          columns: full
+      - features:
+        - type: alarm-modes
+          modes:
+          - disarmed
+          - armed_away
+        type: custom:mushroom-template-card
+        entity: alarm_control_panel.blink_casa
+        grid_options:
+          columns: 12
+        primary: '{% set e = states(''alarm_control_panel.blink_casa'') %}{% set m = {''disarmed'':''Desarmada'',''arming'':''Armando…'',''armed_home'':''Armada Casa'',''armed_night'':''Armada Noche'',''armed_away'':''Armada Ausente'',''armed_vacation'':''Armada Vacaciones'',''pending'':''¡Entrada detectada!'',''triggered'':''¡ALARMA DISPARADA!''} %}{{ m.get(e, e) | upper }}'
+        secondary: desde {{ as_local(states.alarm_control_panel.blink_casa.last_changed).strftime('%H:%M') }}
+        icon: '{% set e = states(''alarm_control_panel.blink_casa'') %}{{ {''disarmed'':''mdi:shield-off'',''arming'':''mdi:shield-sync'',''armed_home'':''mdi:home-account'',''armed_night'':''mdi:weather-night'',''armed_away'':''mdi:home-export-outline'',''armed_vacation'':''mdi:airplane'',''pending'':''mdi:shield-alert'',''triggered'':''mdi:alarm-light''}.get(e,''mdi:shield'') }}'
+        tap_action:
+          action: more-info
+        color: '{% set e = states(''alarm_control_panel.blink_casa'') %}{{ {''disarmed'':''cyan'',''arming'':''amber'',''armed_away'':''indigo'',''armed_home'':''indigo'',''armed_night'':''indigo'',''pending'':''red'',''triggered'':''red''}.get(e,''grey'') }}'
+        features_position: bottom
+        area: 9d6ff7118aff4fe1a55c43a4c9b9583e
+        multiline_secondary: true
+        badge_icon: mdi:cctv
+        badge_color: cyan
+    - type: grid
+      cards:
+      - show_state: false
+        show_name: true
+        camera_view: auto
+        fit_mode: cover
+        type: picture-entity
+        entity: alarm_control_panel.alarm_homy
+        name: Armado
+        image:
+          media_content_id: /local/Home_Alarm_Security_I4.jpg
+        tap_action:
+          action: none
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+        aspect_ratio: '3'
+      - type: tile
+        entity: binary_sensor.alarm_homy_lista_para_armar
+        name: Lista para armar
+        state_content:
+        - state
+        - abiertos
+        grid_options:
+          columns: 12
+        color: green
+        icon: mdi:shield-check
+        visibility:
+        - condition: state
+          entity: binary_sensor.alarm_homy_lista_para_armar
+          state: 'on'
+      - type: tile
+        entity: binary_sensor.alarm_homy_no_lista_para_armar
+        name: No lista para armar
+        state_content:
+        - abiertos
+        grid_options:
+          columns: 12
+        color: amber
+        icon: mdi:shield-alert
+        visibility:
+        - condition: state
+          entity: binary_sensor.alarm_homy_lista_para_armar
+          state: 'off'
+      - type: tile
+        grid_options:
+          columns: 12
+        entity: sensor.alarm_homy_averias
+        name: Sensores con averías (sin comunicación)
+        icon: mdi:access-point-network-off
+        color: amber
+        state_content:
+        - state
+        - nombres
+        vertical: false
+        features_position: bottom
+      - type: tile
+        grid_options:
+          columns: 12
+        entity: binary_sensor.alarm_homy_actividad_estudio
+        name: Actividad en el estudio (en Noche se excluye)
+        icon: mdi:monitor-eye
+        color: blue
+        state_content:
+        - state
+        - motivo
+        vertical: false
+        features_position: bottom
+      - type: tile
+        entity: alarm_control_panel.alarm_homy
+        name: Desarmar
+        icon: mdi:shield-off
+        color: green
+        show_entity_picture: false
+        state_content:
+        - state
+        - last_changed
+        vertical: false
+        grid_options:
+          columns: 12
+          rows: 1
+        icon_tap_action:
+          action: more-info
+        tap_action:
+          action: more-info
+      - type: tile
+        entity: button.alarm_homy_armar_casa
+        color: purple
+        show_entity_picture: false
+        hide_state: false
+        state_content: info
+        vertical: false
+        grid_options:
+          columns: 12
+          rows: 1
+        icon_tap_action:
+          action: perform-action
+          perform_action: button.press
+          target:
+            entity_id: button.alarm_homy_armar_casa
+          confirmation:
+            text: ¿Armar Casa?
+        tap_action:
+          action: more-info
+      - type: tile
+        entity: button.alarm_homy_armar_noche
+        color: blue
+        show_entity_picture: false
+        hide_state: false
+        state_content: info
+        vertical: false
+        grid_options:
+          columns: 12
+          rows: 1
+        icon_tap_action:
+          action: perform-action
+          perform_action: button.press
+          target:
+            entity_id: button.alarm_homy_armar_noche
+          confirmation:
+            text: ¿Armar Noche?
+        tap_action:
+          action: more-info
+      - type: tile
+        entity: button.alarm_homy_armar_ausente
+        color: orange
+        show_entity_picture: false
+        hide_state: false
+        state_content: info
+        vertical: false
+        grid_options:
+          columns: 12
+          rows: 1
+        icon_tap_action:
+          action: perform-action
+          perform_action: button.press
+          target:
+            entity_id: button.alarm_homy_armar_ausente
+          confirmation:
+            text: ¿Armar Ausente?
+        tap_action:
+          action: more-info
+      - type: tile
+        entity: button.alarm_homy_armar_vacaciones
+        color: deep-orange
+        show_entity_picture: false
+        hide_state: false
+        state_content: info
+        vertical: false
+        grid_options:
+          columns: 12
+          rows: 1
+        icon_tap_action:
+          action: perform-action
+          perform_action: button.press
+          target:
+            entity_id: button.alarm_homy_armar_vacaciones
+          confirmation:
+            text: ¿Armar Vacaciones?
+        tap_action:
+          action: more-info
+    - type: grid
+      cards:
+      - show_state: false
+        show_name: true
+        camera_view: auto
+        fit_mode: cover
+        type: picture-entity
+        entity: sensor.alarm_homy_disparo
+        name: Último disparo
+        image:
+          media_content_id: /local/Home_Alarm_Security_I7.jpg
+        tap_action:
+          action: none
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+        aspect_ratio: '3'
+      - type: tile
+        entity: sensor.alarm_homy_disparo
+        name: Sensor
+        icon: mdi:alarm-light
+        state_content:
+        - state
+        - area
+        - hora
+        grid_options:
+          columns: 12
+      - type: markdown
+        title: Detalle
+        grid_options:
+          columns: 12
+        content: '{% set d = state_attr(''sensor.alarm_homy_disparo'',''detalles'') or [] %}{% if d %}{% for x in d %}- {{ x }}
+
+          {% endfor %}{% else %}Sin disparos desde el último armado.{% endif %}'
+      - type: tile
+        entity: sensor.alarm_homy_disparo
+        name: Origen
+        icon: mdi:source-branch
+        state_content:
+        - origen
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: sensor.alarm_homy_disparo
+        name: Sensores del disparo
+        icon: mdi:format-list-bulleted
+        state_content:
+        - lista
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: sensor.alarm_homy_excluidos
+        name: Excluidos
+        icon: mdi:shield-off-outline
+        state_content:
+        - state
+        - nombres
+        grid_options:
+          columns: 12
+    - type: grid
+      cards:
+      - show_state: false
+        show_name: true
+        camera_view: auto
+        fit_mode: cover
+        type: picture-entity
+        entity: alarm_control_panel.alarm_homy
+        name: Registro
+        image:
+          media_content_id: /local/Home_Alarm_Security_I2.jpg
+        tap_action:
+          action: none
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+        aspect_ratio: '3'
+      - type: logbook
+        hours_to_show: 72
+        target:
+          entity_id:
+          - alarm_control_panel.alarm_homy
+          - sensor.alarm_homy_disparo
+          - sensor.alarm_homy_excluidos
+        grid_options:
+          columns: 12
+          rows: 8
+  - title: Sensores Activos
+    path: sensores-armado
+    icon: mdi:shield-search
+    type: sections
+    max_columns: 4
+    badges: []
+    sections:
+    - type: grid
+      cards:
+      - show_state: false
+        show_name: true
+        camera_view: auto
+        fit_mode: cover
+        type: picture-entity
+        entity: alarm_control_panel.alarm_homy
+        name: Puertas y ventanas
+        image:
+          media_content_id: /local/Home_Alarm_Security_I2.jpg
+        tap_action:
+          action: none
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+        aspect_ratio: '5'
+      - type: heading
+        heading: Entrada
+        heading_style: subtitle
+        icon: mdi:door
+        grid_options:
+          columns: 12
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.ikea_sensor_puerta_entrada
+        primary: Sensor puerta entrada (respaldo)
+        secondary: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.ikea_sensor_puerta_entrada'') | from_json).t }}'
+        icon: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.ikea_sensor_puerta_entrada'') | from_json).i }}'
+        color: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.ikea_sensor_puerta_entrada'') | from_json).c }}'
+        tap_action:
+          action: more-info
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.aqara_puerta_entrada_principal
+        primary: Sensor puerta entrada principal
+        secondary: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_puerta_entrada_principal'') | from_json).t }}'
+        icon: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_puerta_entrada_principal'') | from_json).i }}'
+        color: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_puerta_entrada_principal'') | from_json).c }}'
+        tap_action:
+          action: more-info
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Salón
+        heading_style: subtitle
+        icon: mdi:sofa
+        grid_options:
+          columns: 12
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.aqara_puerta_salon
+        primary: Sensor puerta salón
+        secondary: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_puerta_salon'') | from_json).t }}'
+        icon: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_puerta_salon'') | from_json).i }}'
+        color: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_puerta_salon'') | from_json).c }}'
+        tap_action:
+          action: more-info
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.ikea_sensor_puerta_reja_salon
+        primary: Sensor reja puerta salón
+        secondary: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.ikea_sensor_puerta_reja_salon'') | from_json).t }}'
+        icon: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.ikea_sensor_puerta_reja_salon'') | from_json).i }}'
+        color: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.ikea_sensor_puerta_reja_salon'') | from_json).c }}'
+        tap_action:
+          action: more-info
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Dormitorios
+        heading_style: subtitle
+        icon: mdi:bed
+        grid_options:
+          columns: 12
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.aqara_ventana_dormitorio_principal
+        primary: Sensor ventana dormitorio principal
+        secondary: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_ventana_dormitorio_principal'') | from_json).t }}'
+        icon: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_ventana_dormitorio_principal'') | from_json).i }}'
+        color: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_ventana_dormitorio_principal'') | from_json).c }}'
+        tap_action:
+          action: more-info
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.aqara_ventana_dormitorio_agu
+        primary: Sensor ventana dormitorio Agu
+        secondary: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_ventana_dormitorio_agu'') | from_json).t }}'
+        icon: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_ventana_dormitorio_agu'') | from_json).i }}'
+        color: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_ventana_dormitorio_agu'') | from_json).c }}'
+        tap_action:
+          action: more-info
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.aqara_ventana_dormitorio_paloma
+        primary: Sensor ventana dormitorio Paloma
+        secondary: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_ventana_dormitorio_paloma'') | from_json).t }}'
+        icon: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_ventana_dormitorio_paloma'') | from_json).i }}'
+        color: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_ventana_dormitorio_paloma'') | from_json).c }}'
+        tap_action:
+          action: more-info
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.aqara_ventana_dormitorio_plancha
+        primary: Sensor ventana dormitorio plancha
+        secondary: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_ventana_dormitorio_plancha'') | from_json).t }}'
+        icon: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_ventana_dormitorio_plancha'') | from_json).i }}'
+        color: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_ventana_dormitorio_plancha'') | from_json).c }}'
+        tap_action:
+          action: more-info
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Estudio
+        heading_style: subtitle
+        icon: mdi:desk
+        grid_options:
+          columns: 12
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.aqara_ventana_estudio_derecha
+        primary: Sensor ventana estudio derecha
+        secondary: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_ventana_estudio_derecha'') | from_json).t }}'
+        icon: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_ventana_estudio_derecha'') | from_json).i }}'
+        color: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_ventana_estudio_derecha'') | from_json).c }}'
+        tap_action:
+          action: more-info
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.aqara_ventana_estudio_izquierda
+        primary: Sensor ventana estudio izquierda
+        secondary: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_ventana_estudio_izquierda'') | from_json).t }}'
+        icon: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_ventana_estudio_izquierda'') | from_json).i }}'
+        color: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_ventana_estudio_izquierda'') | from_json).c }}'
+        tap_action:
+          action: more-info
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Armario
+        heading_style: subtitle
+        icon: mdi:wardrobe
+        grid_options:
+          columns: 12
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.aqara_puerta_estudio_armario
+        primary: Sensor puerta estudio armario
+        secondary: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_puerta_estudio_armario'') | from_json).t }}'
+        icon: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_puerta_estudio_armario'') | from_json).i }}'
+        color: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_puerta_estudio_armario'') | from_json).c }}'
+        tap_action:
+          action: more-info
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Desván
+        heading_style: subtitle
+        icon: mdi:home-floor-a
+        grid_options:
+          columns: 12
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.aqara_puerta_estudio_desvan
+        primary: Sensor puerta estudio desván
+        secondary: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_puerta_estudio_desvan'') | from_json).t }}'
+        icon: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_puerta_estudio_desvan'') | from_json).i }}'
+        color: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_puerta_estudio_desvan'') | from_json).c }}'
+        tap_action:
+          action: more-info
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+    - type: grid
+      cards:
+      - show_state: false
+        show_name: true
+        camera_view: auto
+        fit_mode: cover
+        type: picture-entity
+        entity: alarm_control_panel.alarm_homy
+        name: Movimiento interior
+        image:
+          media_content_id: /local/Home_Alarm_Security_I8.jpg
+        tap_action:
+          action: none
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+        aspect_ratio: '5'
+      - type: heading
+        heading: Entrada
+        heading_style: subtitle
+        icon: mdi:door
+        grid_options:
+          columns: 12
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.blink_hall_motion
+        primary: Cámara hall
+        secondary: '{% from ''alarm_homy.jinja'' import vigilancia_blink %}{{ (vigilancia_blink(''hall'') | from_json).t }}'
+        icon: '{% from ''alarm_homy.jinja'' import vigilancia_blink %}{{ (vigilancia_blink(''hall'') | from_json).i }}'
+        color: '{% from ''alarm_homy.jinja'' import vigilancia_blink %}{{ (vigilancia_blink(''hall'') | from_json).c }}'
+        tap_action:
+          action: more-info
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.aqara_movimiento_entrada
+        primary: Movimiento entrada-hall
+        secondary: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_movimiento_entrada'') | from_json).t }}'
+        icon: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_movimiento_entrada'') | from_json).i }}'
+        color: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_movimiento_entrada'') | from_json).c }}'
+        tap_action:
+          action: more-info
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.ikea_movimiento_entrada
+        primary: Movimiento entrada-pasillo
+        secondary: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.ikea_movimiento_entrada'') | from_json).t }}'
+        icon: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.ikea_movimiento_entrada'') | from_json).i }}'
+        color: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.ikea_movimiento_entrada'') | from_json).c }}'
+        tap_action:
+          action: more-info
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Pasillo
+        heading_style: subtitle
+        icon: mdi:arrow-left-right
+        grid_options:
+          columns: 12
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.hue_movimiento_pasillo_presencia
+        primary: Movimiento pasillo
+        secondary: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.hue_movimiento_pasillo_presencia'') | from_json).t }}'
+        icon: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.hue_movimiento_pasillo_presencia'') | from_json).i }}'
+        color: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.hue_movimiento_pasillo_presencia'') | from_json).c }}'
+        tap_action:
+          action: more-info
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Salón
+        heading_style: subtitle
+        icon: mdi:sofa
+        grid_options:
+          columns: 12
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.blink_salon_motion
+        primary: Cámara salón
+        secondary: '{% from ''alarm_homy.jinja'' import vigilancia_blink %}{{ (vigilancia_blink(''salon'') | from_json).t }}'
+        icon: '{% from ''alarm_homy.jinja'' import vigilancia_blink %}{{ (vigilancia_blink(''salon'') | from_json).i }}'
+        color: '{% from ''alarm_homy.jinja'' import vigilancia_blink %}{{ (vigilancia_blink(''salon'') | from_json).c }}'
+        tap_action:
+          action: more-info
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.aqara_movimiento_salon
+        primary: Movimiento salón
+        secondary: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_movimiento_salon'') | from_json).t }}'
+        icon: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_movimiento_salon'') | from_json).i }}'
+        color: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_movimiento_salon'') | from_json).c }}'
+        tap_action:
+          action: more-info
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Cocina
+        heading_style: subtitle
+        icon: mdi:silverware-fork-knife
+        grid_options:
+          columns: 12
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.blink_cocina_motion
+        primary: Cámara cocina
+        secondary: '{% from ''alarm_homy.jinja'' import vigilancia_blink %}{{ (vigilancia_blink(''cocina'') | from_json).t }}'
+        icon: '{% from ''alarm_homy.jinja'' import vigilancia_blink %}{{ (vigilancia_blink(''cocina'') | from_json).i }}'
+        color: '{% from ''alarm_homy.jinja'' import vigilancia_blink %}{{ (vigilancia_blink(''cocina'') | from_json).c }}'
+        tap_action:
+          action: more-info
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.ikea_sensor_movimiento_cocina
+        primary: Movimiento cocina
+        secondary: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.ikea_sensor_movimiento_cocina'') | from_json).t }}'
+        icon: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.ikea_sensor_movimiento_cocina'') | from_json).i }}'
+        color: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.ikea_sensor_movimiento_cocina'') | from_json).c }}'
+        tap_action:
+          action: more-info
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Dormitorios
+        heading_style: subtitle
+        icon: mdi:bed
+        grid_options:
+          columns: 12
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.aqara_movimiento_principal
+        primary: Movimiento dormitorio principal
+        secondary: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_movimiento_principal'') | from_json).t }}'
+        icon: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_movimiento_principal'') | from_json).i }}'
+        color: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_movimiento_principal'') | from_json).c }}'
+        tap_action:
+          action: more-info
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Estudio
+        heading_style: subtitle
+        icon: mdi:desk
+        grid_options:
+          columns: 12
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.blink_estudio_motion
+        primary: Cámara estudio
+        secondary: '{% from ''alarm_homy.jinja'' import vigilancia_blink %}{{ (vigilancia_blink(''estudio'') | from_json).t }}'
+        icon: '{% from ''alarm_homy.jinja'' import vigilancia_blink %}{{ (vigilancia_blink(''estudio'') | from_json).i }}'
+        color: '{% from ''alarm_homy.jinja'' import vigilancia_blink %}{{ (vigilancia_blink(''estudio'') | from_json).c }}'
+        tap_action:
+          action: more-info
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.aqara_movimiento_estudio
+        primary: Movimiento estudio
+        secondary: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_movimiento_estudio'') | from_json).t }}'
+        icon: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_movimiento_estudio'') | from_json).i }}'
+        color: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_movimiento_estudio'') | from_json).c }}'
+        tap_action:
+          action: more-info
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+    - type: grid
+      cards:
+      - show_state: false
+        show_name: true
+        camera_view: auto
+        fit_mode: cover
+        type: picture-entity
+        entity: alarm_control_panel.alarm_homy
+        name: Exterior y cámaras
+        image:
+          media_content_id: /local/Home_Alarm_Security_I8.jpg
+        tap_action:
+          action: none
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+        aspect_ratio: '5'
+      - type: heading
+        heading: Entrada
+        heading_style: subtitle
+        icon: mdi:door
+        grid_options:
+          columns: 12
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.blink_puerta_principal_motion
+        primary: Cámara puerta principal
+        secondary: '{% from ''alarm_homy.jinja'' import vigilancia_blink %}{{ (vigilancia_blink(''puerta_principal'') | from_json).t }}'
+        icon: '{% from ''alarm_homy.jinja'' import vigilancia_blink %}{{ (vigilancia_blink(''puerta_principal'') | from_json).i }}'
+        color: '{% from ''alarm_homy.jinja'' import vigilancia_blink %}{{ (vigilancia_blink(''puerta_principal'') | from_json).c }}'
+        tap_action:
+          action: more-info
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Porche
+        heading_style: subtitle
+        icon: mdi:home-roof
+        grid_options:
+          columns: 12
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.blink_porche_motion
+        primary: Cámara porche
+        secondary: '{% from ''alarm_homy.jinja'' import vigilancia_blink %}{{ (vigilancia_blink(''porche'') | from_json).t }}'
+        icon: '{% from ''alarm_homy.jinja'' import vigilancia_blink %}{{ (vigilancia_blink(''porche'') | from_json).i }}'
+        color: '{% from ''alarm_homy.jinja'' import vigilancia_blink %}{{ (vigilancia_blink(''porche'') | from_json).c }}'
+        tap_action:
+          action: more-info
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Entrada garaje
+        heading_style: subtitle
+        icon: mdi:gate
+        grid_options:
+          columns: 12
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.blink_cancela_right_motion
+        primary: Cámara cancela derecha
+        secondary: '{% from ''alarm_homy.jinja'' import vigilancia_blink %}{{ (vigilancia_blink(''cancela_right'') | from_json).t }}'
+        icon: '{% from ''alarm_homy.jinja'' import vigilancia_blink %}{{ (vigilancia_blink(''cancela_right'') | from_json).i }}'
+        color: '{% from ''alarm_homy.jinja'' import vigilancia_blink %}{{ (vigilancia_blink(''cancela_right'') | from_json).c }}'
+        tap_action:
+          action: more-info
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.blink_cancela_left_motion
+        primary: Cámara cancela izquierda
+        secondary: '{% from ''alarm_homy.jinja'' import vigilancia_blink %}{{ (vigilancia_blink(''cancela_left'') | from_json).t }}'
+        icon: '{% from ''alarm_homy.jinja'' import vigilancia_blink %}{{ (vigilancia_blink(''cancela_left'') | from_json).i }}'
+        color: '{% from ''alarm_homy.jinja'' import vigilancia_blink %}{{ (vigilancia_blink(''cancela_left'') | from_json).c }}'
+        tap_action:
+          action: more-info
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.aqara_movimiento_entrada_exterior
+        primary: Movimiento entrada exterior
+        secondary: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_movimiento_entrada_exterior'') | from_json).t }}'
+        icon: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_movimiento_entrada_exterior'') | from_json).i }}'
+        color: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_movimiento_entrada_exterior'') | from_json).c }}'
+        tap_action:
+          action: more-info
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.ikea_sensor_movimiento_entrada_exterior
+        primary: Movimiento cancela exterior
+        secondary: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.ikea_sensor_movimiento_entrada_exterior'') | from_json).t }}'
+        icon: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.ikea_sensor_movimiento_entrada_exterior'') | from_json).i }}'
+        color: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.ikea_sensor_movimiento_entrada_exterior'') | from_json).c }}'
+        tap_action:
+          action: more-info
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Piscina
+        heading_style: subtitle
+        icon: mdi:pool
+        grid_options:
+          columns: 12
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.blink_piscina_motion
+        primary: Cámara piscina
+        secondary: '{% from ''alarm_homy.jinja'' import vigilancia_blink %}{{ (vigilancia_blink(''piscina'') | from_json).t }}'
+        icon: '{% from ''alarm_homy.jinja'' import vigilancia_blink %}{{ (vigilancia_blink(''piscina'') | from_json).i }}'
+        color: '{% from ''alarm_homy.jinja'' import vigilancia_blink %}{{ (vigilancia_blink(''piscina'') | from_json).c }}'
+        tap_action:
+          action: more-info
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+    - type: grid
+      cards:
+      - show_state: false
+        show_name: true
+        camera_view: auto
+        fit_mode: cover
+        type: picture-entity
+        entity: alarm_control_panel.alarm_homy
+        name: Vibración
+        image:
+          media_content_id: /local/Home_Alarm_Security_I0.webp
+        tap_action:
+          action: none
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+        aspect_ratio: '5'
+      - type: heading
+        heading: Entrada
+        heading_style: subtitle
+        icon: mdi:door
+        grid_options:
+          columns: 12
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.aqara_vibracion_puerta_principal
+        primary: Sensor vibración puerta principal
+        secondary: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_vibracion_puerta_principal'') | from_json).t }}'
+        icon: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_vibracion_puerta_principal'') | from_json).i }}'
+        color: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_vibracion_puerta_principal'') | from_json).c }}'
+        tap_action:
+          action: more-info
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Salón
+        heading_style: subtitle
+        icon: mdi:sofa
+        grid_options:
+          columns: 12
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.aqara_vibracion_puerta_salon
+        primary: Sensor vibración puerta salón
+        secondary: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_vibracion_puerta_salon'') | from_json).t }}'
+        icon: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_vibracion_puerta_salon'') | from_json).i }}'
+        color: '{% from ''alarm_homy.jinja'' import vigilancia %}{{ (vigilancia(''binary_sensor.aqara_vibracion_puerta_salon'') | from_json).c }}'
+        tap_action:
+          action: more-info
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+    - type: grid
+      column_span: 4
+      cards:
+      - type: tile
+        entity: input_select.alarm_homy_modo_vista
+        name: Vista previa del modo
+        icon: mdi:eye
+        grid_options:
+          columns: full
+        features:
+        - type: select-options
+        features_position: inline
+        visibility:
+        - condition: state
+          entity: input_select.alarm_homy_estado
+          state: disarmed
+      - type: custom:mushroom-template-card
+        entity: alarm_control_panel.alarm_homy
+        grid_options:
+          columns: full
+        primary: '{% from ''alarm_homy.jinja'' import resumen_vista %}{{ resumen_vista() }}'
+        secondary: '{% if states(''input_select.alarm_homy_estado'') == ''disarmed'' %}Desarmada: elige abajo el modo para ver qué quedará vigilado al armar.{% else %}Situación real del modo armado ahora.{% endif %} Verde = vigilando · rojo = activo/abierto · naranja = excluido · ámbar = sin comunicación · gris = no participa.'
+        icon: mdi:shield-search
+        color: '{% from ''alarm_homy.jinja'' import modo_vista %}{{ {''armed_home'':''purple'',''armed_night'':''blue'',''armed_away'':''orange'',''armed_vacation'':''deep-orange''}.get(modo_vista(),''grey'') }}'
+        multiline_secondary: true
+        tap_action:
+          action: none
+        hold_action:
+          action: none
   - title: Estado Sensores Alarma
     icon: mdi:motion-sensor
     badges: []
@@ -1359,664 +1944,664 @@ views:
     type: sections
     max_columns: 4
     sections:
-      - type: grid
-        cards:
-          - show_state: false
-            show_name: true
-            camera_view: auto
-            fit_mode: cover
-            type: picture-entity
-            entity: binary_sensor.alarm_homy_lista_para_armar
-            name: Puertas y ventanas
-            image:
-              media_content_id: /local/Home_Alarm_Security_I2.jpg
-            tap_action:
-              action: none
-            hold_action:
-              action: none
-            grid_options:
-              columns: 12
-            aspect_ratio: '5'
-          - type: heading
-            heading: Entrada
-            heading_style: subtitle
-            icon: mdi:door
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: input_boolean.alarm_homy_sensor_ikea_sensor_puerta_entrada
-            name: Sensor puerta entrada (respaldo)
-            icon: mdi:shield-check
-            state_content:
-              - state
-              - last_changed
-            tap_action:
-              action: more-info
-            icon_tap_action:
-              action: more-info
-            hold_action:
-              action: more-info
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: input_boolean.alarm_homy_sensor_aqara_puerta_entrada_principal
-            name: Sensor puerta entrada principal
-            icon: mdi:shield-check
-            state_content:
-              - state
-              - last_changed
-            tap_action:
-              action: more-info
-            icon_tap_action:
-              action: more-info
-            hold_action:
-              action: more-info
-            grid_options:
-              columns: 12
-          - type: heading
-            heading: Salón
-            heading_style: subtitle
-            icon: mdi:sofa
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: input_boolean.alarm_homy_sensor_aqara_puerta_salon
-            name: Sensor puerta salón
-            icon: mdi:shield-check
-            state_content:
-              - state
-              - last_changed
-            tap_action:
-              action: more-info
-            icon_tap_action:
-              action: more-info
-            hold_action:
-              action: more-info
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: input_boolean.alarm_homy_sensor_ikea_sensor_puerta_reja_salon
-            name: Sensor reja puerta salón
-            icon: mdi:shield-check
-            state_content:
-              - state
-              - last_changed
-            tap_action:
-              action: more-info
-            icon_tap_action:
-              action: more-info
-            hold_action:
-              action: more-info
-            grid_options:
-              columns: 12
-          - type: heading
-            heading: Dormitorios
-            heading_style: subtitle
-            icon: mdi:bed
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: input_boolean.alarm_homy_sensor_aqara_ventana_dormitorio_principal
-            name: Sensor ventana dormitorio principal
-            icon: mdi:shield-check
-            state_content:
-              - state
-              - last_changed
-            tap_action:
-              action: more-info
-            icon_tap_action:
-              action: more-info
-            hold_action:
-              action: more-info
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: input_boolean.alarm_homy_sensor_aqara_ventana_dormitorio_agu
-            name: Sensor ventana dormitorio Agu
-            icon: mdi:shield-check
-            state_content:
-              - state
-              - last_changed
-            tap_action:
-              action: more-info
-            icon_tap_action:
-              action: more-info
-            hold_action:
-              action: more-info
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: input_boolean.alarm_homy_sensor_aqara_ventana_dormitorio_paloma
-            name: Sensor ventana dormitorio Paloma
-            icon: mdi:shield-check
-            state_content:
-              - state
-              - last_changed
-            tap_action:
-              action: more-info
-            icon_tap_action:
-              action: more-info
-            hold_action:
-              action: more-info
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: input_boolean.alarm_homy_sensor_aqara_ventana_dormitorio_plancha
-            name: Sensor ventana dormitorio plancha
-            icon: mdi:shield-check
-            state_content:
-              - state
-              - last_changed
-            tap_action:
-              action: more-info
-            icon_tap_action:
-              action: more-info
-            hold_action:
-              action: more-info
-            grid_options:
-              columns: 12
-          - type: heading
-            heading: Estudio
-            heading_style: subtitle
-            icon: mdi:desk
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: input_boolean.alarm_homy_sensor_aqara_ventana_estudio_derecha
-            name: Sensor ventana estudio derecha
-            icon: mdi:shield-check
-            state_content:
-              - state
-              - last_changed
-            tap_action:
-              action: more-info
-            icon_tap_action:
-              action: more-info
-            hold_action:
-              action: more-info
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: input_boolean.alarm_homy_sensor_aqara_ventana_estudio_izquierda
-            name: Sensor ventana estudio izquierda
-            icon: mdi:shield-check
-            state_content:
-              - state
-              - last_changed
-            tap_action:
-              action: more-info
-            icon_tap_action:
-              action: more-info
-            hold_action:
-              action: more-info
-            grid_options:
-              columns: 12
-          - type: heading
-            heading: Armario
-            heading_style: subtitle
-            icon: mdi:wardrobe
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: input_boolean.alarm_homy_sensor_aqara_puerta_estudio_armario
-            name: Sensor puerta estudio armario
-            icon: mdi:shield-check
-            state_content:
-              - state
-              - last_changed
-            tap_action:
-              action: more-info
-            icon_tap_action:
-              action: more-info
-            hold_action:
-              action: more-info
-            grid_options:
-              columns: 12
-          - type: heading
-            heading: Desván
-            heading_style: subtitle
-            icon: mdi:home-floor-a
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: input_boolean.alarm_homy_sensor_aqara_puerta_estudio_desvan
-            name: Sensor puerta estudio desván
-            icon: mdi:shield-check
-            state_content:
-              - state
-              - last_changed
-            tap_action:
-              action: more-info
-            icon_tap_action:
-              action: more-info
-            hold_action:
-              action: more-info
-            grid_options:
-              columns: 12
-      - type: grid
-        cards:
-          - show_state: false
-            show_name: true
-            camera_view: auto
-            fit_mode: cover
-            type: picture-entity
-            entity: input_select.alarm_homy_estado
-            name: Movimiento interior
-            image:
-              media_content_id: /local/Home_Alarm_Security_I8.jpg
-            tap_action:
-              action: none
-            hold_action:
-              action: none
-            grid_options:
-              columns: 12
-            aspect_ratio: '5'
-          - type: heading
-            heading: Entrada
-            heading_style: subtitle
-            icon: mdi:door
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: input_boolean.alarm_homy_sensor_blink_hall_motion
-            name: Cámara hall
-            icon: mdi:shield-check
-            state_content:
-              - state
-              - last_changed
-            tap_action:
-              action: more-info
-            icon_tap_action:
-              action: more-info
-            hold_action:
-              action: more-info
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: input_boolean.alarm_homy_sensor_aqara_movimiento_entrada
-            name: Movimiento entrada-hall
-            icon: mdi:shield-check
-            state_content:
-              - state
-              - last_changed
-            tap_action:
-              action: more-info
-            icon_tap_action:
-              action: more-info
-            hold_action:
-              action: more-info
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: input_boolean.alarm_homy_sensor_ikea_movimiento_entrada
-            name: Movimiento entrada-pasillo
-            icon: mdi:shield-check
-            state_content:
-              - state
-              - last_changed
-            tap_action:
-              action: more-info
-            icon_tap_action:
-              action: more-info
-            hold_action:
-              action: more-info
-            grid_options:
-              columns: 12
-          - type: heading
-            heading: Pasillo
-            heading_style: subtitle
-            icon: mdi:arrow-left-right
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: input_boolean.alarm_homy_sensor_hue_movimiento_pasillo_presencia
-            name: Movimiento pasillo
-            icon: mdi:shield-check
-            state_content:
-              - state
-              - last_changed
-            tap_action:
-              action: more-info
-            icon_tap_action:
-              action: more-info
-            hold_action:
-              action: more-info
-            grid_options:
-              columns: 12
-          - type: heading
-            heading: Salón
-            heading_style: subtitle
-            icon: mdi:sofa
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: input_boolean.alarm_homy_sensor_blink_salon_motion
-            name: Cámara salón
-            icon: mdi:shield-check
-            state_content:
-              - state
-              - last_changed
-            tap_action:
-              action: more-info
-            icon_tap_action:
-              action: more-info
-            hold_action:
-              action: more-info
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: input_boolean.alarm_homy_sensor_aqara_movimiento_salon
-            name: Movimiento salón
-            icon: mdi:shield-check
-            state_content:
-              - state
-              - last_changed
-            tap_action:
-              action: more-info
-            icon_tap_action:
-              action: more-info
-            hold_action:
-              action: more-info
-            grid_options:
-              columns: 12
-          - type: heading
-            heading: Cocina
-            heading_style: subtitle
-            icon: mdi:silverware-fork-knife
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: input_boolean.alarm_homy_sensor_blink_cocina_motion
-            name: Cámara cocina
-            icon: mdi:shield-check
-            state_content:
-              - state
-              - last_changed
-            tap_action:
-              action: more-info
-            icon_tap_action:
-              action: more-info
-            hold_action:
-              action: more-info
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: input_boolean.alarm_homy_sensor_ikea_sensor_movimiento_cocina
-            name: Movimiento cocina
-            icon: mdi:shield-check
-            state_content:
-              - state
-              - last_changed
-            tap_action:
-              action: more-info
-            icon_tap_action:
-              action: more-info
-            hold_action:
-              action: more-info
-            grid_options:
-              columns: 12
-          - type: heading
-            heading: Dormitorios
-            heading_style: subtitle
-            icon: mdi:bed
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: input_boolean.alarm_homy_sensor_aqara_movimiento_principal
-            name: Movimiento dormitorio principal
-            icon: mdi:shield-check
-            state_content:
-              - state
-              - last_changed
-            tap_action:
-              action: more-info
-            icon_tap_action:
-              action: more-info
-            hold_action:
-              action: more-info
-            grid_options:
-              columns: 12
-          - type: heading
-            heading: Estudio
-            heading_style: subtitle
-            icon: mdi:desk
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: input_boolean.alarm_homy_sensor_blink_estudio_motion
-            name: Cámara estudio
-            icon: mdi:shield-check
-            state_content:
-              - state
-              - last_changed
-            tap_action:
-              action: more-info
-            icon_tap_action:
-              action: more-info
-            hold_action:
-              action: more-info
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: input_boolean.alarm_homy_sensor_aqara_movimiento_estudio
-            name: Movimiento estudio
-            icon: mdi:shield-check
-            state_content:
-              - state
-              - last_changed
-            tap_action:
-              action: more-info
-            icon_tap_action:
-              action: more-info
-            hold_action:
-              action: more-info
-            grid_options:
-              columns: 12
-      - type: grid
-        cards:
-          - show_state: false
-            show_name: true
-            camera_view: auto
-            fit_mode: cover
-            type: picture-entity
-            entity: input_select.alarm_homy_estado
-            name: Exterior y cámaras
-            image:
-              media_content_id: /local/Home_Alarm_Security_I8.jpg
-            tap_action:
-              action: none
-            hold_action:
-              action: none
-            grid_options:
-              columns: 12
-            aspect_ratio: '5'
-          - type: heading
-            heading: Entrada
-            heading_style: subtitle
-            icon: mdi:door
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: input_boolean.alarm_homy_sensor_blink_puerta_principal_motion
-            name: Cámara puerta principal
-            icon: mdi:shield-check
-            state_content:
-              - state
-              - last_changed
-            tap_action:
-              action: more-info
-            icon_tap_action:
-              action: more-info
-            hold_action:
-              action: more-info
-            grid_options:
-              columns: 12
-          - type: heading
-            heading: Porche
-            heading_style: subtitle
-            icon: mdi:home-roof
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: input_boolean.alarm_homy_sensor_blink_porche_motion
-            name: Cámara porche
-            icon: mdi:shield-check
-            state_content:
-              - state
-              - last_changed
-            tap_action:
-              action: more-info
-            icon_tap_action:
-              action: more-info
-            hold_action:
-              action: more-info
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: input_boolean.alarm_homy_sensor_ikea_sensor_movimiento_entrada_exterior
-            name: Movimiento cancela exterior
-            icon: mdi:shield-check
-            state_content:
-              - state
-              - last_changed
-            tap_action:
-              action: more-info
-            icon_tap_action:
-              action: more-info
-            hold_action:
-              action: more-info
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: input_boolean.alarm_homy_sensor_aqara_movimiento_entrada_exterior
-            name: Movimiento entrada exterior
-            icon: mdi:shield-check
-            state_content:
-              - state
-              - last_changed
-            tap_action:
-              action: more-info
-            icon_tap_action:
-              action: more-info
-            hold_action:
-              action: more-info
-            grid_options:
-              columns: 12
-          - type: heading
-            heading: Entrada garaje
-            heading_style: subtitle
-            icon: mdi:gate
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: input_boolean.alarm_homy_sensor_blink_cancela_right_motion
-            name: Cámara cancela derecha
-            icon: mdi:shield-check
-            state_content:
-              - state
-              - last_changed
-            tap_action:
-              action: more-info
-            icon_tap_action:
-              action: more-info
-            hold_action:
-              action: more-info
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: input_boolean.alarm_homy_sensor_blink_cancela_left_motion
-            name: Cámara cancela izquierda
-            icon: mdi:shield-check
-            state_content:
-              - state
-              - last_changed
-            tap_action:
-              action: more-info
-            icon_tap_action:
-              action: more-info
-            hold_action:
-              action: more-info
-            grid_options:
-              columns: 12
-          - type: heading
-            heading: Piscina
-            heading_style: subtitle
-            icon: mdi:pool
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: input_boolean.alarm_homy_sensor_blink_piscina_motion
-            name: Cámara piscina
-            icon: mdi:shield-check
-            state_content:
-              - state
-              - last_changed
-            tap_action:
-              action: more-info
-            icon_tap_action:
-              action: more-info
-            hold_action:
-              action: more-info
-            grid_options:
-              columns: 12
-      - type: grid
-        cards:
-          - show_state: false
-            show_name: true
-            camera_view: auto
-            fit_mode: cover
-            type: picture-entity
-            entity: input_select.alarm_homy_estado
-            name: Vibración
-            image:
-              media_content_id: /local/Home_Alarm_Security_I0.webp
-            tap_action:
-              action: none
-            hold_action:
-              action: none
-            grid_options:
-              columns: 12
-            aspect_ratio: '5'
-          - type: heading
-            heading: Entrada
-            heading_style: subtitle
-            icon: mdi:door
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: input_boolean.alarm_homy_sensor_aqara_vibracion_puerta_principal
-            name: Sensor vibración puerta principal
-            icon: mdi:shield-check
-            state_content:
-              - state
-              - last_changed
-            tap_action:
-              action: more-info
-            icon_tap_action:
-              action: more-info
-            hold_action:
-              action: more-info
-            grid_options:
-              columns: 12
-          - type: heading
-            heading: Salón
-            heading_style: subtitle
-            icon: mdi:sofa
-            grid_options:
-              columns: 12
-          - type: tile
-            entity: input_boolean.alarm_homy_sensor_aqara_vibracion_puerta_salon
-            name: Sensor vibración puerta salón
-            icon: mdi:shield-check
-            state_content:
-              - state
-              - last_changed
-            tap_action:
-              action: more-info
-            icon_tap_action:
-              action: more-info
-            hold_action:
-              action: more-info
-            grid_options:
-              columns: 12
+    - type: grid
+      cards:
+      - show_state: false
+        show_name: true
+        camera_view: auto
+        fit_mode: cover
+        type: picture-entity
+        entity: binary_sensor.alarm_homy_lista_para_armar
+        name: Puertas y ventanas
+        image:
+          media_content_id: /local/Home_Alarm_Security_I2.jpg
+        tap_action:
+          action: none
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+        aspect_ratio: '5'
+      - type: heading
+        heading: Entrada
+        heading_style: subtitle
+        icon: mdi:door
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: input_boolean.alarm_homy_sensor_ikea_sensor_puerta_entrada
+        name: Sensor puerta entrada (respaldo)
+        icon: mdi:shield-check
+        state_content:
+        - state
+        - last_changed
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        hold_action:
+          action: more-info
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: input_boolean.alarm_homy_sensor_aqara_puerta_entrada_principal
+        name: Sensor puerta entrada principal
+        icon: mdi:shield-check
+        state_content:
+        - state
+        - last_changed
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        hold_action:
+          action: more-info
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Salón
+        heading_style: subtitle
+        icon: mdi:sofa
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: input_boolean.alarm_homy_sensor_aqara_puerta_salon
+        name: Sensor puerta salón
+        icon: mdi:shield-check
+        state_content:
+        - state
+        - last_changed
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        hold_action:
+          action: more-info
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: input_boolean.alarm_homy_sensor_ikea_sensor_puerta_reja_salon
+        name: Sensor reja puerta salón
+        icon: mdi:shield-check
+        state_content:
+        - state
+        - last_changed
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        hold_action:
+          action: more-info
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Dormitorios
+        heading_style: subtitle
+        icon: mdi:bed
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: input_boolean.alarm_homy_sensor_aqara_ventana_dormitorio_principal
+        name: Sensor ventana dormitorio principal
+        icon: mdi:shield-check
+        state_content:
+        - state
+        - last_changed
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        hold_action:
+          action: more-info
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: input_boolean.alarm_homy_sensor_aqara_ventana_dormitorio_agu
+        name: Sensor ventana dormitorio Agu
+        icon: mdi:shield-check
+        state_content:
+        - state
+        - last_changed
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        hold_action:
+          action: more-info
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: input_boolean.alarm_homy_sensor_aqara_ventana_dormitorio_paloma
+        name: Sensor ventana dormitorio Paloma
+        icon: mdi:shield-check
+        state_content:
+        - state
+        - last_changed
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        hold_action:
+          action: more-info
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: input_boolean.alarm_homy_sensor_aqara_ventana_dormitorio_plancha
+        name: Sensor ventana dormitorio plancha
+        icon: mdi:shield-check
+        state_content:
+        - state
+        - last_changed
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        hold_action:
+          action: more-info
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Estudio
+        heading_style: subtitle
+        icon: mdi:desk
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: input_boolean.alarm_homy_sensor_aqara_ventana_estudio_derecha
+        name: Sensor ventana estudio derecha
+        icon: mdi:shield-check
+        state_content:
+        - state
+        - last_changed
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        hold_action:
+          action: more-info
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: input_boolean.alarm_homy_sensor_aqara_ventana_estudio_izquierda
+        name: Sensor ventana estudio izquierda
+        icon: mdi:shield-check
+        state_content:
+        - state
+        - last_changed
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        hold_action:
+          action: more-info
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Armario
+        heading_style: subtitle
+        icon: mdi:wardrobe
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: input_boolean.alarm_homy_sensor_aqara_puerta_estudio_armario
+        name: Sensor puerta estudio armario
+        icon: mdi:shield-check
+        state_content:
+        - state
+        - last_changed
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        hold_action:
+          action: more-info
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Desván
+        heading_style: subtitle
+        icon: mdi:home-floor-a
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: input_boolean.alarm_homy_sensor_aqara_puerta_estudio_desvan
+        name: Sensor puerta estudio desván
+        icon: mdi:shield-check
+        state_content:
+        - state
+        - last_changed
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        hold_action:
+          action: more-info
+        grid_options:
+          columns: 12
+    - type: grid
+      cards:
+      - show_state: false
+        show_name: true
+        camera_view: auto
+        fit_mode: cover
+        type: picture-entity
+        entity: input_select.alarm_homy_estado
+        name: Movimiento interior
+        image:
+          media_content_id: /local/Home_Alarm_Security_I8.jpg
+        tap_action:
+          action: none
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+        aspect_ratio: '5'
+      - type: heading
+        heading: Entrada
+        heading_style: subtitle
+        icon: mdi:door
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: input_boolean.alarm_homy_sensor_blink_hall_motion
+        name: Cámara hall
+        icon: mdi:shield-check
+        state_content:
+        - state
+        - last_changed
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        hold_action:
+          action: more-info
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: input_boolean.alarm_homy_sensor_aqara_movimiento_entrada
+        name: Movimiento entrada-hall
+        icon: mdi:shield-check
+        state_content:
+        - state
+        - last_changed
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        hold_action:
+          action: more-info
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: input_boolean.alarm_homy_sensor_ikea_movimiento_entrada
+        name: Movimiento entrada-pasillo
+        icon: mdi:shield-check
+        state_content:
+        - state
+        - last_changed
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        hold_action:
+          action: more-info
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Pasillo
+        heading_style: subtitle
+        icon: mdi:arrow-left-right
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: input_boolean.alarm_homy_sensor_hue_movimiento_pasillo_presencia
+        name: Movimiento pasillo
+        icon: mdi:shield-check
+        state_content:
+        - state
+        - last_changed
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        hold_action:
+          action: more-info
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Salón
+        heading_style: subtitle
+        icon: mdi:sofa
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: input_boolean.alarm_homy_sensor_blink_salon_motion
+        name: Cámara salón
+        icon: mdi:shield-check
+        state_content:
+        - state
+        - last_changed
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        hold_action:
+          action: more-info
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: input_boolean.alarm_homy_sensor_aqara_movimiento_salon
+        name: Movimiento salón
+        icon: mdi:shield-check
+        state_content:
+        - state
+        - last_changed
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        hold_action:
+          action: more-info
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Cocina
+        heading_style: subtitle
+        icon: mdi:silverware-fork-knife
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: input_boolean.alarm_homy_sensor_blink_cocina_motion
+        name: Cámara cocina
+        icon: mdi:shield-check
+        state_content:
+        - state
+        - last_changed
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        hold_action:
+          action: more-info
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: input_boolean.alarm_homy_sensor_ikea_sensor_movimiento_cocina
+        name: Movimiento cocina
+        icon: mdi:shield-check
+        state_content:
+        - state
+        - last_changed
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        hold_action:
+          action: more-info
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Dormitorios
+        heading_style: subtitle
+        icon: mdi:bed
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: input_boolean.alarm_homy_sensor_aqara_movimiento_principal
+        name: Movimiento dormitorio principal
+        icon: mdi:shield-check
+        state_content:
+        - state
+        - last_changed
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        hold_action:
+          action: more-info
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Estudio
+        heading_style: subtitle
+        icon: mdi:desk
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: input_boolean.alarm_homy_sensor_blink_estudio_motion
+        name: Cámara estudio
+        icon: mdi:shield-check
+        state_content:
+        - state
+        - last_changed
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        hold_action:
+          action: more-info
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: input_boolean.alarm_homy_sensor_aqara_movimiento_estudio
+        name: Movimiento estudio
+        icon: mdi:shield-check
+        state_content:
+        - state
+        - last_changed
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        hold_action:
+          action: more-info
+        grid_options:
+          columns: 12
+    - type: grid
+      cards:
+      - show_state: false
+        show_name: true
+        camera_view: auto
+        fit_mode: cover
+        type: picture-entity
+        entity: input_select.alarm_homy_estado
+        name: Exterior y cámaras
+        image:
+          media_content_id: /local/Home_Alarm_Security_I8.jpg
+        tap_action:
+          action: none
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+        aspect_ratio: '5'
+      - type: heading
+        heading: Entrada
+        heading_style: subtitle
+        icon: mdi:door
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: input_boolean.alarm_homy_sensor_blink_puerta_principal_motion
+        name: Cámara puerta principal
+        icon: mdi:shield-check
+        state_content:
+        - state
+        - last_changed
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        hold_action:
+          action: more-info
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Porche
+        heading_style: subtitle
+        icon: mdi:home-roof
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: input_boolean.alarm_homy_sensor_blink_porche_motion
+        name: Cámara porche
+        icon: mdi:shield-check
+        state_content:
+        - state
+        - last_changed
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        hold_action:
+          action: more-info
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Entrada garaje
+        heading_style: subtitle
+        icon: mdi:gate
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: input_boolean.alarm_homy_sensor_blink_cancela_right_motion
+        name: Cámara cancela derecha
+        icon: mdi:shield-check
+        state_content:
+        - state
+        - last_changed
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        hold_action:
+          action: more-info
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: input_boolean.alarm_homy_sensor_blink_cancela_left_motion
+        name: Cámara cancela izquierda
+        icon: mdi:shield-check
+        state_content:
+        - state
+        - last_changed
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        hold_action:
+          action: more-info
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: input_boolean.alarm_homy_sensor_aqara_movimiento_entrada_exterior
+        name: Movimiento entrada exterior
+        icon: mdi:shield-check
+        state_content:
+        - state
+        - last_changed
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        hold_action:
+          action: more-info
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: input_boolean.alarm_homy_sensor_ikea_sensor_movimiento_entrada_exterior
+        name: Movimiento cancela exterior
+        icon: mdi:shield-check
+        state_content:
+        - state
+        - last_changed
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        hold_action:
+          action: more-info
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Piscina
+        heading_style: subtitle
+        icon: mdi:pool
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: input_boolean.alarm_homy_sensor_blink_piscina_motion
+        name: Cámara piscina
+        icon: mdi:shield-check
+        state_content:
+        - state
+        - last_changed
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        hold_action:
+          action: more-info
+        grid_options:
+          columns: 12
+    - type: grid
+      cards:
+      - show_state: false
+        show_name: true
+        camera_view: auto
+        fit_mode: cover
+        type: picture-entity
+        entity: input_select.alarm_homy_estado
+        name: Vibración
+        image:
+          media_content_id: /local/Home_Alarm_Security_I0.webp
+        tap_action:
+          action: none
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+        aspect_ratio: '5'
+      - type: heading
+        heading: Entrada
+        heading_style: subtitle
+        icon: mdi:door
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: input_boolean.alarm_homy_sensor_aqara_vibracion_puerta_principal
+        name: Sensor vibración puerta principal
+        icon: mdi:shield-check
+        state_content:
+        - state
+        - last_changed
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        hold_action:
+          action: more-info
+        grid_options:
+          columns: 12
+      - type: heading
+        heading: Salón
+        heading_style: subtitle
+        icon: mdi:sofa
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: input_boolean.alarm_homy_sensor_aqara_vibracion_puerta_salon
+        name: Sensor vibración puerta salón
+        icon: mdi:shield-check
+        state_content:
+        - state
+        - last_changed
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        hold_action:
+          action: more-info
+        grid_options:
+          columns: 12
     cards: []

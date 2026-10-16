@@ -6,7 +6,7 @@
       alarm_homy_ausente/casa/noche/vacaciones  -> modos en que está activo
       alarm_homy_inmediato     -> dispara sin retardo de entrada
       alarm_homy_armar_abierto -> permite armar abierto (se ignora hasta que cierre)
-      alarm_homy_auto_excluir  -> SIN EFECTO desde 2026-10-12: puertas y ventanas abiertas siempre bloquean el armado
+      (alarm_homy_auto_excluir eliminada el 2026-10-16: puertas y ventanas abiertas siempre bloquean el armado)
       alarm_homy_excluir_si_activo -> (2026-10-16) movimiento de una zona en uso de noche (estudio):
                                   al armar NOCHE con binary_sensor.alarm_homy_actividad_estudio en on se excluye;
                                   se reincorpora cuando la actividad termina (luz apagada) y lleva 20 min sin movimiento
@@ -36,7 +36,7 @@
 {{ ns.l | to_json }}
 {%- endmacro -%}
 
-{#- Abiertos que IMPIDEN armar en el modo: TODAS las puertas y ventanas (2026-10-12, también las de auto_excluir).
+{#- Abiertos que IMPIDEN armar en el modo: TODAS las puertas y ventanas (desde 2026-10-12).
     Solo se salta la etiqueta alarm_homy_armar_abierto. Movimiento y vibración nunca bloquean. Unavailable = avería, no bloquea -#}
 {%- macro bloqueantes(modo) -%}
 {%- set ns = namespace(l=[]) -%}
@@ -187,4 +187,95 @@
 {%- set m = {'binary_sensor.family_home_aac': 'notify.mobile_app_iphone_aac', 'binary_sensor.family_home_paf': 'notify.mobile_app_iphone_paf',
              'binary_sensor.family_home_aaf': 'notify.mobile_app_a2f', 'binary_sensor.family_home_mfc': 'notify.mobile_app_iphone_malen'} -%}
 {{ m.items() | selectattr('0', 'is_state', 'on') | map(attribute='1') | list | to_json }}
+{%- endmacro -%}
+
+
+{#- BLINK (2026-10-16, ALA-25 fase 1): cámaras con detección activa en cada modo.
+    En los modos que no aparecen, el sistema Blink queda desarmado. Al desarmar, las 9 vuelven a ON. -#}
+{%- macro blink_todas() -%}
+{{ ['puerta_principal', 'hall', 'piscina', 'cancela_left', 'cancela_right', 'porche', 'estudio', 'cocina', 'salon'] | to_json }}
+{%- endmacro -%}
+
+{%- macro blink_camaras(modo) -%}
+{%- set todas = blink_todas() | from_json -%}
+{#- Ausente: sin las cancelas (miran a la calle, pilas y WiFi débil; las cubren los sensores de presencia exteriores) -#}
+{{ {'armed_away': ['puerta_principal', 'porche', 'piscina', 'hall', 'salon', 'cocina', 'estudio'],
+    'armed_vacation': todas}.get(modo, []) | to_json }}
+{%- endmacro -%}
+
+{%- macro blink_nombre(cam) -%}
+{{ {'puerta_principal': 'Puerta principal', 'hall': 'Hall', 'piscina': 'Piscina', 'cancela_left': 'Cancela izquierda',
+    'cancela_right': 'Cancela derecha', 'porche': 'Porche', 'estudio': 'Estudio', 'cocina': 'Cocina', 'salon': 'Salón'}.get(cam, cam) }}
+{%- endmacro -%}
+
+
+{#- ==========================================================================
+    VISTA "SENSORES ACTIVOS" (2026-10-16)
+   ========================================================================== -#}
+{#- Modo que muestra la vista: el armado actual, o el de vista previa (input_select.alarm_homy_modo_vista) si está desarmada -#}
+{%- macro modo_vista() -%}
+{%- set est = states('input_select.alarm_homy_estado') -%}
+{%- set prev = {'Casa': 'armed_home', 'Noche': 'armed_night', 'Ausente': 'armed_away', 'Vacaciones': 'armed_vacation'} -%}
+{{ states('input_select.alarm_homy_modo') if est in ['arming', 'armed_away', 'armed_home', 'armed_night', 'armed_vacation', 'pending', 'triggered']
+   else prev.get(states('input_select.alarm_homy_modo_vista'), 'armed_away') }}
+{%- endmacro -%}
+
+{#- Situación real de un sensor en el modo de la vista → JSON {c: color, t: texto, i: icono}
+    verde = vigilando en reposo · rojo = activo/abierto · naranja = excluido · ámbar = sin comunicación · gris = no participa -#}
+{%- macro vigilancia(e) -%}
+{%- set m = modo_vista() -%}
+{%- set armada = states('input_select.alarm_homy_estado') not in ['disarmed', 'unknown', 'unavailable'] -%}
+{%- set nm = nombre_modo(m) -%}
+{%- set s = states(e) -%}
+{%- set dc = state_attr(e, 'device_class') -%}
+{%- set on = s == 'on' -%}
+{%- set ico = {'door': ['mdi:door-closed', 'mdi:door-open'], 'garage_door': ['mdi:garage', 'mdi:garage-open'],
+               'window': ['mdi:window-closed', 'mdi:window-open'], 'opening': ['mdi:window-closed-variant', 'mdi:window-open-variant'],
+               'motion': ['mdi:motion-sensor-off', 'mdi:motion-sensor'], 'moving': ['mdi:motion-sensor-off', 'mdi:motion-sensor'],
+               'occupancy': ['mdi:account-outline', 'mdi:account'], 'presence': ['mdi:account-outline', 'mdi:account'],
+               'vibration': ['mdi:vibrate-off', 'mdi:vibrate']}.get(dc, ['mdi:checkbox-blank-circle-outline', 'mdi:checkbox-blank-circle']) -%}
+{%- set txt_on = {'door': 'abierta', 'garage_door': 'abierta', 'window': 'abierta', 'opening': 'abierta', 'vibration': 'vibración'}.get(dc, 'detectando') -%}
+{%- set txt_off = {'door': 'cerrada', 'garage_door': 'cerrada', 'window': 'cerrada', 'opening': 'cerrada', 'vibration': 'en reposo'}.get(dc, 'sin movimiento') -%}
+{%- set en_modo = e in (sensores_modo(m) | from_json) -%}
+{%- set etiquetado = e in label_entities(etiqueta_modo(m)) -%}
+{%- set excl = armada and e in (state_attr('sensor.alarm_homy_excluidos', 'entidades') or []) -%}
+{%- set inm = e in label_entities('alarm_homy_inmediato') -%}
+{%- set vig = 'Vigilando' if armada else 'Vigilará' -%}
+{%- if not etiquetado -%}{%- set r = {'c': 'disabled', 't': 'No vigila en ' ~ nm, 'i': ico[1 if on else 0]} -%}
+{%- elif not en_modo -%}{%- set r = {'c': 'disabled', 't': 'Deshabilitado', 'i': 'mdi:shield-off-outline'} -%}
+{%- elif excl -%}{%- set r = {'c': 'orange', 't': 'Excluido por actividad', 'i': 'mdi:shield-off'} -%}
+{%- elif s in ['unavailable', 'unknown'] -%}{%- set r = {'c': 'amber', 't': 'Sin comunicación (avería)', 'i': 'mdi:access-point-network-off'} -%}
+{%- elif on -%}{%- set r = {'c': 'red', 't': vig ~ ' · ' ~ txt_on ~ (' · impide armar' if not armada and dc in ['door', 'window', 'opening', 'garage_door'] else ''), 'i': ico[1]} -%}
+{%- else -%}{%- set r = {'c': 'green', 't': vig ~ ' · ' ~ txt_off ~ (' · inmediato' if inm else ''), 'i': ico[0]} -%}
+{%- endif -%}
+{{ r | to_json }}
+{%- endmacro -%}
+
+{#- Cámara Blink en el modo de la vista → JSON {c, t, i} -#}
+{%- macro vigilancia_blink(cam) -%}
+{%- set m = modo_vista() -%}
+{%- set armada = states('input_select.alarm_homy_estado') not in ['disarmed', 'unknown', 'unavailable'] -%}
+{%- set mot = 'binary_sensor.blink_' ~ cam ~ '_motion' -%}
+{%- set activa = cam in (blink_camaras(m) | from_json) -%}
+{%- set dispara = mot in (sensores_modo(m) | from_json) -%}
+{%- set blink_arm = not is_state('alarm_control_panel.blink_casa', 'disarmed') -%}
+{%- if not activa -%}{%- set r = {'c': 'disabled', 't': 'Sin detección en ' ~ nombre_modo(m), 'i': 'mdi:cctv-off'} -%}
+{%- elif states('camera.blink_' ~ cam) in ['unavailable', 'unknown'] -%}{%- set r = {'c': 'amber', 't': 'Sin comunicación', 'i': 'mdi:cctv-off'} -%}
+{%- elif is_state(mot, 'on') -%}{%- set r = {'c': 'red', 't': 'Movimiento detectado', 'i': 'mdi:cctv'} -%}
+{%- elif armada and not blink_arm -%}{%- set r = {'c': 'amber', 't': 'Sistema Blink sin armar', 'i': 'mdi:cctv'} -%}
+{%- else -%}{%- set r = {'c': 'green', 't': ('Detectando' if armada else 'Detectará') ~ (' · dispara' if dispara else ' · solo aviso'), 'i': 'mdi:cctv'} -%}
+{%- endif -%}
+{{ r | to_json }}
+{%- endmacro -%}
+
+{#- Resumen de la vista: "Ausente (armada) · 24 vigilando · 1 excluido · 0 sin comunicación · 2 activos" -#}
+{%- macro resumen_vista() -%}
+{%- set m = modo_vista() -%}
+{%- set armada = states('input_select.alarm_homy_estado') not in ['disarmed', 'unknown', 'unavailable'] -%}
+{%- set ns = namespace(v=0, x=0, a=0, o=0) -%}
+{%- for e in sensores_modo(m) | from_json -%}
+{%- set r = vigilancia(e) | from_json -%}
+{%- if r.c == 'green' %}{% set ns.v = ns.v + 1 %}{% elif r.c == 'red' %}{% set ns.v = ns.v + 1 %}{% set ns.o = ns.o + 1 %}{% elif r.c == 'orange' %}{% set ns.x = ns.x + 1 %}{% elif r.c == 'amber' %}{% set ns.a = ns.a + 1 %}{% endif -%}
+{%- endfor -%}
+{{ nombre_modo(m) }} ({{ 'armada' if armada else 'vista previa' }}) · {{ ns.v }} {{ 'vigilando' if armada else 'vigilarán' }} · {{ ns.o }} activos · {{ ns.x }} excluidos · {{ ns.a }} sin comunicación
 {%- endmacro -%}
