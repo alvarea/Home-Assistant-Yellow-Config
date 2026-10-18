@@ -38,3 +38,7 @@ esphome/secrets.yaml
 # Ignore files created by IDE's
 .vscode
 .ssh
+
+# Claude Code (datos privados)
+CLAUDE.local.md
+.claude/settings.local.json
