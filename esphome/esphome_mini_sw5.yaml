@@ -1,17 +1,12 @@
 #
 # ESPHOME SONOFF MINI R2 - SW5 - ARMARIO ESTUDIO
 #
-# MIGRACION ESPHOME 2024.2.2 -> 2026.9.0: 26.09.2026
-#   - platform/board salen de 'esphome:' a bloque 'esp8266:'
-#   - 'ota:' pasa a lista con '- platform: esphome'
-#
 substitutions:
   device_name: esphome_mini_sw5
 
 esphome:
   name: ${device_name}
-
-esp8266:
+  platform: ESP8266
   board: esp8285
 
 wifi:
@@ -31,7 +26,6 @@ api:
 
 # Enable Over The Air update
 ota:
-  - platform: esphome
 #  password: "ota_password"
 
 time:

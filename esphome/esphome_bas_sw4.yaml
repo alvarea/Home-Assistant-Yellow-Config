@@ -1,11 +1,7 @@
 #
-# ESPHOME SONOFF BASIC R2 - SW4 - MESA TALLER ESTUDIO-
+# ESPHOME SONOFF BASIC R2 - SW4 - 
 #
 # 12.05.2023 : Fix error Network not found tras upgrade a ESPHOME 2023.04.  Elimino componentes innecesarios, dejando solo binary_sensor + switch
-#
-# MIGRACION ESPHOME 2024.2.2 -> 2026.9.0: 26.09.2026
-#   - platform/board salen de 'esphome:' a bloque 'esp8266:'
-#   - 'ota:' pasa a lista con '- platform: esphome'
 #
 
 substitutions:
@@ -13,8 +9,7 @@ substitutions:
 
 esphome:
   name: ${device_name}
-
-esp8266:
+  platform: ESP8266
   board: esp01_1m
   board_flash_mode: dout
 
@@ -33,7 +28,6 @@ logger:
   level: VERBOSE
 
 ota:
-  - platform: esphome
 
 binary_sensor:
   - platform: gpio

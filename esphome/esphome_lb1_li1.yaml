@@ -1,14 +1,9 @@
 #
 # ESPHOME SONOFF LIGHT B1 LI1 - COCINA
 #
-# MIGRACION ESPHOME 2024.2.2 -> 2026.9.0: 26.09.2026
-#   - platform/board salen de 'esphome:' a bloque 'esp8266:'
-#   - 'ota:' pasa a lista con '- platform: esphome'
-#
 esphome:
   name: esphome_lb1_l01
-
-esp8266:
+  platform: ESP8266
   board: esp01_1m
   board_flash_mode: dout
 
@@ -26,7 +21,6 @@ api:
 #logger:
 
 ota:
-  - platform: esphome
 
 # Enable logging
 logger:
