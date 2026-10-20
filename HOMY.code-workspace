@@ -2,6 +2,9 @@
 	"folders": [
 		{
 			"path": "."
+		},
+		{
+			"path": "../../Library/Mobile Documents/com~apple~CloudDocs/claude/HOMY"
 		}
 	],
 	"settings": {
