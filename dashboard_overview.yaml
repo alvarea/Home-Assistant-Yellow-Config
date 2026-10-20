@@ -1,8 +1,8 @@
 ###############################################################################
 #  Dashboard principal "Overview" (/lovelace) — copia del storage .storage/lovelace.lovelace
-#  Exportado: 2026-10-13 00:40 (23 vistas); vista Lavadora actualizada 2026-10-16 00:45. Sin vistas de la alarma antigua;
-#  la alarma está en /alarma-homy (dashboard_alarma_homy.yaml).
-#  Versión previa completa: dashboard_overview.old-2026-10-12.yaml
+#  Exportado: 2026-10-21 (24 vistas), antes de los cambios BAT-12/13/14/15 de la vista Baterías.
+#  Copia verificada contra lovelace/config de HA (mismo SHA-256). La alarma está en /alarma-homy
+#  (dashboard_alarma_homy.yaml). Versión previa completa: dashboard_overview.old-2026-10-12.yaml
 #  Restaurar: Ajustes → Paneles → Overview → Editar → ⋮ Editor de configuración
 #             en bruto → pegar este contenido (las líneas de comentario se ignoran).
 ###############################################################################
@@ -18,50 +18,49 @@ views:
         cards:
           - type: heading
             icon: mdi:alarm-panel
-            heading_style: subtitle
-            badges:
-              - type: entity
-                entity: alarm_control_panel.alarm_homy
-              - type: entity
-                entity: alarm_control_panel.blink_casa
-            heading: Alarma Seguridad
-          - type: heading
-            icon: mdi:account-convert
-            heading: Presencia
             heading_style: title
             badges:
               - type: entity
+                show_state: true
+                show_icon: true
+                entity: alarm_control_panel.alarm_homy
+                color: primary
+              - type: button
+                icon: mdi:gesture-tap-button
+                color: primary
+                tap_action:
+                  action: navigate
+                  navigation_path: /alarma-homy/alarma
+                text: Menú
+            heading: ALARMA
+          - type: heading
+            icon: mdi:account-convert
+            heading: 'GENTE:'
+            heading_style: subtitle
+            badges:
+              - type: entity
+                show_state: true
+                show_icon: true
                 entity: binary_sensor.family_any_home
+                color: primary
+                state_content: name
               - type: entity
+                show_state: true
+                show_icon: true
                 entity: binary_sensor.family_all_home
+                color: primary
+                state_content: name
               - type: entity
+                show_state: true
+                show_icon: true
                 entity: sensor.family_home
+                color: primary
               - type: entity
+                show_state: true
+                show_icon: true
                 entity: sensor.family_sleep_home
-          - cards:
-              - cards:
-                  - type: custom:mushroom-chips-card
-                    chips:
-                      - type: entity
-                        entity: sensor.iphone_aac_battery_level
-                        icon: mdi:cellphone-charging
-                  - type: custom:mushroom-chips-card
-                    chips:
-                      - type: entity
-                        entity: sensor.iphone_mfc_battery_level
-                        icon: mdi:cellphone-charging
-                  - type: custom:mushroom-chips-card
-                    chips:
-                      - type: entity
-                        entity: sensor.iphone_paf_battery_level
-                        icon: mdi:cellphone-charging
-                  - type: custom:mushroom-chips-card
-                    chips:
-                      - type: entity
-                        entity: sensor.iphone_aaf_battery_level
-                        icon: mdi:cellphone-charging
-                type: horizontal-stack
-            type: vertical-stack
+                color: primary
+                state_content: state
           - cards:
               - cards:
                   - type: tile
@@ -89,20 +88,47 @@ views:
                     secondary_info: last-changed
                 type: horizontal-stack
             type: vertical-stack
+          - cards:
+              - cards:
+                  - type: custom:mushroom-chips-card
+                    chips:
+                      - type: entity
+                        entity: sensor.iphone_aac_battery_level
+                        icon: mdi:cellphone-charging
+                        icon_color: green
+                    alignment: center
+                  - type: custom:mushroom-chips-card
+                    chips:
+                      - type: entity
+                        entity: sensor.iphone_mfc_battery_level
+                        icon: mdi:cellphone-charging
+                        content_info: state
+                        icon_color: blue
+                        use_entity_picture: false
+                    alignment: center
+                  - type: custom:mushroom-chips-card
+                    chips:
+                      - type: entity
+                        entity: sensor.iphone_aaf_battery_level
+                        icon: mdi:cellphone-charging
+                        icon_color: green
+                    alignment: center
+                  - type: custom:mushroom-chips-card
+                    chips:
+                      - type: entity
+                        entity: sensor.iphone_paf_battery_level
+                        icon: mdi:cellphone-charging
+                        icon_color: primary
+                    alignment: center
+                type: horizontal-stack
+            type: vertical-stack
+            grid_options:
+              columns: full
+              rows: auto
           - type: heading
             icon: mdi:door-closed-lock
             heading_style: title
             badges:
-              - type: button
-                icon: mdi:gesture-tap-button
-                text: Puerta Cancela
-                color: dark-grey
-                tap_action:
-                  action: perform-action
-                  perform_action: button.press
-                  target:
-                    entity_id: button.puerta_exterior_open_door
-                  data: {}
               - type: entity
                 show_state: true
                 show_icon: true
@@ -115,7 +141,9 @@ views:
                 show_state: true
                 show_icon: true
                 entity: sensor.ring_puerta_exterior_bateria
-            heading: Telefonillo
+            heading: TELEFONILLO
+            grid_options:
+              rows: 1
           - type: tile
             grid_options:
               rows: 1
@@ -136,7 +164,9 @@ views:
                 show_state: true
                 show_icon: true
                 entity: sensor.v2c_house_power
-            heading: Consumo Eléctrico
+            heading: 'ENERGÍA '
+            grid_options:
+              rows: 1
           - type: tile
             grid_options:
               columns: 12
@@ -311,7 +341,9 @@ views:
                 entity: sensor.temperatura_media_interior
                 name: Media Interior
                 color: orange
-            heading: Temperatura
+            heading: TEMPERATURA
+            grid_options:
+              rows: 1
           - graph: line
             type: sensor
             detail: 1
@@ -1788,33 +1820,295 @@ views:
     icon: mdi:lightbulb-on
     path: luces_view
     title: Luces
-  - theme: Backend-selected
-    title: Calendar
-    path: calendar
-    icon: mdi:calendar
-    badges: []
-    cards:
-      - type: calendar
-        entities:
-          - calendar.universidad_universidad_aaf
-          - calendar.universidad_universidad_paf
-          - calendar.family_almuerzo
-          - calendar.family_cena
-          - calendar.family_eventos
-        initial_view: dayGridMonth
-        title: CALENDARIO FAMILY
-      - type: calendar
-        entities:
-          - calendar.universidad_universidad_aaf
-          - calendar.universidad_universidad_paf
-          - calendar.family_almuerzo
-          - calendar.family_cena
-          - calendar.family_eventos
-        initial_view: listWeek
-        title: CALENDARIO FAMILY
-      - type: todo-list
-        entity: todo.pizarra_super
-        title: 'Bring : Pizarra Super'
+  - title: Lavadora
+    path: lavadora
+    icon: mdi:washing-machine
+    type: sections
+    max_columns: 4
+    sections:
+      - type: grid
+        cards:
+          - type: picture-entity
+            entity: sensor.lavadora_estado
+            name: Lavadora
+            image:
+              media_content_id: /local/lavadora_i0.jpg
+            show_state: false
+            show_name: true
+            camera_view: auto
+            fit_mode: cover
+            aspect_ratio: '3'
+            tap_action:
+              action: none
+            hold_action:
+              action: none
+            grid_options:
+              columns: 12
+          - type: heading
+            heading: Estado
+            icon: mdi:washing-machine
+            heading_style: title
+            badges:
+              - type: entity
+                entity: sensor.lavadora_estado
+                show_state: true
+                show_icon: true
+          - type: custom:mushroom-template-card
+            entity: sensor.lavadora_estado
+            grid_options:
+              columns: 12
+            multiline_secondary: true
+            tap_action:
+              action: more-info
+            icon: '{{ state_attr(''sensor.lavadora_estado'',''icon'') }}'
+            color: '{% set e = states(''sensor.lavadora_estado'') %}{{ {''lavando'':''blue'',''terminada'':''green''}.get(e, ''amber'' if is_state(''switch.grillplats_lavadora'',''on'') else ''grey'') }}'
+            primary: '{% set a = states.sensor.lavadora_estado.attributes %}{% set e = states(''sensor.lavadora_estado'') %}{% if e == ''lavando'' and a.inicio %}{% set p = ((now() - as_datetime(a.inicio)).total_seconds() / 60 / (a.duracion_estimada | int(63)) * 100) | round(0) | int %}Lavando · {{ [p, 99] | min }} %{% elif e == ''lavando'' %}Lavando{% elif e == ''terminada'' %}Lavado terminado{% elif is_state(''switch.grillplats_lavadora'',''on'') %}Lista para lavar{% else %}Apagada{% endif %}'
+            secondary: '{% set a = states.sensor.lavadora_estado.attributes %}{% set e = states(''sensor.lavadora_estado'') %}{% if e == ''lavando'' and a.inicio and a.fin_estimado %}{% set f = as_datetime(a.fin_estimado) %}Desde las {{ as_local(as_datetime(a.inicio)).strftime(''%H:%M'') }} · fin ≈ {{ as_local(f).strftime(''%H:%M'') }} (quedan {{ [((f - now()).total_seconds() / 60) | round(0) | int, 0] | max }} min){% elif e == ''terminada'' and a.ultimo_fin %}Terminó a las {{ as_local(as_datetime(a.ultimo_fin)).strftime(''%H:%M'') }} · {{ {''fuera'':''tender fuera'',''secadora'':''usar la secadora'',''desconocido'':''sin previsión''}.get(a.destino, '''') }}{{ '' ('' ~ a.tendido_cuando ~ '')'' if a.tendido_cuando in [''mañana'',''por la mañana''] else '''' }}{% elif is_state(''switch.grillplats_lavadora'',''on'') %}Enchufe encendido · gira el mando y elige programa{% else %}Sin corriente · pulsa el botón del enchufe (mando en off){% endif %}'
+          - type: tile
+            entity: switch.lavadora
+            name: Lavadora (protegida)
+            vertical: false
+            features_position: bottom
+            grid_options:
+              columns: 12
+          - type: heading
+            heading: Último lavado
+            icon: mdi:history
+            heading_style: title
+          - type: tile
+            entity: sensor.grillplats_lavadora_power
+            name: Potencia
+            grid_options:
+              columns: 6
+          - type: tile
+            entity: sensor.grillplats_lavadora_active_current
+            name: Corriente
+            grid_options:
+              columns: 6
+          - type: custom:mushroom-template-card
+            entity: sensor.lavadora_estado
+            icon: mdi:clock-outline
+            primary: '{% set a = states.sensor.lavadora_estado.attributes %}{{ as_local(as_datetime(a.ultimo_inicio)).strftime(''%H:%M'') if a.ultimo_inicio else ''—'' }} → {{ as_local(as_datetime(a.ultimo_fin)).strftime(''%H:%M'') if a.ultimo_fin else ''—'' }}'
+            secondary: '{% set a = states.sensor.lavadora_estado.attributes %}{{ as_local(as_datetime(a.ultimo_fin)).strftime(''%d/%m/%Y'') if a.ultimo_fin else ''Sin datos'' }}'
+            color: blue
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 6
+            multiline_secondary: true
+          - type: custom:mushroom-template-card
+            entity: sensor.lavadora_estado
+            icon: mdi:lightning-bolt
+            primary: '{% set a = states.sensor.lavadora_estado.attributes %}{{ ''%.2f'' | format(a.ultimo_kwh) ~ '' kWh'' if a.ultimo_kwh is number else ''—'' }}'
+            secondary: Energía del lavado
+            color: amber
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 6
+            multiline_secondary: true
+          - type: custom:mushroom-template-card
+            entity: sensor.lavadora_estado
+            icon: mdi:currency-eur
+            color: green
+            primary: '{% set a = states.sensor.lavadora_estado.attributes %}{{ (''%.2f'' | format(a.ultimo_coste) | replace(''.'', '','')) ~ '' €'' if a.ultimo_coste is number else ''—'' }}'
+            secondary: '{% set a = states.sensor.lavadora_estado.attributes %}{% if states(''sensor.lavadora_estado'') == ''lavando'' and a.coste is number %}En curso: {{ ''%.2f'' | format(a.coste) | replace(''.'', '','') }} €{% else %}Coste del lavado{% endif %}'
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 6
+            multiline_secondary: true
+          - type: tile
+            entity: sensor.precio_luz_actual
+            name: Precio luz ahora
+            state_content:
+              - state
+              - periodo
+            grid_options:
+              columns: 6
+          - type: tile
+            entity: counter.lavadora_lavados_mes
+            name: Lavados este mes
+            grid_options:
+              columns: 12
+          - type: custom:mushroom-template-card
+            entity: sensor.lavadora_estado
+            icon: '{% set a = states.sensor.lavadora_estado.attributes %}{{ {''fuera'':''mdi:hanger'',''secadora'':''mdi:tumble-dryer''}.get(a.destino, ''mdi:help-circle-outline'') }}'
+            primary: '{% set a = states.sensor.lavadora_estado.attributes %}{{ {''fuera'':''Tender fuera'',''secadora'':''Secadora'',''desconocido'':''Sin previsión''}.get(a.destino, ''—'') }}'
+            secondary: '{% set a = states.sensor.lavadora_estado.attributes %}{{ ''Lluvia máx. '' ~ a.prob_lluvia ~ '' %'' if a.prob_lluvia is not none else ''Previsión AEMET'' }}{{ '' · '' ~ a.tendido_cuando if a.tendido_cuando else '''' }}'
+            color: '{% set a = states.sensor.lavadora_estado.attributes %}{{ ''green'' if a.destino == ''fuera'' else (''orange'' if a.destino == ''secadora'' else ''grey'') }}'
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 6
+            multiline_secondary: true
+          - type: custom:mushroom-template-card
+            entity: sensor.lavadora_estado
+            icon: mdi:timer-outline
+            primary: '{% set a = states.sensor.lavadora_estado.attributes %}{{ a.ultimo_duracion_min ~ '' min'' if a.ultimo_duracion_min else ''—'' }}'
+            secondary: '{% set a = states.sensor.lavadora_estado.attributes %}Duración · típica {{ a.duracion_estimada }} min'
+            color: purple
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 6
+            multiline_secondary: true
+      - type: grid
+        cards:
+          - show_state: false
+            show_name: true
+            camera_view: auto
+            fit_mode: cover
+            type: picture-entity
+            entity: sensor.lavadora_estado
+            name: LogBook Lavadora
+            image:
+              media_content_id: /local/lavadora_i1.jpg
+            aspect_ratio: '3'
+            tap_action:
+              action: none
+            hold_action:
+              action: none
+            grid_options:
+              columns: 12
+          - type: heading
+            heading: Registro
+            icon: mdi:format-list-bulleted
+            heading_style: title
+          - type: logbook
+            entities:
+              - sensor.lavadora_estado
+              - switch.grillplats_lavadora
+            hours_to_show: 168
+            grid_options:
+              columns: 12
+      - type: grid
+        cards:
+          - type: picture-entity
+            entity: sensor.lavadora_estado
+            name: Consumo
+            image:
+              media_content_id: /local/lavadora_i2.jpg
+            show_state: false
+            show_name: true
+            camera_view: auto
+            fit_mode: cover
+            aspect_ratio: '3'
+            tap_action:
+              action: none
+            hold_action:
+              action: none
+            grid_options:
+              columns: 12
+          - type: heading
+            heading: Consumo
+            icon: mdi:lightning-bolt
+            heading_style: title
+          - type: statistic
+            entity: sensor.grillplats_lavadora_energy
+            name: Hoy
+            stat_type: change
+            period:
+              calendar:
+                period: day
+            grid_options:
+              columns: 6
+          - type: statistic
+            entity: sensor.grillplats_lavadora_energy
+            name: Este mes
+            stat_type: change
+            period:
+              calendar:
+                period: month
+            grid_options:
+              columns: 6
+          - type: statistics-graph
+            title: Energía diaria (14 días)
+            entities:
+              - sensor.grillplats_lavadora_energy
+            chart_type: bar
+            period: day
+            days_to_show: 14
+            stat_types:
+              - change
+            hide_legend: true
+            grid_options:
+              columns: 12
+              rows: 3
+          - type: statistics-graph
+            title: Energía mensual
+            entities:
+              - sensor.grillplats_lavadora_energy
+            chart_type: bar
+            period: month
+            days_to_show: 365
+            stat_types:
+              - change
+            hide_legend: true
+            grid_options:
+              columns: 12
+              rows: 3
+      - type: grid
+        cards:
+          - type: picture-entity
+            entity: sensor.lavadora_estado
+            name: Tendido
+            image:
+              media_content_id: /local/lavadora_i3.jpg
+            show_state: false
+            show_name: true
+            camera_view: auto
+            fit_mode: cover
+            aspect_ratio: '3'
+            tap_action:
+              action: none
+            hold_action:
+              action: none
+            grid_options:
+              columns: 12
+          - type: heading
+            heading: Tiempo para tender
+            icon: mdi:weather-partly-cloudy
+            heading_style: title
+          - type: custom:mushroom-template-card
+            entity: sun.sun
+            icon: mdi:weather-sunset
+            color: orange
+            primary: Puesta de sol {{ as_local(as_datetime(state_attr('sun.sun','next_setting'))).strftime('%H:%M') }}
+            secondary: Salida {{ as_local(as_datetime(state_attr('sun.sun','next_rising'))).strftime('%H:%M') }} · secadora si lluvia > 50 %
+            grid_options:
+              columns: 12
+          - type: weather-forecast
+            entity: weather.aemet
+            forecast_type: hourly
+            show_current: true
+            show_forecast: true
+            grid_options:
+              columns: 12
+          - type: heading
+            heading: Técnico
+            icon: mdi:cog
+            heading_style: title
+          - type: tile
+            entity: switch.grillplats_lavadora
+            name: Enchufe (real)
+            grid_options:
+              columns: 6
+          - type: tile
+            entity: sensor.grillplats_lavadora_voltage
+            name: Tensión
+            grid_options:
+              columns: 6
+          - type: tile
+            entity: automation.lavadora_fin_de_lavado_cortar_y_avisar
+            name: Fin de lavado
+            grid_options:
+              columns: 6
+          - type: tile
+            entity: automation.lavadora_no_cortar_durante_un_lavado
+            name: Protección
+            grid_options:
+              columns: 6
   - title: Plan Riego
     path: planriego_view
     icon: mdi:head-snowflake-outline
@@ -3546,6 +3840,34 @@ views:
         type: entities
       - type: entities
         show_header_toggle: false
+        title: Sensores Pulsadores Planta Alta
+        entities:
+          - type: custom:battery-entity-row
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+            entity: sensor.ikea_remote_control_estudio_battery
+          - type: custom:battery-entity-row
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+            entity: sensor.ikea_tradfri_switch_setup_battery
+          - type: custom:battery-entity-row
+            attribute: battery_percent
+            unit: '%'
+            secondary_info: last-changed
+            warning: 40
+            critical: 20
+            charging: true
+            entity: sensor.hue_dimmer_switch_battery
+      - type: entities
+        show_header_toggle: false
         title: Sensores Pulsadores Planta Baja
         entities:
           - type: custom:battery-entity-row
@@ -3604,34 +3926,6 @@ views:
             critical: 20
             charging: true
             entity: sensor.hue_smart_button_entrada_bateria
-      - type: entities
-        show_header_toggle: false
-        title: Sensores Pulsadores Planta Alta
-        entities:
-          - type: custom:battery-entity-row
-            attribute: battery_percent
-            unit: '%'
-            secondary_info: last-changed
-            warning: 40
-            critical: 20
-            charging: true
-            entity: sensor.ikea_remote_control_estudio_battery
-          - type: custom:battery-entity-row
-            attribute: battery_percent
-            unit: '%'
-            secondary_info: last-changed
-            warning: 40
-            critical: 20
-            charging: true
-            entity: sensor.ikea_tradfri_switch_setup_battery
-          - type: custom:battery-entity-row
-            attribute: battery_percent
-            unit: '%'
-            secondary_info: last-changed
-            warning: 40
-            critical: 20
-            charging: true
-            entity: sensor.hue_dimmer_switch_battery
       - type: entities
         show_header_toggle: false
         title: Sensores Temperatura
@@ -3721,6 +4015,105 @@ views:
     icon: mdi:battery-50
     path: batery_view
     title: Batery Status
+  - title: Baterías
+    path: baterias
+    icon: mdi:battery-heart-variant
+    type: panel
+    cards:
+      - type: custom:auto-entities
+        show_empty: true
+        filter:
+          include:
+            - integration: battery_notes
+              entity_id: sensor.*_battery_plus
+              state: '>= 0'
+              sort:
+                method: state
+                numeric: true
+            - integration: battery_notes
+              entity_id: sensor.*_battery_plus
+              state: unavailable
+              sort:
+                method: name
+            - integration: battery_notes
+              entity_id: sensor.*_battery_plus
+              state: unknown
+              sort:
+                method: name
+        card:
+          type: custom:flex-table-card
+          title: Baterías (Battery Notes)
+          strict: false
+          columns:
+            - name: Dispositivo
+              data: device_name
+              modify: |-
+                (() => {
+                  if (String(x ?? "") && !/^(undefined)+$/.test(String(x))) return x;
+                  const h = document.querySelector('home-assistant').hass;
+                  const e = h.entities[this.entity.entity_id];
+                  const d = e && h.devices[e.device_id];
+                  return d ? (d.name_by_user || d.name) : this.entity.entity_id;
+                })()
+            - name: Pila
+              data: battery_type_and_quantity
+              modify: |-
+                (() => {
+                  if (String(x ?? "") && !/^(undefined)+$/.test(String(x))) return x;
+                  const h = document.querySelector('home-assistant').hass;
+                  const st = h.states[this.entity.entity_id.replace(/_battery_plus$/, '_battery_type')];
+                  if (!st) return '—';
+                  const q = st.attributes.battery_quantity;
+                  return (q > 1 ? q + '× ' : '') + st.state;
+                })()
+            - name: '%'
+              data: state
+              modify: |-
+                isNaN(parseFloat(x))
+                  ? '⚠️ no disponible'
+                  : (parseFloat(x) <= 10 ? '🔴 ' : parseFloat(x) <= 35 ? '🟠 ' : '🟢 ') + Math.round(parseFloat(x)) + ' %'
+            - name: Último cambio
+              data: battery_last_replaced
+              modify: |-
+                (() => {
+                  let v = String(x ?? "");
+                  if (!v || /^(undefined)+$/.test(v)) {
+                    try {
+                      const id = this.entity.entity_id.replace(/_battery_plus$/, '_battery_last_replaced');
+                      const st = document.querySelector('home-assistant').hass.states[id];
+                      v = st ? st.state : null;
+                    } catch (e) { v = null; }
+                  }
+                  const d = v ? new Date(v) : null;
+                  return (d && !isNaN(d)) ? d.toLocaleDateString('es-ES') : '—';
+                })()
+  - theme: Backend-selected
+    title: Calendar
+    path: calendar
+    icon: mdi:calendar
+    badges: []
+    cards:
+      - type: calendar
+        entities:
+          - calendar.universidad_universidad_aaf
+          - calendar.universidad_universidad_paf
+          - calendar.family_almuerzo
+          - calendar.family_cena
+          - calendar.family_eventos
+        initial_view: dayGridMonth
+        title: CALENDARIO FAMILY
+      - type: calendar
+        entities:
+          - calendar.universidad_universidad_aaf
+          - calendar.universidad_universidad_paf
+          - calendar.family_almuerzo
+          - calendar.family_cena
+          - calendar.family_eventos
+        initial_view: listWeek
+        title: CALENDARIO FAMILY
+      - type: todo-list
+        entity: todo.pizarra_super
+        title: 'Bring : Pizarra Super'
   - type: sections
     max_columns: 4
     title: Climate
@@ -4242,295 +4635,6 @@ views:
     icon: mdi:thermometer-lines
     path: temperatura
     title: Temperatura
-  - title: Lavadora
-    path: lavadora
-    icon: mdi:washing-machine
-    type: sections
-    max_columns: 4
-    sections:
-      - type: grid
-        cards:
-          - type: picture-entity
-            entity: sensor.lavadora_estado
-            name: Lavadora
-            image:
-              media_content_id: /local/lavadora_i0.jpg
-            show_state: false
-            show_name: true
-            camera_view: auto
-            fit_mode: cover
-            aspect_ratio: '3'
-            tap_action:
-              action: none
-            hold_action:
-              action: none
-            grid_options:
-              columns: 12
-          - type: heading
-            heading: Estado
-            icon: mdi:washing-machine
-            heading_style: title
-            badges:
-              - type: entity
-                entity: sensor.lavadora_estado
-                show_state: true
-                show_icon: true
-          - type: custom:mushroom-template-card
-            entity: sensor.lavadora_estado
-            grid_options:
-              columns: 12
-            multiline_secondary: true
-            tap_action:
-              action: more-info
-            icon: '{{ state_attr(''sensor.lavadora_estado'',''icon'') }}'
-            color: '{% set e = states(''sensor.lavadora_estado'') %}{{ {''lavando'':''blue'',''terminada'':''green''}.get(e, ''amber'' if is_state(''switch.grillplats_lavadora'',''on'') else ''grey'') }}'
-            primary: '{% set a = states.sensor.lavadora_estado.attributes %}{% set e = states(''sensor.lavadora_estado'') %}{% if e == ''lavando'' and a.inicio %}{% set p = ((now() - as_datetime(a.inicio)).total_seconds() / 60 / (a.duracion_estimada | int(63)) * 100) | round(0) | int %}Lavando · {{ [p, 99] | min }} %{% elif e == ''lavando'' %}Lavando{% elif e == ''terminada'' %}Lavado terminado{% elif is_state(''switch.grillplats_lavadora'',''on'') %}Lista para lavar{% else %}Apagada{% endif %}'
-            secondary: '{% set a = states.sensor.lavadora_estado.attributes %}{% set e = states(''sensor.lavadora_estado'') %}{% if e == ''lavando'' and a.inicio and a.fin_estimado %}{% set f = as_datetime(a.fin_estimado) %}Desde las {{ as_local(as_datetime(a.inicio)).strftime(''%H:%M'') }} · fin ≈ {{ as_local(f).strftime(''%H:%M'') }} (quedan {{ [((f - now()).total_seconds() / 60) | round(0) | int, 0] | max }} min){% elif e == ''terminada'' and a.ultimo_fin %}Terminó a las {{ as_local(as_datetime(a.ultimo_fin)).strftime(''%H:%M'') }} · {{ {''fuera'':''tender fuera'',''secadora'':''usar la secadora'',''desconocido'':''sin previsión''}.get(a.destino, '''') }}{{ '' ('' ~ a.tendido_cuando ~ '')'' if a.tendido_cuando in [''mañana'',''por la mañana''] else '''' }}{% elif is_state(''switch.grillplats_lavadora'',''on'') %}Enchufe encendido · gira el mando y elige programa{% else %}Sin corriente · pulsa el botón del enchufe (mando en off){% endif %}'
-          - type: tile
-            entity: switch.lavadora
-            name: Lavadora (protegida)
-            vertical: false
-            features_position: bottom
-            grid_options:
-              columns: 12
-          - type: heading
-            heading: Último lavado
-            icon: mdi:history
-            heading_style: title
-          - type: tile
-            entity: sensor.grillplats_lavadora_power
-            name: Potencia
-            grid_options:
-              columns: 6
-          - type: tile
-            entity: sensor.grillplats_lavadora_active_current
-            name: Corriente
-            grid_options:
-              columns: 6
-          - type: custom:mushroom-template-card
-            entity: sensor.lavadora_estado
-            icon: mdi:clock-outline
-            primary: '{% set a = states.sensor.lavadora_estado.attributes %}{{ as_local(as_datetime(a.ultimo_inicio)).strftime(''%H:%M'') if a.ultimo_inicio else ''—'' }} → {{ as_local(as_datetime(a.ultimo_fin)).strftime(''%H:%M'') if a.ultimo_fin else ''—'' }}'
-            secondary: '{% set a = states.sensor.lavadora_estado.attributes %}{{ as_local(as_datetime(a.ultimo_fin)).strftime(''%d/%m/%Y'') if a.ultimo_fin else ''Sin datos'' }}'
-            color: blue
-            tap_action:
-              action: more-info
-            grid_options:
-              columns: 6
-            multiline_secondary: true
-          - type: custom:mushroom-template-card
-            entity: sensor.lavadora_estado
-            icon: mdi:lightning-bolt
-            primary: '{% set a = states.sensor.lavadora_estado.attributes %}{{ ''%.2f'' | format(a.ultimo_kwh) ~ '' kWh'' if a.ultimo_kwh is number else ''—'' }}'
-            secondary: Energía del lavado
-            color: amber
-            tap_action:
-              action: more-info
-            grid_options:
-              columns: 6
-            multiline_secondary: true
-          - type: custom:mushroom-template-card
-            entity: sensor.lavadora_estado
-            icon: mdi:currency-eur
-            color: green
-            primary: '{% set a = states.sensor.lavadora_estado.attributes %}{{ (''%.2f'' | format(a.ultimo_coste) | replace(''.'', '','')) ~ '' €'' if a.ultimo_coste is number else ''—'' }}'
-            secondary: '{% set a = states.sensor.lavadora_estado.attributes %}{% if states(''sensor.lavadora_estado'') == ''lavando'' and a.coste is number %}En curso: {{ ''%.2f'' | format(a.coste) | replace(''.'', '','') }} €{% else %}Coste del lavado{% endif %}'
-            tap_action:
-              action: more-info
-            grid_options:
-              columns: 6
-            multiline_secondary: true
-          - type: tile
-            entity: sensor.precio_luz_actual
-            name: Precio luz ahora
-            state_content:
-              - state
-              - periodo
-            grid_options:
-              columns: 6
-          - type: tile
-            entity: counter.lavadora_lavados_mes
-            name: Lavados este mes
-            grid_options:
-              columns: 12
-          - type: custom:mushroom-template-card
-            entity: sensor.lavadora_estado
-            icon: '{% set a = states.sensor.lavadora_estado.attributes %}{{ {''fuera'':''mdi:hanger'',''secadora'':''mdi:tumble-dryer''}.get(a.destino, ''mdi:help-circle-outline'') }}'
-            primary: '{% set a = states.sensor.lavadora_estado.attributes %}{{ {''fuera'':''Tender fuera'',''secadora'':''Secadora'',''desconocido'':''Sin previsión''}.get(a.destino, ''—'') }}'
-            secondary: '{% set a = states.sensor.lavadora_estado.attributes %}{{ ''Lluvia máx. '' ~ a.prob_lluvia ~ '' %'' if a.prob_lluvia is not none else ''Previsión AEMET'' }}{{ '' · '' ~ a.tendido_cuando if a.tendido_cuando else '''' }}'
-            color: '{% set a = states.sensor.lavadora_estado.attributes %}{{ ''green'' if a.destino == ''fuera'' else (''orange'' if a.destino == ''secadora'' else ''grey'') }}'
-            tap_action:
-              action: more-info
-            grid_options:
-              columns: 6
-            multiline_secondary: true
-          - type: custom:mushroom-template-card
-            entity: sensor.lavadora_estado
-            icon: mdi:timer-outline
-            primary: '{% set a = states.sensor.lavadora_estado.attributes %}{{ a.ultimo_duracion_min ~ '' min'' if a.ultimo_duracion_min else ''—'' }}'
-            secondary: '{% set a = states.sensor.lavadora_estado.attributes %}Duración · típica {{ a.duracion_estimada }} min'
-            color: purple
-            tap_action:
-              action: more-info
-            grid_options:
-              columns: 6
-            multiline_secondary: true
-      - type: grid
-        cards:
-          - show_state: false
-            show_name: true
-            camera_view: auto
-            fit_mode: cover
-            type: picture-entity
-            entity: sensor.lavadora_estado
-            name: LogBook Lavadora
-            image:
-              media_content_id: /local/lavadora_i1.jpg
-            aspect_ratio: '3'
-            tap_action:
-              action: none
-            hold_action:
-              action: none
-            grid_options:
-              columns: 12
-          - type: heading
-            heading: Registro
-            icon: mdi:format-list-bulleted
-            heading_style: title
-          - type: logbook
-            entities:
-              - sensor.lavadora_estado
-              - switch.grillplats_lavadora
-            hours_to_show: 168
-            grid_options:
-              columns: 12
-      - type: grid
-        cards:
-          - type: picture-entity
-            entity: sensor.lavadora_estado
-            name: Consumo
-            image:
-              media_content_id: /local/lavadora_i2.jpg
-            show_state: false
-            show_name: true
-            camera_view: auto
-            fit_mode: cover
-            aspect_ratio: '3'
-            tap_action:
-              action: none
-            hold_action:
-              action: none
-            grid_options:
-              columns: 12
-          - type: heading
-            heading: Consumo
-            icon: mdi:lightning-bolt
-            heading_style: title
-          - type: statistic
-            entity: sensor.grillplats_lavadora_energy
-            name: Hoy
-            stat_type: change
-            period:
-              calendar:
-                period: day
-            grid_options:
-              columns: 6
-          - type: statistic
-            entity: sensor.grillplats_lavadora_energy
-            name: Este mes
-            stat_type: change
-            period:
-              calendar:
-                period: month
-            grid_options:
-              columns: 6
-          - type: statistics-graph
-            title: Energía diaria (14 días)
-            entities:
-              - sensor.grillplats_lavadora_energy
-            chart_type: bar
-            period: day
-            days_to_show: 14
-            stat_types:
-              - change
-            hide_legend: true
-            grid_options:
-              columns: 12
-              rows: 3
-          - type: statistics-graph
-            title: Energía mensual
-            entities:
-              - sensor.grillplats_lavadora_energy
-            chart_type: bar
-            period: month
-            days_to_show: 365
-            stat_types:
-              - change
-            hide_legend: true
-            grid_options:
-              columns: 12
-              rows: 3
-      - type: grid
-        cards:
-          - type: picture-entity
-            entity: sensor.lavadora_estado
-            name: Tendido
-            image:
-              media_content_id: /local/lavadora_i3.jpg
-            show_state: false
-            show_name: true
-            camera_view: auto
-            fit_mode: cover
-            aspect_ratio: '3'
-            tap_action:
-              action: none
-            hold_action:
-              action: none
-            grid_options:
-              columns: 12
-          - type: heading
-            heading: Tiempo para tender
-            icon: mdi:weather-partly-cloudy
-            heading_style: title
-          - type: custom:mushroom-template-card
-            entity: sun.sun
-            icon: mdi:weather-sunset
-            color: orange
-            primary: Puesta de sol {{ as_local(as_datetime(state_attr('sun.sun','next_setting'))).strftime('%H:%M') }}
-            secondary: Salida {{ as_local(as_datetime(state_attr('sun.sun','next_rising'))).strftime('%H:%M') }} · secadora si lluvia > 50 %
-            grid_options:
-              columns: 12
-          - type: weather-forecast
-            entity: weather.aemet
-            forecast_type: hourly
-            show_current: true
-            show_forecast: true
-            grid_options:
-              columns: 12
-          - type: heading
-            heading: Técnico
-            icon: mdi:cog
-            heading_style: title
-          - type: tile
-            entity: switch.grillplats_lavadora
-            name: Enchufe (real)
-            grid_options:
-              columns: 6
-          - type: tile
-            entity: sensor.grillplats_lavadora_voltage
-            name: Tensión
-            grid_options:
-              columns: 6
-          - type: tile
-            entity: automation.lavadora_fin_de_lavado_cortar_y_avisar
-            name: Fin de lavado
-            grid_options:
-              columns: 6
-          - type: tile
-            entity: automation.lavadora_no_cortar_durante_un_lavado
-            name: Protección
-            grid_options:
-              columns: 6
   - badges: []
     cards:
       - aspect_ratio: 75%
@@ -4981,23 +5085,28 @@ views:
             name: Ahora
             grid_options:
               columns: 12
-            tap_action: &id001
+            tap_action:
               action: more-info
-            icon_tap_action: *id001
+            icon_tap_action:
+              action: more-info
           - type: tile
             entity: input_datetime.alexa_noche_desde
             name: Noche desde
             grid_options:
               columns: 6
-            tap_action: *id001
-            icon_tap_action: *id001
+            tap_action:
+              action: more-info
+            icon_tap_action:
+              action: more-info
           - type: tile
             entity: input_datetime.alexa_noche_hasta
             name: Noche hasta
             grid_options:
               columns: 6
-            tap_action: *id001
-            icon_tap_action: *id001
+            tap_action:
+              action: more-info
+            icon_tap_action:
+              action: more-info
           - type: markdown
             grid_options:
               columns: 12
@@ -5037,23 +5146,28 @@ views:
             name: No molestar
             grid_options:
               columns: 12
-            tap_action: *id001
-            icon_tap_action: *id001
+            tap_action:
+              action: more-info
+            icon_tap_action:
+              action: more-info
           - type: heading
             heading: Volumen de los avisos
             heading_style: subtitle
             icon: mdi:volume-high
           - type: tile
-            entity: input_number.alexa_entrada_volumen_anuncio_dia
-            name: Anuncio · día
             grid_options:
               columns: 6
+            entity: input_number.alexa_entrada_volumen_anuncio_dia
+            name: Anuncio · día
+            vertical: false
+            tap_action:
+              action: more-info
+            icon_tap_action:
+              action: more-info
             features:
               - type: numeric-input
                 style: slider
             features_position: bottom
-            tap_action: *id001
-            icon_tap_action: *id001
           - type: tile
             entity: input_number.alexa_entrada_volumen_anuncio_noc
             name: Anuncio · noche
@@ -5063,8 +5177,10 @@ views:
               - type: numeric-input
                 style: slider
             features_position: bottom
-            tap_action: *id001
-            icon_tap_action: *id001
+            tap_action:
+              action: more-info
+            icon_tap_action:
+              action: more-info
           - type: tile
             entity: input_number.alexa_entrada_volumen_alarma_dia
             name: Alarma · día
@@ -5074,8 +5190,10 @@ views:
               - type: numeric-input
                 style: slider
             features_position: bottom
-            tap_action: *id001
-            icon_tap_action: *id001
+            tap_action:
+              action: more-info
+            icon_tap_action:
+              action: more-info
           - type: tile
             entity: input_number.alexa_entrada_volumen_alarma_noc
             name: Alarma · noche
@@ -5085,8 +5203,10 @@ views:
               - type: numeric-input
                 style: slider
             features_position: bottom
-            tap_action: *id001
-            icon_tap_action: *id001
+            tap_action:
+              action: more-info
+            icon_tap_action:
+              action: more-info
           - type: custom:mushroom-template-card
             primary: Probar anuncio
             secondary: '{{ ''Noche'' if is_state(''binary_sensor.alexa_franja_noche'',''on'') else ''Día'' }} · volumen {{ (states(''input_number.alexa_entrada_volumen_anuncio_'' ~ (''noc'' if is_state(''binary_sensor.alexa_franja_noche'',''on'') else ''dia'')) | float(0) * 100) | int }} %'
@@ -5156,8 +5276,10 @@ views:
             name: No molestar
             grid_options:
               columns: 12
-            tap_action: *id001
-            icon_tap_action: *id001
+            tap_action:
+              action: more-info
+            icon_tap_action:
+              action: more-info
           - type: heading
             heading: Volumen de los avisos
             heading_style: subtitle
@@ -5171,8 +5293,10 @@ views:
               - type: numeric-input
                 style: slider
             features_position: bottom
-            tap_action: *id001
-            icon_tap_action: *id001
+            tap_action:
+              action: more-info
+            icon_tap_action:
+              action: more-info
           - type: tile
             entity: input_number.alexa_estudio_volumen_anuncio_noc
             name: Anuncio · noche
@@ -5182,8 +5306,10 @@ views:
               - type: numeric-input
                 style: slider
             features_position: bottom
-            tap_action: *id001
-            icon_tap_action: *id001
+            tap_action:
+              action: more-info
+            icon_tap_action:
+              action: more-info
           - type: tile
             entity: input_number.alexa_estudio_volumen_alarma_dia
             name: Alarma · día
@@ -5193,8 +5319,10 @@ views:
               - type: numeric-input
                 style: slider
             features_position: bottom
-            tap_action: *id001
-            icon_tap_action: *id001
+            tap_action:
+              action: more-info
+            icon_tap_action:
+              action: more-info
           - type: tile
             entity: input_number.alexa_estudio_volumen_alarma_noc
             name: Alarma · noche
@@ -5204,8 +5332,10 @@ views:
               - type: numeric-input
                 style: slider
             features_position: bottom
-            tap_action: *id001
-            icon_tap_action: *id001
+            tap_action:
+              action: more-info
+            icon_tap_action:
+              action: more-info
           - type: custom:mushroom-template-card
             primary: Probar anuncio
             secondary: '{{ ''Noche'' if is_state(''binary_sensor.alexa_franja_noche'',''on'') else ''Día'' }} · volumen {{ (states(''input_number.alexa_estudio_volumen_anuncio_'' ~ (''noc'' if is_state(''binary_sensor.alexa_franja_noche'',''on'') else ''dia'')) | float(0) * 100) | int }} %'
@@ -5275,8 +5405,10 @@ views:
             name: No molestar
             grid_options:
               columns: 12
-            tap_action: *id001
-            icon_tap_action: *id001
+            tap_action:
+              action: more-info
+            icon_tap_action:
+              action: more-info
           - type: heading
             heading: Volumen de los avisos
             heading_style: subtitle
@@ -5290,8 +5422,10 @@ views:
               - type: numeric-input
                 style: slider
             features_position: bottom
-            tap_action: *id001
-            icon_tap_action: *id001
+            tap_action:
+              action: more-info
+            icon_tap_action:
+              action: more-info
           - type: tile
             entity: input_number.alexa_dormitorio_volumen_anuncio_noc
             name: Anuncio · noche
@@ -5301,8 +5435,10 @@ views:
               - type: numeric-input
                 style: slider
             features_position: bottom
-            tap_action: *id001
-            icon_tap_action: *id001
+            tap_action:
+              action: more-info
+            icon_tap_action:
+              action: more-info
           - type: tile
             entity: input_number.alexa_dormitorio_volumen_alarma_dia
             name: Alarma · día
@@ -5312,8 +5448,10 @@ views:
               - type: numeric-input
                 style: slider
             features_position: bottom
-            tap_action: *id001
-            icon_tap_action: *id001
+            tap_action:
+              action: more-info
+            icon_tap_action:
+              action: more-info
           - type: tile
             entity: input_number.alexa_dormitorio_volumen_alarma_noc
             name: Alarma · noche
@@ -5323,8 +5461,10 @@ views:
               - type: numeric-input
                 style: slider
             features_position: bottom
-            tap_action: *id001
-            icon_tap_action: *id001
+            tap_action:
+              action: more-info
+            icon_tap_action:
+              action: more-info
           - type: custom:mushroom-template-card
             primary: Probar anuncio
             secondary: '{{ ''Noche'' if is_state(''binary_sensor.alexa_franja_noche'',''on'') else ''Día'' }} · volumen {{ (states(''input_number.alexa_dormitorio_volumen_anuncio_'' ~ (''noc'' if is_state(''binary_sensor.alexa_franja_noche'',''on'') else ''dia'')) | float(0) * 100) | int }} %'
@@ -5394,8 +5534,10 @@ views:
             name: No molestar
             grid_options:
               columns: 12
-            tap_action: *id001
-            icon_tap_action: *id001
+            tap_action:
+              action: more-info
+            icon_tap_action:
+              action: more-info
           - type: heading
             heading: Volumen de los avisos
             heading_style: subtitle
@@ -5409,8 +5551,10 @@ views:
               - type: numeric-input
                 style: slider
             features_position: bottom
-            tap_action: *id001
-            icon_tap_action: *id001
+            tap_action:
+              action: more-info
+            icon_tap_action:
+              action: more-info
           - type: tile
             entity: input_number.alexa_dormitorio_paf_volumen_anuncio_noc
             name: Anuncio · noche
@@ -5420,8 +5564,10 @@ views:
               - type: numeric-input
                 style: slider
             features_position: bottom
-            tap_action: *id001
-            icon_tap_action: *id001
+            tap_action:
+              action: more-info
+            icon_tap_action:
+              action: more-info
           - type: tile
             entity: input_number.alexa_dormitorio_paf_volumen_alarma_dia
             name: Alarma · día
@@ -5431,8 +5577,10 @@ views:
               - type: numeric-input
                 style: slider
             features_position: bottom
-            tap_action: *id001
-            icon_tap_action: *id001
+            tap_action:
+              action: more-info
+            icon_tap_action:
+              action: more-info
           - type: tile
             entity: input_number.alexa_dormitorio_paf_volumen_alarma_noc
             name: Alarma · noche
@@ -5442,8 +5590,10 @@ views:
               - type: numeric-input
                 style: slider
             features_position: bottom
-            tap_action: *id001
-            icon_tap_action: *id001
+            tap_action:
+              action: more-info
+            icon_tap_action:
+              action: more-info
           - type: custom:mushroom-template-card
             primary: Probar anuncio
             secondary: '{{ ''Noche'' if is_state(''binary_sensor.alexa_franja_noche'',''on'') else ''Día'' }} · volumen {{ (states(''input_number.alexa_dormitorio_paf_volumen_anuncio_'' ~ (''noc'' if is_state(''binary_sensor.alexa_franja_noche'',''on'') else ''dia'')) | float(0) * 100) | int }} %'

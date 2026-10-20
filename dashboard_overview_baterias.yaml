@@ -1,9 +1,15 @@
 # HA.BAT-07 — Vista de baterías (Battery Notes) para el dashboard Overview (lovelace, storage).
-# Sustituirá a "Batery Status" (batery_view). Pegar como vista nueva desde el editor RAW.
+# Sustituye a "Batery Status" (batery_view, BAT-12). Pegar como vista desde el editor RAW.
 # Requiere: custom:auto-entities (1.16.1) y custom:flex-table-card (1.5.0).
 #
-# Orden: auto-entities, con un sort por regla (primero numéricos por % ascendente,
-# después los no disponibles). flex-table-card sin sort_by mantiene ese orden.
+# BAT-15 (orden) y BAT-14 (filtros): un único filter.template de auto-entities. Devuelve primero los
+#   no disponibles (por entity_id) y después el resto por % ascendente; flex-table-card sin sort_by
+#   mantiene ese orden. Filtra por input_select.baterias_filtro_tipo (tipo base: "2× AAA" cuenta como
+#   AAA; Recargable = Rechargeable) y input_select.baterias_filtro_area (área o planta). Si los
+#   input_select no existen, no filtra.
+# BAT-13: columna 🔄 → button.press del button.*_battery_replaced del dispositivo, con confirmación.
+#   El entity_id del botón va en una columna oculta (col[5]); flex-table sustituye col[N] por el
+#   contenido ya modificado de esa columna.
 # En modify, this es la fila (DataRow) y this.entity el objeto de estado del sensor:
 # se usa para leer los sensores hermanos de Battery Notes.
 title: Baterías
@@ -11,75 +17,104 @@ path: baterias
 icon: mdi:battery-heart-variant
 type: panel
 cards:
-  - type: custom:auto-entities
-    show_empty: true
-    filter:
-      include:
-        # 1) Con % numérico, ascendente
-        - integration: battery_notes
-          entity_id: "sensor.*_battery_plus"
-          state: ">= 0"
-          sort:
-            method: state
-            numeric: true
-        # 2) No disponibles / desconocidos, al final
-        - integration: battery_notes
-          entity_id: "sensor.*_battery_plus"
-          state: unavailable
-          sort:
-            method: name
-        - integration: battery_notes
-          entity_id: "sensor.*_battery_plus"
-          state: unknown
-          sort:
-            method: name
-    card:
-      type: custom:flex-table-card
-      title: Baterías (Battery Notes)
-      strict: false
-      columns:
-        # Los sensores unavailable pierden los atributos: fallback al registro de
-        # dispositivos (nombre) y al hermano sensor.*_battery_type (pila).
-        # flex-table entrega un atributo ausente como [] (que pinta "undefined…"), no vacío.
-        - name: Dispositivo
-          data: device_name
-          modify: >-
-            (() => {
-              if (String(x ?? "") && !/^(undefined)+$/.test(String(x))) return x;
-              const h = document.querySelector('home-assistant').hass;
-              const e = h.entities[this.entity.entity_id];
-              const d = e && h.devices[e.device_id];
-              return d ? (d.name_by_user || d.name) : this.entity.entity_id;
-            })()
-        - name: Pila
-          data: battery_type_and_quantity
-          modify: >-
-            (() => {
-              if (String(x ?? "") && !/^(undefined)+$/.test(String(x))) return x;
-              const h = document.querySelector('home-assistant').hass;
-              const st = h.states[this.entity.entity_id.replace(/_battery_plus$/, '_battery_type')];
-              if (!st) return '—';
-              const q = st.attributes.battery_quantity;
-              return (q > 1 ? q + '× ' : '') + st.state;
-            })()
-        - name: "%"
-          data: state
-          modify: >-
-            isNaN(parseFloat(x))
-              ? '⚠️ no disponible'
-              : (parseFloat(x) <= 10 ? '🔴 ' : parseFloat(x) <= 35 ? '🟠 ' : '🟢 ') + Math.round(parseFloat(x)) + ' %'
-        - name: Último cambio
-          data: battery_last_replaced
-          modify: >-
-            (() => {
-              let v = String(x ?? "");
-              if (!v || /^(undefined)+$/.test(v)) {
-                try {
-                  const id = this.entity.entity_id.replace(/_battery_plus$/, '_battery_last_replaced');
-                  const st = document.querySelector('home-assistant').hass.states[id];
-                  v = st ? st.state : null;
-                } catch (e) { v = null; }
-              }
-              const d = v ? new Date(v) : null;
-              return (d && !isNaN(d)) ? d.toLocaleDateString('es-ES') : '—';
-            })()
+  - type: vertical-stack
+    cards:
+      - type: horizontal-stack
+        cards:
+          - type: tile
+            entity: input_select.baterias_filtro_tipo
+            name: Tipo de pila
+            icon: mdi:battery
+            features:
+              - type: select-options
+          - type: tile
+            entity: input_select.baterias_filtro_area
+            name: Área / planta
+            icon: mdi:floor-plan
+            features:
+              - type: select-options
+      - type: custom:auto-entities
+        show_empty: true
+        filter:
+          template: |-
+            {%- set tipo = states('input_select.baterias_filtro_tipo') -%}
+            {%- set zona = states('input_select.baterias_filtro_area') -%}
+            {%- set tipo = 'Rechargeable' if tipo == 'Recargable' else tipo -%}
+            {%- set ns = namespace(nd=[], ok=[]) -%}
+            {%- for e in integration_entities('battery_notes') | select('match', 'sensor\..*_battery_plus$') -%}
+              {%- set t = states(e | replace('_battery_plus', '_battery_type')).split('× ') | last -%}
+              {%- set ok_tipo = tipo in ['Todos', 'unknown', 'unavailable'] or t == tipo -%}
+              {%- set ok_zona = zona in ['Todas', 'unknown', 'unavailable'] or zona in [area_name(e), floor_name(floor_id(e))] -%}
+              {%- if ok_tipo and ok_zona -%}
+                {%- if states(e) | is_number -%}
+                  {%- set ns.ok = ns.ok + [[states(e) | float, e]] -%}
+                {%- else -%}
+                  {%- set ns.nd = ns.nd + [[e, e]] -%}
+                {%- endif -%}
+              {%- endif -%}
+            {%- endfor -%}
+            {{ (ns.nd | sort | map(attribute=1) | list) + (ns.ok | sort | map(attribute=1) | list) }}
+        card:
+          type: custom:flex-table-card
+          title: Baterías (Battery Notes)
+          strict: false
+          columns:
+            # Los sensores unavailable pierden los atributos: fallback al registro de
+            # dispositivos (nombre) y al hermano sensor.*_battery_type (pila).
+            # flex-table entrega un atributo ausente como [] (que pinta "undefined…"), no vacío.
+            - name: Dispositivo
+              data: device_name
+              modify: >-
+                (() => {
+                  if (String(x ?? "") && !/^(undefined)+$/.test(String(x))) return x;
+                  const h = document.querySelector('home-assistant').hass;
+                  const e = h.entities[this.entity.entity_id];
+                  const d = e && h.devices[e.device_id];
+                  return d ? (d.name_by_user || d.name) : this.entity.entity_id;
+                })()
+            - name: Pila
+              data: battery_type_and_quantity
+              modify: >-
+                (() => {
+                  if (String(x ?? "") && !/^(undefined)+$/.test(String(x))) return x;
+                  const h = document.querySelector('home-assistant').hass;
+                  const st = h.states[this.entity.entity_id.replace(/_battery_plus$/, '_battery_type')];
+                  return st ? st.state : '—';  // *_battery_type ya trae la cantidad ("2× AAA")
+                })()
+            - name: "%"
+              data: state
+              modify: >-
+                isNaN(parseFloat(x))
+                  ? '⚠️ no disponible'
+                  : (parseFloat(x) <= 10 ? '🔴 ' : parseFloat(x) <= 35 ? '🟠 ' : '🟢 ') + Math.round(parseFloat(x)) + ' %'
+            - name: Último cambio
+              data: battery_last_replaced
+              modify: >-
+                (() => {
+                  let v = String(x ?? "");
+                  if (!v || /^(undefined)+$/.test(v)) {
+                    try {
+                      const id = this.entity.entity_id.replace(/_battery_plus$/, '_battery_last_replaced');
+                      const st = document.querySelector('home-assistant').hass.states[id];
+                      v = st ? st.state : null;
+                    } catch (e) { v = null; }
+                  }
+                  const d = v ? new Date(v) : null;
+                  return (d && !isNaN(d)) ? d.toLocaleDateString('es-ES') : '—';
+                })()
+            - name: "🔄"
+              data: state
+              align: center
+              modify: "'<ha-icon icon=\"mdi:battery-sync\"></ha-icon>'"
+              tap_action:
+                action: perform-action
+                perform_action: button.press
+                data: {}  # sin esto flex-table envía data: "" y la llamada falla
+                target:
+                  entity_id: col[5]
+                confirmation:
+                  text: "¿Registrar cambio de pila HOY en col[0]?"
+            - name: boton
+              data: state
+              hidden: true
+              modify: this.entity.entity_id.replace(/^sensor\./, 'button.').replace(/_battery_plus$/, '_battery_replaced')
