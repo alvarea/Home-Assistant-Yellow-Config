@@ -1,0 +1,85 @@
+# HA.BAT-07 — Vista de baterías (Battery Notes) para el dashboard Overview (lovelace, storage).
+# Sustituirá a "Batery Status" (batery_view). Pegar como vista nueva desde el editor RAW.
+# Requiere: custom:auto-entities (1.16.1) y custom:flex-table-card (1.5.0).
+#
+# Orden: auto-entities, con un sort por regla (primero numéricos por % ascendente,
+# después los no disponibles). flex-table-card sin sort_by mantiene ese orden.
+# En modify, this es la fila (DataRow) y this.entity el objeto de estado del sensor:
+# se usa para leer los sensores hermanos de Battery Notes.
+title: Baterías
+path: baterias
+icon: mdi:battery-heart-variant
+type: panel
+cards:
+  - type: custom:auto-entities
+    show_empty: true
+    filter:
+      include:
+        # 1) Con % numérico, ascendente
+        - integration: battery_notes
+          entity_id: "sensor.*_battery_plus"
+          state: ">= 0"
+          sort:
+            method: state
+            numeric: true
+        # 2) No disponibles / desconocidos, al final
+        - integration: battery_notes
+          entity_id: "sensor.*_battery_plus"
+          state: unavailable
+          sort:
+            method: name
+        - integration: battery_notes
+          entity_id: "sensor.*_battery_plus"
+          state: unknown
+          sort:
+            method: name
+    card:
+      type: custom:flex-table-card
+      title: Baterías (Battery Notes)
+      strict: false
+      columns:
+        # Los sensores unavailable pierden los atributos: fallback al registro de
+        # dispositivos (nombre) y al hermano sensor.*_battery_type (pila).
+        # flex-table entrega un atributo ausente como [] (que pinta "undefined…"), no vacío.
+        - name: Dispositivo
+          data: device_name
+          modify: >-
+            (() => {
+              if (String(x ?? "") && !/^(undefined)+$/.test(String(x))) return x;
+              const h = document.querySelector('home-assistant').hass;
+              const e = h.entities[this.entity.entity_id];
+              const d = e && h.devices[e.device_id];
+              return d ? (d.name_by_user || d.name) : this.entity.entity_id;
+            })()
+        - name: Pila
+          data: battery_type_and_quantity
+          modify: >-
+            (() => {
+              if (String(x ?? "") && !/^(undefined)+$/.test(String(x))) return x;
+              const h = document.querySelector('home-assistant').hass;
+              const st = h.states[this.entity.entity_id.replace(/_battery_plus$/, '_battery_type')];
+              if (!st) return '—';
+              const q = st.attributes.battery_quantity;
+              return (q > 1 ? q + '× ' : '') + st.state;
+            })()
+        - name: "%"
+          data: state
+          modify: >-
+            isNaN(parseFloat(x))
+              ? '⚠️ no disponible'
+              : (parseFloat(x) <= 10 ? '🔴 ' : parseFloat(x) <= 35 ? '🟠 ' : '🟢 ') + Math.round(parseFloat(x)) + ' %'
+        - name: Último cambio
+          data: battery_last_replaced
+          modify: >-
+            (() => {
+              let v = String(x ?? "");
+              if (!v || /^(undefined)+$/.test(v)) {
+                try {
+                  const id = this.entity.entity_id.replace(/_battery_plus$/, '_battery_last_replaced');
+                  const st = document.querySelector('home-assistant').hass.states[id];
+                  v = st ? st.state : null;
+                } catch (e) { v = null; }
+              }
+              const d = v ? new Date(v) : null;
+              return (d && !isNaN(d)) ? d.toLocaleDateString('es-ES') : '—';
+            })()
