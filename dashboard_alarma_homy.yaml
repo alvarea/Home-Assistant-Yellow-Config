@@ -230,18 +230,19 @@ views:
         - nombres
         vertical: false
         features_position: bottom
-      - type: tile
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.alarm_homy_actividad_estudio
         grid_options:
           columns: 12
-        entity: binary_sensor.alarm_homy_actividad_estudio
-        name: Actividad en el estudio (en Noche se excluye)
-        icon: mdi:monitor-eye
-        color: blue
-        state_content:
-        - state
-        - motivo
-        vertical: false
-        features_position: bottom
+        primary: '{% set on = is_state(''binary_sensor.alarm_homy_actividad_estudio'', ''on'') %}Arriba: {{ state_attr(''binary_sensor.alarm_homy_actividad_estudio'', ''motivos'') if on else ''sin actividad'' }}'
+        secondary: '{% set est = states(''input_select.alarm_homy_estado'') %}{% if est == ''armed_home'' and is_state(''input_boolean.alarm_homy_noche_pendiente'', ''on'') %}Casa nocturno → Noche en el próximo check ({{ (now() + timedelta(hours=1)).strftime(''%H'') }}:00) o tras 15 min sin actividad arriba{% elif est == ''armed_night'' %}Noche: planta alta vigilada{% else %}Armar Noche con actividad arriba arma Casa y sube a Noche cuando quede libre{% endif %}'
+        icon: '{{ ''mdi:weather-night-partly-cloudy'' if is_state(''input_boolean.alarm_homy_noche_pendiente'', ''on'') else (''mdi:desk'' if is_state(''binary_sensor.alarm_homy_actividad_estudio'', ''on'') else ''mdi:desk-lamp-off'') }}'
+        color: '{{ ''purple'' if is_state(''input_boolean.alarm_homy_noche_pendiente'', ''on'') else (''blue'' if is_state(''binary_sensor.alarm_homy_actividad_estudio'', ''on'') else ''grey'') }}'
+        multiline_secondary: true
+        tap_action:
+          action: more-info
+        hold_action:
+          action: none
       - type: tile
         entity: alarm_control_panel.alarm_homy
         name: Desarmar
@@ -386,15 +387,6 @@ views:
         - lista
         grid_options:
           columns: 12
-      - type: tile
-        entity: sensor.alarm_homy_excluidos
-        name: Excluidos
-        icon: mdi:shield-off-outline
-        state_content:
-        - state
-        - nombres
-        grid_options:
-          columns: 12
     - type: grid
       cards:
       - show_state: false
@@ -419,7 +411,7 @@ views:
           entity_id:
           - alarm_control_panel.alarm_homy
           - sensor.alarm_homy_disparo
-          - sensor.alarm_homy_excluidos
+          - input_boolean.alarm_homy_noche_pendiente
         grid_options:
           columns: 12
           rows: 8
@@ -1015,12 +1007,25 @@ views:
         grid_options:
           columns: full
         primary: '{% from ''alarm_homy.jinja'' import resumen_vista %}{{ resumen_vista() }}'
-        secondary: '{% if states(''input_select.alarm_homy_estado'') == ''disarmed'' %}Desarmada: elige abajo el modo para ver qué quedará vigilado al armar.{% else %}Situación real del modo armado ahora.{% endif %} Verde = vigilando · rojo = activo/abierto · naranja = excluido · ámbar = sin comunicación · gris = no participa.'
+        secondary: '{% if states(''input_select.alarm_homy_estado'') == ''disarmed'' %}Desarmada: elige abajo el modo para ver qué quedará vigilado al armar.{% else %}Situación real del modo armado ahora.{% endif %} Verde = vigilando · rojo = activo/abierto · ámbar = sin comunicación · gris = no participa.'
         icon: mdi:shield-search
         color: '{% from ''alarm_homy.jinja'' import modo_vista %}{{ {''armed_home'':''purple'',''armed_night'':''blue'',''armed_away'':''orange'',''armed_vacation'':''deep-orange''}.get(modo_vista(),''grey'') }}'
         multiline_secondary: true
         tap_action:
           action: none
+        hold_action:
+          action: none
+      - type: custom:mushroom-template-card
+        entity: binary_sensor.alarm_homy_actividad_estudio
+        grid_options:
+          columns: full
+        primary: '{% set on = is_state(''binary_sensor.alarm_homy_actividad_estudio'', ''on'') %}Arriba: {{ state_attr(''binary_sensor.alarm_homy_actividad_estudio'', ''motivos'') if on else ''sin actividad'' }}'
+        secondary: '{% set est = states(''input_select.alarm_homy_estado'') %}{% if est == ''armed_home'' and is_state(''input_boolean.alarm_homy_noche_pendiente'', ''on'') %}Casa nocturno → Noche en el próximo check ({{ (now() + timedelta(hours=1)).strftime(''%H'') }}:00) o tras 15 min sin actividad arriba{% elif est == ''armed_night'' %}Noche: planta alta vigilada{% else %}Armar Noche con actividad arriba arma Casa y sube a Noche cuando quede libre{% endif %}'
+        icon: '{{ ''mdi:weather-night-partly-cloudy'' if is_state(''input_boolean.alarm_homy_noche_pendiente'', ''on'') else (''mdi:desk'' if is_state(''binary_sensor.alarm_homy_actividad_estudio'', ''on'') else ''mdi:desk-lamp-off'') }}'
+        color: '{{ ''purple'' if is_state(''input_boolean.alarm_homy_noche_pendiente'', ''on'') else (''blue'' if is_state(''binary_sensor.alarm_homy_actividad_estudio'', ''on'') else ''grey'') }}'
+        multiline_secondary: true
+        tap_action:
+          action: more-info
         hold_action:
           action: none
   - title: Estado Sensores Alarma

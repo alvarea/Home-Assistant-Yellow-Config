@@ -7,9 +7,8 @@
       alarm_homy_inmediato     -> dispara sin retardo de entrada
       alarm_homy_armar_abierto -> permite armar abierto (se ignora hasta que cierre)
       (alarm_homy_auto_excluir eliminada el 2026-10-16: puertas y ventanas abiertas siempre bloquean el armado)
-      alarm_homy_excluir_si_activo -> (2026-10-16) movimiento de una zona en uso de noche (estudio):
-                                  al armar NOCHE con binary_sensor.alarm_homy_actividad_estudio en on se excluye;
-                                  se reincorpora cuando la actividad termina (luz apagada) y lleva 20 min sin movimiento
+      (la etiqueta de exclusión del estudio se eliminó el 2026-10-21, ALA-31: ya no se excluye nada al armar;
+       con actividad arriba el Noche se arma como "Casa nocturno", ver actividad_arriba y alarm_homy_auto.yaml)
       alarm_homy_unavailable   -> unavailable > 5 min cuenta como disparo SOLO en Ausente/Vacaciones
     Sin comunicación (unavailable/unknown > 2 min) con la alarma armada = AVERÍA:
       aviso (sensor.alarm_homy_averias), nunca impide armar. En Casa/Noche no dispara.
@@ -51,30 +50,28 @@
 {{ ns.l | to_json }}
 {%- endmacro -%}
 
-{#- EXCLUIBLES al armar (2026-10-16): solo en NOCHE y con actividad en el estudio
-    (binary_sensor.alarm_homy_actividad_estudio: movimiento en 15 min o luz del estudio encendida)
-    → todos los sensores del modo con etiqueta alarm_homy_excluir_si_activo -#}
-{%- macro excluibles(modo) -%}
-{%- set ns = namespace(l=[]) -%}
-{%- if modo == 'armed_night' and is_state('binary_sensor.alarm_homy_actividad_estudio', 'on') -%}
-{%- set ex = label_entities('alarm_homy_excluir_si_activo') -%}
-{%- for e in sensores_modo(modo) | from_json if e in ex -%}
-{%- set ns.l = ns.l + [e] -%}
+{#- ACTIVIDAD ARRIBA (2026-10-21, ALA-28) → JSON con los motivos legibles; [] = sin actividad.
+    OR de: luces del área estudio_setup encendidas · binary_sensor.macbook_aac_active_2 on (unavailable no cuenta)
+    · movimiento/ocupación en la planta alta ahora o en los últimos <minutos> (uno por área).
+    Sin device_class presence: binary_sensor.family_home_aac está en el área Estudio_Sala -#}
+{%- macro actividad_arriba(minutos=15) -%}
+{%- set ns = namespace(l=[], luces=[]) -%}
+{%- for e in area_entities('estudio_setup') | select('match', 'light\\.') | select('is_state', 'on') -%}
+{%- set ns.luces = ns.luces + [(state_attr(e, 'friendly_name') or e) | regex_replace('(?i)^luz\\s+', '')] -%}
 {%- endfor -%}
+{%- if ns.luces | count > 2 -%}{%- set ns.l = ns.l + [ns.luces | count ~ ' luces de ' ~ area_name('estudio_setup')] -%}
+{%- elif ns.luces | count > 0 -%}{%- set ns.l = ns.l + [('luz ' if ns.luces | count == 1 else 'luces ') ~ ns.luces | join(' y ')] -%}
 {%- endif -%}
-{{ ns.l | to_json }}
-{%- endmacro -%}
-
-{#- REINCORPORABLES (2026-10-16): excluidos con etiqueta excluir_si_activo, sin actividad en el estudio
-    (luz apagada) y sin movimiento desde hace <minutos> -#}
-{%- macro reincorporables(minutos=20) -%}
-{%- set ns = namespace(l=[]) -%}
-{%- set ex = label_entities('alarm_homy_excluir_si_activo') -%}
-{%- for e in state_attr('sensor.alarm_homy_excluidos', 'entidades') or [] if e in ex and states[e] is not none
-      and is_state('binary_sensor.alarm_homy_actividad_estudio', 'off') -%}
-{%- if is_state(e, 'off') and (as_timestamp(now()) - as_timestamp(states[e].last_changed)) >= minutos * 60 -%}
-{%- set ns.l = ns.l + [e] -%}
+{%- if is_state('binary_sensor.macbook_aac_active_2', 'on') -%}{%- set ns.l = ns.l + ['MacBook activo'] -%}{%- endif -%}
+{%- for a in floor_areas('planta_alta') -%}
+{%- set mov = namespace(si=false) -%}
+{%- for e in area_entities(a) | select('match', 'binary_sensor\\.') if states[e] is not none
+      and state_attr(e, 'device_class') in ['motion', 'occupancy'] -%}
+{%- if is_state(e, 'on') or (is_state(e, 'off') and (as_timestamp(now()) - as_timestamp(states[e].last_changed)) < minutos * 60) -%}
+{%- set mov.si = true -%}
 {%- endif -%}
+{%- endfor -%}
+{%- if mov.si -%}{%- set ns.l = ns.l + ['movimiento ' ~ area_name(a)] -%}{%- endif -%}
 {%- endfor -%}
 {{ ns.l | to_json }}
 {%- endmacro -%}
@@ -87,9 +84,8 @@
 {%- set modo = states('input_select.alarm_homy_modo') -%}
 {%- if estado in ['armed_away','armed_home','armed_night','armed_vacation','pending','triggered'] and modo != 'disarmed' -%}
 {%- set t0 = as_timestamp(states.input_select.alarm_homy_estado.last_changed) -%}
-{%- set excl = state_attr('sensor.alarm_homy_excluidos', 'entidades') or [] -%}
 {%- set unav = label_entities('alarm_homy_unavailable') -%}
-{%- for e in sensores_modo(modo) | from_json if e not in excl and states[e] is not none -%}
+{%- for e in sensores_modo(modo) | from_json if states[e] is not none -%}
 {%- set s = states[e] -%}
 {%- set tc = as_timestamp(s.last_changed) -%}
 {%- if s.state == 'on' and tc >= t0 -%}
@@ -221,7 +217,7 @@
 {%- endmacro -%}
 
 {#- Situación real de un sensor en el modo de la vista → JSON {c: color, t: texto, i: icono}
-    verde = vigilando en reposo · rojo = activo/abierto · naranja = excluido · ámbar = sin comunicación · gris = no participa -#}
+    verde = vigilando en reposo · rojo = activo/abierto · ámbar = sin comunicación · gris = no participa -#}
 {%- macro vigilancia(e) -%}
 {%- set m = modo_vista() -%}
 {%- set armada = states('input_select.alarm_homy_estado') not in ['disarmed', 'unknown', 'unavailable'] -%}
@@ -238,12 +234,10 @@
 {%- set txt_off = {'door': 'cerrada', 'garage_door': 'cerrada', 'window': 'cerrada', 'opening': 'cerrada', 'vibration': 'en reposo'}.get(dc, 'sin movimiento') -%}
 {%- set en_modo = e in (sensores_modo(m) | from_json) -%}
 {%- set etiquetado = e in label_entities(etiqueta_modo(m)) -%}
-{%- set excl = armada and e in (state_attr('sensor.alarm_homy_excluidos', 'entidades') or []) -%}
 {%- set inm = e in label_entities('alarm_homy_inmediato') -%}
 {%- set vig = 'Vigilando' if armada else 'Vigilará' -%}
 {%- if not etiquetado -%}{%- set r = {'c': 'disabled', 't': 'No vigila en ' ~ nm, 'i': ico[1 if on else 0]} -%}
 {%- elif not en_modo -%}{%- set r = {'c': 'disabled', 't': 'Deshabilitado', 'i': 'mdi:shield-off-outline'} -%}
-{%- elif excl -%}{%- set r = {'c': 'orange', 't': 'Excluido por actividad', 'i': 'mdi:shield-off'} -%}
 {%- elif s in ['unavailable', 'unknown'] -%}{%- set r = {'c': 'amber', 't': 'Sin comunicación (avería)', 'i': 'mdi:access-point-network-off'} -%}
 {%- elif on -%}{%- set r = {'c': 'red', 't': vig ~ ' · ' ~ txt_on ~ (' · impide armar' if not armada and dc in ['door', 'window', 'opening', 'garage_door'] else ''), 'i': ico[1]} -%}
 {%- else -%}{%- set r = {'c': 'green', 't': vig ~ ' · ' ~ txt_off ~ (' · inmediato' if inm else ''), 'i': ico[0]} -%}
@@ -268,14 +262,14 @@
 {{ r | to_json }}
 {%- endmacro -%}
 
-{#- Resumen de la vista: "Ausente (armada) · 24 vigilando · 1 excluido · 0 sin comunicación · 2 activos" -#}
+{#- Resumen de la vista: "Ausente (armada) · 24 vigilando · 2 activos · 0 sin comunicación" -#}
 {%- macro resumen_vista() -%}
 {%- set m = modo_vista() -%}
 {%- set armada = states('input_select.alarm_homy_estado') not in ['disarmed', 'unknown', 'unavailable'] -%}
-{%- set ns = namespace(v=0, x=0, a=0, o=0) -%}
+{%- set ns = namespace(v=0, a=0, o=0) -%}
 {%- for e in sensores_modo(m) | from_json -%}
 {%- set r = vigilancia(e) | from_json -%}
-{%- if r.c == 'green' %}{% set ns.v = ns.v + 1 %}{% elif r.c == 'red' %}{% set ns.v = ns.v + 1 %}{% set ns.o = ns.o + 1 %}{% elif r.c == 'orange' %}{% set ns.x = ns.x + 1 %}{% elif r.c == 'amber' %}{% set ns.a = ns.a + 1 %}{% endif -%}
+{%- if r.c == 'green' %}{% set ns.v = ns.v + 1 %}{% elif r.c == 'red' %}{% set ns.v = ns.v + 1 %}{% set ns.o = ns.o + 1 %}{% elif r.c == 'amber' %}{% set ns.a = ns.a + 1 %}{% endif -%}
 {%- endfor -%}
-{{ nombre_modo(m) }} ({{ 'armada' if armada else 'vista previa' }}) · {{ ns.v }} {{ 'vigilando' if armada else 'vigilarán' }} · {{ ns.o }} activos · {{ ns.x }} excluidos · {{ ns.a }} sin comunicación
+{{ nombre_modo(m) }} ({{ 'armada' if armada else 'vista previa' }}) · {{ ns.v }} {{ 'vigilando' if armada else 'vigilarán' }} · {{ ns.o }} activos · {{ ns.a }} sin comunicación
 {%- endmacro -%}

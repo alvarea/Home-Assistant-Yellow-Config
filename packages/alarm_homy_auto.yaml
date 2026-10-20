@@ -9,10 +9,15 @@
 #      Si inicio > fin (p. ej. 23:30 → 07:00) la franja empieza la noche anterior.
 #    Ausente: el auto armado al quedar la casa vacía está permitido SIEMPRE salvo en una excepción semanal
 #      (día + desde/hasta; p. ej. jueves 06:30-15:00). binary_sensor.alarm_homy_franja_ausente → on = permitido.
-#  Actividad en el estudio (2026-10-16): binary_sensor.alarm_homy_actividad_estudio (movimiento en 15 min o
-#    light.estudio encendida). Ya NO aplaza el auto Noche (16-10 01:30 armó con Agustín en la mesa): arma igual y
-#    excluye los sensores del estudio (voz en Echo entrada + estudio); vuelven con luz apagada + 20 min sin movimiento.
-#    El MacBook no sirve como señal: su ping WiFi sigue en on con el portátil apagado.
+#  Actividad arriba (2026-10-21, ALA-28): binary_sensor.alarm_homy_actividad_estudio = luz de Estudio_Setup encendida,
+#    MacBook activo (app HA, binary_sensor.macbook_aac_active_2) o movimiento en la planta alta en 15 min
+#    (macro actividad_arriba; atributo motivos). El ping del Mac no sirve: sigue en on con el portátil dormido.
+#  CASA NOCTURNO (2026-10-21, ALA-30; sustituye la exclusión del estudio del 16-10): armar Noche (auto o a mano) con
+#    actividad arriba arma CASA + input_boolean.alarm_homy_noche_pendiente (lógica en script.alarm_homy_armar).
+#    alarm_homy_subida_noche: cada hora en punto y con la actividad 15 min en off → sube a Noche sin desarmar ni
+#    tiempo de salida; con puertas/ventanas de Noche abiertas sigue en Casa y reintenta. Un Casa armado a mano
+#    (sin pendiente) no sube nunca. Pendiente off al desarmar, al armar otro modo, al subir y al fin de franja.
+#    De noche sin voz de Alexa al armar/desarmar (ALA-32, packages/alarm_homy_acciones.yaml).
 #  Presencia (2026-10-14): binary_sensor.family_any_home ← sensor.family_home (python_script countpeople)
 #    ← binary_sensor.family_home_<x> = helpers de plantilla de la UI:
 #       {{ is_state('input_boolean.family_home_<x>', 'on') and is_state('person.<x>', 'home') }}
@@ -75,26 +80,16 @@ template:
         availability: >-
           {{ ['inicio_laborable', 'fin_laborable', 'inicio_finde', 'fin_finde']
              | map('regex_replace', '^', 'input_datetime.alarm_homy_noche_') | select('has_value') | list | count == 4 }}
-      # Actividad en el estudio (2026-10-16): movimiento (etiqueta alarm_homy_excluir_si_activo) en los últimos
-      # 15 min, o luz del estudio encendida (sentado en la mesa el Aqara de la escalera no ve movimiento).
+      # Actividad arriba (ALA-28): el entity_id conserva "estudio" por el histórico y el dashboard
       - name: alarm_homy_actividad_estudio
         unique_id: alarm_homy_actividad_estudio
         icon: mdi:desk
         device_class: occupancy
         state: >-
-          {%- set ns = namespace(m15=false) -%}
-          {%- for e in label_entities('alarm_homy_excluir_si_activo') if states[e] is not none -%}
-            {%- if is_state(e, 'on') or (as_timestamp(now()) - as_timestamp(states[e].last_changed)) < 900 %}{% set ns.m15 = true %}{% endif -%}
-          {%- endfor -%}
-          {{ ns.m15 or is_state('light.estudio', 'on') }}
+          {% from 'alarm_homy.jinja' import actividad_arriba %}{{ actividad_arriba() | from_json | count > 0 }}
         attributes:
-          motivo: >-
-            {%- set ns = namespace(m15=false) -%}
-            {%- for e in label_entities('alarm_homy_excluir_si_activo') if states[e] is not none -%}
-              {%- if is_state(e, 'on') or (as_timestamp(now()) - as_timestamp(states[e].last_changed)) < 900 %}{% set ns.m15 = true %}{% endif -%}
-            {%- endfor -%}
-            {%- set l = (['movimiento en los últimos 15 minutos'] if ns.m15 else []) + (['luz encendida'] if is_state('light.estudio', 'on') else []) -%}
-            {{ l | join(' y ') if l else 'ninguno' }}
+          motivos: >-
+            {% from 'alarm_homy.jinja' import actividad_arriba %}{% set l = actividad_arriba() | from_json %}{{ l | join(', ') if l else 'ninguno' }}
       - name: alarm_homy_franja_ausente
         unique_id: alarm_homy_franja_ausente
         icon: mdi:home-export-outline
@@ -166,7 +161,7 @@ automation:
       - condition: template
         value_template: "{{ trigger.id == 'inicio' or 1 <= now().hour <= 6 }}"
     actions:
-      # Con actividad en el estudio arma igual: script.alarm_homy_armar excluye sus sensores (macro excluibles)
+      # Con actividad arriba, script.alarm_homy_armar arma Casa nocturno (Casa + noche_pendiente)
       - action: script.alarm_homy_armar
         data:
           modo: armed_night
@@ -183,20 +178,78 @@ automation:
         entity_id: binary_sensor.alarm_homy_franja_noche
         from: "on"
         to: "off"
-    conditions:
+    actions:
+      # Casa nocturno (ALA-30): también se desarma. La pendiente se apaga siempre al terminar la franja.
+      - variables:
+          nocturno: "{{ is_state('input_select.alarm_homy_estado', 'armed_home') and is_state('input_boolean.alarm_homy_noche_pendiente', 'on') }}"
+      - action: input_boolean.turn_off
+        target: {entity_id: input_boolean.alarm_homy_noche_pendiente}
       - condition: state
         entity_id: input_boolean.alarm_homy_automatismos
         state: "on"
-      - condition: state
-        entity_id: input_select.alarm_homy_estado
-        state: armed_night
+      - condition: template
+        value_template: "{{ is_state('input_select.alarm_homy_estado', 'armed_night') or nocturno }}"
       - condition: state
         entity_id: binary_sensor.family_any_home
         state: "on"
-    actions:
       - action: script.alarm_homy_desarmar
         data:
           validar: false
           origen: auto (fin de noche)
-      - action: script.alarm_homy_comprobar
-        continue_on_error: true
+      # ALA-32: sin script.alarm_homy_comprobar (hablaba al desarmar); quedan el bip largo y el LED
+
+  # ---------------------------------------------------------------------------
+  # SUBIDA CASA NOCTURNO → NOCHE (2026-10-21, ALA-30): cada hora en punto y cuando la actividad arriba
+  # lleva 15 min en off. Directo, sin desarmar ni tiempo de salida. Con bloqueantes de Noche sigue en Casa.
+  # ---------------------------------------------------------------------------
+  - id: alarm_homy_subida_noche
+    alias: Alarm HOMY · Subida Casa nocturno a Noche
+    mode: single
+    triggers:
+      - trigger: time_pattern
+        minutes: 0
+        id: hora
+      - trigger: state
+        entity_id: binary_sensor.alarm_homy_actividad_estudio
+        to: "off"
+        for: {minutes: 15}
+        id: actividad
+    conditions:
+      - condition: state
+        entity_id: input_boolean.alarm_homy_noche_pendiente
+        state: "on"
+      - condition: state
+        entity_id: input_select.alarm_homy_estado
+        state: armed_home
+      - condition: state
+        entity_id: binary_sensor.alarm_homy_actividad_estudio
+        state: "off"
+    actions:
+      - variables:
+          bloqueantes: >-
+            {% from 'alarm_homy.jinja' import bloqueantes %}{{ bloqueantes('armed_night') | from_json }}
+      - if:
+          - condition: template
+            value_template: "{{ bloqueantes | count > 0 }}"
+        then:
+          - action: logbook.log
+            data:
+              name: Alarm HOMY
+              message: >-
+                {% from 'alarm_homy.jinja' import nombres %}sigue en Casa nocturno: no sube a Noche con {{ nombres(bloqueantes) }} abierto
+              entity_id: alarm_control_panel.alarm_homy
+          - stop: Bloqueantes de Noche
+      # Primero el modo y después el estado: alarm_homy_acciones_estado lee el modo al cambiar el estado
+      - action: input_boolean.turn_off
+        target: {entity_id: input_boolean.alarm_homy_noche_pendiente}
+      - action: input_select.select_option
+        target: {entity_id: input_select.alarm_homy_modo}
+        data: {option: armed_night}
+      - action: input_select.select_option
+        target: {entity_id: input_select.alarm_homy_estado}
+        data: {option: armed_night}
+      - action: logbook.log
+        data:
+          name: Alarm HOMY
+          message: "sube de Casa nocturno a Noche ({{ 'sin actividad arriba durante 15 min' if trigger.id == 'actividad' else 'comprobación de las ' ~ now().strftime('%H:00') }})"
+          entity_id: alarm_control_panel.alarm_homy

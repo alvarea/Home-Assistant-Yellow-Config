@@ -11,11 +11,18 @@
 #  Eventos emitidos:
 #    alarm_homy_fallo_armado       {modo, origen, sensores, nombres}
 #    alarm_homy_registrar_disparo  {sensores, origen}
-#    alarm_homy_set_excluidos      {entidades}
 #    alarm_homy_reset_disparo      {}
 #    alarm_homy_codigo_incorrecto  {origen}
-#    alarm_homy_desarmado          {origen, desde, tipo}
+#    alarm_homy_desarmado          {origen, desde, modo, tipo, nocturno}
+#  Casa nocturno (2026-10-21, ALA-30): armar Noche con actividad arriba (binary_sensor.alarm_homy_actividad_estudio)
+#    arma Casa + input_boolean.alarm_homy_noche_pendiente; la subida a Noche está en alarm_homy_auto.yaml.
 ###############################################################################
+
+input_boolean:
+  # ALA-30: Casa armado en lugar de Noche por actividad arriba; sube a Noche al quedar libre
+  alarm_homy_noche_pendiente:
+    name: Alarma · Casa nocturno (Noche pendiente)
+    icon: mdi:weather-night-partly-cloudy
 
 input_select:
   # Vista "Sensores Activos" del dashboard: modo que se previsualiza con la alarma desarmada (2026-10-16)
@@ -276,25 +283,9 @@ template:
               {{ ns.l }}
             {% endif %}
 
-  # ---------------------------------------------------------------------------
-  # SENSORES EXCLUIDOS en la sesión de armado (Noche: etiqueta alarm_homy_excluir_si_activo)
-  # ---------------------------------------------------------------------------
-  - trigger:
-      - trigger: event
-        event_type: alarm_homy_set_excluidos
-    sensor:
-      - name: alarm_homy_excluidos
-        unique_id: alarm_homy_excluidos
-        icon: mdi:shield-off-outline
-        state: "{{ trigger.event.data.entidades | count }}"
-        attributes:
-          entidades: "{{ trigger.event.data.entidades }}"
-          nombres: >-
-            {% from 'alarm_homy.jinja' import nombres %}{{ nombres(trigger.event.data.entidades) }}
-
 script:
   # ---------------------------------------------------------------------------
-  # ARMAR: comprueba sensores, aplica auto-exclusión y arranca el tiempo de salida
+  # ARMAR: comprueba sensores, Casa nocturno (ALA-30) y arranca el tiempo de salida
   # ---------------------------------------------------------------------------
   alarm_homy_armar:
     alias: Alarm HOMY · Armar
@@ -317,11 +308,15 @@ script:
           estado: "{{ states('input_select.alarm_homy_estado') }}"
       - condition: template
         value_template: "{{ estado not in ['pending', 'triggered'] }}"
+      # Noche con actividad arriba → Casa nocturno (Casa + noche_pendiente). Si ya lo está, no se rearma.
+      - variables:
+          nocturno: "{{ modo == 'armed_night' and is_state('binary_sensor.alarm_homy_actividad_estudio', 'on') }}"
+          modo: "{{ 'armed_home' if nocturno else modo }}"
+      - condition: template
+        value_template: "{{ not (nocturno and estado == 'armed_home' and is_state('input_boolean.alarm_homy_noche_pendiente', 'on')) }}"
       - variables:
           bloqueantes: >-
             {% from 'alarm_homy.jinja' import bloqueantes %}{{ bloqueantes(modo) | from_json }}
-          excluibles: >-
-            {% from 'alarm_homy.jinja' import excluibles %}{{ excluibles(modo) | from_json }}
           txt: >-
             {% from 'alarm_homy.jinja' import texto_modo %}{{ texto_modo(modo) }}
           salida: "{{ states('input_number.alarm_homy_' ~ txt ~ '_salida') | int(0) }}"
@@ -340,9 +335,18 @@ script:
       - action: timer.cancel
         target:
           entity_id: [timer.alarm_homy_salida, timer.alarm_homy_entrada, timer.alarm_homy_disparo]
-      - event: alarm_homy_set_excluidos
-        event_data:
-          entidades: "{{ excluibles }}"
+      # Antes de cambiar el estado: alarm_homy_acciones_estado la usa para callar la voz (ALA-32)
+      - action: "input_boolean.turn_{{ 'on' if nocturno else 'off' }}"
+        target: {entity_id: input_boolean.alarm_homy_noche_pendiente}
+      - if:
+          - condition: template
+            value_template: "{{ nocturno }}"
+        then:
+          - action: logbook.log
+            data:
+              name: Alarm HOMY
+              message: "Casa nocturno ({{ origen }}): {{ state_attr('binary_sensor.alarm_homy_actividad_estudio', 'motivos') }}. Sube a Noche cuando no haya actividad arriba"
+              entity_id: alarm_control_panel.alarm_homy
       - event: alarm_homy_reset_disparo
       - action: input_select.select_option
         target: {entity_id: input_select.alarm_homy_tipo_disparo}
@@ -401,6 +405,7 @@ script:
           desde: "{{ states('input_select.alarm_homy_estado') }}"
           modo_previo: "{{ states('input_select.alarm_homy_modo') }}"
           tipo_previo: "{{ states('input_select.alarm_homy_tipo_disparo') }}"
+          nocturno_previo: "{{ modo_previo == 'armed_night' or is_state('input_boolean.alarm_homy_noche_pendiente', 'on') }}"
       - action: timer.cancel
         target:
           entity_id: [timer.alarm_homy_salida, timer.alarm_homy_entrada, timer.alarm_homy_disparo]
@@ -413,15 +418,15 @@ script:
           desde: "{{ desde }}"
           modo: "{{ modo_previo }}"
           tipo: "{{ tipo_previo }}"
+          nocturno: "{{ nocturno_previo }}"
       - action: input_select.select_option
         target: {entity_id: input_select.alarm_homy_modo}
         data: {option: disarmed}
       - action: input_select.select_option
         target: {entity_id: input_select.alarm_homy_tipo_disparo}
         data: {option: normal}
-      - event: alarm_homy_set_excluidos
-        event_data:
-          entidades: []
+      - action: input_boolean.turn_off
+        target: {entity_id: input_boolean.alarm_homy_noche_pendiente}
 
   # ---------------------------------------------------------------------------
   # DISPARAR: pasa a triggered y arranca el tiempo de disparo

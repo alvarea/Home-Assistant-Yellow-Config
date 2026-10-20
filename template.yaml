@@ -1439,8 +1439,8 @@
     - name: macbook_monitor_lg1
       unique_id: macbook_monitor_lg1
       state: >-
-        {% if is_state('binary_sensor.macbook_aac_active','on') and
-              (is_state('sensor.macbook_aac_displays','2') or is_state('sensor.macbook_aac_displays','3'))  %}
+        {% if is_state('binary_sensor.macbook_aac_active_2','on') and
+              (is_state('sensor.macbook_aac_displays_2','2') or is_state('sensor.macbook_aac_displays_2','3'))  %}
           true
         {% else %}
           false
@@ -1451,7 +1451,7 @@
     - name: macbook_monitor_lg2
       unique_id: macbook_monitor_lg2
       state: >-
-        {% if is_state('binary_sensor.macbook_aac_active','on') and is_state('sensor.macbook_aac_displays','3') %}
+        {% if is_state('binary_sensor.macbook_aac_active_2','on') and is_state('sensor.macbook_aac_displays_2','3') %}
           true
         {% else %}
           false
@@ -1516,7 +1516,7 @@
     - name: setup_devices_status
       unique_id: setup_devices_status
       state: >-
-        {{ states('binary_sensor.laptop_macbook_aac') == 'on' 
+        {{ states('binary_sensor.portatil_macbook_aac') == 'on' 
            or states('binary_sensor.laptop_dell_aac') == 'on' 
            or states('switch.esphome_4ch_sw4_relay_2') == 'on' 
            or states('switch.esphome_4ch_sw4_relay_3') == 'on' 
@@ -1528,7 +1528,7 @@
     - name: laptop_aac
       unique_id: laptop_aac
       state: >-
-        {% if is_state('binary_sensor.laptop_macbook_aac','on') 
+        {% if is_state('binary_sensor.portatil_macbook_aac','on') 
             or is_state('binary_sensor.laptop_dell_aac','on')%}
           true
         {% else %}
@@ -1537,17 +1537,11 @@
       icon: mdi:laptop
       # friendly_name (referencia): 'Portátiles Mac/Dell AAC '
 
+    # 2026-10-21 (ALA-29): entity_id binary_sensor.portatil_macbook_aac (renombrado en el registro).
+    # Antes ping/NMAP: seguían en on con el Mac dormido. Ahora "Active" de la app HA del Mac (unavailable = off).
     - name: laptop_macbook_aac
       unique_id: laptop_macbook_aac
-      state: >-
-        {% if is_state('device_tracker.apple_13_b4_97_mac_aac_lan','home') 
-            or is_state('device_tracker.apple_69_64_86_mac_aac','home') 
-            or is_state('binary_sensor.ping_macbook_aac_lan','on')
-            or is_state('binary_sensor.ping_macbook_aac_wifi','on')%}
-          true
-        {% else %}
-          false
-        {% endif %}
+      state: "{{ is_state('binary_sensor.macbook_aac_active_2', 'on') }}"
       icon: mdi:laptop
       # friendly_name (referencia): 'Portátil Macbook AAC '
 
