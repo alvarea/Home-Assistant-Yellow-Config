@@ -1,0 +1,211 @@
+###############################################################################
+#  BATERÍAS · Aviso único (BAT-08) sobre Battery Notes (2026-10-20)
+#
+#  sensor.baterias_bajas       → nº de dispositivos por debajo del umbral de aviso, con atributos:
+#                                  bajas         lista [{entity_id, nombre, pila, pct}] < umbral aviso, ascendente
+#                                  criticas      entity_ids < umbral crítico
+#                                  sin_reportar  lista [{entity_id, nombre, pila, desde}] no disponibles > N días
+#  automation.baterias_resumen_diario → un único push a AAC a primera hora, solo si hay algo que contar.
+#  automation.baterias_aviso_critico  → push crítico inmediato al entrar un dispositivo < umbral crítico,
+#                                       repetido cada 24 h mientras quede alguno (al cambiar la pila sale solo).
+#
+#  Bajas/críticas: solo sensor.*_battery_plus con % numérico y pila no recargable (fuera iPhones, iPad,
+#  timbre): un no disponible nunca da aviso de batería baja.
+#  "Sin reportar" = battery_plus no disponible (ZHA lo marca a las 6 h sin noticias) durante más de N días.
+#  No se usa battery_last_reported ni battery_notes.check_battery_last_reported: ZHA solo escribe el
+#  estado cuando el % cambia, así que un dispositivo sano con % estable pasaría por "sin reportar"
+#  (comprobado 20-10: 25+ dispositivos con último reporte = arranque de HA del 18-10). Además ese
+#  servicio lanza un evento por dispositivo y no consolida. Ojo: un reinicio de HA reinicia la cuenta de días.
+#  Envío: script.notifica (packages/avisos.yaml), destinos admin = notify.mobile_app_iphone_aac.
+###############################################################################
+
+input_number:
+  baterias_umbral_aviso:
+    name: Baterías · umbral aviso
+    icon: mdi:battery-20
+    min: 5
+    max: 50
+    step: 5
+    unit_of_measurement: "%"
+    mode: box
+  baterias_umbral_critico:
+    name: Baterías · umbral crítico
+    icon: mdi:battery-alert-variant-outline
+    min: 1
+    max: 30
+    step: 1
+    unit_of_measurement: "%"
+    mode: box
+  baterias_dias_sin_reportar:
+    name: Baterías · días sin reportar
+    icon: mdi:battery-unknown
+    min: 1
+    max: 14
+    step: 1
+    unit_of_measurement: d
+    mode: box
+
+# Filtros de la vista Baterías (BAT-14, dashboard_overview_baterias.yaml). Tipo base: "2× AAA" cuenta
+# como AAA; Recargable = Rechargeable. Área: una planta (floor) o un área con dispositivos a pilas.
+input_select:
+  baterias_filtro_tipo:
+    name: Baterías · filtro tipo
+    icon: mdi:battery
+    options: [Todos, CR2032, CR2450, CR1632, AAA, Recargable]
+  baterias_filtro_area:
+    name: Baterías · filtro área
+    icon: mdi:floor-plan
+    options:
+      - Todas
+      - Planta Baja
+      - Planta Alta
+      - Jardín
+      - Entrada
+      - Salón
+      - Cocina
+      - Pasillo
+      - Dormitorio M&D
+      - Dormitorio AAF
+      - Dormitorio PAF
+      - Dormitorio Plancha
+      - Estudio_Sala
+      - Estudio_Setup
+      - Armario
+      - Desván
+      - Porche
+      - Entrada Garaje
+
+template:
+  - sensor:
+      - name: baterias_bajas
+        unique_id: baterias_bajas
+        icon: mdi:battery-alert-variant
+        unit_of_measurement: dispositivos
+        state_class: measurement
+        state: >-
+          {%- set u = states('input_number.baterias_umbral_aviso') | float(20) -%}
+          {%- set ns = namespace(n=0) -%}
+          {%- for s in integration_entities('battery_notes') | select('match', 'sensor\..*_battery_plus$') | expand -%}
+            {%- if s.state | is_number and s.state | float < u and s.attributes.battery_type | default('') != 'Rechargeable' -%}
+              {%- set ns.n = ns.n + 1 -%}
+            {%- endif -%}
+          {%- endfor -%}
+          {{ ns.n }}
+        attributes:
+          bajas: >-
+            {%- set u = states('input_number.baterias_umbral_aviso') | float(20) -%}
+            {%- set ns = namespace(l=[]) -%}
+            {%- for s in integration_entities('battery_notes') | select('match', 'sensor\..*_battery_plus$') | expand -%}
+              {%- if s.state | is_number and s.state | float < u and s.attributes.battery_type | default('') != 'Rechargeable' -%}
+                {%- set ns.l = ns.l + [{'entity_id': s.entity_id,
+                                        'nombre': s.attributes.device_name | default(s.name),
+                                        'pila': s.attributes.battery_type_and_quantity | default('?'),
+                                        'pct': s.state | float | round(0, 'floor') | int}] -%}
+              {%- endif -%}
+            {%- endfor -%}
+            {{ ns.l | sort(attribute='pct') }}
+          criticas: >-
+            {%- set c = states('input_number.baterias_umbral_critico') | float(10) -%}
+            {%- set ns = namespace(l=[]) -%}
+            {%- for s in integration_entities('battery_notes') | select('match', 'sensor\..*_battery_plus$') | expand -%}
+              {%- if s.state | is_number and s.state | float < c and s.attributes.battery_type | default('') != 'Rechargeable' -%}
+                {%- set ns.l = ns.l + [s.entity_id] -%}
+              {%- endif -%}
+            {%- endfor -%}
+            {{ ns.l | sort }}
+          # Sin atributos al estar no disponible: nombre del registro de dispositivos y pila de *_battery_type
+          sin_reportar: >-
+            {%- set lim = now() - timedelta(days=states('input_number.baterias_dias_sin_reportar') | float(2)) -%}
+            {%- set ns = namespace(l=[]) -%}
+            {%- for s in integration_entities('battery_notes') | select('match', 'sensor\..*_battery_plus$') | expand -%}
+              {%- set pila = states(s.entity_id | replace('_battery_plus', '_battery_type')) -%}
+              {%- if s.state in ['unavailable', 'unknown'] and s.last_changed < lim and pila != 'Rechargeable' -%}
+                {%- set d = device_id(s.entity_id) -%}
+                {%- set ns.l = ns.l + [{'entity_id': s.entity_id,
+                                        'nombre': device_attr(d, 'name_by_user') or device_attr(d, 'name') or s.entity_id,
+                                        'pila': pila,
+                                        'desde': as_local(s.last_changed).strftime('%d/%m')}] -%}
+              {%- endif -%}
+            {%- endfor -%}
+            {{ ns.l | sort(attribute='nombre') }}
+
+automation:
+  # ---------------------------------------------------------------------------
+  # Resumen diario: un solo mensaje con bajas (< aviso) y sin reportar. Nada que contar → nada se envía.
+  # ---------------------------------------------------------------------------
+  - id: baterias_resumen_diario
+    alias: Baterías · Resumen diario
+    mode: single
+    triggers:
+      - trigger: time
+        at: "08:30:00"
+    conditions:
+      - condition: template
+        value_template: >-
+          {{ state_attr('sensor.baterias_bajas', 'bajas') | default([], true) | count > 0
+             or state_attr('sensor.baterias_bajas', 'sin_reportar') | default([], true) | count > 0 }}
+    actions:
+      - variables:
+          bajas: "{{ state_attr('sensor.baterias_bajas', 'bajas') | default([], true) }}"
+          mudos: "{{ state_attr('sensor.baterias_bajas', 'sin_reportar') | default([], true) }}"
+          crit: "{{ states('input_number.baterias_umbral_critico') | float(10) }}"
+      - action: script.notifica
+        data:
+          titulo: "🔋 Baterías: {{ bajas | count }} bajas{{ ', %d sin reportar' % (mudos | count) if mudos else '' }}"
+          mensaje: |-
+            {%- if bajas -%}
+            Bajo {{ states('input_number.baterias_umbral_aviso') | int(20) }} %:
+            {%- for b in bajas %}
+            {{ '🔴' if b.pct < crit else '🟠' }} {{ b.nombre }} · {{ b.pila }} · {{ b.pct }} %
+            {%- endfor %}
+            {%- endif %}
+            {%- if bajas and mudos %}
+
+            {% endif -%}
+            {%- if mudos -%}
+            Sin reportar (no disponible > {{ states('input_number.baterias_dias_sin_reportar') | int(2) }} días):
+            {%- for m in mudos %}
+            ⚠️ {{ m.nombre }} · {{ m.pila }} · desde {{ m.desde }}
+            {%- endfor %}
+            {%- endif %}
+          nivel: info
+          destinos: admin
+          tag: baterias_resumen
+
+  # ---------------------------------------------------------------------------
+  # Crítico: inmediato cuando ENTRA un dispositivo < umbral crítico (salir uno no reavisa) y
+  # repetido cada 24 h mientras quede alguno. mode restart: un crítico nuevo reinicia el ciclo.
+  # Tras un reinicio de HA vuelve a avisar en cuanto los sensores recuperan el valor.
+  # ---------------------------------------------------------------------------
+  - id: baterias_aviso_critico
+    alias: Baterías · Aviso crítico
+    mode: restart
+    triggers:
+      - trigger: state
+        entity_id: sensor.baterias_bajas
+        attribute: criticas
+    conditions:
+      - condition: template
+        value_template: >-
+          {%- set new = trigger.to_state.attributes.criticas | default([], true) if trigger.to_state else [] -%}
+          {%- set old = trigger.from_state.attributes.criticas | default([], true) if trigger.from_state else [] -%}
+          {{ new | reject('in', old) | list | count > 0 }}
+    actions:
+      - repeat:
+          sequence:
+            - variables:
+                bajas: "{{ state_attr('sensor.baterias_bajas', 'bajas') | default([], true) }}"
+                crits: "{{ state_attr('sensor.baterias_bajas', 'criticas') | default([], true) }}"
+            - action: script.notifica
+              data:
+                titulo: "🪫 Batería crítica: {{ crits | count }} dispositivo{{ 's' if crits | count != 1 else '' }}"
+                mensaje: |-
+                  {%- for b in bajas | selectattr('entity_id', 'in', crits) %}
+                  🔴 {{ b.nombre }} · {{ b.pila }} · {{ b.pct }} %
+                  {%- endfor %}
+                nivel: critico
+                destinos: admin
+                tag: baterias_critico
+            - wait_template: "{{ state_attr('sensor.baterias_bajas', 'criticas') | default([], true) | count == 0 }}"
+              timeout: "24:00:00"
+          until: "{{ state_attr('sensor.baterias_bajas', 'criticas') | default([], true) | count == 0 }}"
