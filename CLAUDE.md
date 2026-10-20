@@ -4,7 +4,7 @@ Responde siempre en español. Soy ingeniero informático con conocimientos de do
 
 La planificación y el backlog se hacen en el proyecto **IT-HA de Claude Cowork**. Aquí (Claude Code) se implementan las tareas. Datos personales y URL de acceso remoto: `CLAUDE.local.md` (fuera de git; este repo es **público** en GitHub).
 
-**Docs del proyecto (backlog, migraciones, recetas): `/Users/agustin/Documents/claude/HOMY/`.** Es una carpeta de iCloud compartida con Cowork y fuera del repo, así que nunca se copia aquí. Las referencias a `claude/<doc>.md` que aparezcan en docs o skills se refieren a esta carpeta. Revisa los docs antes de rediagnosticar un problema.
+**Docs del proyecto (backlog, migraciones, recetas): `~/claude/HOMY/`.** `~/claude` es un enlace simbólico a `/Users/agustin/Library/Mobile Documents/com~apple~CloudDocs/claude` (iCloud Drive, una carpeta por proyecto de Cowork). Es una carpeta compartida con Cowork y fuera del repo, así que nunca se copia aquí. Las referencias a `claude/<doc>.md` que aparezcan en docs o skills se refieren a esta carpeta. Revisa los docs antes de rediagnosticar un problema.
 
 ## Instalación
 - **Home Assistant Yellow** (4 GB RAM, SSD externo), ethernet, IP fija 192.168.0.10. HA 2026.10.1. Los antiguos "add-ons" se llaman ahora **apps**.
