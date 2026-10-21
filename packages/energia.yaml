@@ -34,3 +34,303 @@ template:
             {%- set laborable = (wd == 'on') if wd in ['on', 'off'] else (now().isoweekday() <= 5) -%}
             {{ 0.067 if (not laborable) or now().hour < 8 else 0.211 }}
           tarifa: Octopus Go
+
+      # Potencia contratada vigente (factura sep-2026): P1 4,6 kW (punta/llano), P2 5,7 kW (valle).
+      # Consumo de la casa = consumo general (pinza) - consumo del coche (Trydan), mínimo 0.
+      # Vocabulario: general = casa + coche. Si algún día hay pinza propia del circuito casa
+      # (ENE-13/15) se sustituye esta medida por la real.
+      - name: casa_potencia
+        unique_id: casa_potencia
+        unit_of_measurement: W
+        device_class: power
+        state_class: measurement
+        icon: mdi:home-lightning-bolt
+        availability: "{{ has_value('sensor.v2c_house_power') and has_value('sensor.v2c_charge_power') }}"
+        state: "{{ [states('sensor.v2c_house_power') | float(0) - states('sensor.v2c_charge_power') | float(0), 0] | max | round(0) }}"
+      - name: potencia_contratada_actual
+        unique_id: potencia_contratada_actual
+        unit_of_measurement: kW
+        device_class: power
+        state_class: measurement
+        icon: mdi:flash-triangle
+        availability: "{{ state_attr('sensor.precio_luz_actual', 'periodo') in ['valle', 'punta_llano'] }}"
+        state: >-
+          {{ 5.7 if state_attr('sensor.precio_luz_actual', 'periodo') == 'valle' else 4.6 }}
+
+  # ENE-06 · Coste (tarifa Octopus Go con impuestos, mismos precios que precio_luz_actual).
+  # Coste = kWh del utility_meter por tarifa × precio. Sin state_class: se reinicia cada ciclo
+  # y el histórico largo está en las estadísticas de los kWh.
+  - sensor:
+      - name: precio_luz_valle
+        unique_id: precio_luz_valle
+        unit_of_measurement: "EUR/kWh"
+        state_class: measurement
+        icon: mdi:cash-minus
+        state: "{{ (0.067 * 1.0511 * 1.21) | round(4) }}"
+      - name: precio_luz_punta_llano
+        unique_id: precio_luz_punta_llano
+        unit_of_measurement: "EUR/kWh"
+        state_class: measurement
+        icon: mdi:cash-plus
+        state: "{{ (0.211 * 1.0511 * 1.21) | round(4) }}"
+      - name: coste_general_hoy_valle
+        unique_id: coste_general_hoy_valle
+        unit_of_measurement: EUR
+        device_class: monetary
+        icon: mdi:home-lightning-bolt
+        availability: "{{ has_value('sensor.precio_luz_valle') and has_value('sensor.precio_luz_punta_llano') }}"
+        state: "{{ (states('sensor.general_energia_red_diario_valle') | float(0) * states('sensor.precio_luz_valle') | float(0)) | round(2) }}"
+      - name: coste_general_hoy_punta_llano
+        unique_id: coste_general_hoy_punta_llano
+        unit_of_measurement: EUR
+        device_class: monetary
+        icon: mdi:home-lightning-bolt
+        availability: "{{ has_value('sensor.precio_luz_valle') and has_value('sensor.precio_luz_punta_llano') }}"
+        state: "{{ (states('sensor.general_energia_red_diario_punta_llano') | float(0) * states('sensor.precio_luz_punta_llano') | float(0)) | round(2) }}"
+      - name: coste_general_hoy
+        unique_id: coste_general_hoy
+        unit_of_measurement: EUR
+        device_class: monetary
+        icon: mdi:home-lightning-bolt
+        availability: "{{ has_value('sensor.precio_luz_valle') and has_value('sensor.precio_luz_punta_llano') }}"
+        state: "{{ ((states('sensor.general_energia_red_diario_valle') | float(0) * states('sensor.precio_luz_valle') | float(0)) + (states('sensor.general_energia_red_diario_punta_llano') | float(0) * states('sensor.precio_luz_punta_llano') | float(0))) | round(2) }}"
+      - name: coste_general_mes_valle
+        unique_id: coste_general_mes_valle
+        unit_of_measurement: EUR
+        device_class: monetary
+        icon: mdi:home-lightning-bolt
+        availability: "{{ has_value('sensor.precio_luz_valle') and has_value('sensor.precio_luz_punta_llano') }}"
+        state: "{{ (states('sensor.general_energia_red_mensual_valle') | float(0) * states('sensor.precio_luz_valle') | float(0)) | round(2) }}"
+      - name: coste_general_mes_punta_llano
+        unique_id: coste_general_mes_punta_llano
+        unit_of_measurement: EUR
+        device_class: monetary
+        icon: mdi:home-lightning-bolt
+        availability: "{{ has_value('sensor.precio_luz_valle') and has_value('sensor.precio_luz_punta_llano') }}"
+        state: "{{ (states('sensor.general_energia_red_mensual_punta_llano') | float(0) * states('sensor.precio_luz_punta_llano') | float(0)) | round(2) }}"
+      - name: coste_general_mes
+        unique_id: coste_general_mes
+        unit_of_measurement: EUR
+        device_class: monetary
+        icon: mdi:home-lightning-bolt
+        availability: "{{ has_value('sensor.precio_luz_valle') and has_value('sensor.precio_luz_punta_llano') }}"
+        state: "{{ ((states('sensor.general_energia_red_mensual_valle') | float(0) * states('sensor.precio_luz_valle') | float(0)) + (states('sensor.general_energia_red_mensual_punta_llano') | float(0) * states('sensor.precio_luz_punta_llano') | float(0))) | round(2) }}"
+      - name: coste_ve_hoy_valle
+        unique_id: coste_ve_hoy_valle
+        unit_of_measurement: EUR
+        device_class: monetary
+        icon: mdi:ev-station
+        availability: "{{ has_value('sensor.precio_luz_valle') and has_value('sensor.precio_luz_punta_llano') }}"
+        state: "{{ (states('sensor.ve_energia_diario_valle') | float(0) * states('sensor.precio_luz_valle') | float(0)) | round(2) }}"
+      - name: coste_ve_hoy_punta_llano
+        unique_id: coste_ve_hoy_punta_llano
+        unit_of_measurement: EUR
+        device_class: monetary
+        icon: mdi:ev-station
+        availability: "{{ has_value('sensor.precio_luz_valle') and has_value('sensor.precio_luz_punta_llano') }}"
+        state: "{{ (states('sensor.ve_energia_diario_punta_llano') | float(0) * states('sensor.precio_luz_punta_llano') | float(0)) | round(2) }}"
+      - name: coste_ve_hoy
+        unique_id: coste_ve_hoy
+        unit_of_measurement: EUR
+        device_class: monetary
+        icon: mdi:ev-station
+        availability: "{{ has_value('sensor.precio_luz_valle') and has_value('sensor.precio_luz_punta_llano') }}"
+        state: "{{ ((states('sensor.ve_energia_diario_valle') | float(0) * states('sensor.precio_luz_valle') | float(0)) + (states('sensor.ve_energia_diario_punta_llano') | float(0) * states('sensor.precio_luz_punta_llano') | float(0))) | round(2) }}"
+      - name: coste_ve_mes_valle
+        unique_id: coste_ve_mes_valle
+        unit_of_measurement: EUR
+        device_class: monetary
+        icon: mdi:ev-station
+        availability: "{{ has_value('sensor.precio_luz_valle') and has_value('sensor.precio_luz_punta_llano') }}"
+        state: "{{ (states('sensor.ve_energia_mensual_valle') | float(0) * states('sensor.precio_luz_valle') | float(0)) | round(2) }}"
+      - name: coste_ve_mes_punta_llano
+        unique_id: coste_ve_mes_punta_llano
+        unit_of_measurement: EUR
+        device_class: monetary
+        icon: mdi:ev-station
+        availability: "{{ has_value('sensor.precio_luz_valle') and has_value('sensor.precio_luz_punta_llano') }}"
+        state: "{{ (states('sensor.ve_energia_mensual_punta_llano') | float(0) * states('sensor.precio_luz_punta_llano') | float(0)) | round(2) }}"
+      - name: coste_ve_mes
+        unique_id: coste_ve_mes
+        unit_of_measurement: EUR
+        device_class: monetary
+        icon: mdi:ev-station
+        availability: "{{ has_value('sensor.precio_luz_valle') and has_value('sensor.precio_luz_punta_llano') }}"
+        state: "{{ ((states('sensor.ve_energia_mensual_valle') | float(0) * states('sensor.precio_luz_valle') | float(0)) + (states('sensor.ve_energia_mensual_punta_llano') | float(0) * states('sensor.precio_luz_punta_llano') | float(0))) | round(2) }}"
+
+###############################################################################
+#  ENERGÍA · Consumo de red (ENE-02, 2026-10-21)
+#
+#  Integra la potencia de la pinza del V2C (interruptor general del cuadro
+#  principal = consumo total de la vivienda, coche incluido) → kWh para el
+#  panel de Energía. Acumula desde su creación: el histórico anterior no se
+#  convierte. Método 'left' (la potencia constante se integra bien) y
+#  max_sub_interval para que siga sumando aunque la pinza no cambie de valor.
+###############################################################################
+
+sensor:
+  - platform: integration
+    source: sensor.v2c_house_power
+    name: general_energia_red
+    unique_id: general_energia_red
+    unit_prefix: k
+    unit_time: h
+    round: 3
+    method: left
+    max_sub_interval: "00:01:00"
+
+###############################################################################
+#  ENERGÍA · Contadores por ciclo y tarifa (ENE-03, 2026-10-21)
+#
+#  utility_meter diario / mensual / anual con las tarifas del atributo `periodo`
+#  de sensor.precio_luz_actual (valle | punta_llano), para:
+#    · el consumo general (sensor.general_energia_red, pinza V2C = casa + coche)
+#    · el coche (sensor.v2c_charge_energy del Trydan: carga fuera de valle)
+#  Cada medidor crea select.<nombre> (tarifa activa) y sensor.<nombre>_valle /
+#  sensor.<nombre>_punta_llano. La automatización cambia la tarifa de los seis.
+#  Acumulan desde su creación (sin histórico anterior).
+###############################################################################
+
+utility_meter:
+  general_energia_red_diario:
+    source: sensor.general_energia_red
+    name: general_energia_red_diario
+    cycle: daily
+    tariffs: [valle, punta_llano]
+  general_energia_red_mensual:
+    source: sensor.general_energia_red
+    name: general_energia_red_mensual
+    cycle: monthly
+    tariffs: [valle, punta_llano]
+  general_energia_red_anual:
+    source: sensor.general_energia_red
+    name: general_energia_red_anual
+    cycle: yearly
+    tariffs: [valle, punta_llano]
+  ve_energia_diario:
+    source: sensor.v2c_charge_energy
+    name: ve_energia_diario
+    cycle: daily
+    tariffs: [valle, punta_llano]
+  ve_energia_mensual:
+    source: sensor.v2c_charge_energy
+    name: ve_energia_mensual
+    cycle: monthly
+    tariffs: [valle, punta_llano]
+  ve_energia_anual:
+    source: sensor.v2c_charge_energy
+    name: ve_energia_anual
+    cycle: yearly
+    tariffs: [valle, punta_llano]
+
+automation:
+  - id: energia_tarifa_utility_meter
+    alias: Energía · Tarifa de los contadores según periodo
+    description: Pone valle o punta_llano en los selects de los utility_meter (general y VE) al cambiar el periodo de sensor.precio_luz_actual y al arrancar HA.
+    mode: restart
+    triggers:
+      - trigger: state
+        entity_id: sensor.precio_luz_actual
+        attribute: periodo
+      - trigger: homeassistant
+        event: start
+    conditions:
+      - "{{ state_attr('sensor.precio_luz_actual', 'periodo') in ['valle', 'punta_llano'] }}"
+    actions:
+      - action: select.select_option
+        target:
+          entity_id:
+            - select.general_energia_red_diario
+            - select.general_energia_red_mensual
+            - select.general_energia_red_anual
+            - select.ve_energia_diario
+            - select.ve_energia_mensual
+            - select.ve_energia_anual
+        data:
+          option: "{{ state_attr('sensor.precio_luz_actual', 'periodo') }}"
+
+###############################################################################
+#  ENERGÍA · Aviso de potencia contratada (ENE-08, revisado en ENE-17, 2026-10-21)
+#
+#  Vocabulario: consumo general = pinza V2C (casa + coche) · consumo casa =
+#  sensor.casa_potencia (general - coche) · consumo coche = sensor.v2c_charge_power.
+#  Límite vigente: sensor.potencia_contratada_actual (P1 4,6 kW · P2 5,7 kW).
+#    cerca     consumo CASA > 90 % del límite durante 20 s (cooldown 10 min).
+#              Sin coche cargando, casa = general. Con coche, el Trydan modula
+#              hasta llenar el límite de valle: el general queda casi siempre
+#              > 90 %, por eso se avisa sobre la casa y no sobre el general.
+#    superado  consumo GENERAL > 100 % del límite (sin cooldown; el trigger solo
+#              salta al cruzar el umbral): 10 s sin coche, 30 s con coche
+#              (> 300 W) para no avisar por los ajustes del Trydan.
+#  Los picos reales de 6-8 kW sin coche son escalones de ~1,8 kW de cargas
+#  resistivas; el ICP los tolera unos minutos. La pinza reporta cada 5 s.
+#  Voz por Echo (entrada y estudio) fuera de la franja de noche; iOS a admin
+#  siempre (time-sensitive). El mensaje lista lo que está en marcha: coche,
+#  lavadora, pozo y aires encendidos.
+###############################################################################
+
+  - id: energia_aviso_potencia_contratada
+    alias: Energía · Aviso de potencia contratada
+    description: Avisa por Echo (de día) e iOS (AAC) cuando el consumo de la casa pasa del 90 % (cerca) o el general del 100 % (superado) de la potencia contratada vigente.
+    mode: single
+    max_exceeded: silent
+    triggers:
+      - trigger: template
+        id: cerca
+        value_template: "{{ states('sensor.casa_potencia') | float(0) > 900 * (states('sensor.potencia_contratada_actual') | float(99)) }}"
+        for: {seconds: 20}
+      - trigger: template
+        id: superado
+        value_template: "{{ states('sensor.v2c_house_power') | float(0) > 1000 * (states('sensor.potencia_contratada_actual') | float(99)) and states('sensor.v2c_charge_power') | float(0) <= 300 }}"
+        for: {seconds: 10}
+      - trigger: template
+        id: superado
+        value_template: "{{ states('sensor.v2c_house_power') | float(0) > 1000 * (states('sensor.potencia_contratada_actual') | float(99)) and states('sensor.v2c_charge_power') | float(0) > 300 }}"
+        for: {seconds: 30}
+    conditions:
+      - condition: or
+        conditions:
+          - condition: trigger
+            id: superado
+          - "{{ this.attributes.last_triggered is none or (now() - this.attributes.last_triggered).total_seconds() > 600 }}"
+    actions:
+      - variables:
+          fmt_general: "{{ ((states('sensor.v2c_house_power') | float(0) / 1000) | round(1) | string).replace('.', ',') }}"
+          fmt_casa: "{{ ((states('sensor.casa_potencia') | float(0) / 1000) | round(1) | string).replace('.', ',') }}"
+          fmt_lim: "{{ (states('sensor.potencia_contratada_actual') | float(0) | string).replace('.', ',') }}"
+          activos: >-
+            {%- set ns = namespace(l=[]) -%}
+            {%- if states('sensor.v2c_charge_power') | float(0) > 500 -%}{%- set ns.l = ns.l + ['el coche'] -%}{%- endif -%}
+            {%- if states('sensor.grillplats_lavadora_power') | float(0) > 300 -%}{%- set ns.l = ns.l + ['la lavadora'] -%}{%- endif -%}
+            {%- if states('sensor.esphome_pow_sw4_power') | float(0) > 300 -%}{%- set ns.l = ns.l + ['la bomba del pozo'] -%}{%- endif -%}
+            {%- for e, n in {'climate.aa_estudio': 'el aire del estudio', 'climate.gree_dormitorio_paf': 'el aire de Paloma', 'climate.gree_dormitorio_aaf': 'el aire de Agu'}.items() -%}
+              {%- if states(e) not in ['off', 'unavailable', 'unknown'] -%}{%- set ns.l = ns.l + [n] -%}{%- endif -%}
+            {%- endfor -%}
+            {{ ns.l }}
+          resto: "{{ ' En marcha: ' ~ (activos | join(', ')) ~ '.' if activos | count > 0 else '' }}"
+          texto: >-
+            {%- if trigger.id == 'superado' -%}
+              El consumo general supera la potencia contratada: {{ fmt_general }} de {{ fmt_lim }} kW.
+            {%- else -%}
+              El consumo de la casa se acerca a la potencia contratada: {{ fmt_casa }} de {{ fmt_lim }} kW{{ ' (con el coche, ' ~ fmt_general ~ ' en total)' if states('sensor.v2c_charge_power') | float(0) > 300 else '' }}.
+            {%- endif -%}
+            {{ resto }}
+          voz: "{{ texto | replace(' kW', ' kilovatios') }}"
+      - if: "{{ is_state('binary_sensor.alexa_franja_noche', 'off') }}"
+        then:
+          - action: script.turn_on
+            target: {entity_id: script.alexa_decir}
+            data:
+              variables:
+                echos: [entrada, estudio]
+                tipo: anuncio
+                mensaje: "{{ voz }}"
+      - action: script.turn_on
+        target: {entity_id: script.notifica}
+        data:
+          variables:
+            titulo: "⚡ Potencia contratada"
+            mensaje: "{{ texto }}"
+            nivel: aviso
+            destinos: admin
+            tag: energia_potencia_contratada
