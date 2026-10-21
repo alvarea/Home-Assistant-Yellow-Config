@@ -61,6 +61,21 @@ template:
   # Coste = kWh del utility_meter por tarifa × precio. Sin state_class: se reinicia cada ciclo
   # y el histórico largo está en las estadísticas de los kWh.
   - sensor:
+      # ENE-18 · Periodo de facturación 2.0TD para mostrar en el dashboard: Valle (00-08 h laborables y
+      # fines de semana/festivos), Punta (10-14 y 18-22 h laborables) y Llano (resto). Octopus Go cobra
+      # igual punta y llano (ver precio_luz_actual: periodo valle | punta_llano); este sensor es informativo.
+      - name: periodo_luz_actual
+        unique_id: periodo_luz_actual
+        state: >-
+          {%- set wd = states('binary_sensor.workday_sensor') -%}
+          {%- set laborable = (wd == 'on') if wd in ['on', 'off'] else (now().isoweekday() <= 5) -%}
+          {%- set h = now().hour -%}
+          {%- if (not laborable) or h < 8 -%}Valle{%- elif h in [10, 11, 12, 13, 18, 19, 20, 21] -%}Punta{%- else -%}Llano{%- endif -%}
+        icon: >-
+          {%- set wd = states('binary_sensor.workday_sensor') -%}
+          {%- set laborable = (wd == 'on') if wd in ['on', 'off'] else (now().isoweekday() <= 5) -%}
+          {%- set h = now().hour -%}
+          {%- if (not laborable) or h < 8 -%}mdi:weather-night{%- elif h in [10, 11, 12, 13, 18, 19, 20, 21] -%}mdi:flash-alert{%- else -%}mdi:flash-outline{%- endif -%}
       - name: precio_luz_valle
         unique_id: precio_luz_valle
         unit_of_measurement: "EUR/kWh"
@@ -157,6 +172,43 @@ template:
         icon: mdi:ev-station
         availability: "{{ has_value('sensor.precio_luz_valle') and has_value('sensor.precio_luz_punta_llano') }}"
         state: "{{ ((states('sensor.ve_energia_mensual_valle') | float(0) * states('sensor.precio_luz_valle') | float(0)) + (states('sensor.ve_energia_mensual_punta_llano') | float(0) * states('sensor.precio_luz_punta_llano') | float(0))) | round(2) }}"
+
+  # ENE-18 · Totales para el resumen de la Home View (los utility_meter con tarifas solo crean
+  # sensores _valle y _punta_llano). Sin state_class: se reinician cada ciclo; el histórico largo
+  # está en las estadísticas de los medidores.
+  - sensor:
+      - name: general_energia_hoy
+        unique_id: general_energia_hoy
+        unit_of_measurement: kWh
+        device_class: energy
+        icon: mdi:lightning-bolt
+        state: "{{ (states('sensor.general_energia_red_diario_valle') | float(0) + states('sensor.general_energia_red_diario_punta_llano') | float(0)) | round(3) }}"
+      - name: general_energia_mes
+        unique_id: general_energia_mes
+        unit_of_measurement: kWh
+        device_class: energy
+        icon: mdi:lightning-bolt
+        state: "{{ (states('sensor.general_energia_red_mensual_valle') | float(0) + states('sensor.general_energia_red_mensual_punta_llano') | float(0)) | round(3) }}"
+      - name: ve_energia_hoy
+        unique_id: ve_energia_hoy
+        unit_of_measurement: kWh
+        device_class: energy
+        icon: mdi:ev-station
+        state: "{{ (states('sensor.ve_energia_diario_valle') | float(0) + states('sensor.ve_energia_diario_punta_llano') | float(0)) | round(3) }}"
+      - name: ve_energia_mes
+        unique_id: ve_energia_mes
+        unit_of_measurement: kWh
+        device_class: energy
+        icon: mdi:ev-station
+        state: "{{ (states('sensor.ve_energia_mensual_valle') | float(0) + states('sensor.ve_energia_mensual_punta_llano') | float(0)) | round(3) }}"
+      # % del límite vigente que consume la casa (sin coche): mismo criterio que el aviso de ENE-17.
+      - name: casa_potencia_pct_limite
+        unique_id: casa_potencia_pct_limite
+        unit_of_measurement: "%"
+        state_class: measurement
+        icon: mdi:gauge
+        availability: "{{ has_value('sensor.casa_potencia') and has_value('sensor.potencia_contratada_actual') }}"
+        state: "{{ (states('sensor.casa_potencia') | float(0) / (states('sensor.potencia_contratada_actual') | float(1) * 10)) | round(0) }}"
 
 ###############################################################################
 #  ENERGÍA · Consumo de red (ENE-02, 2026-10-21)

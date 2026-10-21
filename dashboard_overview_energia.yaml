@@ -63,6 +63,31 @@ sections:
         heading: Coche (Trydan)
         icon: mdi:ev-station
         heading_style: title
+        badges:
+          - type: entity
+            entity: binary_sensor.v2c_connected
+            show_state: true
+            show_icon: true
+          - type: entity
+            entity: binary_sensor.v2c_charging
+            show_state: true
+            show_icon: true
+          - type: entity
+            entity: sensor.v2c_charge_power
+            show_state: true
+            show_icon: true
+          - type: entity
+            entity: number.evse_192_168_0_22_intensity
+            show_state: true
+            show_icon: true
+          - type: entity
+            entity: number.evse_192_168_0_22_min_intensity
+            show_state: true
+            show_icon: true
+          - type: entity
+            entity: number.evse_192_168_0_22_max_intensity
+            show_state: true
+            show_icon: true
       - type: tile
         entity: sensor.coste_ve_hoy
         name: Hoy
@@ -115,6 +140,22 @@ sections:
         entity: sensor.potencia_contratada_actual
         name: Límite vigente
         vertical: true
+      - type: gauge
+        entity: sensor.casa_potencia_pct_limite
+        name: Casa sobre el límite contratado
+        min: 0
+        max: 120
+        needle: true
+        segments:
+          - from: 0
+            color: '#43a047'
+          - from: 80
+            color: '#fb8c00'
+          - from: 90
+            color: '#e53935'
+        grid_options:
+          columns: 12
+          rows: 3
       - type: history-graph
         title: Consumo frente al límite (24 h)
         hours_to_show: 24

@@ -1,0 +1,104 @@
+###############################################################################
+#  Bloque "ENERGÍA" de la Home View del Overview (sección 0, tarjetas 6 en adelante)
+#  ENE-18 · resumen ejecutivo compacto (2026-10-21, v3: Hoy/Mes en una tarjeta con kWh y €). Solo los KPI principales;
+#  el detalle (límite contratado, intensidades, desglose valle/punta, coche mes)
+#  está en la vista Energía (/lovelace/energia).
+#  Sustituye a las 6 tarjetas anteriores (copia previa en
+#  dashboard_overview_home.old-2026-10-21.yaml).
+#  Package: packages/energia.yaml
+#  Vocabulario: general = casa + coche · casa = sin coche · coche = Trydan.
+#  Restaurar: Overview → Editar → ⋮ Editor de configuración en bruto → en la primera
+#             vista (Home View), primera sección, sustituir las tarjetas de ENERGÍA
+#             (desde el heading "ENERGÍA") por esta lista.
+###############################################################################
+- type: heading
+  icon: mdi:flash
+  heading: ENERGÍA
+  heading_style: title
+  badges:
+    - type: entity
+      entity: sensor.v2c_house_power
+      show_state: true
+      show_icon: true
+    - type: entity
+      entity: sensor.periodo_luz_actual
+      show_state: true
+      show_icon: true
+    - type: entity
+      entity: sensor.coste_general_hoy
+      show_state: true
+      show_icon: true
+    - type: button
+      icon: mdi:gesture-tap-button
+      color: primary
+      tap_action:
+        action: navigate
+        navigation_path: /lovelace/energia
+      text: Detalle
+  grid_options:
+    rows: 1
+- type: tile
+  entity: sensor.v2c_house_power
+  name: General
+  vertical: false
+  hold_action:
+    action: more-info
+  features:
+    - type: trend-graph
+  features_position: inline
+  grid_options:
+    columns: 12
+    rows: auto
+- type: horizontal-stack
+  cards:
+    - type: tile
+      entity: sensor.casa_potencia
+      name: Casa
+      vertical: false
+    - type: custom:mushroom-template-card
+      icon: mdi:home-lightning-bolt
+      icon_color: orange
+      primary: "{{ states('sensor.general_energia_hoy') | float(0) | round(2) }} kWh"
+      secondary: "Hoy · {{ states('sensor.coste_general_hoy') | float(0) | round(2) }} €"
+      fill_container: true
+    - type: custom:mushroom-template-card
+      icon: mdi:home-lightning-bolt
+      icon_color: orange
+      primary: "{{ states('sensor.general_energia_mes') | float(0) | round(2) }} kWh"
+      secondary: "Mes · {{ states('sensor.coste_general_mes') | float(0) | round(2) }} €"
+      fill_container: true
+- type: heading
+  icon: mdi:ev-station
+  heading: Coche
+  heading_style: subtitle
+  badges:
+    - type: entity
+      entity: binary_sensor.v2c_connected
+      show_state: true
+      show_icon: true
+    - type: entity
+      entity: binary_sensor.v2c_charging
+      show_state: true
+      show_icon: true
+    - type: entity
+      entity: sensor.v2c_charge_power
+      show_state: true
+      show_icon: true
+    - type: entity
+      entity: number.evse_192_168_0_22_intensity
+      show_state: true
+      show_icon: true
+- type: horizontal-stack
+  cards:
+    - type: custom:mushroom-template-card
+      icon: mdi:ev-station
+      icon_color: blue
+      primary: "{{ states('sensor.ve_energia_hoy') | float(0) | round(2) }} kWh"
+      secondary: "Hoy · {{ states('sensor.coste_ve_hoy') | float(0) | round(2) }} €"
+      fill_container: true
+    - type: custom:mushroom-template-card
+      icon: mdi:ev-station
+      icon_color: blue
+      primary: "{{ states('sensor.ve_energia_mes') | float(0) | round(2) }} kWh"
+      secondary: "Mes · {{ states('sensor.coste_ve_mes') | float(0) | round(2) }} €"
+      fill_container: true

@@ -1,0 +1,728 @@
+###############################################################################
+#  Vista "Home View" del dashboard Overview (/lovelace/0) · COPIA DE SEGURIDAD
+#  Exportada: 2026-10-21 23:xx desde el storage (lovelace/config, views[0]),
+#  ANTES de rediseñar el bloque ENERGÍA (ENE-18).
+#  Verificada contra la vista real: mismo JSON (15.999 bytes, sha256 dbc4d4ea14168eb9).
+#  Restaurar: Overview → Editar → ⋮ Editor de configuración en bruto → sustituir
+#             la vista "Home View" (la primera de "views:") por este contenido.
+###############################################################################
+badges: []
+cards: []
+icon: mdi:home-assistant
+title: Home View
+type: sections
+sections:
+- type: grid
+  cards:
+  - type: heading
+    icon: mdi:alarm-panel
+    heading_style: title
+    badges:
+    - type: entity
+      show_state: true
+      show_icon: true
+      entity: alarm_control_panel.alarm_homy
+      color: primary
+    - type: button
+      icon: mdi:gesture-tap-button
+      color: primary
+      tap_action:
+        action: navigate
+        navigation_path: "/alarma-homy/alarma"
+      text: Menú
+    heading: ALARMA
+  - type: heading
+    icon: mdi:account-convert
+    heading: 'GENTE:'
+    heading_style: subtitle
+    badges:
+    - type: entity
+      show_state: true
+      show_icon: true
+      entity: binary_sensor.family_any_home
+      color: primary
+      state_content: name
+    - type: entity
+      show_state: true
+      show_icon: true
+      entity: binary_sensor.family_all_home
+      color: primary
+      state_content: name
+    - type: entity
+      show_state: true
+      show_icon: true
+      entity: sensor.family_home
+      color: primary
+    - type: entity
+      show_state: true
+      show_icon: true
+      entity: sensor.family_sleep_home
+      color: primary
+      state_content: state
+  - cards:
+    - cards:
+      - type: tile
+        entity: person.agustin
+        show_entity_picture: true
+        vertical: true
+        state_content: last_changed
+      - type: custom:mushroom-person-card
+        entity: person.malen
+        icon_type: entity-picture
+        layout: vertical
+        fill_container: true
+        secondary_info: last-changed
+      - type: custom:mushroom-person-card
+        entity: person.agu
+        icon_type: entity-picture
+        layout: vertical
+        fill_container: true
+        secondary_info: last-changed
+      - type: custom:mushroom-person-card
+        entity: person.paloma
+        icon_type: entity-picture
+        layout: vertical
+        fill_container: true
+        secondary_info: last-changed
+      type: horizontal-stack
+    type: vertical-stack
+  - cards:
+    - cards:
+      - type: custom:mushroom-chips-card
+        chips:
+        - type: entity
+          entity: sensor.iphone_aac_battery_level
+          icon: mdi:cellphone-charging
+          icon_color: green
+        alignment: center
+      - type: custom:mushroom-chips-card
+        chips:
+        - type: entity
+          entity: sensor.iphone_mfc_battery_level
+          icon: mdi:cellphone-charging
+          content_info: state
+          icon_color: blue
+          use_entity_picture: false
+        alignment: center
+      - type: custom:mushroom-chips-card
+        chips:
+        - type: entity
+          entity: sensor.iphone_aaf_battery_level
+          icon: mdi:cellphone-charging
+          icon_color: green
+        alignment: center
+      - type: custom:mushroom-chips-card
+        chips:
+        - type: entity
+          entity: sensor.iphone_paf_battery_level
+          icon: mdi:cellphone-charging
+          icon_color: primary
+        alignment: center
+      type: horizontal-stack
+    type: vertical-stack
+    grid_options:
+      columns: full
+      rows: auto
+  - type: heading
+    icon: mdi:door-closed-lock
+    heading_style: title
+    badges:
+    - type: entity
+      show_state: true
+      show_icon: true
+      entity: sensor.puerta_exterior_last_ding
+    - type: entity
+      show_state: true
+      show_icon: true
+      entity: binary_sensor.puerta_exterior_ding
+    - type: entity
+      show_state: true
+      show_icon: true
+      entity: sensor.ring_puerta_exterior_bateria
+    heading: TELEFONILLO
+    grid_options:
+      rows: 1
+  - type: tile
+    grid_options:
+      rows: 1
+    entity: button.puerta_exterior_open_door
+    color: green
+    show_entity_picture: false
+    hide_state: false
+    state_content: last_updated
+    vertical: false
+    features:
+    - type: button
+    features_position: inline
+  - type: heading
+    icon: mdi:power-plug-battery-outline
+    heading_style: title
+    badges:
+    - type: entity
+      show_state: true
+      show_icon: true
+      entity: sensor.v2c_house_power
+    heading: 'ENERGÍA '
+    grid_options:
+      rows: 1
+  - type: tile
+    grid_options:
+      columns: 12
+      rows: auto
+    entity: sensor.v2c_house_power
+    name:
+      type: entity
+    vertical: false
+    hold_action:
+      action: more-info
+    features:
+    - type: trend-graph
+    features_position: inline
+  - type: heading
+    icon: mdi:power-plug-battery-outline
+    heading_style: subtitle
+    badges:
+    - type: entity
+      show_state: true
+      show_icon: true
+      entity: binary_sensor.v2c_charging
+    - type: entity
+      show_state: true
+      show_icon: true
+      entity: number.evse_192_168_0_22_intensity
+    - type: entity
+      show_state: true
+      show_icon: true
+      entity: number.evse_192_168_0_22_min_intensity
+    - type: entity
+      show_state: true
+      show_icon: true
+      entity: number.evse_192_168_0_22_max_intensity
+    heading: V2C Carga Batería KIT
+  - type: custom:mushroom-entity-card
+    entity: binary_sensor.v2c_connected
+    fill_container: false
+  - type: custom:mushroom-entity-card
+    entity: sensor.v2c_charge_energy
+    icon_type: icon
+    fill_container: false
+    primary_info: name
+  - type: tile
+    grid_options:
+      columns: 12
+      rows: 2
+    entity: sensor.v2c_charge_power
+    name:
+    - type: device
+    - type: entity
+    show_entity_picture: false
+    hide_state: false
+    vertical: false
+    hold_action:
+      action: more-info
+    features:
+    - type: trend-graph
+    features_position: bottom
+    visibility:
+    - condition: state
+      entity: binary_sensor.v2c_connected
+      state: 'on'
+- type: grid
+  cards:
+  - type: heading
+    icon: mdi:weather-cloudy-clock
+    heading: El Tiempo
+    heading_style: subtitle
+    badges:
+    - type: entity
+      show_state: true
+      show_icon: true
+      entity: sensor.aemet_town_name
+    - type: entity
+      entity: sensor.aemet_temperature
+  - type: custom:mushroom-chips-card
+    chips:
+    - type: entity
+      entity: sensor.sun_next_rising
+      icon_color: amber
+    - type: entity
+      entity: sensor.sun_next_setting
+      name: Puesta Sol
+      icon_color: orange
+      use_entity_picture: false
+    - type: entity
+      entity: sensor.aemet_min_temperatura_0d
+      icon: mdi:thermometer-minus
+      icon_color: blue
+      tap_action:
+        action: more-info
+      use_entity_picture: false
+    - type: entity
+      entity: sensor.aemet_max_temperatura_0d
+      icon: mdi:thermometer-plus
+      icon_color: deep-orange
+    - type: entity
+      entity: sensor.aemet_rain_probability
+      icon: mdi:weather-lightning-rainy
+      icon_color: primary
+    - type: entity
+      entity: sensor.aemet_rain
+      content_info: state
+      icon_color: primary
+    - type: weather
+      entity: weather.aemet
+      show_conditions: true
+      show_temperature: true
+    - type: weather
+      show_conditions: true
+      show_temperature: false
+      entity: sensor.aemet_tiempo_1d
+  - type: custom:weather-chart-card
+    entity: weather.aemet
+    show_main: false
+    show_temperature: true
+    show_current_condition: true
+    show_attributes: true
+    show_time: false
+    show_time_seconds: false
+    show_day: false
+    show_date: true
+    show_humidity: true
+    show_pressure: true
+    show_wind_direction: true
+    show_wind_speed: true
+    show_sun: true
+    show_feels_like: false
+    show_dew_point: false
+    show_wind_gust_speed: true
+    show_visibility: false
+    show_last_changed: true
+    use_12hour_format: true
+    icons_size: '32'
+    animated_icons: true
+    icon_style: style1
+    autoscroll: true
+    forecast:
+      precipitation_type: rainfall
+      show_probability: false
+      labels_font_size: '11'
+      precip_bar_size: '100'
+      style: style2
+      show_wind_forecast: true
+      condition_icons: true
+      round_temp: false
+      type: daily
+      number_of_forecasts: '0'
+      disable_animation: false
+    units:
+      speed: km/h
+      pressure: mmHg
+    title: AEMET
+    time_size: '18'
+    day_date_size: '12'
+    current_temp_size: '32'
+- type: grid
+  cards:
+  - type: heading
+    icon: mdi:temperature-celsius
+    heading_style: subtitle
+    badges:
+    - type: entity
+      show_state: true
+      show_icon: true
+      entity: sensor.temperatura_media_exterior
+      name: Exterior
+      color: indigo
+    - type: entity
+      show_state: true
+      show_icon: true
+      entity: sensor.temperatura_media_interior
+      name: Media Interior
+      color: orange
+    heading: TEMPERATURA
+    grid_options:
+      rows: 1
+  - graph: line
+    type: sensor
+    detail: 1
+    name: Planta Baja
+    entity: sensor.temperatura_media_planta_baja
+  - graph: line
+    type: sensor
+    detail: 2
+    name: Planta Alta
+    entity: sensor.temperatura_media_planta_alta
+  - graph: line
+    type: sensor
+    detail: 2
+    entity: sensor.ly3_entrada_exterior_temperatura
+    name: Entrada
+    grid_options:
+      columns: 6
+      rows: 2
+  - graph: line
+    type: sensor
+    detail: 2
+    name: Porche
+    entity: sensor.aqara_temperatura_porche
+  - type: heading
+    icon: mdi:tree
+    heading_style: title
+    grid_options:
+      columns: 12
+      rows: auto
+    heading: Exterior y Jardín
+  - show_state: true
+    show_name: true
+    camera_view: auto
+    fit_mode: cover
+    type: picture-entity
+    image: "/local/Riego_General_s0_1900x800.jpg"
+    tap_action:
+      action: more-info
+    hold_action:
+      action: toggle
+    entity: input_boolean.riego_interruptor_global
+    name: "[IG] Riego"
+    aspect_ratio: '3'
+    grid_options:
+      columns: 6
+      rows: auto
+  - show_state: true
+    show_name: true
+    camera_view: auto
+    fit_mode: cover
+    type: picture-entity
+    name: "[P] Riego Turbinas"
+    aspect_ratio: '3'
+    grid_options:
+      columns: 6
+      rows: 1
+    image:
+      media_content_id: "/local/Riego_Cesped_s1_1900x800.jpeg"
+    entity: binary_sensor.riego_cesped_ch1_dia_ejecucion
+    tap_action:
+      action: url
+      url_path: "/lovelace/riego_cesped_view"
+    show_entity_picture: false
+  - show_state: true
+    show_name: true
+    camera_view: auto
+    fit_mode: cover
+    type: picture-entity
+    image: "/local/Riego_Bonsais_x1_900x362.jpg"
+    tap_action:
+      action: more-info
+    hold_action:
+      action: toggle
+    entity: switch.esphome_pow_sw4
+    name: "[IG] Pozo"
+    aspect_ratio: '3'
+    grid_options:
+      columns: 6
+      rows: auto
+  - show_state: true
+    show_name: true
+    camera_view: auto
+    fit_mode: cover
+    type: picture-entity
+    name: "[P]Riego Difusores"
+    aspect_ratio: '3'
+    grid_options:
+      columns: 6
+      rows: auto
+    image:
+      media_content_id: "/local/Riego_Cesped_s2_1991x821.jpeg"
+    entity: binary_sensor.riego_cesped_ch2_dia_ejecucion_t2
+    tap_action:
+      action: url
+      url_path: "/lovelace/riego_cesped_view"
+  - show_state: true
+    show_name: true
+    camera_view: auto
+    fit_mode: cover
+    type: picture-entity
+    entity: binary_sensor.piscina_depuradora_ch0_dia_ejecucion
+    image:
+      media_content_id: "/local/Piscina_Depuradora_s1_1900x800.jpg"
+    name: "[P] Depuradora"
+    aspect_ratio: '3'
+    grid_options:
+      columns: 6
+      rows: auto
+  - show_state: true
+    show_name: true
+    camera_view: auto
+    fit_mode: cover
+    type: picture-entity
+    name: "[P] Riego Bonsais"
+    aspect_ratio: '3'
+    grid_options:
+      columns: 6
+      rows: auto
+    entity: binary_sensor.riego_bonsais_ch1_dia_ejecucion
+    image:
+      media_content_id: "/local/Riego_Bonsais_s3_1900x884.jpeg"
+    tap_action:
+      action: url
+      url_path: "/lovelace/riego_view"
+  column_span: 1
+- type: grid
+  cards:
+  - type: heading
+    icon: mdi:lightbulb-group
+    heading: Luces Plantas - Estancias
+    heading_style: title
+    badges:
+    - type: entity
+      show_state: true
+      show_icon: true
+      entity: light.luces_planta_baja
+      color: deep-orange
+    - type: entity
+      show_state: true
+      show_icon: true
+      entity: light.luces_planta_alta
+      color: blue
+    - type: entity
+      show_state: true
+      show_icon: true
+      entity: light.luces_exterior
+      name: Luces Jardín
+      icon: mdi:tree
+      color: green
+  - cards:
+    - cards:
+      - type: custom:mushroom-entity-card
+        fill_container: false
+        icon_color: cyan
+        icon: ''
+        secondary_info: none
+        double_tap_action:
+          action: more-info
+        hold_action:
+          action: navigate
+          navigation_path: "/lovelace/salon_view"
+        tap_action:
+          action: toggle
+        entity: light.luces_exterior
+        name: Exterior
+        primary_info: name
+      - type: custom:mushroom-entity-card
+        fill_container: false
+        icon_color: orange
+        icon: ''
+        secondary_info: none
+        double_tap_action:
+          action: more-info
+        tap_action:
+          action: toggle
+        entity: light.luces_planta_baja
+        name: Planta Baja
+      - type: custom:mushroom-entity-card
+        fill_container: false
+        icon_color: light-blue
+        icon: ''
+        hold_action:
+          action: navigate
+          navigation_path: "/lovelace/cocina_view"
+        double_tap_action:
+          action: more-info
+        tap_action:
+          action: toggle
+        entity: light.luces_planta_alta
+        secondary_info: none
+        name: Planta Alta
+      type: horizontal-stack
+    type: vertical-stack
+  - type: custom:mushroom-chips-card
+    chips:
+    - type: light
+      entity: light.luz_exterior
+      content_info: name
+      name: Exterior
+      use_light_color: true
+    - type: light
+      entity: light.luz_hall
+      content_info: name
+      name: Hall
+      use_light_color: true
+    - type: light
+      entity: light.luces_salon
+      content_info: name
+      name: Salón
+      use_light_color: true
+    - type: light
+      entity: light.luces_cocina
+      content_info: name
+      name: Cocina
+  - type: heading
+    icon: mdi:tree
+    heading_style: subtitle
+    grid_options:
+      columns: 12
+      rows: auto
+    heading: Jardín
+  - type: custom:mushroom-chips-card
+    chips:
+    - type: light
+      entity: light.luz_porche_jardin
+      content_info: name
+      name: Porche
+    - type: light
+      entity: light.luz_balizas_cesped
+      name: Césped
+      content_info: name
+      use_light_color: true
+    - type: light
+      entity: light.luz_entrada_bonsais
+      name: Bonsai
+      content_info: name
+    - type: light
+      entity: light.luz_olivo_nubes
+      name: Olivo1
+      content_info: name
+    - type: light
+      entity: light.luz_olivo_grande
+      name: Olivo2
+      content_info: name
+    - type: light
+      entity: light.luz_piscina
+      name: Piscina
+      content_info: name
+      use_light_color: true
+  - type: heading
+    icon: mdi:fridge
+    heading_style: subtitle
+    grid_options:
+      columns: 12
+      rows: auto
+    visibility:
+    - condition: state
+      entity: light.luces_cocina
+      state: 'on'
+    heading: Cocina
+  - type: custom:mushroom-chips-card
+    chips:
+    - type: entity
+      entity: switch.hue_switch_sw1
+      icon_color: light-grey
+    - type: light
+      entity: light.luz_cocina_izquierda
+      content_info: name
+      name: TV Izq
+      use_light_color: true
+    - type: light
+      entity: light.led_cocina_tv
+      name: Led TV
+      use_light_color: true
+      content_info: name
+    - type: light
+      entity: light.luz_cocina_derecha
+      content_info: name
+      name: TV Dcha
+      use_light_color: true
+    visibility:
+    - condition: state
+      entity: light.luces_cocina
+      state: 'on'
+  - type: heading
+    icon: mdi:sofa
+    heading_style: subtitle
+    grid_options:
+      columns: 12
+      rows: auto
+    heading: Salón
+    visibility:
+    - condition: state
+      entity: light.luces_salon
+      state: 'on'
+  - type: custom:mushroom-chips-card
+    chips:
+    - type: light
+      entity: light.arbol_navidad
+      name: Arbol
+      content_info: name
+      use_light_color: true
+    - type: light
+      entity: light.led_salon_tv
+      content_info: name
+      name: TV
+      use_light_color: true
+    - type: light
+      entity: light.luz_salon_tv
+      content_info: name
+      name: Play
+      use_light_color: true
+    - type: light
+      entity: light.luz_lectura
+      content_info: name
+      name: L
+      use_light_color: true
+    - type: light
+      entity: light.luz_cilindro
+      use_light_color: true
+      name: C
+      content_info: name
+    - type: light
+      entity: light.luz_salon_sofa
+      content_info: name
+      name: S
+      use_light_color: true
+    - type: light
+      entity: light.luz_vitrina
+      name: V
+      content_info: name
+      use_light_color: true
+    visibility:
+    - condition: state
+      entity: light.luces_salon
+      state: 'on'
+  - type: heading
+    icon: mdi:bed
+    heading_style: subtitle
+    grid_options:
+      columns: 12
+      rows: auto
+    heading: Dormitorios
+    visibility:
+    - condition: state
+      entity: light.luces_dormitorios
+      state: 'on'
+  - type: custom:mushroom-chips-card
+    chips:
+    - type: light
+      entity: light.luz_dormitorio_agustin
+      content_info: name
+      name: AAC
+      use_light_color: true
+    - type: light
+      entity: light.luz_dormitorio_malen
+      content_info: name
+      name: MFC
+      use_light_color: true
+    - type: light
+      entity: light.luz_mesilla_aaf
+      name: AAF
+      content_info: name
+      use_light_color: true
+    - type: light
+      entity: light.luz_mesilla_paf
+      use_light_color: true
+      name: PAF
+      content_info: name
+    - type: light
+      entity: light.luz_mesa_paf
+      content_info: name
+      name: Mesa PAF
+      use_light_color: true
+    - type: light
+      entity: light.led_mesa_agu
+      content_info: name
+      name: Mesa AAF
+      use_light_color: true
+    visibility:
+    - condition: state
+      entity: light.luces_dormitorios
+      state: 'on'
+  column_span: 1

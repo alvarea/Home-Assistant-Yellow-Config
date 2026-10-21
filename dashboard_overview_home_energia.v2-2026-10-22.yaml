@@ -1,0 +1,92 @@
+###############################################################################
+#  Bloque "ENERGÍA" de la Home View · COPIA DE SEGURIDAD (v2, antes de las tarjetas
+#  mushroom Hoy/Mes y del badge de periodo Valle/Llano/Punta).
+#  Exportado: 2026-10-22 desde el storage (lovelace/config, views[0].sections[0].cards[6..]).
+#  Restaurar: Overview → Editar → ⋮ Editor de configuración en bruto → en la primera
+#             vista (Home View), primera sección, sustituir las tarjetas del bloque
+#             ENERGÍA (desde el heading "ENERGÍA") por esta lista.
+###############################################################################
+- type: heading
+  icon: mdi:flash
+  heading: ENERGÍA
+  heading_style: title
+  badges:
+  - type: entity
+    entity: sensor.v2c_house_power
+    show_state: true
+    show_icon: true
+  - type: entity
+    entity: sensor.precio_luz_actual
+    state_content: periodo
+    show_state: true
+    show_icon: true
+  - type: entity
+    entity: sensor.coste_general_hoy
+    show_state: true
+    show_icon: true
+  - type: button
+    icon: mdi:gesture-tap-button
+    color: primary
+    tap_action:
+      action: navigate
+      navigation_path: "/lovelace/energia"
+    text: Detalle
+  grid_options:
+    rows: 1
+- type: tile
+  entity: sensor.v2c_house_power
+  name: General
+  vertical: false
+  hold_action:
+    action: more-info
+  features:
+  - type: trend-graph
+  features_position: inline
+  grid_options:
+    columns: 12
+    rows: auto
+- type: horizontal-stack
+  cards:
+  - type: tile
+    entity: sensor.casa_potencia
+    name: Casa
+    vertical: false
+  - type: tile
+    entity: sensor.general_energia_hoy
+    name: Hoy
+    vertical: false
+  - type: tile
+    entity: sensor.coste_general_mes
+    name: Mes
+    vertical: false
+- type: heading
+  icon: mdi:ev-station
+  heading: Coche
+  heading_style: subtitle
+  badges:
+  - type: entity
+    entity: binary_sensor.v2c_connected
+    show_state: true
+    show_icon: true
+  - type: entity
+    entity: binary_sensor.v2c_charging
+    show_state: true
+    show_icon: true
+  - type: entity
+    entity: sensor.v2c_charge_power
+    show_state: true
+    show_icon: true
+  - type: entity
+    entity: number.evse_192_168_0_22_intensity
+    show_state: true
+    show_icon: true
+- type: horizontal-stack
+  cards:
+  - type: tile
+    entity: sensor.ve_energia_hoy
+    name: Coche hoy
+    vertical: false
+  - type: tile
+    entity: sensor.coste_ve_hoy
+    name: Coste hoy
+    vertical: false
