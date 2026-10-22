@@ -401,11 +401,14 @@ script:
           - event: alarm_homy_codigo_incorrecto
             event_data: {origen: "{{ origen }}"}
           - stop: Código incorrecto
+      # ALA-35: nocturno se calcula ANTES de tocar noche_pendiente (Noche o Casa nocturno; siempre en el fin de franja)
       - variables:
           desde: "{{ states('input_select.alarm_homy_estado') }}"
           modo_previo: "{{ states('input_select.alarm_homy_modo') }}"
           tipo_previo: "{{ states('input_select.alarm_homy_tipo_disparo') }}"
-          nocturno_previo: "{{ modo_previo == 'armed_night' or is_state('input_boolean.alarm_homy_noche_pendiente', 'on') }}"
+          nocturno_previo: >-
+            {{ modo_previo == 'armed_night' or is_state('input_boolean.alarm_homy_noche_pendiente', 'on')
+               or origen == 'auto (fin de noche)' }}
       - action: timer.cancel
         target:
           entity_id: [timer.alarm_homy_salida, timer.alarm_homy_entrada, timer.alarm_homy_disparo]

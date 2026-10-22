@@ -179,24 +179,27 @@ automation:
         from: "on"
         to: "off"
     actions:
-      # Casa nocturno (ALA-30): también se desarma. La pendiente se apaga siempre al terminar la franja.
-      - variables:
-          nocturno: "{{ is_state('input_select.alarm_homy_estado', 'armed_home') and is_state('input_boolean.alarm_homy_noche_pendiente', 'on') }}"
+      # Casa nocturno (ALA-30): también se desarma. ALA-35: la pendiente NO se apaga antes de desarmar
+      # (alarm_homy_desarmar la usa para marcar el evento como nocturno → sin voz); se apaga al final siempre.
+      - if:
+          - condition: state
+            entity_id: input_boolean.alarm_homy_automatismos
+            state: "on"
+          - condition: template
+            value_template: >-
+              {{ is_state('input_select.alarm_homy_estado', 'armed_night')
+                 or (is_state('input_select.alarm_homy_estado', 'armed_home') and is_state('input_boolean.alarm_homy_noche_pendiente', 'on')) }}
+          - condition: state
+            entity_id: binary_sensor.family_any_home
+            state: "on"
+        then:
+          - action: script.alarm_homy_desarmar
+            data:
+              validar: false
+              origen: auto (fin de noche)
+          # ALA-32: sin script.alarm_homy_comprobar (hablaba al desarmar); quedan el bip largo y el LED
       - action: input_boolean.turn_off
         target: {entity_id: input_boolean.alarm_homy_noche_pendiente}
-      - condition: state
-        entity_id: input_boolean.alarm_homy_automatismos
-        state: "on"
-      - condition: template
-        value_template: "{{ is_state('input_select.alarm_homy_estado', 'armed_night') or nocturno }}"
-      - condition: state
-        entity_id: binary_sensor.family_any_home
-        state: "on"
-      - action: script.alarm_homy_desarmar
-        data:
-          validar: false
-          origen: auto (fin de noche)
-      # ALA-32: sin script.alarm_homy_comprobar (hablaba al desarmar); quedan el bip largo y el LED
 
   # ---------------------------------------------------------------------------
   # SUBIDA CASA NOCTURNO → NOCHE (2026-10-21, ALA-30): cada hora en punto y cuando la actividad arriba

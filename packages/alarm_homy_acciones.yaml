@@ -605,11 +605,12 @@ automation:
       - choose:
           - conditions: "{{ trigger.id == 'desarmado' }}"
             sequence:
-              # ALA-32: sin voz si estaba en Noche o Casa nocturno (incluye el desarmado del fin de franja)
+              # ALA-32/35: sin voz si estaba en Noche o Casa nocturno, o en el desarmado del fin de franja
               - if:
                   - condition: template
                     value_template: >-
                       {{ not trigger.event.data.get('nocturno', false)
+                         and trigger.event.data.get('origen') != 'auto (fin de noche)'
                          and not (trigger.event.data.desde == 'triggered' and trigger.event.data.tipo == 'panico_silencioso') }}
                 then:
                   - action: script.turn_on

@@ -52,8 +52,16 @@
 
 {#- ACTIVIDAD ARRIBA (2026-10-21, ALA-28) → JSON con los motivos legibles; [] = sin actividad.
     OR de: luces del área estudio_setup encendidas · binary_sensor.macbook_aac_active_2 on (unavailable no cuenta)
-    · movimiento/ocupación en la planta alta ahora o en los últimos <minutos> (uno por área).
-    Sin device_class presence: binary_sensor.family_home_aac está en el área Estudio_Sala -#}
+    · movimiento en la planta alta ahora o en los últimos <minutos> (uno por área).
+    ALA-36 (23-10): lista EXPLÍCITA de sensores de movimiento de arriba (por área no vale: family_home_aac hereda
+    el área Estudio_Sala del iPhone y la actividad no bajaba nunca). Un mmWave nuevo (ALA-26) se añade aquí.
+    Cuenta un sensor si CAMBIÓ (on u off) en los últimos <minutos>: un on colgado no cuenta (23-10: el _ocupacion
+    del Aqara quedó en on tras una recarga de ZHA). Con alguien arriba el Aqara de movimiento cicla cada ~70 s. -#}
+{%- macro movimiento_arriba() -%}
+{{ ['binary_sensor.aqara_movimiento_estudio', 'binary_sensor.aqara_movimiento_estudio_ocupacion',
+    'binary_sensor.blink_estudio_motion'] | to_json }}
+{%- endmacro -%}
+
 {%- macro actividad_arriba(minutos=15) -%}
 {%- set ns = namespace(l=[], luces=[]) -%}
 {%- for e in area_entities('estudio_setup') | select('match', 'light\\.') | select('is_state', 'on') -%}
@@ -63,16 +71,13 @@
 {%- elif ns.luces | count > 0 -%}{%- set ns.l = ns.l + [('luz ' if ns.luces | count == 1 else 'luces ') ~ ns.luces | join(' y ')] -%}
 {%- endif -%}
 {%- if is_state('binary_sensor.macbook_aac_active_2', 'on') -%}{%- set ns.l = ns.l + ['MacBook activo'] -%}{%- endif -%}
-{%- for a in floor_areas('planta_alta') -%}
-{%- set mov = namespace(si=false) -%}
-{%- for e in area_entities(a) | select('match', 'binary_sensor\\.') if states[e] is not none
-      and state_attr(e, 'device_class') in ['motion', 'occupancy'] -%}
-{%- if is_state(e, 'on') or (is_state(e, 'off') and (as_timestamp(now()) - as_timestamp(states[e].last_changed)) < minutos * 60) -%}
-{%- set mov.si = true -%}
+{%- set mov = namespace(areas=[]) -%}
+{%- for e in movimiento_arriba() | from_json if states[e] is not none -%}
+{%- if states(e) in ['on', 'off'] and (as_timestamp(now()) - as_timestamp(states[e].last_changed)) < minutos * 60 -%}
+{%- set mov.areas = mov.areas + [area_name(e) or 'planta alta'] -%}
 {%- endif -%}
 {%- endfor -%}
-{%- if mov.si -%}{%- set ns.l = ns.l + ['movimiento ' ~ area_name(a)] -%}{%- endif -%}
-{%- endfor -%}
+{%- for a in mov.areas | unique -%}{%- set ns.l = ns.l + ['movimiento ' ~ a] -%}{%- endfor -%}
 {{ ns.l | to_json }}
 {%- endmacro -%}
 
