@@ -3949,7 +3949,21 @@
               target:
                 entity_id: light.luz_dormitorio_malen
         # ELIF b2_short_press
+        - conditions:
+          - condition: trigger
+            id: b2_short_press
+          sequence:
+            - action: light.toggle
+              target:
+                entity_id: light.luz_entrada
         # ELIF b2_double_press
+        - conditions:
+          - condition: trigger
+            id: b2_double_press
+          sequence:
+            - action: light.toggle
+              target:
+                entity_id: light.luz_pasillo
         # ELIF b1_long_press
         - conditions:
           - condition: trigger
