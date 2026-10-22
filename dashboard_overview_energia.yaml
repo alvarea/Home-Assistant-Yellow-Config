@@ -170,3 +170,13 @@ sections:
             name: Límite
         grid_options:
           columns: 12
+      # ENE-22 · excesos de potencia registrados por la automatización de ENE-20 (logbook.log
+      # asociado a sensor.casa_potencia; un sensor numérico no genera más entradas en el Logbook).
+      - type: logbook
+        title: Excesos de potencia contratada
+        target:
+          entity_id:
+            - sensor.casa_potencia
+        hours_to_show: 168
+        grid_options:
+          columns: 12

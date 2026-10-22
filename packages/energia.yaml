@@ -302,87 +302,51 @@ automation:
           option: "{{ state_attr('sensor.precio_luz_actual', 'periodo') }}"
 
 ###############################################################################
-#  ENERGÍA · Aviso de potencia contratada (ENE-08, revisado en ENE-17, 2026-10-21)
+#  ENERGÍA · Aviso de potencia contratada (ENE-08/17; ENE-20/21 · 2026-10-22)
 #
-#  Vocabulario: consumo general = pinza V2C (casa + coche) · consumo casa =
-#  sensor.casa_potencia (general - coche) · consumo coche = sensor.v2c_charge_power.
-#  Límite vigente: sensor.potencia_contratada_actual (P1 4,6 kW · P2 5,7 kW).
-#    cerca     consumo CASA > 90 % del límite durante 20 s (cooldown 10 min).
-#              Sin coche cargando, casa = general. Con coche, el Trydan modula
-#              hasta llenar el límite de valle: el general queda casi siempre
-#              > 90 %, por eso se avisa sobre la casa y no sobre el general.
-#    superado  consumo GENERAL > 100 % del límite (sin cooldown; el trigger solo
-#              salta al cruzar el umbral): 10 s sin coche, 30 s con coche
-#              (> 300 W) para no avisar por los ajustes del Trydan.
-#  Los picos reales de 6-8 kW sin coche son escalones de ~1,8 kW de cargas
-#  resistivas; el ICP los tolera unos minutos. La pinza reporta cada 5 s.
-#  Voz por Echo (entrada y estudio) fuera de la franja de noche; iOS a admin
-#  siempre (time-sensitive). El mensaje lista lo que está en marcha: coche,
-#  lavadora, pozo y aires encendidos.
+#  FASE DE PRUEBAS: sin Alexa ni push. Cada exceso deja una entrada escueta en el
+#  Logbook (logbook.log asociado a sensor.casa_potencia, para filtrarla en una
+#  tarjeta logbook): pico en W y % sobre el límite vigente. La automatización se
+#  mantiene APAGADA hasta que Agustín decida encenderla.
+#
+#  Vocabulario: general = pinza V2C (casa + coche) · casa = sensor.casa_potencia
+#  (general - coche). Límite vigente: sensor.potencia_contratada_actual.
+#    cerca     consumo CASA > 90 % del límite de forma CONTINUA durante 120 s
+#              (cooldown 10 min).
+#    superado  consumo GENERAL > 100 % del límite de forma CONTINUA durante 60 s
+#              (cooldown 2 min).
+#  Anti-falsos positivos (ENE-21): las cargas resistivas con termostato (vitro, horno…)
+#  alternan 1,3-6,2 kW en segundos y el `for:` se reinicia en cada bajada. El historial
+#  del 22-10 (26 h, muestras de 5 s) muestra tramos continuos máximos de 60 s sobre el 90 %
+#  y de 30 s sobre el 100 %; el `for:` elegido duplica esos máximos. Con estos parámetros
+#  la ventana 19:00-19:10 UTC del 22-10 no habría disparado nada, y solo se habría
+#  registrado el consumo estable del 21-10 22:44 (130 s a 4,3 kW, 93 %).
+#  El valor registrado es el del momento de la detección (sostenido sobre el umbral).
 ###############################################################################
 
   - id: energia_aviso_potencia_contratada
     alias: Energía · Aviso de potencia contratada
-    description: Avisa por Echo (de día) e iOS (AAC) cuando el consumo de la casa pasa del 90 % (cerca) o el general del 100 % (superado) de la potencia contratada vigente.
+    description: "Fase de pruebas: registra en el Logbook (sin Alexa ni push) cuando el consumo de la casa supera el 90 % (120 s seguidos) o el general el 100 % (60 s seguidos) de la potencia contratada vigente. Apagada hasta decisión de Agustín."
     mode: single
     max_exceeded: silent
     triggers:
       - trigger: template
         id: cerca
         value_template: "{{ states('sensor.casa_potencia') | float(0) > 900 * (states('sensor.potencia_contratada_actual') | float(99)) }}"
-        for: {seconds: 20}
+        for: {seconds: 120}
       - trigger: template
         id: superado
-        value_template: "{{ states('sensor.v2c_house_power') | float(0) > 1000 * (states('sensor.potencia_contratada_actual') | float(99)) and states('sensor.v2c_charge_power') | float(0) <= 300 }}"
-        for: {seconds: 10}
-      - trigger: template
-        id: superado
-        value_template: "{{ states('sensor.v2c_house_power') | float(0) > 1000 * (states('sensor.potencia_contratada_actual') | float(99)) and states('sensor.v2c_charge_power') | float(0) > 300 }}"
-        for: {seconds: 30}
+        value_template: "{{ states('sensor.v2c_house_power') | float(0) > 1000 * (states('sensor.potencia_contratada_actual') | float(99)) }}"
+        for: {seconds: 60}
     conditions:
-      - condition: or
-        conditions:
-          - condition: trigger
-            id: superado
-          - "{{ this.attributes.last_triggered is none or (now() - this.attributes.last_triggered).total_seconds() > 600 }}"
+      - "{{ this.attributes.last_triggered is none or (now() - this.attributes.last_triggered).total_seconds() > (120 if trigger.id == 'superado' else 600) }}"
     actions:
       - variables:
-          fmt_general: "{{ ((states('sensor.v2c_house_power') | float(0) / 1000) | round(1) | string).replace('.', ',') }}"
-          fmt_casa: "{{ ((states('sensor.casa_potencia') | float(0) / 1000) | round(1) | string).replace('.', ',') }}"
-          fmt_lim: "{{ (states('sensor.potencia_contratada_actual') | float(0) | string).replace('.', ',') }}"
-          activos: >-
-            {%- set ns = namespace(l=[]) -%}
-            {%- if states('sensor.v2c_charge_power') | float(0) > 500 -%}{%- set ns.l = ns.l + ['el coche'] -%}{%- endif -%}
-            {%- if states('sensor.grillplats_lavadora_power') | float(0) > 300 -%}{%- set ns.l = ns.l + ['la lavadora'] -%}{%- endif -%}
-            {%- if states('sensor.esphome_pow_sw4_power') | float(0) > 300 -%}{%- set ns.l = ns.l + ['la bomba del pozo'] -%}{%- endif -%}
-            {%- for e, n in {'climate.aa_estudio': 'el aire del estudio', 'climate.gree_dormitorio_paf': 'el aire de Paloma', 'climate.gree_dormitorio_aaf': 'el aire de Agu'}.items() -%}
-              {%- if states(e) not in ['off', 'unavailable', 'unknown'] -%}{%- set ns.l = ns.l + [n] -%}{%- endif -%}
-            {%- endfor -%}
-            {{ ns.l }}
-          resto: "{{ ' En marcha: ' ~ (activos | join(', ')) ~ '.' if activos | count > 0 else '' }}"
-          texto: >-
-            {%- if trigger.id == 'superado' -%}
-              El consumo general supera la potencia contratada: {{ fmt_general }} de {{ fmt_lim }} kW.
-            {%- else -%}
-              El consumo de la casa se acerca a la potencia contratada: {{ fmt_casa }} de {{ fmt_lim }} kW{{ ' (con el coche, ' ~ fmt_general ~ ' en total)' if states('sensor.v2c_charge_power') | float(0) > 300 else '' }}.
-            {%- endif -%}
-            {{ resto }}
-          voz: "{{ texto | replace(' kW', ' kilovatios') }}"
-      - if: "{{ is_state('binary_sensor.alexa_franja_noche', 'off') }}"
-        then:
-          - action: script.turn_on
-            target: {entity_id: script.alexa_decir}
-            data:
-              variables:
-                echos: [entrada, estudio]
-                tipo: anuncio
-                mensaje: "{{ voz }}"
-      - action: script.turn_on
-        target: {entity_id: script.notifica}
+          pico: "{{ (states('sensor.v2c_house_power') if trigger.id == 'superado' else states('sensor.casa_potencia')) | float(0) | round(0) | int }}"
+          lim_w: "{{ (states('sensor.potencia_contratada_actual') | float(0) * 1000) | round(0) | int }}"
+          pct: "{{ (pico / lim_w * 100) | round(0) | int if lim_w > 0 else 0 }}"
+      - action: logbook.log
         data:
-          variables:
-            titulo: "⚡ Potencia contratada"
-            mensaje: "{{ texto }}"
-            nivel: aviso
-            destinos: admin
-            tag: energia_potencia_contratada
+          name: Potencia contratada
+          message: "{{ 'Superado' if trigger.id == 'superado' else 'Cerca' }}: {{ pico }} W · {{ pct }} % del límite ({{ (lim_w / 1000) | string | replace('.', ',') }} kW)"
+          entity_id: sensor.casa_potencia
