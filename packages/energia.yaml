@@ -275,6 +275,17 @@ utility_meter:
     cycle: yearly
     tariffs: [valle, punta_llano]
 
+###############################################################################
+#  ENERGÍA · Ancla del registro de excesos de potencia (ENE-20/22)
+#  Entidad sin uso funcional: solo sirve para que el Logbook pueda filtrar por ella
+#  las entradas que escribe la automatización de aviso de potencia.
+###############################################################################
+
+input_boolean:
+  energia_registro_potencia:
+    name: energia_registro_potencia
+    icon: mdi:flash-alert
+
 automation:
   - id: energia_tarifa_utility_meter
     alias: Energía · Tarifa de los contadores según periodo
@@ -305,9 +316,11 @@ automation:
 #  ENERGÍA · Aviso de potencia contratada (ENE-08/17; ENE-20/21 · 2026-10-22)
 #
 #  FASE DE PRUEBAS: sin Alexa ni push. Cada exceso deja una entrada escueta en el
-#  Logbook (logbook.log asociado a sensor.casa_potencia, para filtrarla en una
-#  tarjeta logbook): pico en W y % sobre el límite vigente. La automatización se
-#  mantiene APAGADA hasta que Agustín decida encenderla.
+#  Logbook: pico en W y % sobre el límite vigente. Se asocia (logbook.log) a
+#  input_boolean.energia_registro_potencia, una entidad ancla que nadie cambia, porque
+#  HA no muestra en las vistas filtradas por entidad las entradas de sensores numéricos
+#  (sensor.casa_potencia): la tarjeta logbook de la vista Energía filtra por el ancla.
+#  Encendida el 22-10 por decisión de Agustín.
 #
 #  Vocabulario: general = pinza V2C (casa + coche) · casa = sensor.casa_potencia
 #  (general - coche). Límite vigente: sensor.potencia_contratada_actual.
@@ -349,4 +362,4 @@ automation:
         data:
           name: Potencia contratada
           message: "{{ 'Superado' if trigger.id == 'superado' else 'Cerca' }}: {{ pico }} W · {{ pct }} % del límite ({{ (lim_w / 1000) | string | replace('.', ',') }} kW)"
-          entity_id: sensor.casa_potencia
+          entity_id: input_boolean.energia_registro_potencia
