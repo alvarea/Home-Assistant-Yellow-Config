@@ -58,6 +58,21 @@ Interfaz Lovelace completamente personalizada, organizada por vistas:
 - **Vistas por estancia** (p. ej. Estudio): control detallado de luces, sensores, climatización y multimedia de cada habitación.
 - **Panel de alarma**: control de armado/desarmado, estado de sensores, último disparo y registro histórico de eventos.
 
+<p align="center">
+  <img src="docs/img/dashboard-overview.png" alt="Dashboard Overview General" width="100%"><br>
+  <em>Dashboard Overview General</em>
+</p>
+
+<p align="center">
+  <img src="docs/img/dashboard-estudio.png" alt="Dashboard Estudio" width="100%"><br>
+  <em>Dashboard Estudio</em>
+</p>
+
+<p align="center">
+  <img src="docs/img/dashboard-alarma.png" alt="Dashboard Alarma" width="100%"><br>
+  <em>Dashboard Alarma</em>
+</p>
+
 ## Flujo de trabajo
 
 El desarrollo sigue un flujo de *GitOps* ligero: los cambios se preparan y versionan en este repositorio, se validan y se despliegan a Home Assistant, nunca se edita directamente en el editor visual salvo para los dashboards. El backlog de mejoras y tareas pendientes se gestiona como **GitHub Issues** en este mismo repositorio, organizado por subsistema.
