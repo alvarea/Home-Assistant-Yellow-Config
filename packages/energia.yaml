@@ -210,6 +210,61 @@ template:
         availability: "{{ has_value('sensor.casa_potencia') and has_value('sensor.potencia_contratada_actual') }}"
         state: "{{ (states('sensor.casa_potencia') | float(0) / (states('sensor.potencia_contratada_actual') | float(1) * 10)) | round(0) }}"
 
+  # ENE-25 · kWh y coste (EUR) de hoy y del mes por aparato. Sin state_class: se reinician cada ciclo.
+  - sensor:
+      - name: lavadora_energia_hoy
+        unique_id: lavadora_energia_hoy
+        unit_of_measurement: kWh
+        device_class: energy
+        icon: mdi:washing-machine
+        state: "{{ (states('sensor.lavadora_energia_diario_valle') | float(0) + states('sensor.lavadora_energia_diario_punta_llano') | float(0)) | round(3) }}"
+      - name: coste_lavadora_hoy
+        unique_id: coste_lavadora_hoy
+        unit_of_measurement: EUR
+        device_class: monetary
+        icon: mdi:washing-machine
+        availability: "{{ has_value('sensor.precio_luz_valle') and has_value('sensor.precio_luz_punta_llano') }}"
+        state: "{{ ((states('sensor.lavadora_energia_diario_valle') | float(0) * states('sensor.precio_luz_valle') | float(0)) + (states('sensor.lavadora_energia_diario_punta_llano') | float(0) * states('sensor.precio_luz_punta_llano') | float(0))) | round(2) }}"
+      - name: lavadora_energia_mes
+        unique_id: lavadora_energia_mes
+        unit_of_measurement: kWh
+        device_class: energy
+        icon: mdi:washing-machine
+        state: "{{ (states('sensor.lavadora_energia_mensual_valle') | float(0) + states('sensor.lavadora_energia_mensual_punta_llano') | float(0)) | round(3) }}"
+      - name: coste_lavadora_mes
+        unique_id: coste_lavadora_mes
+        unit_of_measurement: EUR
+        device_class: monetary
+        icon: mdi:washing-machine
+        availability: "{{ has_value('sensor.precio_luz_valle') and has_value('sensor.precio_luz_punta_llano') }}"
+        state: "{{ ((states('sensor.lavadora_energia_mensual_valle') | float(0) * states('sensor.precio_luz_valle') | float(0)) + (states('sensor.lavadora_energia_mensual_punta_llano') | float(0) * states('sensor.precio_luz_punta_llano') | float(0))) | round(2) }}"
+      - name: pozo_energia_hoy
+        unique_id: pozo_energia_hoy
+        unit_of_measurement: kWh
+        device_class: energy
+        icon: mdi:water-pump
+        state: "{{ (states('sensor.pozo_energia_diario_valle') | float(0) + states('sensor.pozo_energia_diario_punta_llano') | float(0)) | round(3) }}"
+      - name: coste_pozo_hoy
+        unique_id: coste_pozo_hoy
+        unit_of_measurement: EUR
+        device_class: monetary
+        icon: mdi:water-pump
+        availability: "{{ has_value('sensor.precio_luz_valle') and has_value('sensor.precio_luz_punta_llano') }}"
+        state: "{{ ((states('sensor.pozo_energia_diario_valle') | float(0) * states('sensor.precio_luz_valle') | float(0)) + (states('sensor.pozo_energia_diario_punta_llano') | float(0) * states('sensor.precio_luz_punta_llano') | float(0))) | round(2) }}"
+      - name: pozo_energia_mes
+        unique_id: pozo_energia_mes
+        unit_of_measurement: kWh
+        device_class: energy
+        icon: mdi:water-pump
+        state: "{{ (states('sensor.pozo_energia_mensual_valle') | float(0) + states('sensor.pozo_energia_mensual_punta_llano') | float(0)) | round(3) }}"
+      - name: coste_pozo_mes
+        unique_id: coste_pozo_mes
+        unit_of_measurement: EUR
+        device_class: monetary
+        icon: mdi:water-pump
+        availability: "{{ has_value('sensor.precio_luz_valle') and has_value('sensor.precio_luz_punta_llano') }}"
+        state: "{{ ((states('sensor.pozo_energia_mensual_valle') | float(0) * states('sensor.precio_luz_valle') | float(0)) + (states('sensor.pozo_energia_mensual_punta_llano') | float(0) * states('sensor.precio_luz_punta_llano') | float(0))) | round(2) }}"
+
 ###############################################################################
 #  ENERGÍA · Consumo de red (ENE-02, 2026-10-21)
 #
@@ -225,6 +280,27 @@ sensor:
     source: sensor.v2c_house_power
     name: general_energia_red
     unique_id: general_energia_red
+    unit_prefix: k
+    unit_time: h
+    round: 3
+    method: left
+    max_sub_interval: "00:01:00"
+
+  # ENE-25 · Energía por aparato (Riemann sobre su potencia). Se usa Riemann también para la lavadora
+  # porque un utility_meter sobre un sensor de energía que no cambia se queda sin unidad hasta que cambie.
+  - platform: integration
+    source: sensor.grillplats_lavadora_power
+    name: lavadora_energia
+    unique_id: lavadora_energia
+    unit_prefix: k
+    unit_time: h
+    round: 3
+    method: left
+    max_sub_interval: "00:01:00"
+  - platform: integration
+    source: sensor.esphome_pow_sw4_power
+    name: pozo_energia
+    unique_id: pozo_energia
     unit_prefix: k
     unit_time: h
     round: 3
@@ -275,6 +351,28 @@ utility_meter:
     cycle: yearly
     tariffs: [valle, punta_llano]
 
+  # ENE-25 · lavadora y pozo (diario y mensual)
+  lavadora_energia_diario:
+    source: sensor.lavadora_energia
+    name: lavadora_energia_diario
+    cycle: daily
+    tariffs: [valle, punta_llano]
+  lavadora_energia_mensual:
+    source: sensor.lavadora_energia
+    name: lavadora_energia_mensual
+    cycle: monthly
+    tariffs: [valle, punta_llano]
+  pozo_energia_diario:
+    source: sensor.pozo_energia
+    name: pozo_energia_diario
+    cycle: daily
+    tariffs: [valle, punta_llano]
+  pozo_energia_mensual:
+    source: sensor.pozo_energia
+    name: pozo_energia_mensual
+    cycle: monthly
+    tariffs: [valle, punta_llano]
+
 ###############################################################################
 #  ENERGÍA · Ancla del registro de excesos de potencia (ENE-20/22)
 #  Entidad sin uso funcional: solo sirve para que el Logbook pueda filtrar por ella
@@ -289,7 +387,7 @@ input_boolean:
 automation:
   - id: energia_tarifa_utility_meter
     alias: Energía · Tarifa de los contadores según periodo
-    description: Pone valle o punta_llano en los selects de los utility_meter (general y VE) al cambiar el periodo de sensor.precio_luz_actual y al arrancar HA.
+    description: Pone valle o punta_llano en los selects de los utility_meter (general, VE, lavadora y pozo) al cambiar el periodo de sensor.precio_luz_actual y al arrancar HA.
     mode: restart
     triggers:
       - trigger: state
@@ -309,6 +407,10 @@ automation:
             - select.ve_energia_diario
             - select.ve_energia_mensual
             - select.ve_energia_anual
+            - select.lavadora_energia_diario
+            - select.lavadora_energia_mensual
+            - select.pozo_energia_diario
+            - select.pozo_energia_mensual
         data:
           option: "{{ state_attr('sensor.precio_luz_actual', 'periodo') }}"
 

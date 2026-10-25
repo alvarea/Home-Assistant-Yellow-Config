@@ -1,0 +1,190 @@
+###############################################################################
+#  Vista "Energía" del Overview (/lovelace/energia) · COPIA DE SEGURIDAD
+#  Exportada: 2026-10-23 desde el storage (lovelace/config) ANTES de añadir la tarjeta
+#  «Aparatos» (ENE-25). Es la versión retocada por Agustín en la interfaz (4 columnas,
+#  4ª sección con el Logbook de excesos de potencia).
+#  Verificada contra la vista real: mismo JSON (4.376 bytes, sha256 39c526f2bdcb6c72).
+#  Restaurar: Overview → Editar → ⋮ Editor de configuración en bruto → sustituir la vista
+#             con path "energia" por este contenido.
+###############################################################################
+title: Energía
+path: energia
+icon: mdi:flash
+type: sections
+max_columns: 4
+sections:
+- type: grid
+  cards:
+  - type: heading
+    heading: Coste general (casa + coche)
+    icon: mdi:home-lightning-bolt
+    heading_style: title
+    badges:
+    - type: entity
+      entity: sensor.precio_luz_actual
+      show_state: true
+      show_icon: true
+  - type: tile
+    entity: sensor.coste_general_hoy
+    name: Hoy
+    icon: mdi:calendar-today
+    vertical: false
+    features_position: bottom
+  - type: tile
+    entity: sensor.coste_general_mes
+    name: Este mes
+    icon: mdi:calendar-month
+    vertical: false
+    features_position: bottom
+  - type: entities
+    title: Valle frente a punta/llano
+    show_header_toggle: false
+    entities:
+    - type: section
+      label: Hoy
+    - entity: sensor.general_energia_red_diario_valle
+      name: kWh valle
+    - entity: sensor.coste_general_hoy_valle
+      name: Coste valle
+    - entity: sensor.general_energia_red_diario_punta_llano
+      name: kWh punta/llano
+    - entity: sensor.coste_general_hoy_punta_llano
+      name: Coste punta/llano
+    - type: section
+      label: Mes
+    - entity: sensor.general_energia_red_mensual_valle
+      name: kWh valle
+    - entity: sensor.coste_general_mes_valle
+      name: Coste valle
+    - entity: sensor.general_energia_red_mensual_punta_llano
+      name: kWh punta/llano
+    - entity: sensor.coste_general_mes_punta_llano
+      name: Coste punta/llano
+  column_span: 1
+- type: grid
+  cards:
+  - type: heading
+    heading: Coche (Trydan)
+    icon: mdi:ev-station
+    heading_style: title
+    badges:
+    - type: entity
+      entity: binary_sensor.v2c_connected
+      show_state: true
+      show_icon: true
+    - type: entity
+      entity: binary_sensor.v2c_charging
+      show_state: true
+      show_icon: true
+    - type: entity
+      entity: sensor.v2c_charge_power
+      show_state: true
+      show_icon: true
+    - type: entity
+      entity: number.evse_192_168_0_22_intensity
+      show_state: true
+      show_icon: true
+    - type: entity
+      entity: number.evse_192_168_0_22_min_intensity
+      show_state: true
+      show_icon: true
+    - type: entity
+      entity: number.evse_192_168_0_22_max_intensity
+      show_state: true
+      show_icon: true
+  - type: tile
+    entity: sensor.coste_ve_hoy
+    name: Hoy
+    icon: mdi:calendar-today
+    vertical: false
+    features_position: bottom
+  - type: tile
+    entity: sensor.coste_ve_mes
+    name: Este mes
+    icon: mdi:calendar-month
+    vertical: false
+    features_position: bottom
+  - type: entities
+    title: Carga por periodo
+    show_header_toggle: false
+    entities:
+    - type: section
+      label: Hoy
+    - entity: sensor.ve_energia_diario_valle
+      name: kWh valle
+    - entity: sensor.ve_energia_diario_punta_llano
+      name: kWh punta/llano
+    - entity: sensor.coste_ve_hoy_valle
+      name: Coste valle
+    - entity: sensor.coste_ve_hoy_punta_llano
+      name: Coste punta/llano
+    - type: section
+      label: Mes
+    - entity: sensor.ve_energia_mensual_valle
+      name: kWh valle
+    - entity: sensor.ve_energia_mensual_punta_llano
+      name: kWh punta/llano
+    - entity: sensor.coste_ve_mes_valle
+      name: Coste valle
+    - entity: sensor.coste_ve_mes_punta_llano
+      name: Coste punta/llano
+- type: grid
+  cards:
+  - type: heading
+    heading: Potencia
+    icon: mdi:flash-triangle
+    heading_style: title
+  - type: tile
+    entity: sensor.v2c_house_power
+    name: Consumo general
+    vertical: false
+    features_position: bottom
+  - type: tile
+    entity: sensor.casa_potencia
+    name: Consumo casa (sin coche)
+    vertical: false
+    features_position: bottom
+  - type: gauge
+    entity: sensor.casa_potencia_pct_limite
+    name: Casa sobre el límite contratado
+    min: 0
+    max: 120
+    needle: true
+    segments:
+    - from: 0
+      color: "#43a047"
+    - from: 80
+      color: "#fb8c00"
+    - from: 90
+      color: "#e53935"
+    grid_options:
+      columns: 12
+      rows: 3
+  - type: history-graph
+    title: Consumo frente al límite (24 h)
+    hours_to_show: 24
+    entities:
+    - entity: sensor.v2c_house_power
+      name: General
+    - entity: sensor.casa_potencia
+      name: Casa
+    - entity: sensor.v2c_charge_power
+      name: Coche
+    - entity: sensor.potencia_contratada_actual
+      name: Límite
+    grid_options:
+      columns: 12
+- type: grid
+  cards:
+  - type: heading
+    heading: Control excesos potencia contratada
+    heading_style: title
+  - type: logbook
+    title: Excesos de potencia contratada
+    target:
+      entity_id:
+      - input_boolean.energia_registro_potencia
+    hours_to_show: 168
+    grid_options:
+      columns: 12
+cards: []
