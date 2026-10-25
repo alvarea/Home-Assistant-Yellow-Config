@@ -35,6 +35,9 @@
 #  LED (2026-10-14): apagado salvo binary_sensor.alarm_homy_led_visible (presencia en la entrada, armando,
 #    entrada o disparo). Brillo uniforme 128; solo el rojo de entrada/disparo a 255.
 #  input_boolean.alarm_homy_silenciar_sirenas ON: sin sirena ni sirena Alexa.
+#  APAGADO (2026-10-25, ALA-40): al quedar armada, script.alarm_homy_apagar_casa apaga lo encendido según la
+#    política por modo (macros filas_apagado / politica_apagado / apagar_al_armar). Hoy: Ausente y Vacaciones.
+#    Interruptor input_boolean.alarm_homy_apagado_auto. Resumen en el push de armado. Sustituye a script.home_switch_off.
 ###############################################################################
 
 template:
@@ -146,6 +149,63 @@ script:
           - action: switch.turn_on
             continue_on_error: true
             target: {entity_id: "{{ apagados }}"}
+
+  # ---------------------------------------------------------------------------
+  # APAGADO DE LA CASA AL ARMAR (ALA-40): apaga lo encendido de las filas que la política asigna al modo
+  # (macro apagar_al_armar). Sin restaurar al desarmar. Se lanza con script.turn_on (la nube de MELCloud/Gree tarda).
+  # ---------------------------------------------------------------------------
+  alarm_homy_apagar_casa:
+    alias: Alarm HOMY · Apagar casa al armar
+    icon: mdi:power-sleep
+    mode: restart
+    fields:
+      modo:
+        required: true
+        selector: {select: {options: [armed_away, armed_home, armed_night, armed_vacation]}}
+    sequence:
+      - variables:
+          lista: >-
+            {% from 'alarm_homy.jinja' import apagar_al_armar %}{{ apagar_al_armar(modo) | from_json }}
+      - condition: template
+        value_template: "{{ lista | count > 0 }}"
+      - action: logbook.log
+        data:
+          name: Alarm HOMY
+          message: >-
+            {% from 'alarm_homy.jinja' import resumen_apagado %}apaga al armar: {{ resumen_apagado(lista) }}
+          entity_id: alarm_control_panel.alarm_homy
+      - parallel:
+          - sequence:
+              - condition: template
+                value_template: "{{ lista | select('match', 'light\\.') | list | count > 0 }}"
+              - action: light.turn_off
+                continue_on_error: true
+                target: {entity_id: "{{ lista | select('match', 'light\\.') | list }}"}
+          - sequence:
+              - condition: template
+                value_template: "{{ lista | select('match', 'fan\\.') | list | count > 0 }}"
+              - action: fan.turn_off
+                continue_on_error: true
+                target: {entity_id: "{{ lista | select('match', 'fan\\.') | list }}"}
+          - sequence:
+              - condition: template
+                value_template: "{{ lista | select('match', 'switch\\.') | list | count > 0 }}"
+              - action: switch.turn_off
+                continue_on_error: true
+                target: {entity_id: "{{ lista | select('match', 'switch\\.') | list }}"}
+          - sequence:
+              - condition: template
+                value_template: "{{ lista | select('match', 'climate\\.') | list | count > 0 }}"
+              - action: climate.set_hvac_mode
+                continue_on_error: true
+                target: {entity_id: "{{ lista | select('match', 'climate\\.') | list }}"}
+                data: {hvac_mode: "off"}
+          - sequence:
+              - condition: template
+                value_template: "{{ lista | select('match', 'media_player\\.') | list | count > 0 }}"
+              - action: media_player.turn_off
+                continue_on_error: true
+                target: {entity_id: "{{ lista | select('match', 'media_player\\.') | list }}"}
 
   # ---------------------------------------------------------------------------
   # PITIDOS tag reader (rtttl)
@@ -444,12 +504,18 @@ automation:
           # ----- ARMADA -----
           - conditions: "{{ estado in ['armed_away', 'armed_home', 'armed_night', 'armed_vacation'] and desde in ['arming', 'disarmed'] }}"
             sequence:
+              # APAGADO (ALA-40; sustituye a script.home_switch_off): la lista se calcula aquí para el push
+              - variables:
+                  apagado: >-
+                    {% from 'alarm_homy.jinja' import apagar_al_armar %}{{ (apagar_al_armar(estado) | from_json) if is_state('input_boolean.alarm_homy_apagado_auto', 'on') else [] }}
               - if:
                   - condition: template
-                    value_template: "{{ estado in ['armed_away', 'armed_vacation'] and is_state('input_boolean.alarm_homy_modo_pruebas', 'off') }}"
+                    value_template: "{{ apagado | count > 0 }}"
                 then:
                   - action: script.turn_on
-                    target: {entity_id: script.home_switch_off}
+                    target: {entity_id: script.alarm_homy_apagar_casa}
+                    data:
+                      variables: {modo: "{{ estado }}"}
               # BLINK (ALA-25): Ausente/Vacaciones → detección solo en las cámaras del modo y panel Blink armado
               - variables:
                   blink_on: >-
@@ -505,6 +571,7 @@ automation:
                       mensaje: >-
                         Armado {{ nombre | lower }} a las {{ now().strftime('%H:%M') }}.
                         {%- if deshab %} Deshabilitados: {{ deshab }}.{% endif %}
+                        {%- if apagado | count > 0 %}{% from 'alarm_homy.jinja' import resumen_apagado %} Apagado: {{ resumen_apagado(apagado) }}.{% endif %}
                       nivel: active
                       telegram: "{{ estado == 'armed_vacation' }}"
           # ----- ENTRADA -----

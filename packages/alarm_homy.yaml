@@ -23,6 +23,10 @@ input_boolean:
   alarm_homy_noche_pendiente:
     name: Alarma · Casa nocturno (Noche pendiente)
     icon: mdi:weather-night-partly-cloudy
+  # ALA-40: apagado automático de la casa al armar (política por modo en alarm_homy.jinja)
+  alarm_homy_apagado_auto:
+    name: Alarma · Apagado automático al armar
+    icon: mdi:power-sleep
 
 input_select:
   # Vista "Sensores Activos" del dashboard: modo que se previsualiza con la alarma desarmada (2026-10-16)

@@ -1542,6 +1542,15 @@ views:
               columns: 12
             name: Automatismos (interruptor general)
           - type: tile
+            entity: input_boolean.alarm_homy_apagado_auto
+            tap_action:
+              action: more-info
+            icon_tap_action:
+              action: toggle
+            grid_options:
+              columns: 12
+            name: Apagado automático al armar (Ausente/Vacaciones)
+          - type: tile
             entity: automation.alarm_homy_auto_armado_noche
             tap_action:
               action: more-info

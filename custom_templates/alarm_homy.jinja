@@ -211,6 +211,66 @@
 
 
 {#- ==========================================================================
+    APAGADO AL ARMAR (2026-10-25, ALA-40)
+    Filas = dominio nativo y, en luces, planta (floor). Solo se apaga lo encendido de las filas que la política
+    asigna al modo. Etiquetas: alarm_homy_apagar (switch a incluir) · alarm_homy_no_apagar (excluir en todo).
+    Nunca: grupos de luces (group/Hue), LEDs de estado (esphome_*, tagreader_*, V2C), luces sin planta,
+    switch.* sin etiqueta, valve, siren, cover. Multimedia = TV/streaming (androidtv, webostv, apple_tv).
+   ========================================================================== -#}
+{%- macro filas_apagado() -%}
+{%- set no = label_entities('alarm_homy_no_apagar') -%}
+{%- set leds = integration_entities('v2c') -%}
+{%- set ns = namespace(pb=[], pa=[], jd=[]) -%}
+{%- for e in states.light | map(attribute='entity_id') if e not in no and e not in leds
+      and not e.startswith(('light.esphome_', 'light.tagreader_'))
+      and state_attr(e, 'entity_id') is none and not state_attr(e, 'is_hue_group') -%}
+{%- set f = floor_id(e) -%}
+{%- if f == 'planta_baja' %}{% set ns.pb = ns.pb + [e] %}{% elif f == 'planta_alta' %}{% set ns.pa = ns.pa + [e] %}{% elif f == 'jardin' %}{% set ns.jd = ns.jd + [e] %}{% endif -%}
+{%- endfor -%}
+{%- set multimedia = (integration_entities('androidtv') + integration_entities('webostv') + integration_entities('apple_tv'))
+      | select('match', 'media_player\\.') | list -%}
+{{ {'luces_planta_baja': ns.pb, 'luces_planta_alta': ns.pa, 'luces_jardin': ns.jd,
+    'clima': states.climate | map(attribute='entity_id') | reject('in', no) | list,
+    'ventilacion': states.fan | map(attribute='entity_id') | reject('in', no) | list,
+    'multimedia': multimedia | reject('in', no) | list,
+    'etiquetados': label_entities('alarm_homy_apagar') | reject('in', no) | list} | to_json }}
+{%- endmacro -%}
+
+{#- POLÍTICA: modo → filas que se apagan al armarlo. "fila:planta" limita la fila a esa planta (p. ej. clima:planta_alta).
+    Modo sin entrada = no se apaga nada. ALA-41 completará Casa y Noche. -#}
+{%- macro politica_apagado() -%}
+{%- set todo = ['luces_planta_baja', 'luces_planta_alta', 'luces_jardin', 'clima', 'ventilacion', 'multimedia', 'etiquetados'] -%}
+{{ {'armed_away': todo, 'armed_vacation': todo} | to_json }}
+{%- endmacro -%}
+
+{#- Entidades de las filas del modo; encendidas=true → solo lo que está encendido ahora -#}
+{%- macro entidades_apagado(modo, encendidas=true) -%}
+{%- set filas = filas_apagado() | from_json -%}
+{%- set ns = namespace(l=[]) -%}
+{%- for f in (politica_apagado() | from_json).get(modo, []) -%}
+{%- set p = f.split(':') -%}
+{%- for e in filas.get(p[0], []) if p | count == 1 or floor_id(e) == p[1] -%}
+{%- if not encendidas or states(e) not in ['off', 'standby', 'unavailable', 'unknown'] -%}
+{%- set ns.l = ns.l + [e] -%}
+{%- endif -%}
+{%- endfor -%}
+{%- endfor -%}
+{{ ns.l | unique | list | to_json }}
+{%- endmacro -%}
+
+{%- macro apagar_al_armar(modo) -%}{{ entidades_apagado(modo, true) }}{%- endmacro -%}
+
+{#- Resumen para el push: "4 luces, AA Estudio y Fire TV Estudio" -#}
+{%- macro resumen_apagado(lista) -%}
+{%- set luces = lista | select('match', 'light\\.') | list | count -%}
+{%- set ns = namespace(l=[]) -%}
+{%- if luces > 0 %}{% set ns.l = ns.l + [luces ~ (' luz' if luces == 1 else ' luces')] %}{% endif -%}
+{%- for e in lista | reject('match', 'light\\.') -%}{%- set ns.l = ns.l + [state_attr(e, 'friendly_name') or e] -%}{%- endfor -%}
+{{ (ns.l[:-1] | join(', ') ~ ' y ' ~ ns.l[-1]) if ns.l | count > 1 else (ns.l | join('')) }}
+{%- endmacro -%}
+
+
+{#- ==========================================================================
     VISTA "SENSORES ACTIVOS" (2026-10-16)
    ========================================================================== -#}
 {#- Modo que muestra la vista: el armado actual, o el de vista previa (input_select.alarm_homy_modo_vista) si está desarmada -#}
