@@ -81,6 +81,16 @@ El desarrollo sigue un flujo de *GitOps* ligero: los cambios se preparan y versi
 
 En desarrollo activo y uso diario de producción. Próximos frentes: migración completa del parque ESPHome a firmware reciente, ampliación de la red Matter/Thread y un modelo espacial (plano de la vivienda) integrado en el dashboard.
 
+## Historia
+
+| Fecha | Hito |
+|---|---|
+| 18-09-2021 | Pedido del Home Assistant Yellow en Crowd Supply |
+| 10-10-2022 | Unboxing e instalación del Home Assistant Yellow |
+| 12-11-2022 | Primer commit de este repositorio |
+
+(C) AlvareA 2022
+
 ---
 
 *Repositorio de uso personal. La configuración incluye referencias a hardware y servicios de terceros propios de esta instalación; no está pensado como plantilla genérica, aunque partes del código pueden servir de referencia.*
