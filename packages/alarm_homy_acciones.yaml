@@ -20,6 +20,7 @@
 #  Tags iOS: estado (armada/desarmada) · alerta (entrada/disparo/pánico; se borra al desarmar) · fallo · codigo.
 #  Echo de la voz: input_select.alarm_homy_echo_voz (entrada por defecto).
 #    desarmado       iOS normal (borra la crítica) + voz + bip largo + LED verde (lista) / amarillo (no lista)
+#                    De noche (ALA-39): sin push ni voz; solo bip largo y LED (se sigue borrando la crítica)
 #    LED rojo SOLO para entrada y disparo.
 #    código erróneo  iOS + Telegram + 3 bips graves
 #  input_boolean.alarm_homy_notif_<evento>: activa/desactiva solo los AVISOS (iOS/Telegram).
@@ -29,7 +30,7 @@
 #    (La exclusión del estudio del 16-10 se eliminó el 21-10, ALA-31: ahora Casa nocturno, alarm_homy_auto.yaml)
 #  BLINK (2026-10-16, ALA-25 fase 1): al armar Ausente/Vacaciones se activa la detección de las cámaras de
 #    blink_camaras(modo) (macro), se apaga en el resto y se arma alarm_control_panel.blink_casa; al desarmar, se
-#    desarma y las 9 vuelven a ON. Mientras Blink está armado, sondeo cada minuto (solo nube, no despierta cámaras).
+#    desarma y las 9 vuelven a ON (ALA-37: script.alarm_homy_blink_desarmar, al final y sin bloquear). Mientras Blink está armado, sondeo cada minuto (solo nube, no despierta cámaras).
 #    Movimiento de una cámara activa que no sea sensor del modo → aviso urgente con la imagen (no dispara).
 #  LED (2026-10-14): apagado salvo binary_sensor.alarm_homy_led_visible (presencia en la entrada, armando,
 #    entrada o disparo). Brillo uniforme 128; solo el rojo de entrada/disparo a 255.
@@ -116,6 +117,35 @@ script:
             data:
               title: "*{{ titulo }}*"
               message: "{{ mensaje }}"
+
+  # ---------------------------------------------------------------------------
+  # BLINK AL DESARMAR (ALA-37): panel Blink desarmado y las 9 cámaras con la detección activa
+  # (estado neutro de la app Blink). Se lanza con script.turn_on desde la rama DESARMADA para no
+  # bloquear LED y bip; solo llama a la nube si hay algo que cambiar (en Casa/Noche normalmente nada).
+  # ---------------------------------------------------------------------------
+  alarm_homy_blink_desarmar:
+    alias: Alarm HOMY · Blink al desarmar
+    icon: mdi:cctv
+    mode: restart
+    sequence:
+      - variables:
+          switches: >-
+            {% from 'alarm_homy.jinja' import blink_todas %}{{ blink_todas() | from_json | map('regex_replace', '^', 'switch.blink_') | map('regex_replace', '$', '_camera_motion_detection') | list }}
+          apagados: "{{ switches | select('is_state', 'off') | list }}"
+      - if:
+          - condition: template
+            value_template: "{{ not is_state('alarm_control_panel.blink_casa', 'disarmed') }}"
+        then:
+          - action: alarm_control_panel.alarm_disarm
+            continue_on_error: true
+            target: {entity_id: alarm_control_panel.blink_casa}
+      - if:
+          - condition: template
+            value_template: "{{ apagados | count > 0 }}"
+        then:
+          - action: switch.turn_on
+            continue_on_error: true
+            target: {entity_id: "{{ apagados }}"}
 
   # ---------------------------------------------------------------------------
   # PITIDOS tag reader (rtttl)
@@ -430,6 +460,9 @@ automation:
                   - condition: template
                     value_template: "{{ blink_on | count > 0 }}"
                 then:
+                  # ALA-37: que un desarmado previo aún en curso no deshaga el armado de Blink
+                  - action: script.turn_off
+                    target: {entity_id: script.alarm_homy_blink_desarmar}
                   - action: switch.turn_on
                     continue_on_error: true
                     target:
@@ -538,19 +571,6 @@ automation:
               - action: siren.turn_off
                 continue_on_error: true
                 target: {entity_id: siren.sirena}
-              - if:
-                  - condition: template
-                    value_template: "{{ not is_state('alarm_control_panel.blink_casa', 'disarmed') }}"
-                then:
-                  - action: alarm_control_panel.alarm_disarm
-                    continue_on_error: true
-                    target: {entity_id: alarm_control_panel.blink_casa}
-              # BLINK (ALA-25): las 9 cámaras vuelven a tener la detección activa (estado neutro de la app Blink)
-              - action: switch.turn_on
-                continue_on_error: true
-                target:
-                  entity_id: >-
-                    {% from 'alarm_homy.jinja' import blink_todas %}{{ blink_todas() | from_json | map('regex_replace', '^', 'switch.blink_') | map('regex_replace', '$', '_camera_motion_detection') | list }}
               - action: script.alarm_homy_led
               - if:
                   - condition: template
@@ -559,6 +579,9 @@ automation:
                   - action: script.alarm_homy_pitidos
                     data: {patron: largo}
                   # La voz "Alarma desactivada" va en alarm_homy_acciones_eventos (el evento sabe si era de noche)
+              # ALA-37: Blink al final y sin esperar (la nube tardaba ~50 s y retrasaba LED y bip largo)
+              - action: script.turn_on
+                target: {entity_id: script.alarm_homy_blink_desarmar}
 
   # ---------------------------------------------------------------------------
   # LED EN REPOSO: verde = lista para armar · amarillo = puerta/ventana abierta (solo desarmada)
@@ -629,10 +652,13 @@ automation:
                           data:
                             message: clear_notification
                             data: {tag: alarm_homy_alerta}
+              # ALA-39: sin push si era de noche (Noche o Casa nocturno, cualquier origen); el logbook lo registra igual
               - if:
                   - condition: state
                     entity_id: input_boolean.alarm_homy_notif_desarmada
                     state: "on"
+                  - condition: template
+                    value_template: "{{ not trigger.event.data.get('nocturno', false) }}"
                 then:
                   - action: script.alarm_homy_notificar
                     data:
