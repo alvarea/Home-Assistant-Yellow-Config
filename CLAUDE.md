@@ -98,7 +98,7 @@ Vive en **GitHub Issues + GitHub Project "HOMY Backlog"** (los 10 subproyectos, 
 | Label **`hold:*`** (issue) | motivo de espera (la tarea no cambia de columna) | `hold:needs-decision` · `hold:manual-action` · `hold:parked` |
 
 - No existen labels `type:*`, `subproject:*` ni `status:*`: no los crees. (El campo se llama `Subtype` porque `Type` es palabra reservada en Projects.)
-- Las opciones nuevas de un desplegable (p. ej. un subproyecto nuevo) las añade Agustín **a mano** en la UI del Project: por API GitHub regenera todas las opciones y se pierden los valores asignados.
+- Las opciones nuevas de un desplegable (p. ej. un subproyecto nuevo) las añade Agustín **a mano** en la UI del Project (⋯ → Settings → campo): por API GitHub regenera todas las opciones y se pierden los valores asignados.
 
 ### Tokens (`CLAUDE.local.md`)
 - `GH_TOKEN` (fine-grained, solo Issues de este repo): crear/editar/comentar/cerrar issues y labels con `gh api repos/{owner}/{repo}/...` (REST).
@@ -111,7 +111,7 @@ Vive en **GitHub Issues + GitHub Project "HOMY Backlog"** (los 10 subproyectos, 
 - **Empezar**: `tools/homy-status.sh <n> "In progress"`.
 - **Bloquear / desbloquear**: añadir o quitar el label `hold:*` con `gh api .../issues/{n}/labels`.
 - **Terminar** (hecha y validada): `gh api -X PATCH .../issues/{n} -f state=closed -f state_reason=completed` (o `not_planned` si se descarta) → pasa sola a `Done`.
-- **Listar** tareas de un subproyecto con su estado: consulta GraphQL a `user(login:"alvarea"){projectV2(number:2){items(...)}}` con `fieldValueByName(name:"Subproject"|"Status"|"Subtype")`, paginando con `after`.
+- **Listar** tareas de un subproyecto con Status, Subtype y `hold:*`: `tools/homy-list.sh <SUBPROYECTO>` (`-` = todos; `--all` incluye cerradas).
 - Al hablar con Agustín, nombra las tareas por su ID del título (`ALA-40`), no por el número de issue.
 
 ### Ficheros iCloud — solo backup histórico (migración completa 25-10-2026)
