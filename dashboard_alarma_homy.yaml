@@ -1426,7 +1426,6 @@ views:
         entities:
           - entity: binary_sensor.blink_salon_camera_armed
           - entity: binary_sensor.blink_salon_motion
-          - entity: binary_sensor.blink_salon_battery
           - entity: sensor.blink_salon_temperature
           - entity: sensor.blink_salon_wifi
           - entity: light.luces_salon
@@ -1443,7 +1442,6 @@ views:
           - entity: binary_sensor.blink_cocina_camera_armed
           - entity: binary_sensor.blink_cocina_motion
           - entity: sensor.blink_cocina_temperature
-          - entity: binary_sensor.blink_cocina_battery
           - entity: sensor.blink_cocina_wifi
           - entity: light.luz_cocina
         hold_action:
@@ -1461,7 +1459,6 @@ views:
         entities:
           - entity: binary_sensor.blink_estudio_camera_armed
           - entity: binary_sensor.blink_estudio_motion
-          - entity: binary_sensor.blink_estudio_battery
           - entity: sensor.blink_estudio_temperature
           - entity: sensor.blink_estudio_wifi
           - entity: light.luces_estudio
@@ -1479,7 +1476,6 @@ views:
           - entity: binary_sensor.blink_porche_motion
           - entity: sensor.blink_porche_temperature
           - entity: sensor.blink_porche_wifi
-          - entity: binary_sensor.blink_porche_battery
         hold_action:
           action: call-service
           service: script.trigger_blink_porche

@@ -7,6 +7,9 @@
 #   mantiene ese orden. Filtra por input_select.baterias_filtro_tipo (tipo base: "2× AAA" cuenta como
 #   AAA; Recargable = Rechargeable) y input_select.baterias_filtro_area (área o planta). Si los
 #   input_select no existen, no filtra.
+# BAT-02: también las notas con fuente binaria (Blink a pilas): Battery Notes solo crea
+#   binary_sensor.*_battery_plus_low. Se listan si no existe su sensor.*_battery_plus; en el orden,
+#   'on' (baja) va tras los no disponibles y 'off' (OK) al final. Columna %: "baja" / "OK".
 # BAT-13: columna 🔄 → button.press del button.*_battery_replaced del dispositivo, con confirmación.
 #   El entity_id del botón va en una columna oculta (col[5]); flex-table sustituye col[N] por el
 #   contenido ya modificado de esa columna.
@@ -14,7 +17,7 @@
 # se usa para leer los sensores hermanos de Battery Notes.
 title: Baterías
 path: baterias
-icon: mdi:battery-heart-variant
+icon: mdi:battery-high
 type: panel
 cards:
   - type: vertical-stack
@@ -41,13 +44,16 @@ cards:
             {%- set zona = states('input_select.baterias_filtro_area') -%}
             {%- set tipo = 'Rechargeable' if tipo == 'Recargable' else tipo -%}
             {%- set ns = namespace(nd=[], ok=[]) -%}
-            {%- for e in integration_entities('battery_notes') | select('match', 'sensor\..*_battery_plus$') -%}
-              {%- set t = states(e | replace('_battery_plus', '_battery_type')).split('× ') | last -%}
+            {%- for e in integration_entities('battery_notes')
+                  | select('match', '(sensor\..*_battery_plus|binary_sensor\..*_battery_plus_low)$') -%}
+              {%- set num = e | regex_replace('^binary_sensor\.', 'sensor.') | regex_replace('_low$', '') -%}
+              {%- if e.startswith('binary_sensor.') and expand(num) | count > 0 -%}{%- continue -%}{%- endif -%}
+              {%- set t = states(num | replace('_battery_plus', '_battery_type')).split('× ') | last -%}
               {%- set ok_tipo = tipo in ['Todos', 'unknown', 'unavailable'] or t == tipo -%}
               {%- set ok_zona = zona in ['Todas', 'unknown', 'unavailable'] or zona in [area_name(e), floor_name(floor_id(e))] -%}
               {%- if ok_tipo and ok_zona -%}
-                {%- if states(e) | is_number -%}
-                  {%- set ns.ok = ns.ok + [[states(e) | float, e]] -%}
+                {%- if states(e) | is_number or states(e) in ['on', 'off'] -%}
+                  {%- set ns.ok = ns.ok + [[{'on': -1, 'off': 101}.get(states(e), states(e) | float(0)), e]] -%}
                 {%- else -%}
                   {%- set ns.nd = ns.nd + [[e, e]] -%}
                 {%- endif -%}
@@ -78,13 +84,14 @@ cards:
                 (() => {
                   if (String(x ?? "") && !/^(undefined)+$/.test(String(x))) return x;
                   const h = document.querySelector('home-assistant').hass;
-                  const st = h.states[this.entity.entity_id.replace(/_battery_plus$/, '_battery_type')];
+                  const st = h.states[this.entity.entity_id.replace(/^binary_sensor\./, 'sensor.').replace(/_battery_plus(_low)?$/, '_battery_type')];
                   return st ? st.state : '—';  // *_battery_type ya trae la cantidad ("2× AAA")
                 })()
             - name: "%"
               data: state
               modify: >-
-                isNaN(parseFloat(x))
+                x === 'on' ? '🔴 baja' : x === 'off' ? '🟢 OK'
+                : isNaN(parseFloat(x))
                   ? '⚠️ no disponible'
                   : (parseFloat(x) <= 10 ? '🔴 ' : parseFloat(x) <= 35 ? '🟠 ' : '🟢 ') + Math.round(parseFloat(x)) + ' %'
             - name: Último cambio
@@ -94,7 +101,7 @@ cards:
                   let v = String(x ?? "");
                   if (!v || /^(undefined)+$/.test(v)) {
                     try {
-                      const id = this.entity.entity_id.replace(/_battery_plus$/, '_battery_last_replaced');
+                      const id = this.entity.entity_id.replace(/^binary_sensor\./, 'sensor.').replace(/_battery_plus(_low)?$/, '_battery_last_replaced');
                       const st = document.querySelector('home-assistant').hass.states[id];
                       v = st ? st.state : null;
                     } catch (e) { v = null; }
@@ -117,4 +124,4 @@ cards:
             - name: boton
               data: state
               hidden: true
-              modify: this.entity.entity_id.replace(/^sensor\./, 'button.').replace(/_battery_plus$/, '_battery_replaced')
+              modify: this.entity.entity_id.replace(/^(binary_)?sensor\./, 'button.').replace(/_battery_plus(_low)?$/, '_battery_replaced')

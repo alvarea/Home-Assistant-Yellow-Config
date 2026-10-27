@@ -16,6 +16,9 @@
 #  estado cuando el % cambia, así que un dispositivo sano con % estable pasaría por "sin reportar"
 #  (comprobado 20-10: 25+ dispositivos con último reporte = arranque de HA del 18-10). Además ese
 #  servicio lanza un evento por dispositivo y no consolida. Ojo: un reinicio de HA reinicia la cuenta de días.
+#  Fuente binaria (BAT-02, Blink a pilas): Battery Notes solo crea binary_sensor.*_battery_plus_low, sin
+#  sensor.*_battery_plus. Si está en 'on' cuenta como baja con pct -1 ("batería baja", sin %; nunca crítica)
+#  y entra en sin_reportar igual que los numéricos.
 #  Envío: script.notifica (packages/avisos.yaml), destinos admin = notify.mobile_app_iphone_aac.
 ###############################################################################
 
@@ -90,6 +93,11 @@ template:
               {%- set ns.n = ns.n + 1 -%}
             {%- endif -%}
           {%- endfor -%}
+          {%- for s in integration_entities('battery_notes') | select('match', 'binary_sensor\..*_battery_plus_low$') | expand -%}
+            {%- if s.state == 'on' and expand(s.entity_id | regex_replace('^binary_sensor\.', 'sensor.') | regex_replace('_low$', '')) | count == 0 -%}
+              {%- set ns.n = ns.n + 1 -%}
+            {%- endif -%}
+          {%- endfor -%}
           {{ ns.n }}
         attributes:
           bajas: >-
@@ -101,6 +109,14 @@ template:
                                         'nombre': s.attributes.device_name | default(s.name),
                                         'pila': s.attributes.battery_type_and_quantity | default('?'),
                                         'pct': s.state | float | round(0, 'floor') | int}] -%}
+              {%- endif -%}
+            {%- endfor -%}
+            {%- for s in integration_entities('battery_notes') | select('match', 'binary_sensor\..*_battery_plus_low$') | expand -%}
+              {%- if s.state == 'on' and expand(s.entity_id | regex_replace('^binary_sensor\.', 'sensor.') | regex_replace('_low$', '')) | count == 0 -%}
+                {%- set ns.l = ns.l + [{'entity_id': s.entity_id,
+                                        'nombre': s.attributes.device_name | default(s.name),
+                                        'pila': s.attributes.battery_type_and_quantity | default('?'),
+                                        'pct': -1}] -%}
               {%- endif -%}
             {%- endfor -%}
             {{ ns.l | sort(attribute='pct') }}
@@ -117,8 +133,11 @@ template:
           sin_reportar: >-
             {%- set lim = now() - timedelta(days=states('input_number.baterias_dias_sin_reportar') | float(2)) -%}
             {%- set ns = namespace(l=[]) -%}
-            {%- for s in integration_entities('battery_notes') | select('match', 'sensor\..*_battery_plus$') | expand -%}
-              {%- set pila = states(s.entity_id | replace('_battery_plus', '_battery_type')) -%}
+            {%- for s in integration_entities('battery_notes')
+                  | select('match', '(sensor\..*_battery_plus|binary_sensor\..*_battery_plus_low)$') | expand -%}
+              {%- set numerico = expand(s.entity_id | regex_replace('^binary_sensor\.', 'sensor.') | regex_replace('_low$', '')) | count > 0 -%}
+              {%- if s.domain == 'binary_sensor' and numerico -%}{%- continue -%}{%- endif -%}
+              {%- set pila = states(s.entity_id | regex_replace('^binary_sensor\.', 'sensor.') | regex_replace('_battery_plus(_low)?$', '_battery_type')) -%}
               {%- if s.state in ['unavailable', 'unknown'] and s.last_changed < lim and pila != 'Rechargeable' -%}
                 {%- set d = device_id(s.entity_id) -%}
                 {%- set ns.l = ns.l + [{'entity_id': s.entity_id,
@@ -156,7 +175,7 @@ automation:
             {%- if bajas -%}
             Bajo {{ states('input_number.baterias_umbral_aviso') | int(20) }} %:
             {%- for b in bajas %}
-            {{ '🔴' if b.pct < crit else '🟠' }} {{ b.nombre }} · {{ b.pila }} · {{ b.pct }} %
+            {{ '🟠' if b.pct < 0 else '🔴' if b.pct < crit else '🟠' }} {{ b.nombre }} · {{ b.pila }} · {{ 'batería baja' if b.pct < 0 else '%d %%' % b.pct }}
             {%- endfor %}
             {%- endif %}
             {%- if bajas and mudos %}
