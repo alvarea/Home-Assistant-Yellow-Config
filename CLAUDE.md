@@ -87,17 +87,32 @@ La planificación y el backlog se diseñan en el proyecto **IT-HA de Claude Cowo
 - **Energía** (tarifa Octopus Go, submedición): chat ENE.
 
 ## Backlog
-Dos mecanismos en convivencia, según si el subproyecto ya se migró o no:
+Vive en **GitHub Issues + GitHub Project "HOMY Backlog"** (los 10 subproyectos, migración completa 25-10-2026). Clasificación y estado en **campos del Project** (modelo final del 27-10-2026).
 
-### GitHub Issues (migrados: solo ALA por ahora)
-- Repo: `alvarea/home-assistant-yellow-config`.
-- **Solo REST, nunca GraphQL** — la GraphQL API de GitHub está bloqueada en estas sesiones (`gh issue list`, `gh label list` y cualquier cosa de GitHub Projects v2 fallan con HTTP 403). Usa siempre `gh api repos/{owner}/{repo}/...`, nunca los subcomandos de alto nivel `gh issue`/`gh label`.
-- Labels de 3 ejes, con prefijo (no uses los labels estándar de GitHub — `bug`, `enhancement`, etc., borrados a propósito el 25-10-2026):
-  - `type:bug` · `type:task` · `type:improvement` · `type:cleansing`
-  - `status:in-progress` · `status:needs-decision` · `status:manual-action` · `status:parked` (no hay `status:todo`: una issue abierta sin label de estado ya es "pendiente normal")
-  - `subproject:ala` · `subproject:ene` · `subproject:esph` · `subproject:zha` · `subproject:mat` · `subproject:bat` · `subproject:tes` · `subproject:lav` · `subproject:pla` · `subproject:meteo` · `subproject:main`
-- Al implementar una tarea: añade el label `status:*` que corresponda si no avanza de forma lineal, y cierra la issue (`gh api -X PATCH .../issues/{n} -f state=closed -f state_reason=completed`) cuando esté hecha y validada.
-- Project "HOMY Backlog" (uno solo para todo, no por subproyecto) — es solo visualización, las issues se crean/editan por API, el Project las recoge solo via el workflow "Auto-add to project".
+### Modelo
+| Dónde | Qué | Valores |
+|---|---|---|
+| Campo **Status** (Project) | fase | `Todo` · `In progress` · `Done` |
+| Campo **Subtype** (Project) | tipo de tarea | `Bug` · `Task` · `Improvement` · `Cleansing` |
+| Campo **Subproject** (Project) | subsistema | `ALA` · `BAT` · `ENE` · `ESPH` · `LAV` · `MAIN` · `MAT` · `METEO` · `PLA` · `TES` · `ZHA` |
+| Label **`hold:*`** (issue) | motivo de espera (la tarea no cambia de columna) | `hold:needs-decision` · `hold:manual-action` · `hold:parked` |
+
+- No existen labels `type:*`, `subproject:*` ni `status:*`: no los crees. (El campo se llama `Subtype` porque `Type` es palabra reservada en Projects.)
+- Las opciones nuevas de un desplegable (p. ej. un subproyecto nuevo) las añade Agustín **a mano** en la UI del Project: por API GitHub regenera todas las opciones y se pierden los valores asignados.
+
+### Tokens (`CLAUDE.local.md`)
+- `GH_TOKEN` (fine-grained, solo Issues de este repo): crear/editar/comentar/cerrar issues y labels con `gh api repos/{owner}/{repo}/...` (REST).
+- `GH_PROJECT_TOKEN` (*classic*, solo scope `project`): campos del Project vía GraphQL. Los fine-grained no pueden acceder a Projects de una cuenta personal.
+- GraphQL funciona en sesiones enlazadas al Mac; en sesiones cloud de Code está bloqueado (proxy de Anthropic) y no hay `CLAUDE.local.md`: allí no se pueden tocar los campos.
+
+### Operaciones
+- **Crear tarea**: `gh api repos/alvarea/home-assistant-yellow-config/issues -f title="[ALA-42] ..." -f body="..." -f "assignees[]=alvarea"`, y después
+  `tools/homy-field.sh <n> Subproject ALA` y `tools/homy-field.sh <n> Subtype Task` (entra sola en `Todo`).
+- **Empezar**: `tools/homy-status.sh <n> "In progress"`.
+- **Bloquear / desbloquear**: añadir o quitar el label `hold:*` con `gh api .../issues/{n}/labels`.
+- **Terminar** (hecha y validada): `gh api -X PATCH .../issues/{n} -f state=closed -f state_reason=completed` (o `not_planned` si se descarta) → pasa sola a `Done`.
+- **Listar** tareas de un subproyecto con su estado: consulta GraphQL a `user(login:"alvarea"){projectV2(number:2){items(...)}}` con `fieldValueByName(name:"Subproject"|"Status"|"Subtype")`, paginando con `after`.
+- Al hablar con Agustín, nombra las tareas por su ID del título (`ALA-40`), no por el número de issue.
 
 ### Ficheros iCloud — solo backup histórico (migración completa 25-10-2026)
 Los 10 subproyectos ya están en GitHub Issues. Los `backlog-<área>.md` de `~/claude/HOMY/` quedan **congelados** (banner al principio de cada uno) como referencia histórica — no escribir en ellos. `backlog-ha-general.md` sigue útil solo para ubicar a qué subproyecto pertenecía un ID antiguo del Markdown.
