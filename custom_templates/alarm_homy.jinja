@@ -236,29 +236,92 @@
     'etiquetados': label_entities('alarm_homy_apagar') | reject('in', no) | list} | to_json }}
 {%- endmacro -%}
 
-{#- POLÍTICA: modo → filas que se apagan al armarlo. "fila:planta" limita la fila a esa planta (p. ej. clima:planta_alta).
-    Modo sin entrada = no se apaga nada. ALA-41 completará Casa y Noche. -#}
+{#- POLÍTICA (ALA-41, 27-10): modo → filas que se apagan al armarlo. "fila:planta" limita la fila a esa planta.
+    Casa = nada (Casa nocturno incluido; al subir a Noche aplica la de Noche) · Noche = planta alta, jardín,
+    clima/ventilación de planta alta y multimedia · Ausente y Vacaciones = todo. -#}
 {%- macro politica_apagado() -%}
 {%- set todo = ['luces_planta_baja', 'luces_planta_alta', 'luces_jardin', 'clima', 'ventilacion', 'multimedia', 'etiquetados'] -%}
-{{ {'armed_away': todo, 'armed_vacation': todo} | to_json }}
+{{ {'armed_home': [],
+    'armed_night': ['luces_planta_alta', 'luces_jardin', 'clima:planta_alta', 'ventilacion:planta_alta', 'multimedia'],
+    'armed_away': todo, 'armed_vacation': todo} | to_json }}
+{%- endmacro -%}
+
+{#- Filas del modo según la política → JSON [[fila, [entidades]], ...] (todas, encendidas o no), en el orden de filas_apagado -#}
+{%- macro filas_modo(modo) -%}
+{%- set pol = (politica_apagado() | from_json).get(modo, []) -%}
+{%- set ns = namespace(d=[]) -%}
+{%- for f, ents in (filas_apagado() | from_json).items() -%}
+{%- set reglas = pol | select('match', f ~ '(:|$)') | list -%}
+{%- set nf = namespace(l=[]) -%}
+{%- for e in ents -%}{%- for r in reglas if (r.split(':') | count == 1 or floor_id(e) == r.split(':')[1]) and e not in nf.l -%}{%- set nf.l = nf.l + [e] -%}{%- endfor -%}{%- endfor -%}
+{%- set ns.d = ns.d + [[f, nf.l]] -%}
+{%- endfor -%}
+{{ ns.d | to_json }}
 {%- endmacro -%}
 
 {#- Entidades de las filas del modo; encendidas=true → solo lo que está encendido ahora -#}
 {%- macro entidades_apagado(modo, encendidas=true) -%}
-{%- set filas = filas_apagado() | from_json -%}
 {%- set ns = namespace(l=[]) -%}
-{%- for f in (politica_apagado() | from_json).get(modo, []) -%}
-{%- set p = f.split(':') -%}
-{%- for e in filas.get(p[0], []) if p | count == 1 or floor_id(e) == p[1] -%}
-{%- if not encendidas or states(e) not in ['off', 'standby', 'unavailable', 'unknown'] -%}
-{%- set ns.l = ns.l + [e] -%}
-{%- endif -%}
-{%- endfor -%}
+{%- for f, ents in filas_modo(modo) | from_json -%}
+{%- for e in ents if not encendidas or states(e) not in ['off', 'standby', 'unavailable', 'unknown'] -%}{%- set ns.l = ns.l + [e] -%}{%- endfor -%}
 {%- endfor -%}
 {{ ns.l | unique | list | to_json }}
 {%- endmacro -%}
 
 {%- macro apagar_al_armar(modo) -%}{{ entidades_apagado(modo, true) }}{%- endmacro -%}
+
+{#- VISTA "Apagado" (ALA-41): estilo por modo (color del LED del tag reader) y por fila -#}
+{%- macro estilo_apagado() -%}
+{{ {'armed_home': ['#ab47bc', 'mdi:home-account', 'No se apaga nada (tampoco en Casa nocturno).'],
+    'armed_night': ['#42a5f5', 'mdi:weather-night', 'Planta alta, jardín, clima y ventilación de arriba, y multimedia.'],
+    'armed_away': ['#ffa726', 'mdi:home-export-outline', 'Todo: luces de toda la casa, clima, ventilación y multimedia.'],
+    'armed_vacation': ['#ff7043', 'mdi:airplane', 'Todo, igual que Ausente.'],
+    'luces_planta_baja': ['Luces Planta Baja', 'mdi:home-floor-0'], 'luces_planta_alta': ['Luces Planta Alta', 'mdi:home-floor-1'],
+    'luces_jardin': ['Luces Jardín', 'mdi:tree'], 'clima': ['Clima', 'mdi:thermostat'], 'ventilacion': ['Ventilación', 'mdi:fan'],
+    'multimedia': ['Multimedia', 'mdi:television'], 'etiquetados': ['Switch etiquetados', 'mdi:toggle-switch']} | to_json }}
+{%- endmacro -%}
+
+{#- TABLA filas × modos. Celda = nº que se apagarían en el color del modo + encendidas ahora en ámbar; — = no se toca.
+    Usa filas_modo(), igual que apagar_al_armar → la vista no puede descuadrar. -#}
+{%- macro tabla_apagado() -%}
+{%- set st = estilo_apagado() | from_json -%}
+{%- set modos = ['armed_home', 'armed_night', 'armed_away', 'armed_vacation'] -%}
+{%- set datos = namespace(l=[]) -%}
+{%- for m in modos %}{% set datos.l = datos.l + [filas_modo(m) | from_json] %}{% endfor -%}
+| | {% for m in modos %}<font color="{{ st[m][0] }}"><ha-icon icon="{{ st[m][1] }}"></ha-icon><br>**{{ nombre_modo(m) }}**</font> | {% endfor %}
+|:--|{% for m in modos %}:-:|{% endfor %}
+{% for par in datos.l[0] -%}
+{%- set f = par[0] -%}
+| <ha-icon icon="{{ st[f][1] }}"></ha-icon> **{{ st[f][0] }}** <font color="grey">({{ (filas_apagado() | from_json)[f] | count }})</font> | {% for m in modos -%}
+{%- set l = datos.l[loop.index0] | selectattr('0', 'eq', f) | map(attribute='1') | first -%}
+{%- set enc = l | map('states') | reject('in', ['off', 'standby', 'unavailable', 'unknown']) | list | count -%}
+{%- if l %}<font color="{{ st[m][0] }}">**{{ l | count }}**</font>{% if enc %}<br><font color="#ffb300">● {{ enc }} on</font>{% endif %}{% else %}<font color="grey">—</font>{% endif %} | {% endfor %}
+{% endfor -%}
+{%- endmacro -%}
+
+{#- DETALLE de un modo para su tarjeta: cabecera de color, descripción y lo que apagaría ahora agrupado por fila -#}
+{%- macro detalle_apagado(modo) -%}
+{%- set st = estilo_apagado() | from_json -%}
+{%- set filas = filas_modo(modo) | from_json -%}
+{%- set total = filas | map(attribute='1') | map('count') | sum -%}
+## <font color="{{ st[modo][0] }}"><ha-icon icon="{{ st[modo][1] }}"></ha-icon> {{ nombre_modo(modo) }}</font>
+{{ st[modo][2] }}{% if total %} <font color="grey">{{ total }} entidades en total.</font>{% endif %}
+
+{% set ns = namespace(n=0) -%}
+{%- for f, ents in filas -%}
+{%- set on = ents | reject('is_state', ['off', 'standby', 'unavailable', 'unknown']) | list -%}
+{%- if on -%}{%- set ns.n = ns.n + on | count %}
+<ha-icon icon="{{ st[f][1] }}"></ha-icon> **{{ st[f][0] }}** <font color="#ffb300">● {{ on | count }}</font> · {{ on | map('state_attr', 'friendly_name') | map('regex_replace', '(?i)^(ikea\\s+)?(luz|luces)\\s+', '') | join(', ') }}
+{% endif -%}
+{%- endfor %}
+{% if not total -%}
+<ha-alert alert-type="info">Al armar {{ nombre_modo(modo) }} no se apaga nada.</ha-alert>
+{%- elif ns.n == 0 -%}
+<ha-alert alert-type="success">Ahora no hay nada encendido que apagar.</ha-alert>
+{%- else -%}
+<ha-alert alert-type="warning">Al armar {{ nombre_modo(modo) }} ahora se apagarían {{ ns.n }}.</ha-alert>
+{%- endif -%}
+{%- endmacro -%}
 
 {#- Resumen para el push: "4 luces, AA Estudio y Fire TV Estudio" -#}
 {%- macro resumen_apagado(lista) -%}

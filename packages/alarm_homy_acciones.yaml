@@ -36,7 +36,9 @@
 #    entrada o disparo). Brillo uniforme 128; solo el rojo de entrada/disparo a 255.
 #  input_boolean.alarm_homy_silenciar_sirenas ON: sin sirena ni sirena Alexa.
 #  APAGADO (2026-10-25, ALA-40): al quedar armada, script.alarm_homy_apagar_casa apaga lo encendido según la
-#    política por modo (macros filas_apagado / politica_apagado / apagar_al_armar). Hoy: Ausente y Vacaciones.
+#    política por modo (macros filas_apagado / politica_apagado / apagar_al_armar). ALA-41 (27-10): Casa nada,
+#    Noche planta alta + jardín + clima/ventilación de arriba + multimedia (también en la subida Casa nocturno → Noche),
+#    Ausente/Vacaciones todo. Vista "Apagado" del dashboard = macro tabla_apagado().
 #    Interruptor input_boolean.alarm_homy_apagado_auto. Resumen en el push de armado. Sustituye a script.home_switch_off.
 ###############################################################################
 
@@ -501,6 +503,16 @@ automation:
             sequence:
               - action: script.alarm_homy_pitidos
                 data: {patron: tres}
+              # ALA-41: al subir a Noche se aplica la política de apagado de Noche (en Casa nocturno no se apagó nada)
+              - if:
+                  - condition: state
+                    entity_id: input_boolean.alarm_homy_apagado_auto
+                    state: "on"
+                then:
+                  - action: script.turn_on
+                    target: {entity_id: script.alarm_homy_apagar_casa}
+                    data:
+                      variables: {modo: armed_night}
           # ----- ARMADA -----
           - conditions: "{{ estado in ['armed_away', 'armed_home', 'armed_night', 'armed_vacation'] and desde in ['arming', 'disarmed'] }}"
             sequence:

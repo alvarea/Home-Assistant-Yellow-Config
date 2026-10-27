@@ -2619,3 +2619,110 @@ views:
         grid_options:
           columns: 12
     cards: []
+  # ALA-41 (27-10): vista "Apagado" = política de apagado al armar por modo (macros tabla_apagado / detalle_apagado)
+  #   3 columnas, cada una con imagen de cabecera: tabla · Casa y Noche · Ausente y Vacaciones
+  - title: Apagado
+    path: apagado
+    icon: mdi:power-sleep
+    type: sections
+    max_columns: 3
+    sections:
+    - type: grid
+      cards:
+      - show_state: false
+        show_name: true
+        camera_view: auto
+        fit_mode: cover
+        type: picture-entity
+        entity: input_boolean.alarm_homy_apagado_auto
+        name: Apagado al armar
+        image:
+          media_content_id: /local/Home_Alarm_Security_I6.jpg
+        tap_action:
+          action: none
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+        aspect_ratio: '5'
+      - type: heading
+        heading: Qué se apaga en cada modo
+        heading_style: title
+        icon: mdi:table-large
+      - type: tile
+        entity: input_boolean.alarm_homy_apagado_auto
+        name: Apagado automático al armar
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: toggle
+        grid_options:
+          columns: 12
+      - type: markdown
+        grid_options:
+          columns: 12
+        content: |-
+          {% from 'alarm_homy.jinja' import tabla_apagado %}{{ tabla_apagado() }}
+
+          <font color="grey">Número = entidades que se apagarían al armar · <font color="#ffb300">● on</font> = encendidas ahora · — = no se toca.
+          Casa nocturno aplica Casa; al subir a Noche, la de Noche. Nunca se tocan riego, depuradora, lavadora, V2C, sirena, Blink ni lo etiquetado `alarm_homy_no_apagar`.</font>
+    - type: grid
+      cards:
+      - show_state: false
+        show_name: true
+        camera_view: auto
+        fit_mode: cover
+        type: picture-entity
+        entity: input_boolean.alarm_homy_apagado_auto
+        name: Casa y Noche
+        image:
+          media_content_id: /local/Home_Alarm_Security_I5.jpg
+        tap_action:
+          action: none
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+        aspect_ratio: '5'
+      - type: heading
+        heading: Lo que se apagaría ahora
+        heading_style: title
+        icon: mdi:lightbulb-off-outline
+      - type: markdown
+        grid_options:
+          columns: 12
+        content: "{% from 'alarm_homy.jinja' import detalle_apagado %}{{ detalle_apagado('armed_home') }}"
+      - type: markdown
+        grid_options:
+          columns: 12
+        content: "{% from 'alarm_homy.jinja' import detalle_apagado %}{{ detalle_apagado('armed_night') }}"
+    - type: grid
+      cards:
+      - show_state: false
+        show_name: true
+        camera_view: auto
+        fit_mode: cover
+        type: picture-entity
+        entity: input_boolean.alarm_homy_apagado_auto
+        name: Ausente y Vacaciones
+        image:
+          media_content_id: /local/Home_Alarm_Security_I4.jpg
+        tap_action:
+          action: none
+        hold_action:
+          action: none
+        grid_options:
+          columns: 12
+        aspect_ratio: '5'
+      - type: heading
+        heading: Lo que se apagaría ahora
+        heading_style: title
+        icon: mdi:lightbulb-off-outline
+      - type: markdown
+        grid_options:
+          columns: 12
+        content: "{% from 'alarm_homy.jinja' import detalle_apagado %}{{ detalle_apagado('armed_away') }}"
+      - type: markdown
+        grid_options:
+          columns: 12
+        content: "{% from 'alarm_homy.jinja' import detalle_apagado %}{{ detalle_apagado('armed_vacation') }}"
