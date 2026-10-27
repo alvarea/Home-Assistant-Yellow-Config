@@ -106,11 +106,13 @@ Vive en **GitHub Issues + GitHub Project "HOMY Backlog"** (los 10 subproyectos, 
 - GraphQL funciona en sesiones enlazadas al Mac; en sesiones cloud de Code está bloqueado (proxy de Anthropic) y no hay `CLAUDE.local.md`: allí no se pueden tocar los campos.
 
 ### Operaciones
-- **Crear tarea**: `gh api repos/alvarea/home-assistant-yellow-config/issues -f title="[ALA-42] ..." -f body="..." -f "assignees[]=alvarea"`, y después
+- **Crear tarea**: `gh api repos/alvarea/home-assistant-yellow-config/issues -f title="[ALA-42] ..." -f body="..." -f "assignees[]=alvarea"` (en MAIN, título sin prefijo: son tareas misceláneas), y después
   `tools/homy-field.sh <n> Subproject ALA` y `tools/homy-field.sh <n> Subtype Task` (entra sola en `Todo`).
 - **Empezar**: `tools/homy-status.sh <n> "In progress"`.
 - **Bloquear / desbloquear**: añadir o quitar el label `hold:*` con `gh api .../issues/{n}/labels`.
 - **Terminar** (hecha y validada): `gh api -X PATCH .../issues/{n} -f state=closed -f state_reason=completed` (o `not_planned` si se descarta) → pasa sola a `Done`.
+- **Comentar el avance** (siempre, en todas las sesiones de Code): `gh api repos/alvarea/home-assistant-yellow-config/issues/{n}/comments -f body="..."`. Un comentario breve en cada hito: al empezar (enfoque elegido), al desplegar en HA (qué ficheros y qué queda pendiente de validar), al bloquear con `hold:*` (motivo) y al cerrar (resultado de la validación). Si hay commit, enlázalo (hash corto). No repitas la descripción de la issue.
+  - ⚠️ El repo es **público**: en comentarios nunca IPs, tokens, URL de Nabu Casa, nombres de la familia ni contenido de `secrets.yaml`.
 - **Listar** tareas de un subproyecto con Status, Subtype y `hold:*`: `tools/homy-list.sh <SUBPROYECTO>` (`-` = todos; `--all` incluye cerradas).
 - Al hablar con Agustín, nombra las tareas por su ID del título (`ALA-40`), no por el número de issue.
 
