@@ -55,6 +55,7 @@ La planificación y el backlog se diseñan en el proyecto **IT-HA de Claude Cowo
 3. Valida en HA: comprobar configuración y recargar o reiniciar, o instalar ESPHome por OTA. Las recargas no necesitan OK; el reinicio y el OTA sí.
 4. Si funciona, **el commit lo hago yo** desde VS Code. No hagas commit ni push salvo que te lo pida.
    - Los cambios pequeños van directos a main.
+   - **Mensaje de commit: una sola línea, sin cuerpo** (≤ 72 caracteres si se puede). Al pegarlo en la caja de commit de VS Code se pierden los saltos de línea, así que un cuerpo acabaría dentro del asunto. Formato: `<área>: <qué cambia en pocas palabras> (<IDs de tarea> <#issues>)`, p. ej. `lavadora: apagado al terminar y aviso Alexa (LAV-09 #NN, LAV-06 #NN)`. El detalle vive en las issues, no en el commit; el `#NN` hace que GitHub enlace el commit en la issue. En MAIN, sin ID: solo `#NN`. Nunca `fixes/closes #NN` (cerraría la issue sola; se cierra a mano tras validar).
    - Los YAML preparados pero sin probar los dejo sin commit a propósito: no insistas.
    - Git de solo lectura: usa `git --no-optional-locks status`, `log` y `diff`, sin `fetch`, para no dejar `.lock` que rompan VS Code.
 5. `secrets.yaml` (y `esphome/secrets.yaml`) no están en git. No muestres ni copies su contenido; usa siempre `!secret`.
@@ -106,13 +107,22 @@ Vive en **GitHub Issues + GitHub Project "HOMY Backlog"** (los 10 subproyectos, 
 - `GH_PROJECT_TOKEN` (*classic*, solo scope `project`): campos del Project vía GraphQL. Los fine-grained no pueden acceder a Projects de una cuenta personal.
 - GraphQL funciona en sesiones enlazadas al Mac; en sesiones cloud de Code está bloqueado (proxy de Anthropic) y no hay `CLAUDE.local.md`: allí no se pueden tocar los campos.
 
+### Preparar `gh` (cada sesión arranca sin `gh` ni variables de entorno)
+Al inicio de **cada bloque de shell** que use `gh` o `tools/homy-*.sh` (cada bloque puede ser un proceso nuevo):
+```bash
+source tools/homy-gh.sh
+```
+- Instala `gh` si falta (portable, detecta OS/arquitectura; ~5 s la primera vez, instantáneo después), lo pone en el `PATH` y exporta `GH_TOKEN` de `CLAUDE.local.md` si la sesión no trae ya un token válido. Responde `homy-gh: OK (versión)` o un error.
+- `GH_PROJECT_TOKEN` no hace falta exportarlo: `tools/homy-field.sh`, `homy-status.sh` y `homy-list.sh` lo leen solos de `CLAUDE.local.md`. Para comprobar que existe sin mostrarlo: `grep -c '^GH_PROJECT_TOKEN=' CLAUDE.local.md` → 1.
+- Es la **única fuente** del procedimiento: la skill de Cowork `it-ha-iniciar-subproyecto` y los prompts de arranque se remiten a este script, no copian el comando.
+
 ### Operaciones
 - **Crear tarea**: `gh api repos/alvarea/home-assistant-yellow-config/issues -f title="[ALA-42] ..." -f body="..." -f "assignees[]=alvarea"` (en MAIN, título sin prefijo: son tareas misceláneas), y después
   `tools/homy-field.sh <n> Subproject ALA` y `tools/homy-field.sh <n> Subtype Task` (entra sola en `Todo`).
 - **Empezar**: `tools/homy-status.sh <n> "In progress"`.
 - **Bloquear / desbloquear**: añadir o quitar el label `hold:*` con `gh api .../issues/{n}/labels`.
 - **Terminar** (hecha y validada): `gh api -X PATCH .../issues/{n} -f state=closed -f state_reason=completed` (o `not_planned` si se descarta) → pasa sola a `Done`.
-- **Comentar el avance** (siempre, en todas las sesiones de Code): `gh api repos/alvarea/home-assistant-yellow-config/issues/{n}/comments -f body="..."`. Un comentario breve en cada hito: al empezar (enfoque elegido), al desplegar en HA (qué ficheros y qué queda pendiente de validar), al bloquear con `hold:*` (motivo) y al cerrar (resultado de la validación). Si hay commit, enlázalo (hash corto). No repitas la descripción de la issue.
+- **Comentar el avance** (siempre, en todas las sesiones de Code): `gh api repos/alvarea/home-assistant-yellow-config/issues/{n}/comments -f body="..."`. Un comentario breve en cada hito: al empezar (enfoque elegido), al desplegar en HA (qué ficheros y qué queda pendiente de validar), al bloquear con `hold:*` (motivo) y al cerrar (resultado de la validación). No hace falta enlazar el commit a mano: el `#NN` del mensaje de commit lo enlaza solo en la issue. No repitas la descripción de la issue.
   - ⚠️ El repo es **público**: en comentarios nunca IPs, tokens, URL de Nabu Casa, nombres de la familia ni contenido de `secrets.yaml`.
 - **Listar** tareas de un subproyecto con Status, Subtype y `hold:*`: `tools/homy-list.sh <SUBPROYECTO>` (`-` = todos; `--all` incluye cerradas).
 - Al hablar con Agustín, nombra las tareas por su ID del título (`ALA-40`), no por el número de issue.
