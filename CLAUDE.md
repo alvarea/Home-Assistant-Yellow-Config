@@ -65,7 +65,7 @@ La planificación y el backlog se diseñan en el proyecto **IT-HA de Claude Cowo
 - Si me das comandos para ejecutar, de uno en uno, cada uno en su bloque.
 - En operaciones largas (comisionados, OTA, reinicios), dame avances cada 15-30 s.
 - Al añadir dispositivos ESPHome o Matter nuevos, ofréceme exponerlos **solo a Assist**, no a Alexa. El diálogo "+ Exponer entidades" expone a ambos a la vez.
-- Cuando cambie algo importante de la instalación, recuérdame actualizar este fichero y las instrucciones de Cowork (skill `actualizar-instrucciones-homy`).
+- Cuando cambie algo importante de la instalación, recuérdame actualizar este fichero y las instrucciones de Cowork (skill `it-ha-actualizar-instrucciones`).
 
 ## Convenciones de código
 - Plantillas en formato moderno: `friendly_name` no existe. `name` determina el entity_id y debe mantener el snake_case original.
