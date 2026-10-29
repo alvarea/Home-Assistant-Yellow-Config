@@ -51,6 +51,7 @@ La planificación y el backlog se diseñan en el proyecto **IT-HA de Claude Cowo
 ## Flujo de cambios de código
 1. Todo cambio se hace en **este repo**, nunca directamente en HA ni en el editor visual de ESPHome.
 2. Copia los ficheros modificados a `/Volumes/config/` (ESPHome: `/Volumes/config/esphome/`), **avisándome antes de cada copia**.
+   - Si antes de sobrescribir hace falta copia del fichero vivo de HA, guárdala en `/Volumes/config/backup_yaml/AAAA-MM-DD/<ruta relativa>` (p. ej. `backup_yaml/2026-10-29/packages/lavadora.yaml`). Nunca junto al original ni con sufijo `.bak`, y nunca dentro de `packages/` ni de otra carpeta incluida con `!include_dir_*` (HA la cargaría).
 3. Valida en HA: comprobar configuración y recargar o reiniciar, o instalar ESPHome por OTA. Las recargas no necesitan OK; el reinicio y el OTA sí.
 4. Si funciona, **el commit lo hago yo** desde VS Code. No hagas commit ni push salvo que te lo pida.
    - Los cambios pequeños van directos a main.
