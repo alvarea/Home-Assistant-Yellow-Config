@@ -3885,6 +3885,9 @@
                 entity_id: light.luz_mesilla_paf
 
 #  alias: ZHA Dormitorio AAC IKEA Somrig
+#  ALA-43 (2026-10-29): B1 luces; B2 desarmado urgente en 2 pasos (corta abre ventana de 10 s
+#  con aviso de voz, larga confirma). Solo en Casa/Noche (incluye pending/triggered). La ventana es
+#  timer.alarm_homy_mando_dormitorio (helper UI, sin restore: tras reiniciar HA queda cerrada).
 - id: ZHA_L11
   alias: ZHA Dormitorio AAC IKEA Somrig
   mode: restart
@@ -3908,21 +3911,15 @@
     - device_id: 3669ebbfa7c0575345aa83a9121ba51b
       domain: zha
       trigger: device
-      type: remote_button_short_press
-      subtype: button_2
-      id: b2_short_press 
-    - device_id: 3669ebbfa7c0575345aa83a9121ba51b
-      domain: zha
-      trigger: device
-      type: remote_button_double_press
-      subtype: button_2
-      id: b2_double_press
-    - device_id: 3669ebbfa7c0575345aa83a9121ba51b
-      domain: zha
-      trigger: device
       type: remote_button_long_press
       subtype: button_1
       id: b1_long_press
+    - device_id: 3669ebbfa7c0575345aa83a9121ba51b
+      domain: zha
+      trigger: device
+      type: remote_button_short_press
+      subtype: button_2
+      id: b2_short_press
     - device_id: 3669ebbfa7c0575345aa83a9121ba51b
       domain: zha
       trigger: device
@@ -3931,6 +3928,11 @@
       id: b2_long_press
   conditions: []
   actions:
+    - variables:
+        # Desarmado desde el mando solo en Casa/Noche; el modo se mantiene en pending/triggered
+        desarme_permitido: >-
+          {{ states('input_select.alarm_homy_modo') in ['armed_home', 'armed_night']
+             and not is_state('input_select.alarm_homy_estado', 'disarmed') }}
     - choose:
         # IF b1_short_press
         - conditions:
@@ -3948,58 +3950,54 @@
             - action: light.toggle
               target:
                 entity_id: light.luz_dormitorio_malen
-        # ELIF b2_short_press
-        - conditions:
-          - condition: trigger
-            id: b2_short_press
-          sequence:
-            - action: light.toggle
-              target:
-                entity_id: light.luz_entrada
-        # ELIF b2_double_press
-        - conditions:
-          - condition: trigger
-            id: b2_double_press
-          sequence:
-            - action: light.toggle
-              target:
-                entity_id: light.luz_pasillo
-        # ELIF b1_long_press
+        # ELIF b1_long_press: entrada + pasillo juntas (si alguna está encendida, apaga ambas)
         - conditions:
           - condition: trigger
             id: b1_long_press
           sequence:
-            - action: input_select.select_next
+            - action: "light.turn_{{ 'off' if is_state('light.luz_entrada', 'on') or is_state('light.luz_pasillo', 'on') else 'on' }}"
+              target:
+                entity_id: [light.luz_entrada, light.luz_pasillo]
+        # ELIF b2_short_press: abre la ventana de 10 s (si ya está abierta, se ignora)
+        - conditions:
+          - condition: trigger
+            id: b2_short_press
+          - condition: template
+            value_template: "{{ desarme_permitido }}"
+          - condition: state
+            entity_id: timer.alarm_homy_mando_dormitorio
+            state: idle
+          sequence:
+            - action: timer.start
+              target:
+                entity_id: timer.alarm_homy_mando_dormitorio
               data:
-                cycle: true
+                duration: "00:00:10"
+            - action: script.turn_on
               target:
-                entity_id: input_select.helper_scene_dormitorio
-            - action: scene.turn_on
-              target:
-                entity_id: "{{ states('input_select.helper_scene_dormitorio')}}"
-            - action: input_text.set_value
+                entity_id: script.alexa_decir
               data:
-                value: "turn_on {{ states('input_select.helper_scene_dormitorio')}}"
-              target:
-                entity_id: input_text.helper_hue_dimmer_switch_dormitorio
-        # ELIF b2_long_press
+                variables:
+                  echos: [dormitorio]
+                  tipo: anuncio
+                  mensaje: Mantén pulsado para desarmar.
+        # ELIF b2_long_press: confirma dentro de la ventana
         - conditions:
           - condition: trigger
             id: b2_long_press
+          - condition: template
+            value_template: "{{ desarme_permitido }}"
+          - condition: state
+            entity_id: timer.alarm_homy_mando_dormitorio
+            state: active
           sequence:
-            - action: input_select.select_previous
+            - action: timer.cancel
+              target:
+                entity_id: timer.alarm_homy_mando_dormitorio
+            - action: script.alarm_homy_desarmar
               data:
-                cycle: true
-              target:
-                entity_id: input_select.helper_scene_dormitorio
-            - action: scene.turn_on
-              target:
-                entity_id: "{{ states('input_select.helper_scene_dormitorio')}}"
-            - action: input_text.set_value
-              data:
-                value: "turn_on {{ states('input_select.helper_scene_dormitorio')}}"
-              target:
-                entity_id: input_text.helper_hue_dimmer_switch_dormitorio
+                validar: false
+                origen: Mando dormitorio
 
 #  alias: ZHA Dormitorio MFC IKEA Tradfri
 - id: ZHA_L12
