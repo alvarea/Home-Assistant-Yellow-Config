@@ -2,9 +2,9 @@
 #  LAVADORA BOSCH · Apagado automático al terminar y aviso de tendido (2026-10-12)
 #
 #  Enchufe Matter IKEA GRILLPLATS en el lavadero (área Cocina), encima de la lavadora.
-#  La Bosch pita al terminar hasta que se gira el mando; HA corta el enchufe ~90 s
-#  después del fin. NUNCA se re-enciende solo: al volver la corriente con el mando
-#  en un programa la Bosch vuelve a pitar. Re-encendido: botón físico del enchufe
+#  La Bosch pita al terminar hasta que se gira el mando; HA corta el enchufe ~45 s
+#  después del fin (~90 s en programas cortos). NUNCA se re-enciende solo: al
+#  volver la corriente con el mando en un programa la Bosch vuelve a pitar. Re-encendido: botón físico del enchufe
 #  o "Alexa, enciende la lavadora" (con el mando en off).
 #
 #  Entidades del enchufe (renombradas de grillplats_plug_* a grillplats_lavadora_*):
@@ -18,9 +18,20 @@
 #    lavando:   > 20 W durante 30 s
 #    terminada: tras >= 20 min lavando, < 5 W durante 45 s (15-10: con 90 s la
 #               Bosch ya pitaba; pita ~20 s después del último pulso de desagüe)
+#               o, tras >= 5 min, < 5 W durante 90 s (LAV-09: programas cortos de
+#               ~10-12 min, 28-10; pausas internas < 5 W de 11 s como máximo).
+#               Dos ventanas porque numeric_state solo dispara al cruzar: si 'fin'
+#               se descarta por duración, el pitido no vuelve a cruzar los 5 W.
+#  Calentamiento y tipo (LAV-06, histórico 15/29-10): tramos > 1 kW acumulados →
+#    tipo_lavado frio (< 1 min) | tibio (< 4) | templado (≤ 13, ~40 °C) | caliente;
+#    calento = calentó ≥ 1 min. En vivo durante el lavado y ultimo_* al terminar:
+#    es la interfaz para LAV-07 (pulsador para declarar el tipo). Fin estimado =
+#    mediana de los últimos 5 lavados del tipo en curso (frío/40 °C ~62 min,
+#    caliente ~89 min); los programas cortos (< 20 min) no se aprenden.
 #  Tendido: previsión horaria AEMET; ventana desde el fin hasta la próxima puesta
 #  de sol (de noche incluye la noche y el día siguiente). Secadora si alguna
-#  hora > 50 % de probabilidad de lluvia.
+#  hora > 50 % de probabilidad de lluvia. Si la horaria no devuelve horas (LAV-05),
+#  respaldo con la diaria: máximo de los días que cubre la ventana.
 #  Spec y backlog de mejoras: doc del proyecto claude/lavadora-bosch-2026-10-12.md
 ###############################################################################
 
@@ -41,6 +52,21 @@ template:
         below: 5
         for: "00:00:45"
         id: fin
+      # Programas cortos: misma bajada, 45 s más tarde (ventana más larga contra pausas manuales)
+      - trigger: numeric_state
+        entity_id: sensor.grillplats_lavadora_power
+        below: 5
+        for: "00:01:30"
+        id: fin_corto
+      # Tramos de calentamiento (resistencia ~2 kW; el motor no pasa de ~340 W)
+      - trigger: numeric_state
+        entity_id: sensor.grillplats_lavadora_power
+        above: 1000
+        id: calor_on
+      - trigger: numeric_state
+        entity_id: sensor.grillplats_lavadora_power
+        below: 1000
+        id: calor_off
       - trigger: numeric_state
         entity_id: sensor.grillplats_lavadora_power
         below: 0.5
@@ -73,6 +99,12 @@ template:
         data: {type: hourly}
         response_variable: prevision
         continue_on_error: true
+      # Respaldo (LAV-05): el 23-10 la horaria no devolvió horas en tres lavados seguidos
+      - action: weather.get_forecasts
+        target: {entity_id: weather.aemet}
+        data: {type: daily}
+        response_variable: prevision_dia
+        continue_on_error: true
       - variables:
           ent: sensor.lavadora_estado
           e: "{{ states(ent) if states(ent) in ['apagada', 'lavando', 'terminada'] else 'apagada' }}"
@@ -83,6 +115,7 @@ template:
           nuevo: >-
             {%- if t == 'inicio' -%}lavando
             {%- elif t == 'fin' and e == 'lavando' and seg >= 1200 -%}terminada
+            {%- elif t == 'fin_corto' and e == 'lavando' and seg >= 300 -%}terminada
             {%- elif t == 'mando_off' and e == 'lavando' and is_state('switch.grillplats_lavadora', 'on') -%}apagada
             {%- elif t == 'enchufe_off' and e == 'lavando' -%}apagada
             {%- elif t == 'enchufe_on' and e == 'terminada' -%}apagada
@@ -96,11 +129,42 @@ template:
             {%- set base = 0 if empieza else state_attr(ent, 'coste') | float(0) -%}
             {{ (base + delta_kwh * states('sensor.precio_luz_actual') | float(0.2684)) | round(4) }}
           termina: "{{ nuevo == 'terminada' and e == 'lavando' }}"
-          # Duraciones (min) de los últimos 5 lavados completos; la estimación usa la mediana
-          dur_prev: "{{ state_attr(ent, 'duraciones') or [63] }}"
-          duraciones: "{{ (dur_prev + [(seg / 60) | round(0) | int])[-5:] if termina else dur_prev }}"
+          # Calentamiento (LAV-06): tramos > 1 kW acumulados. Empieza a los ~20 s del
+          # lavado o incluso antes de 'lavando' (el arranque tarda 30 s): si al empezar
+          # ya calienta, el tramo abre ahí.
+          calentando: "{{ states('sensor.grillplats_lavadora_power') | float(0) > 1000 }}"
+          c_desde_prev: "{{ none if empieza else state_attr(ent, 'calor_desde') }}"
+          c_kwh_desde_prev: "{{ state_attr(ent, 'calor_kwh_desde') | float(energia) }}"
+          abre: "{{ (empieza and calentando) or (t == 'calor_on' and e == 'lavando' and not c_desde_prev) }}"
+          cierra: >-
+            {{ c_desde_prev is not none and (t == 'calor_off' or termina or (nuevo == 'apagada' and e == 'lavando')) }}
+          c_seg: >-
+            {%- set base = 0 if empieza else state_attr(ent, 'seg_calentamiento') | float(0) -%}
+            {{ (base + ((now() - as_datetime(c_desde_prev)).total_seconds() if cierra else 0)) | round(0) }}
+          c_kwh: >-
+            {%- set base = 0 if empieza else state_attr(ent, 'kwh_calentamiento') | float(0) -%}
+            {{ (base + ([energia - c_kwh_desde_prev, 0] | max if cierra else 0)) | round(3) }}
+          c_desde: "{{ now().isoformat() if abre else (none if cierra else c_desde_prev) }}"
+          c_kwh_desde: "{{ energia if abre else c_kwh_desde_prev }}"
+          # Con el tramo abierto, los minutos cuentan en vivo (tipo y fin estimado se actualizan)
+          c_min: >-
+            {{ ((c_seg + ((now() - as_datetime(c_desde)).total_seconds() if c_desde else 0)) / 60) | round(1) }}
+          # Tipo inferido (histórico 15/29-10): 0 min frío · ~2 min tibio · 7-10 min ~40 °C · 17-26 min caliente
+          tipo: >-
+            {%- if c_min < 1 -%}frio{%- elif c_min < 4 -%}tibio{%- elif c_min <= 13 -%}templado{%- else -%}caliente{%- endif -%}
+          # Duraciones (min) de los últimos 5 lavados completos por tipo; la estimación usa
+          # la mediana del tipo en curso. Los programas cortos (< 20 min) no se aprenden.
+          dur_prev: "{{ state_attr(ent, 'duraciones_tipo') or {'frio': [62], 'tibio': [62], 'templado': [62], 'caliente': [89]} }}"
+          duraciones_tipo: >-
+            {%- set ns = namespace(o=[]) -%}
+            {%- for k, d in [('frio', 62), ('tibio', 62), ('templado', 62), ('caliente', 89)] -%}
+              {%- set l = dur_prev.get(k) or [d] -%}
+              {%- if termina and seg >= 1200 and k == tipo -%}{%- set l = (l + [(seg / 60) | round(0) | int])[-5:] -%}{%- endif -%}
+              {%- set ns.o = ns.o + ['"' ~ k ~ '": ' ~ (l | to_json)] -%}
+            {%- endfor -%}
+            {{ '{' ~ ns.o | join(', ') ~ '}' }}
           dur_est: >-
-            {%- set l = duraciones | sort -%}
+            {%- set l = duraciones_tipo[tipo] | sort -%}
             {{ l[(l | count) // 2] }}
           # Ventana de tendido: desde ahora hasta la próxima puesta de sol (de noche cubre
           # la noche y el día siguiente: se puede tender ya por la noche, 15-10)
@@ -117,7 +181,20 @@ template:
               {%- endif -%}
             {%- endfor -%}
             {{ ns.l }}
-          prob: "{{ probs | max if probs | count > 0 else -1 }}"
+          # Respaldo: máximo de los días que toca la ventana (hoy → día de la próxima puesta de sol)
+          probs_dia: >-
+            {%- set f = prevision_dia['weather.aemet'].forecast if prevision_dia is defined and 'weather.aemet' in prevision_dia else [] -%}
+            {%- set d_ini = now().date() -%}
+            {%- set d_fin = as_local(as_datetime(state_attr('sun.sun', 'next_setting'))).date() -%}
+            {%- set ns = namespace(l=[]) -%}
+            {%- for d in f if d.precipitation_probability is number -%}
+              {%- set dd = as_local(as_datetime(d.datetime)).date() -%}
+              {%- if d_ini <= dd <= d_fin -%}{%- set ns.l = ns.l + [d.precipitation_probability | int] -%}{%- endif -%}
+            {%- endfor -%}
+            {{ ns.l }}
+          fuente: "{{ 'horaria' if probs | count > 0 else ('diaria' if probs_dia | count > 0 else none) }}"
+          prob: >-
+            {{ probs | max if probs | count > 0 else (probs_dia | max if probs_dia | count > 0 else -1) }}
           cuando: >-
             {%- if de_dia -%}hoy
             {%- elif as_local(as_datetime(state_attr('sun.sun', 'next_rising'))).date() > now().date() -%}mañana
@@ -132,8 +209,16 @@ template:
           # Lavado en curso
           inicio: "{{ now().isoformat() if empieza else ini }}"
           kwh_inicio: "{{ energia if empieza else state_attr(ent, 'kwh_inicio') }}"
-          duraciones: "{{ duraciones }}"
+          duraciones_tipo: "{{ duraciones_tipo }}"
           duracion_estimada: "{{ dur_est }}"
+          # Calentamiento y tipo inferido del lavado en curso (interfaz para LAV-07)
+          calor_desde: "{{ c_desde }}"
+          calor_kwh_desde: "{{ c_kwh_desde }}"
+          seg_calentamiento: "{{ c_seg }}"
+          kwh_calentamiento: "{{ c_kwh }}"
+          min_calentamiento: "{{ c_min }}"
+          calento: "{{ c_min >= 1 }}"
+          tipo_lavado: "{{ tipo }}"
           fin_estimado: >-
             {%- set i = now() if empieza else (as_datetime(ini) if ini else none) -%}
             {{ (i + timedelta(minutes=dur_est | int(63))).isoformat() if i else none }}
@@ -143,10 +228,15 @@ template:
           ultimo_duracion_min: "{{ (seg / 60) | round(0) | int if termina else state_attr(ent, 'ultimo_duracion_min') }}"
           ultimo_kwh: >-
             {{ (energia - state_attr(ent, 'kwh_inicio') | float(energia)) | round(3) if termina else state_attr(ent, 'ultimo_kwh') }}
+          ultimo_tipo: "{{ tipo if termina else state_attr(ent, 'ultimo_tipo') }}"
+          ultimo_calento: "{{ c_min >= 1 if termina else state_attr(ent, 'ultimo_calento') }}"
+          ultimo_min_calentamiento: "{{ c_min if termina else state_attr(ent, 'ultimo_min_calentamiento') }}"
+          ultimo_kwh_calentamiento: "{{ c_kwh if termina else state_attr(ent, 'ultimo_kwh_calentamiento') }}"
           destino: >-
             {%- if termina -%}{{ 'desconocido' if prob < 0 else ('secadora' if prob > 50 else 'fuera') }}
             {%- else -%}{{ state_attr(ent, 'destino') }}{%- endif -%}
           prob_lluvia: "{{ (prob if prob >= 0 else none) if termina else state_attr(ent, 'prob_lluvia') }}"
+          fuente_prevision: "{{ fuente if termina else state_attr(ent, 'fuente_prevision') }}"
           tendido_cuando: "{{ cuando if termina else state_attr(ent, 'tendido_cuando') }}"
           # Coste (€ con impuestos) del lavado en curso y del último completo
           coste: "{{ coste }}"
@@ -220,10 +310,13 @@ automation:
           a: sensor.lavadora_estado
           destino: "{{ state_attr(a, 'destino') }}"
           cuando: "{{ state_attr(a, 'tendido_cuando') }}"
+          lavado: >-
+            {{ {'frio': 'El lavado en frío', 'tibio': 'El lavado con agua tibia', 'templado': 'El lavado a unos 40 grados',
+                'caliente': 'El lavado con agua caliente'}.get(state_attr(a, 'ultimo_tipo'), 'El lavado') }}
           mensaje: >-
-            {%- if destino == 'desconocido' -%}El lavado ha terminado. No tengo la previsión del tiempo.
-            {%- elif destino == 'fuera' -%}El lavado ha terminado, se puede tender la ropa fuera.
-            {%- else -%}El lavado ha terminado, mejor usar la secadora: se esperan lluvias.
+            {%- if destino == 'desconocido' -%}{{ lavado }} ha terminado. No tengo la previsión del tiempo.
+            {%- elif destino == 'fuera' -%}{{ lavado }} ha terminado, se puede tender la ropa fuera.
+            {%- else -%}{{ lavado }} ha terminado, mejor usar la secadora: se esperan lluvias.
             {%- endif -%}
             {%- set dur = state_attr(a, 'ultimo_duracion_min') | int(0) -%}
             {%- set kwh = state_attr(a, 'ultimo_kwh') | float(0) -%}
@@ -250,7 +343,8 @@ automation:
             data:
               titulo: Lavadora
               mensaje: >-
-                {{ mensaje }}{% if state_attr(a, 'prob_lluvia') is not none %} (lluvia máx. {{ state_attr(a, 'prob_lluvia') }} %){% endif %}
+                {{ mensaje }}{% if state_attr(a, 'prob_lluvia') is not none %} (lluvia máx. {{ state_attr(a, 'prob_lluvia') }} %
+                {%- if state_attr(a, 'fuente_prevision') == 'diaria' %}, previsión diaria{% endif %}){% endif %}
               nivel: info
               destinos: "{{ destinos }}"
               telegram: none

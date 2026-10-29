@@ -1930,7 +1930,19 @@ views:
             entity: counter.lavadora_lavados_mes
             name: Lavados este mes
             grid_options:
-              columns: 12
+              columns: 6
+          # LAV-06: tipo inferido por el calentamiento (en curso o del último lavado)
+          - type: custom:mushroom-template-card
+            entity: sensor.lavadora_estado
+            icon: '{% set a = states.sensor.lavadora_estado.attributes %}{% set t = a.tipo_lavado if states(''sensor.lavadora_estado'') == ''lavando'' else a.ultimo_tipo %}{{ {''frio'':''mdi:snowflake'',''tibio'':''mdi:thermometer-low'',''templado'':''mdi:thermometer'',''caliente'':''mdi:thermometer-high''}.get(t, ''mdi:help-circle-outline'') }}'
+            primary: '{% set a = states.sensor.lavadora_estado.attributes %}{% set t = a.tipo_lavado if states(''sensor.lavadora_estado'') == ''lavando'' else a.ultimo_tipo %}{{ {''frio'':''En frío'',''tibio'':''Agua tibia'',''templado'':''~40 °C'',''caliente'':''Agua caliente''}.get(t, ''—'') }}'
+            secondary: '{% set a = states.sensor.lavadora_estado.attributes %}{% set l = states(''sensor.lavadora_estado'') == ''lavando'' %}{% set m = a.min_calentamiento if l else a.ultimo_min_calentamiento %}{% set k = a.kwh_calentamiento if l else a.ultimo_kwh_calentamiento %}{% if m is number and m >= 1 %}Calentó {{ m | round(0) | int }} min · {{ (''%.2f'' | format(k | float(0))) | replace(''.'', '','') }} kWh{% elif m is number %}Sin calentamiento{% else %}Tipo de lavado{% endif %}{{ '' (en curso)'' if l else '''' }}'
+            color: '{% set a = states.sensor.lavadora_estado.attributes %}{% set t = a.tipo_lavado if states(''sensor.lavadora_estado'') == ''lavando'' else a.ultimo_tipo %}{{ {''frio'':''light-blue'',''tibio'':''amber'',''templado'':''orange'',''caliente'':''red''}.get(t, ''grey'') }}'
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 6
+            multiline_secondary: true
           - type: custom:mushroom-template-card
             entity: sensor.lavadora_estado
             icon: '{% set a = states.sensor.lavadora_estado.attributes %}{{ {''fuera'':''mdi:hanger'',''secadora'':''mdi:tumble-dryer''}.get(a.destino, ''mdi:help-circle-outline'') }}'
