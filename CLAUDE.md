@@ -97,6 +97,8 @@ Vive en **GitHub Issues + GitHub Project "HOMY Backlog"** (los 10 subproyectos, 
 | Campo **Status** (Project) | fase | `Todo` · `In progress` · `Done` |
 | Campo **Subtype** (Project) | tipo de tarea | `Bug` · `Task` · `Improvement` · `Cleansing` |
 | Campo **Subproject** (Project) | subsistema | `ALA` · `BAT` · `ENE` · `ESPH` · `LAV` · `MAIN` · `MAT` · `METEO` · `PLA` · `TES` · `ZHA` |
+| Campo **Priority** (Project) | prioridad | `P0` (urgente) · `P1` (importante) · `P2` (normal, **por defecto**) — convención estándar: P0 es la máxima |
+| Campo **Start date** (Project) | fecha de inicio | se pone sola al pasar a `In progress` (`homy-status.sh`) |
 | Label **`hold:*`** (issue) | motivo de espera (la tarea no cambia de columna) | `hold:needs-decision` · `hold:manual-action` · `hold:parked` |
 
 - No existen labels `type:*`, `subproject:*` ni `status:*`: no los crees. (El campo se llama `Subtype` porque `Type` es palabra reservada en Projects.)
@@ -118,8 +120,9 @@ source tools/homy-gh.sh
 
 ### Operaciones
 - **Crear tarea**: `gh api repos/alvarea/home-assistant-yellow-config/issues -f title="[ALA-42] ..." -f body="..." -f "assignees[]=alvarea"` (en MAIN, título sin prefijo: son tareas misceláneas), y después
-  `tools/homy-field.sh <n> Subproject ALA` y `tools/homy-field.sh <n> Subtype Task` (entra sola en `Todo`).
-- **Empezar**: `tools/homy-status.sh <n> "In progress"`.
+  `tools/homy-field.sh <n> Subproject ALA`, `tools/homy-field.sh <n> Subtype Task` y `tools/homy-field.sh <n> Priority P2` (entra sola en `Todo`). Sube a `P1`/`P0` solo si Agustín lo indica o es claramente urgente.
+- **Empezar**: `tools/homy-status.sh <n> "In progress"` (pone también `Start date` = hoy si estaba vacía).
+- **Otros campos**: `tools/homy-field.sh [--if-empty] <n> "<Campo>" "<Valor>"` admite desplegables (Status, Subtype, Subproject, Priority) y fechas (`Start date`, `Target date`: `AAAA-MM-DD` o `today`).
 - **Bloquear / desbloquear**: añadir o quitar el label `hold:*` con `gh api .../issues/{n}/labels`.
 - **Terminar** (hecha y validada): `gh api -X PATCH .../issues/{n} -f state=closed -f state_reason=completed` (o `not_planned` si se descarta) → pasa sola a `Done`.
 - **Comentar el avance** (siempre, en todas las sesiones de Code): `gh api repos/alvarea/home-assistant-yellow-config/issues/{n}/comments -f body="..."`. Un comentario breve en cada hito: al empezar (enfoque elegido), al desplegar en HA (qué ficheros y qué queda pendiente de validar), al bloquear con `hold:*` (motivo) y al cerrar (resultado de la validación). No hace falta enlazar el commit a mano: el `#NN` del mensaje de commit lo enlaza solo en la issue. No repitas la descripción de la issue.
