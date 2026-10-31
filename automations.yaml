@@ -2954,156 +2954,89 @@
                 origen: Pulsador Hue entrada
 
 #  alias: ZHA Dormitorio MFC Philips HUE Dimmer
-# (2026-10-11) ZHA_L2 COMENTADA: el Hue Dimmer del dormitorio MFC ya no está emparejado en ZHA
-# (device_id bef6e070a0c12e5234501e01092f27e8 inexistente). Re-emparejar, actualizar device_id y descomentar.
-# - id: ZHA_L2
-#   alias: ZHA Dormitorio MFC Philips HUE Dimmer
-#   mode: queued
-#   # Realiza un ciclo cada vez que se pulsa en el boton up/down
-#   # scene.dormitorio_full, scene.dormitorio_lectura, scene.dormitorio_relax, scene.dormitorio_noche
-#   #
-#   # Device: Hue Dimmer Switch
-#   # Event Type: remote_button_short_press, remote_button_double_press
-#   # Event Subtype: turn_on, turn_off, dim_up, dim_down
-#   #
-#   triggers:
-#     - device_id: bef6e070a0c12e5234501e01092f27e8
-#       domain: zha
-#       trigger: device
-#       type: remote_button_short_press
-#       subtype: turn_on
-#       id: on_short_press
-#     - device_id: bef6e070a0c12e5234501e01092f27e8
-#       domain: zha
-#       trigger: device
-#       type: remote_button_double_press
-#       subtype: turn_on
-#       id: on_double_press
-#     - device_id: bef6e070a0c12e5234501e01092f27e8
-#       domain: zha
-#       trigger: device
-#       type: remote_button_short_press
-#       subtype: turn_off
-#       id: off_short_press
-#     - device_id: bef6e070a0c12e5234501e01092f27e8
-#       domain: zha
-#       trigger: device
-#       type: remote_button_double_press
-#       subtype: turn_off
-#       id: off_double_press
-#     - device_id: bef6e070a0c12e5234501e01092f27e8
-#       domain: zha
-#       trigger: device
-#       type: remote_button_short_press
-#       subtype: dim_up
-#       id: dim_up
-#     - device_id: bef6e070a0c12e5234501e01092f27e8
-#       domain: zha
-#       trigger: device
-#       type: remote_button_short_press
-#       subtype: dim_down
-#       id: dim_down
-#   conditions: []
-#   actions:
-#     # value: "{{ trigger.to_state.attributes.friendly_name }}"
-#     - choose:
-#         # IF trigger.id = on_short_press => Escena Dormitorio Lectura
-#         - conditions:
-#           - condition: trigger
-#             id: on_short_press
-#           sequence:
-#             - action: scene.turn_on
-#               target:
-#                 entity_id: scene.dormitorio_lectura
-#             - action: input_text.set_value
-#               data:
-#                 value: "scene.dormitorio_lectura"
-#               target:
-#                 entity_id: input_text.helper_hue_dimmer_switch_dormitorio
-#         # ELIF on_double_press
-#         - conditions:
-#           - condition: trigger
-#             id: on_double_press
-#           sequence:
-#             # Enciende Luz Agustin y Apaga Luz Malen
-#             - action: light.turn_on
-#               target:
-#                 entity_id: light.luz_dormitorio_agustin
-#             - action: light.turn_off
-#               target:
-#                 entity_id: light.luz_dormitorio_malen
-#             - action: input_text.set_value
-#               data:
-#                 value: "turn_on light.luz_agustin"
-#               target:
-#                 entity_id: input_text.helper_hue_dimmer_switch_dormitorio
-#         # ELIF off_short_press
-#         - conditions:
-#           - condition: trigger
-#             id: off_short_press
-#           sequence:
-#             # Apaga Luz Agustin y Apaga Luz Malen
-#             - action: light.turn_off
-#               target:
-#                 entity_id: light.luces_dormitorio_mfc
-#             - action: input_text.set_value
-#               data:
-#                 value: "turn_off light.luces_dormitorio"
-#               target:
-#                 entity_id: input_text.helper_hue_dimmer_switch_dormitorio
-#         # ELIF off_double_press
-#         - conditions:
-#           - condition: trigger
-#             id: off_double_press
-#           sequence:
-#             # Enciende Luz Malen y Apaga Luz Agustín
-#             - action: light.turn_on
-#               target:
-#                 entity_id: light.luz_dormitorio_malen
-#             - action: light.turn_off
-#               target:
-#                 entity_id: light.luz_dormitorio_agustin
-#             - action: input_text.set_value
-#               data:
-#                 value: "turn_on light.luz_malen"
-#               target:
-#                 entity_id: input_text.helper_hue_dimmer_switch_dormitorio
-#         # ELIF dim_up
-#         - conditions:
-#           - condition: trigger
-#             id: dim_up
-#           sequence:
-#             - action: input_select.select_next
-#               data:
-#                 cycle: true
-#               target:
-#                 entity_id: input_select.helper_scene_dormitorio
-#             - action: scene.turn_on
-#               target:
-#                 entity_id: "{{ states('input_select.helper_scene_dormitorio')}}"
-#             - action: input_text.set_value
-#               data:
-#                 value: "turn_on {{ states('input_select.helper_scene_dormitorio')}}"
-#               target:
-#                 entity_id: input_text.helper_hue_dimmer_switch_dormitorio
-#         # ELIF dim_down
-#         - conditions:
-#           - condition: trigger
-#             id: dim_down
-#           sequence:
-#             - action: input_select.select_previous
-#               data:
-#                 cycle: true
-#               target:
-#                 entity_id: input_select.helper_scene_dormitorio
-#             - action: scene.turn_on
-#               target:
-#                 entity_id: "{{ states('input_select.helper_scene_dormitorio')}}"
-#             - action: input_text.set_value
-#               data:
-#                 value: "turn_on {{ states('input_select.helper_scene_dormitorio')}}"
-#               target:
-#                 entity_id: input_text.helper_hue_dimmer_switch_dormitorio
+- id: ZHA_L2
+  alias: ZHA Dormitorio MFC Philips HUE Dimmer
+  mode: queued
+  # Hue Dimmer Switch RWL021 vía puente Hue (no ZHA). Botones Hue v2: 1 ON, 2 subir, 3 bajar, 4 OFF.
+  # (2026-10-31) ZHA-01: hereda el mapeo del IKEA Tradfri (ZHA_L12, retirada; el Tradfri queda para ALA-44).
+  # Short_press ON
+  # Short_press OFF
+  # Long_Press subir
+  # Long_Press bajar
+  #
+  triggers:
+    - device_id: 6d03bddf142f8d9bc26f8d2c6b0b6574
+      domain: hue
+      trigger: device
+      type: short_release
+      subtype: 1
+      unique_id: 1c516f4a-4308-4850-9abf-92580baa26d3
+      id: on_short_press # ==> Dos lamparas on
+    - device_id: 6d03bddf142f8d9bc26f8d2c6b0b6574
+      domain: hue
+      trigger: device
+      type: short_release
+      subtype: 4
+      unique_id: cb163d45-a542-4190-a1ee-ee9c6a48ecab
+      id: off_short_press # ==> Dos lamparas off
+    - device_id: 6d03bddf142f8d9bc26f8d2c6b0b6574
+      domain: hue
+      trigger: device
+      type: long_press
+      subtype: 2
+      unique_id: 7e5eb0cb-55cd-4dd3-b8c4-2bc171ac6027
+      id: dim_up # Lampara AAC toggle
+    - device_id: 6d03bddf142f8d9bc26f8d2c6b0b6574
+      domain: hue
+      trigger: device
+      type: long_press
+      subtype: 3
+      unique_id: 4d4add4a-9a33-4d65-90e6-86065c256de7
+      id: dim_down # Lampara MFC toggle
+  conditions: []
+  actions:
+    - choose:
+        # IF trigger.id = on_short_press ==> Dos lamparas on
+        - conditions:
+          - condition: trigger
+            id: on_short_press
+          sequence:
+            - action: light.turn_on
+              target:
+                entity_id: light.luces_dormitorio_mfc
+        # ELIF off_short_press Dos lamparas OFF
+        - conditions:
+          - condition: trigger
+            id: off_short_press
+          sequence:
+            # Apaga luces dormitorio con retardo variable en función de la hora
+            - action: light.turn_off
+              data:
+                transition: >
+                  {% if now().hour >= 0 and now().hour <= 7 %} 5
+                  {% elif now().hour >= 8 and now().hour <= 19 %} 0
+                  {% else %} 3
+                  {% endif %}
+              target:
+                entity_id: light.luces_dormitorio_mfc
+        # ELIF dim_up => Lampara AAC toggle
+        - conditions:
+          - condition: trigger
+            id: dim_up
+          sequence:
+            - action: light.toggle
+              data: {}
+              target:
+                entity_id: light.luz_dormitorio_agustin
+        # ELIF dim_down => Lampara MFC toggle
+        - conditions:
+          - condition: trigger
+            id: dim_down
+          sequence:
+            - action: light.toggle
+              data: {}
+              target:
+                entity_id: light.luz_dormitorio_malen
 
 #  alias: ZHA Entrada IKEA Rodret Alarma HOMY
 - id: ZHA_L3
@@ -3998,85 +3931,6 @@
               data:
                 validar: false
                 origen: Mando dormitorio
-
-#  alias: ZHA Dormitorio MFC IKEA Tradfri
-- id: ZHA_L12
-  alias: ZHA Dormitorio MFC IKEA Tradfri
-  mode: queued
-  # Short_press ON 
-  # Short_press OFF
-  # Long_Press ON 
-  # Long_Press OFF
-  #
-  triggers:
-    - device_id: dd68b0741084f8f1a5db454612648197
-      domain: zha
-      trigger: device
-      type: remote_button_short_press
-      subtype: turn_on
-      id: on_short_press # ==> Dos lamparas on
-    - device_id: dd68b0741084f8f1a5db454612648197
-      domain: zha
-      trigger: device
-      type: remote_button_short_press
-      subtype: turn_off
-      id: off_short_press # ==> Dos lamparas off
-    - device_id: dd68b0741084f8f1a5db454612648197
-      domain: zha
-      trigger: device
-      type: remote_button_long_press
-      subtype: dim_up
-      id: dim_up # Lampara AAC toggle
-    - device_id: dd68b0741084f8f1a5db454612648197
-      domain: zha
-      trigger: device
-      type: remote_button_long_press
-      subtype: dim_down
-      id: dim_down # Lampara MFC toggle
-  conditions: []
-  actions:
-    - choose:
-        # IF trigger.id = on_short_press ==> Dos lamparas on
-        - conditions:
-          - condition: trigger
-            id: on_short_press
-          sequence:
-            - action: light.turn_on
-              target:
-                entity_id: light.luces_dormitorio_mfc
-        # ELIF off_short_press Dos lamparas OFF
-        - conditions:
-          - condition: trigger
-            id: off_short_press
-          sequence:
-            # Apaga luces estudio con retardo variable en función de la hora
-            - action: light.turn_off
-              data:
-                transition: >
-                  {% if now().hour >= 0 and now().hour <= 7 %} 5
-                  {% elif now().hour >= 8 and now().hour <= 19 %} 0
-                  {% else %} 3
-                  {% endif %}
-              target:
-                entity_id: light.luces_dormitorio_mfc
-        # ELIF dim_up => Lampara AAC toggle
-        - conditions:
-          - condition: trigger
-            id: dim_up
-          sequence:
-            - action: light.toggle
-              data: {}
-              target:
-                entity_id: light.luz_dormitorio_agustin
-        # ELIF dim_up => Lampara AAC toggle
-        - conditions:
-          - condition: trigger
-            id: dim_down
-          sequence:
-            - action: light.toggle
-              data: {}
-              target:
-                entity_id: light.luz_dormitorio_malen
 
 #  alias: ZHA Cocina IKEA Styrbar Dimmer
 - id: ZHA_L13
