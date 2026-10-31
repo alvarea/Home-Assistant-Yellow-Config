@@ -3932,6 +3932,69 @@
                 validar: false
                 origen: Mando dormitorio
 
+#  alias: ZHA Dormitorio IKEA Tradfri pánico
+#  ALA-44 (2026-10-31): pánico en 2 pasos, mismo criterio que ALA-43. I corta abre una ventana de 10 s
+#  con aviso de voz e I larga confirma → pánico SONORO, en cualquier estado de la alarma. O libre.
+#  La ventana es timer.alarm_homy_panico_dormitorio (helper UI, sin restore).
+- id: ZHA_L12
+  alias: ZHA Dormitorio IKEA Tradfri pánico
+  mode: restart
+  #
+  # Event Type: remote_button_short_press (turn_on), remote_button_long_press (dim_up)
+  #
+  triggers:
+    - device_id: dd68b0741084f8f1a5db454612648197
+      domain: zha
+      trigger: device
+      type: remote_button_short_press
+      subtype: turn_on
+      id: on_short_press
+    - device_id: dd68b0741084f8f1a5db454612648197
+      domain: zha
+      trigger: device
+      type: remote_button_long_press
+      subtype: dim_up
+      id: on_long_press
+  conditions: []
+  actions:
+    - choose:
+        # IF on_short_press: abre la ventana de 10 s (si ya está abierta, se ignora)
+        - conditions:
+          - condition: trigger
+            id: on_short_press
+          - condition: state
+            entity_id: timer.alarm_homy_panico_dormitorio
+            state: idle
+          sequence:
+            - action: timer.start
+              target:
+                entity_id: timer.alarm_homy_panico_dormitorio
+              data:
+                duration: "00:00:10"
+            - action: script.turn_on
+              target:
+                entity_id: script.alexa_decir
+              data:
+                variables:
+                  echos: [dormitorio]
+                  tipo: anuncio
+                  mensaje: Mantén pulsado para activar el pánico.
+        # ELIF on_long_press: confirma dentro de la ventana
+        - conditions:
+          - condition: trigger
+            id: on_long_press
+          - condition: state
+            entity_id: timer.alarm_homy_panico_dormitorio
+            state: active
+          sequence:
+            - action: timer.cancel
+              target:
+                entity_id: timer.alarm_homy_panico_dormitorio
+            - action: script.alarm_homy_panico
+              data:
+                tipo: panico_sonoro
+                origen: Pulsador dormitorio
+
 #  alias: ZHA Cocina IKEA Styrbar Dimmer
 - id: ZHA_L13
   alias: ZHA Cocina IKEA Styrbar Dimmer
